@@ -128,13 +128,13 @@ export const LeadForm = () => {
                     <h3 className="font-display text-2xl text-white mb-1">What's happening on your property?</h3>
                     <p className="text-white/50 text-sm mb-6">Select everything that applies.</p>
                     <div className="grid sm:grid-cols-2 gap-3">
-                      {ISSUE_OPTIONS.map((issue) => {
+                      {ISSUE_OPTIONS.map((issue, idx) => {
                         const active = form.issues.includes(issue);
                         return (
                           <button
                             key={issue}
                             type="button"
-                            data-testid={`issue-${issue.slice(0, 8).toLowerCase().replace(/\W/g, "")}`}
+                            data-testid={`issue-option-${idx}`}
                             onClick={() => toggleIssue(issue)}
                             className={`text-left px-4 py-3 rounded-sm border text-sm transition-colors ${
                               active
