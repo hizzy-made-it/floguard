@@ -7,8 +7,8 @@ export const COMPANY = {
   phone: "(386) 259-0023",
   phoneHref: "tel:+13862590023",
   smsHref: "sms:+13862590023",
-  email: "info@floguardfl.com",
-  emailHref: "mailto:info@floguardfl.com",
+  email: "sales@floguardfl.com",
+  emailHref: "mailto:sales@floguardfl.com",
   website: "FloGuardFL.com",
   address: "5114 S Ridgewood Ave, Port Orange, FL 32127",
   hours: "Mon–Fri · 8:00 AM – 5:00 PM",
@@ -54,7 +54,7 @@ export const NAV_LINKS = [
 ];
 
 export const STATS = [
-  { value: 500, suffix: "+", label: "Yards protected across Central Florida" },
+  { value: 100, suffix: "+", label: "Yards protected across Central Florida" },
   { value: 5.0, suffix: "★", label: "Average Google review rating", decimals: 1 },
   { value: 24, suffix: "hr", label: "Typical response for assessments" },
   { value: 15, suffix: "yr", label: "Warranty-backed system designs" },
