@@ -16,6 +16,7 @@ import BlogPost from "./pages/BlogPost";
 import Areas from "./pages/Areas";
 import CityPage from "./pages/CityPage";
 import Contact from "./pages/Contact";
+import Studio from "./pages/Studio";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 
@@ -63,6 +64,7 @@ function App() {
         <Routes>
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/studio" element={<Studio />} />
           <Route path="/*" element={<MarketingApp />} />
         </Routes>
       </BrowserRouter>

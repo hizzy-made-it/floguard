@@ -21,6 +21,13 @@ export async function submitLead(payload) {
   const { data } = await client.post("/leads", payload);
   return data;
 }
+export async function uploadPhoto(file) {
+  const fd = new FormData();
+  fd.append("file", file);
+  const { data } = await client.post("/upload", fd, { headers: { "Content-Type": "multipart/form-data" } });
+  return data; // { path, url }
+}
+export const fileUrl = (path) => `${API}/files/${path}`;
 export async function submitGuide(payload) {
   const { data } = await client.post("/guide", payload);
   return data;

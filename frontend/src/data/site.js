@@ -233,3 +233,98 @@ export const ISSUE_OPTIONS = [
 ];
 
 export const PROPERTY_TYPES = ["Single-family home", "Townhome", "Rental property", "Commercial", "Other"];
+
+// ---- Conversational lead-scoping quiz (landing page) ----
+export const QUIZ = [
+  {
+    id: "issues",
+    type: "multi",
+    q: "What's happening on your property?",
+    sub: "Select everything that applies.",
+    options: ISSUE_OPTIONS,
+  },
+  {
+    id: "water_location",
+    type: "multi",
+    q: "Where does the water collect?",
+    sub: "Select all the spots you're seeing water.",
+    options: [
+      "Backyard", "Front yard", "Side yard", "Driveway", "Patio or lanai",
+      "Around the foundation", "Crawlspace / under the home", "Garage", "Near the AC unit",
+    ],
+  },
+  {
+    id: "water_duration",
+    type: "single",
+    q: "After it rains, how long does the water stick around?",
+    sub: "This tells us how severe the drainage problem is.",
+    options: ["Drains within an hour", "A few hours", "About a day", "Several days", "It never fully dries"],
+  },
+  {
+    id: "frequency",
+    type: "single",
+    q: "How often does the flooding happen?",
+    options: ["Only in heavy storms", "Every time it rains", "Seasonally (rainy season)", "It's constant"],
+  },
+  {
+    id: "affected_size",
+    type: "single",
+    q: "Roughly how large is the problem area?",
+    options: ["A small spot", "A section of the yard", "Most of the yard", "Multiple areas", "Not sure"],
+  },
+  {
+    id: "existing_drainage",
+    type: "multi",
+    q: "Do you have any drainage in place now?",
+    sub: "Select all that apply.",
+    options: ["None", "Just gutters & downspouts", "An old French drain", "A sump pump", "A catch basin", "Not sure"],
+  },
+  {
+    id: "damages",
+    type: "multi",
+    q: "Noticed any of these signs of damage?",
+    sub: "Select all that apply.",
+    options: [
+      "Foundation cracks or moisture", "Mold or musty smell", "Dead grass or erosion",
+      "Water inside the home", "Damaged patio or driveway", "None yet",
+    ],
+  },
+  {
+    id: "timeline",
+    type: "single",
+    q: "How soon do you want this solved?",
+    options: ["ASAP — it's urgent", "Within the next month", "1–3 months", "Just researching"],
+  },
+  {
+    id: "property_type",
+    type: "single",
+    q: "What type of property is it?",
+    options: PROPERTY_TYPES,
+  },
+  {
+    id: "location",
+    type: "single",
+    q: "Which area are you in?",
+    options: [...SERVICE_AREAS, "Other / nearby"],
+  },
+  {
+    id: "photos",
+    type: "photos",
+    q: "Show us the problem area",
+    sub: "Optional — a few photos help us scope your project accurately before we arrive.",
+  },
+  {
+    id: "contact",
+    type: "contact",
+    q: "Where should we send your free assessment?",
+    sub: "A FloGuard specialist will reach out within 24 hours.",
+  },
+];
+
+export const LANDING_FAQ = [
+  { q: "Is the assessment really free?", a: "Yes. We come to your property, evaluate the water problem and give you a clear plan and quote at no cost and with no obligation." },
+  { q: "How fast can you come out?", a: "We typically schedule assessments within 24 hours and prioritize urgent, active flooding situations." },
+  { q: "Will my yard be torn up?", a: "No. We install beneath the surface and fully restore your landscaping — most systems are invisible once we're done." },
+  { q: "Do you guarantee the work?", a: "Every FloGuard system is engineered for your soil and slope and backed by a 15-year warranty-backed design." },
+  { q: "What areas do you serve?", a: "All of Central Florida — from Daytona and Port Orange through Sanford, Orlando and the surrounding communities." },
+];

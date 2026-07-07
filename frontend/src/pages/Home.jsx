@@ -17,10 +17,10 @@ import { COMPANY, IMAGES, SERVICE_AREAS } from "../data/site";
 import { wordContainer, wordChild, fadeUp, EASE } from "../lib/animations";
 import { Seo } from "../components/Seo";
 
-const FlowHero = lazy(() => import("../components/three/TrenchHero"));
+const FlowHero = lazy(() => import("../components/three/RainJourney3D"));
 
 const HeroFallback = () => (
-  <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, #dfeecb 0%, #b6d08a 42%, #7d9e59 100%)" }} />
+  <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, #93aab8 0%, #7b93a3 45%, #566b5a 100%)" }} />
 );
 
 const headline = ["Protected", "flow.", "Engineered", "trust."];
@@ -38,7 +38,7 @@ export default function Home() {
         <Suspense fallback={<HeroFallback />}>
           <ThreeBoundary fallback={<HeroFallback />}>
             <div className="absolute inset-0 z-[2]">
-              <FlowHero />
+              <FlowHero showCaptions={false} />
             </div>
           </ThreeBoundary>
         </Suspense>

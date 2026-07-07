@@ -3,8 +3,8 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-from fastapi import FastAPI, APIRouter, HTTPException, Request, Depends
-from fastapi.responses import StreamingResponse
+from fastapi import FastAPI, APIRouter, HTTPException, Request, Depends, UploadFile, File, Header, Query
+from fastapi.responses import StreamingResponse, Response
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
@@ -12,6 +12,7 @@ import os
 import io
 import asyncio
 import logging
+import requests
 from pydantic import BaseModel, Field, ConfigDict, EmailStr
 from typing import List, Optional
 from datetime import datetime, timezone, timedelta
@@ -34,6 +35,42 @@ logger = logging.getLogger(__name__)
 RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'onboarding@resend.dev')
 LEAD_NOTIFICATION_EMAIL = os.environ.get('LEAD_NOTIFICATION_EMAIL', 'sales@floguardfl.com')
+
+# ---- Object storage ----
+STORAGE_URL = "https://integrations.emergentagent.com/objstore/api/v1/storage"
+EMERGENT_KEY = os.environ.get("EMERGENT_LLM_KEY", "")
+APP_NAME = "floguard"
+MIME_TYPES = {"jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png",
+              "gif": "image/gif", "webp": "image/webp", "heic": "image/heic"}
+_storage_key = None
+
+
+def init_storage():
+    global _storage_key
+    if _storage_key:
+        return _storage_key
+    resp = requests.post(f"{STORAGE_URL}/init", json={"emergent_key": EMERGENT_KEY}, timeout=30)
+    resp.raise_for_status()
+    _storage_key = resp.json()["storage_key"]
+    return _storage_key
+
+
+def put_object(path: str, data: bytes, content_type: str) -> dict:
+    key = init_storage()
+    resp = requests.put(f"{STORAGE_URL}/objects/{path}",
+                        headers={"X-Storage-Key": key, "Content-Type": content_type},
+                        data=data, timeout=120)
+    resp.raise_for_status()
+    return resp.json()
+
+
+def get_object(path: str):
+    key = init_storage()
+    resp = requests.get(f"{STORAGE_URL}/objects/{path}",
+                        headers={"X-Storage-Key": key}, timeout=60)
+    resp.raise_for_status()
+    return resp.content, resp.headers.get("Content-Type", "application/octet-stream")
+
 
 # ---- Auth config ----
 JWT_ALGORITHM = "HS256"
@@ -94,6 +131,14 @@ class LeadCreate(BaseModel):
     location: Optional[str] = ""
     property_type: Optional[str] = Field(default="", alias="propertyType")
     issues: List[str] = []
+    water_location: List[str] = []
+    water_duration: Optional[str] = ""
+    frequency: Optional[str] = ""
+    affected_size: Optional[str] = ""
+    existing_drainage: List[str] = []
+    damages: List[str] = []
+    timeline: Optional[str] = ""
+    photos: List[str] = []
     message: Optional[str] = ""
     source: Optional[str] = "contact"
     model_config = ConfigDict(populate_by_name=True)
@@ -109,6 +154,14 @@ class Lead(BaseModel):
     location: str = ""
     property_type: str = ""
     issues: List[str] = []
+    water_location: List[str] = []
+    water_duration: str = ""
+    frequency: str = ""
+    affected_size: str = ""
+    existing_drainage: List[str] = []
+    damages: List[str] = []
+    timeline: str = ""
+    photos: List[str] = []
     message: str = ""
     source: str = "contact"
     status: str = "new"
@@ -120,21 +173,39 @@ class GuideRequest(BaseModel):
     email: EmailStr
 
 
+def _row(label, value):
+    return f'<tr><td style="padding:6px 0;"><b>{label}</b></td><td>{value or "&mdash;"}</td></tr>'
+
+
 def build_lead_email(lead: Lead) -> str:
-    issues = "".join(f"<li>{i}</li>" for i in lead.issues) or "<li>None specified</li>"
+    def li(items):
+        return "".join(f"<li>{i}</li>" for i in items) or "<li>None specified</li>"
+    header = 'Guide Download' if lead.source == 'guide' else 'Assessment Request'
+    photos_html = ""
+    if lead.photos:
+        photos_html = "<p style='color:#334155;'><b>Photos:</b> " + f"{len(lead.photos)} uploaded (view in dashboard)</p>"
     return f"""
-    <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;">
-      <h2 style="color:#1E2A52;">New FloGuard {('Guide Download' if lead.source=='guide' else 'Assessment Request')}</h2>
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+      <h2 style="color:#1E2A52;">New FloGuard {header}</h2>
       <table style="width:100%;border-collapse:collapse;font-size:14px;color:#334155;">
-        <tr><td style="padding:6px 0;"><b>Name</b></td><td>{lead.name}</td></tr>
-        <tr><td style="padding:6px 0;"><b>Phone</b></td><td>{lead.phone or '—'}</td></tr>
-        <tr><td style="padding:6px 0;"><b>Email</b></td><td>{lead.email}</td></tr>
-        <tr><td style="padding:6px 0;"><b>Property</b></td><td>{lead.property_type or '—'}</td></tr>
-        <tr><td style="padding:6px 0;"><b>Location</b></td><td>{lead.location or '—'}</td></tr>
-        <tr><td style="padding:6px 0;"><b>Source</b></td><td>{lead.source}</td></tr>
+        {_row('Name', lead.name)}
+        {_row('Phone', lead.phone)}
+        {_row('Email', lead.email)}
+        {_row('Property', lead.property_type)}
+        {_row('Location', lead.location)}
+        {_row('Address', lead.address)}
+        {_row('Water lingers', lead.water_duration)}
+        {_row('Frequency', lead.frequency)}
+        {_row('Problem size', lead.affected_size)}
+        {_row('Timeline', lead.timeline)}
+        {_row('Source', lead.source)}
       </table>
-      <p style="color:#334155;"><b>Issues:</b></p><ul style="color:#334155;">{issues}</ul>
-      <p style="color:#334155;"><b>Message:</b> {lead.message or '—'}</p>
+      <p style="color:#334155;"><b>Issues:</b></p><ul style="color:#334155;">{li(lead.issues)}</ul>
+      <p style="color:#334155;"><b>Where water collects:</b></p><ul style="color:#334155;">{li(lead.water_location)}</ul>
+      <p style="color:#334155;"><b>Existing drainage:</b></p><ul style="color:#334155;">{li(lead.existing_drainage)}</ul>
+      <p style="color:#334155;"><b>Damage seen:</b></p><ul style="color:#334155;">{li(lead.damages)}</ul>
+      {photos_html}
+      <p style="color:#334155;"><b>Message:</b> {lead.message or '&mdash;'}</p>
       <p style="color:#F57C1F;font-size:12px;">Submitted {lead.created_at}</p>
     </div>"""
 
@@ -249,6 +320,46 @@ async def root():
     return {"message": "FloGuard API"}
 
 
+@api_router.post("/upload")
+async def upload(file: UploadFile = File(...)):
+    ext = (file.filename.rsplit(".", 1)[-1] if "." in (file.filename or "") else "jpg").lower()
+    content_type = file.content_type or MIME_TYPES.get(ext, "application/octet-stream")
+    if not content_type.startswith("image/"):
+        raise HTTPException(status_code=422, detail="Only image files are allowed.")
+    data = await file.read()
+    if len(data) > 12 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="Image too large (max 12MB).")
+    path = f"{APP_NAME}/leads/{uuid.uuid4()}.{ext}"
+    try:
+        result = await asyncio.to_thread(put_object, path, data, content_type)
+    except Exception as e:
+        logger.error("Upload failed: %s", str(e))
+        raise HTTPException(status_code=502, detail="Upload failed. Please try again.")
+    await db.files.insert_one({
+        "id": str(uuid.uuid4()),
+        "storage_path": result["path"],
+        "original_filename": file.filename,
+        "content_type": content_type,
+        "size": result.get("size", len(data)),
+        "is_deleted": False,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+    return {"path": result["path"], "url": f"/api/files/{result['path']}"}
+
+
+@api_router.get("/files/{path:path}")
+async def serve_file(path: str):
+    record = await db.files.find_one({"storage_path": path, "is_deleted": False})
+    if not record:
+        raise HTTPException(status_code=404, detail="File not found")
+    try:
+        data, content_type = await asyncio.to_thread(get_object, path)
+    except Exception:
+        raise HTTPException(status_code=404, detail="File not found")
+    return Response(content=data, media_type=record.get("content_type", content_type),
+                    headers={"Cache-Control": "public, max-age=86400"})
+
+
 @api_router.post("/leads", response_model=Lead)
 async def create_lead(payload: LeadCreate):
     if not payload.name.strip():
@@ -257,6 +368,10 @@ async def create_lead(payload: LeadCreate):
         name=payload.name.strip(), email=payload.email, phone=(payload.phone or "").strip(),
         address=payload.address or "", location=payload.location or "",
         property_type=payload.property_type or "", issues=payload.issues or [],
+        water_location=payload.water_location or [], water_duration=payload.water_duration or "",
+        frequency=payload.frequency or "", affected_size=payload.affected_size or "",
+        existing_drainage=payload.existing_drainage or [], damages=payload.damages or [],
+        timeline=payload.timeline or "", photos=payload.photos or [],
         message=payload.message or "", source=payload.source or "contact",
     )
     await db.leads.insert_one(lead.model_dump())
@@ -323,8 +438,14 @@ async def startup():
     try:
         await db.users.create_index("email", unique=True)
         await db.login_attempts.create_index("identifier")
+        await db.files.create_index("storage_path")
     except Exception as e:
         logger.warning("index creation: %s", e)
+    try:
+        await asyncio.to_thread(init_storage)
+        logger.info("Object storage initialized")
+    except Exception as e:
+        logger.error("Storage init failed: %s", e)
     admin_email = os.environ.get("ADMIN_EMAIL", "admin@floguardfl.com").lower()
     admin_password = os.environ.get("ADMIN_PASSWORD", "admin123")
     existing = await db.users.find_one({"email": admin_email})
