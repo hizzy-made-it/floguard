@@ -3,7 +3,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Lightformer, Float } from "@react-three/drei";
 import * as THREE from "three";
 
-/* --- Curves: elegant flowing paths sweeping diagonally across the frame --- */
+/* --- Curves: French drain tubing sweeping diagonally across the frame --- */
 function buildCurve(offsetY, offsetZ, amp) {
   const pts = [];
   for (let i = 0; i <= 6; i++) {
@@ -15,22 +15,32 @@ function buildCurve(offsetY, offsetZ, amp) {
   return new THREE.CatmullRomCurve3(pts, false, "catmullrom", 0.5);
 }
 
-/* Bright flowing core = the controlled fluid / energy path */
-function FlowCore({ curve }) {
-  const geo = useMemo(() => new THREE.TubeGeometry(curve, 220, 0.17, 18, false), [curve]);
+/* Rain water flowing through the tube — translucent blue core */
+function WaterFlow({ curve }) {
+  const geo = useMemo(() => new THREE.TubeGeometry(curve, 240, 0.2, 18, false), [curve]);
   const mat = useRef();
   useFrame((s) => {
-    if (mat.current) mat.current.emissiveIntensity = 4.5 + Math.sin(s.clock.elapsedTime * 1.4) * 1.6;
+    if (mat.current) mat.current.emissiveIntensity = 1.4 + Math.sin(s.clock.elapsedTime * 1.6) * 0.6;
   });
   return (
     <mesh geometry={geo}>
-      <meshStandardMaterial ref={mat} color="#ffc07a" emissive="#F57C1F" emissiveIntensity={5} toneMapped={false} />
+      <meshStandardMaterial
+        ref={mat}
+        color="#3aa7e8"
+        emissive="#2f9fe0"
+        emissiveIntensity={1.6}
+        metalness={0.2}
+        roughness={0.15}
+        transparent
+        opacity={0.92}
+        toneMapped={false}
+      />
     </mesh>
   );
 }
 
-/* Protective metal guard-rings threaded along the flow = the channel structure */
-function GuardRings({ curve, count = 16 }) {
+/* Corrugated French drain pipe ribs threaded densely along the water path */
+function CorrugatedPipe({ curve, count = 34 }) {
   const frames = useMemo(() => {
     const arr = [];
     const z = new THREE.Vector3(0, 0, 1);
@@ -48,16 +58,16 @@ function GuardRings({ curve, count = 16 }) {
     <>
       {frames.map((f, i) => (
         <mesh key={i} position={f.pos} quaternion={f.quat}>
-          <torusGeometry args={[0.36, 0.07, 14, 30]} />
-          <meshStandardMaterial color="#8093b4" metalness={1} roughness={0.28} envMapIntensity={2.6} />
+          <torusGeometry args={[0.3, 0.055, 12, 26]} />
+          <meshStandardMaterial color="#1c2735" metalness={0.35} roughness={0.55} envMapIntensity={1.2} />
         </mesh>
       ))}
     </>
   );
 }
 
-/* Emissive pulses that travel through the flow */
-function FlowPulses({ curve, count = 4, speed = 0.06, reduced }) {
+/* Bright pulses of water surging through the tubing */
+function WaterPulses({ curve, count = 4, speed = 0.06, reduced }) {
   const refs = useRef([]);
   useFrame((state) => {
     const base = reduced ? 0.5 : (state.clock.elapsedTime * speed) % 1;
@@ -67,7 +77,7 @@ function FlowPulses({ curve, count = 4, speed = 0.06, reduced }) {
       const m = refs.current[i];
       if (m) {
         m.position.copy(p);
-        m.scale.setScalar(0.8 + Math.sin(t * Math.PI) * 0.9);
+        m.scale.setScalar(0.7 + Math.sin(t * Math.PI) * 0.8);
       }
     }
   });
@@ -75,21 +85,59 @@ function FlowPulses({ curve, count = 4, speed = 0.06, reduced }) {
     <>
       {Array.from({ length: count }).map((_, i) => (
         <mesh key={i} ref={(el) => (refs.current[i] = el)}>
-          <sphereGeometry args={[0.3, 20, 20]} />
-          <meshStandardMaterial color="#fff2e0" emissive="#F57C1F" emissiveIntensity={9} toneMapped={false} />
+          <sphereGeometry args={[0.19, 18, 18]} />
+          <meshStandardMaterial color="#dff3ff" emissive="#5cc4ff" emissiveIntensity={6} toneMapped={false} />
         </mesh>
       ))}
     </>
   );
 }
 
-/* Smoked-glass protective shield form behind the flow */
+/* Falling rain feeding the drain system */
+function Rain({ count = 200, reduced }) {
+  const ref = useRef();
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const drops = useMemo(
+    () =>
+      Array.from({ length: count }, () => ({
+        x: (Math.random() - 0.5) * 20,
+        y: Math.random() * 14 - 3,
+        z: (Math.random() - 0.5) * 9 - 1,
+        speed: 7 + Math.random() * 7,
+        len: 0.3 + Math.random() * 0.6,
+      })),
+    [count]
+  );
+  useFrame((_, delta) => {
+    if (!ref.current) return;
+    const dt = reduced ? 0 : Math.min(delta, 0.05);
+    for (let i = 0; i < count; i++) {
+      const d = drops[i];
+      d.y -= d.speed * dt;
+      if (d.y < -4) d.y = 8 + Math.random() * 4;
+      dummy.position.set(d.x, d.y, d.z);
+      dummy.scale.set(1, d.len, 1);
+      dummy.rotation.set(0, 0, 0.14);
+      dummy.updateMatrix();
+      ref.current.setMatrixAt(i, dummy.matrix);
+    }
+    ref.current.instanceMatrix.needsUpdate = true;
+  });
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, count]}>
+      <boxGeometry args={[0.014, 1, 0.014]} />
+      <meshStandardMaterial color="#cfe9ff" emissive="#8fcbff" emissiveIntensity={1.4} transparent opacity={0.45} toneMapped={false} />
+    </instancedMesh>
+  );
+}
+
+/* Smoked-glass protective shield form behind the tubing */
 function ShieldPanel() {
   return (
     <Float speed={1.2} rotationIntensity={0.12} floatIntensity={0.4}>
       <mesh position={[2.4, 0.6, -1.4]} rotation={[0, -0.5, 0.08]}>
         <boxGeometry args={[2.8, 3.8, 0.06]} />
-        <meshPhysicalMaterial transmission={0.9} thickness={0.6} roughness={0.15} ior={1.4} color="#22335e" metalness={0} transparent opacity={0.8} />
+        <meshPhysicalMaterial transmission={0.9} thickness={0.6} roughness={0.15} ior={1.4} color="#1f3358" metalness={0} transparent opacity={0.8} />
       </mesh>
     </Float>
   );
@@ -118,33 +166,35 @@ function Scene({ reduced }) {
   );
 
   useFrame((state, delta) => {
-    if (group.current && !reduced) group.current.rotation.y += delta * 0.018;
+    if (group.current && !reduced) group.current.rotation.y += delta * 0.016;
   });
 
   return (
     <>
       <fog attach="fog" args={["#0B0F1A", 15, 34]} />
-      <hemisphereLight intensity={0.6} color="#9fb4d8" groundColor="#0B0F1A" />
+      <hemisphereLight intensity={0.6} color="#9fc4e8" groundColor="#0B0F1A" />
       <ambientLight intensity={0.4} />
-      <directionalLight position={[6, 7, 5]} intensity={2.2} color="#dce8ff" />
-      <spotLight position={[-6, 3, 4]} angle={0.6} penumbra={1} intensity={120} color="#F57C1F" distance={34} />
-      <pointLight position={[5, -2, 3]} intensity={50} color="#5a7cff" distance={24} />
+      <directionalLight position={[6, 7, 5]} intensity={2.2} color="#dcefff" />
+      <spotLight position={[-6, 4, 4]} angle={0.6} penumbra={1} intensity={110} color="#5cc4ff" distance={34} />
+      <pointLight position={[5, -2, 3]} intensity={40} color="#F57C1F" distance={22} />
+
+      <Rain count={200} reduced={reduced} />
 
       <group ref={group} position={[0.6, 0.6, 0]} rotation={[0.08, -0.32, -0.12]} scale={1.15}>
         {curves.map((c, i) => (
           <group key={i}>
-            <FlowCore curve={c} />
-            <GuardRings curve={c} count={16} />
-            <FlowPulses curve={c} count={4} speed={0.05 + i * 0.015} reduced={reduced} />
+            <WaterFlow curve={c} />
+            <CorrugatedPipe curve={c} count={34} />
+            <WaterPulses curve={c} count={4} speed={0.05 + i * 0.015} reduced={reduced} />
           </group>
         ))}
         <ShieldPanel />
       </group>
 
       <Environment resolution={256}>
-        <Lightformer form="rect" intensity={3} position={[0, 5, -6]} scale={[14, 5, 1]} color="#aebfdc" />
-        <Lightformer form="rect" intensity={5} position={[-6, 2, 3]} scale={[4, 8, 1]} color="#F57C1F" />
-        <Lightformer form="rect" intensity={3} position={[6, 0, 4]} scale={[4, 8, 1]} color="#5a7cff" />
+        <Lightformer form="rect" intensity={3} position={[0, 5, -6]} scale={[14, 5, 1]} color="#aecdec" />
+        <Lightformer form="rect" intensity={5} position={[-6, 2, 3]} scale={[4, 8, 1]} color="#5cc4ff" />
+        <Lightformer form="rect" intensity={2.4} position={[6, 0, 4]} scale={[4, 8, 1]} color="#F57C1F" />
         <Lightformer form="ring" intensity={2} position={[0, 2, 5]} scale={5} color="#ffffff" />
       </Environment>
 
