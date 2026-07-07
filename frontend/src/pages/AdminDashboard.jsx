@@ -89,8 +89,8 @@ export default function AdminDashboard() {
               className="bg-brand-surface border border-white/10 rounded-sm p-5"
             >
               <c.icon size={20} className="text-brand-orange mb-3" />
-              <div className="font-display text-3xl">{c.value}</div>
-              <div className="text-sm text-white/50 mt-1">{c.label}</div>
+              <div className="font-display text-3xl text-white">{c.value}</div>
+              <div className="text-sm text-white/60 mt-1">{c.label}</div>
             </motion.div>
           ))}
         </div>

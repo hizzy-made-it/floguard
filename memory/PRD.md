@@ -48,3 +48,12 @@ hero blending into a clean, trust-focused light body. Phone (386) 259-0023, 5.0 
 - **P1**: Optional admin dashboard to view/manage submitted leads (`GET /api/leads` already exists).
 - **P2**: Blog / service-area landing pages for local SEO; sitemap.xml + robots.txt.
 - **P2**: Add @react-three/postprocessing bloom for extra hero glow (perf permitting).
+
+
+## Session 3 additions (2026-07-07)
+- **Local SEO**: `/areas` index + dynamic `/areas/:slug` city pages for 8 Central Florida cities (`data/cities.js`); "Areas" added to nav (8 links).
+- **Lead engine**: JWT (Bearer/localStorage) admin auth — `/admin/login` + protected `/admin` dashboard (stats cards, searchable leads table, source filter, per-lead status update). Backend: `/api/auth/login`, `/api/auth/me`, protected `GET /api/leads`, `/api/leads/stats`, `PATCH /api/leads/{id}`; idempotent admin seed. Admin: admin@floguardfl.com / FloGuard2026!.
+- **Lead magnet**: "Florida Drainage Guide" auto-generated PDF, email-gated (`POST /api/guide`, `GET /api/guide/download` via reportlab); `GuideDownload` on Blog; leads saved source="guide".
+- **Proof**: Google-style `GoogleReviews` section on Home.
+- **Elite polish**: cinematic Bloom postprocessing on the 3D rain/water hero.
+- Testing iteration_2: **backend 100% (11/11), frontend 100%**. Fixed dashboard contrast; set CORS `allow_credentials=False` (Bearer-token app). Cleared all test/seed leads for a clean production start.
