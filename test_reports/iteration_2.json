@@ -1,0 +1,30 @@
+{
+  "summary": "Iteration 2 covers new admin JWT auth, protected leads endpoints, lead-magnet PDF guide, city landing pages, and Google reviews section. Backend 11/11 pytest passed. Frontend E2E passed for admin login/dashboard/logout, ProtectedRoute redirect, guide download success, /areas grid + Daytona/Orlando city pages, Google reviews section on home, and Areas nav link.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/admin dashboard stats cards", "issues": ["Total leads stats card text/number appears very low-contrast (dim gray on dark surface) — icon and '6' number are barely readable. Consider brighter text (text-white/90) for the number and stronger label color."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "Optional: improve contrast on Lead dashboard stats card (currently very dim)."
+  ],
+  "critical_code_review_comments": [
+    "Auth implementation follows playbook: bcrypt ($2b$), JWT HS256, brute-force lockout after 5 attempts (15 min), idempotent seed_admin that updates password if changed — verified.",
+    "get_current_admin: uses Bearer header only (no httpOnly cookie). Playbook mentions httpOnly cookies but this app uses localStorage bearer tokens by design (documented). Acceptable, but if cookie-based required, needs refactor.",
+    "GET /api/leads and /api/leads/stats exclude _id correctly via {'_id':0}.",
+    "PATCH /api/leads/{id} accepts arbitrary status string (no enum). Consider validating status values (new|contacted|scheduled|closed).",
+    "server.py:315 CORS allow_origins defaults to ['*'] with allow_credentials=True — invalid combo per CORS spec when credentials used. Set explicit origins via CORS_ORIGINS env var in production.",
+    "generate_guide_pdf regenerated on every /api/guide/download call — fine for low volume, but cache in-memory once for perf if traffic grows."
+  ],
+  "updated_files": ["/app/backend/tests/backend_test.py", "/app/test_reports/iteration_2.json"],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "admin@floguardfl.com / FloGuard2026!",
+  "seed_data_creation": "Created leads via API: TEST_John Doe (contact), TEST_Guide User (guide), TEST_Guide FE (guide) via frontend E2E.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend URL from frontend/.env. All admin routes require Bearer token in Authorization header stored in localStorage['fg_admin_token']. Loader intro (~1.4s) can be bypassed via sessionStorage.setItem('fg_loaded','1'). Brute-force lockout after 5 failed logins per ip+email for 15 minutes — use unique wrong password if re-testing to avoid interference (test uses one-off password once)."
+}

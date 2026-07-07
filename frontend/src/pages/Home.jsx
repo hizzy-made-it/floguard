@@ -9,6 +9,7 @@ import { ServicesGrid } from "../components/ServicesGrid";
 import { ProcessTimeline } from "../components/ProcessTimeline";
 import { FlowPath } from "../components/FlowPath";
 import { Testimonials } from "../components/Testimonials";
+import { GoogleReviews } from "../components/GoogleReviews";
 import { FinalCTA } from "../components/FinalCTA";
 import { LeadForm } from "../components/LeadForm";
 import { COMPANY, IMAGES, SERVICE_AREAS } from "../data/site";
@@ -232,6 +233,8 @@ export default function Home() {
       </section>
 
       <Testimonials />
+
+      <GoogleReviews />
 
       {/* ===== LEAD SECTION ===== */}
       <section data-testid="home-lead" className="section bg-brand-ink grain relative">

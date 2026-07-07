@@ -5,6 +5,7 @@ import { ArrowUpRight, Calendar, Clock } from "lucide-react";
 import { PageHero } from "../components/PageHero";
 import { FinalCTA } from "../components/FinalCTA";
 import { POSTS, BLOG_CATEGORIES, formatDate } from "../data/blog";
+import { GuideDownload } from "../components/GuideDownload";
 import { IMAGES } from "../data/site";
 import { EASE, viewportOnce } from "../lib/animations";
 
@@ -107,6 +108,8 @@ export default function Blog() {
           </motion.div>
         </div>
       </section>
+
+      <GuideDownload />
 
       <FinalCTA />
     </>

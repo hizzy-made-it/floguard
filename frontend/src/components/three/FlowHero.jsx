@@ -1,6 +1,7 @@
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Lightformer, Float } from "@react-three/drei";
+import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import * as THREE from "three";
 
 /* --- Curves: French drain tubing sweeping diagonally across the frame --- */
@@ -199,6 +200,10 @@ function Scene({ reduced }) {
       </Environment>
 
       <Rig reduced={reduced} />
+
+      <EffectComposer disableNormalPass>
+        <Bloom mipmapBlur intensity={0.85} luminanceThreshold={0.8} luminanceSmoothing={0.25} radius={0.7} />
+      </EffectComposer>
     </>
   );
 }
