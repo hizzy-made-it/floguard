@@ -39,7 +39,7 @@ export const Navbar = () => {
           </span>
         </Link>
 
-        <div className="hidden lg:flex items-center gap-9">
+        <div className="hidden lg:flex items-center gap-6 xl:gap-8">
           {NAV_LINKS.map((l) => {
             const active = location.pathname === l.to;
             return (
@@ -61,7 +61,7 @@ export const Navbar = () => {
           <a
             href={COMPANY.phoneHref}
             data-testid="nav-phone"
-            className="hidden md:inline-flex items-center gap-2 text-sm font-medium text-white/80 hover:text-white transition-colors"
+            className="hidden xl:inline-flex items-center gap-2 text-sm font-medium text-white/80 hover:text-white transition-colors"
           >
             <Phone size={15} className="text-brand-orange" />
             {COMPANY.phone}

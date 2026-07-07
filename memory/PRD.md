@@ -34,9 +34,13 @@ hero blending into a clean, trust-focused light body. Phone (386) 259-0023, 5.0 
 - Shared: Navbar (sticky, blur, hide-on-scroll, mobile menu), Footer (JSON-LD LocalBusiness in index.html).
 
 ## Status
-- Testing agent iteration_1: **backend 100%, frontend 100%**. Lead form E2E persists to MongoDB; nav,
-  carousel, filters, modal/before-after slider, accordion, mobile menu all functional.
-- Fixed: duplicate issue-chip data-testids (now `issue-option-{idx}`).
+- Testing agent iteration_1: **backend 100%, frontend 100%**.
+- Added (2026-07-07, session 2): **Blog system** — `/blog` listing (featured post + category-filtered grid) and
+  `/blog/:slug` article pages with read-progress bar, content-block renderer (h2/p/ul/quote), inline CTA,
+  related posts, and per-post document.title for SEO. 8 SEO-keyword posts in `data/blog.js`, dated weekly
+  (2026-05-18 → 2026-07-06). Verified rendering via content crawl.
+- Elite UX layer: branded **intro Loader** (once/session, reduced-motion safe), **service-area Marquee** ticker
+  on Home, custom cursor, scroll progress, magnetic-style CTA hovers. Nav extended to 7 links incl. Blog.
 
 ## Backlog / Next Action Items
 - **P0**: Add real `RESEND_API_KEY` (+ verified sender/recipient) to enable lead-notification emails.

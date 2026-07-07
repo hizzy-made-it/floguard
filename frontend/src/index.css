@@ -67,6 +67,13 @@
     transition: background-size 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .link-underline:hover { background-size: 100% 2px; }
+
+  .marquee-track { animation: fg-marquee 32s linear infinite; }
+}
+
+@keyframes fg-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 
 /* Custom cursor (desktop pointer devices only) */

@@ -49,6 +49,7 @@ export const NAV_LINKS = [
   { label: "How It Works", to: "/process" },
   { label: "Services", to: "/services" },
   { label: "Results", to: "/case-studies" },
+  { label: "Blog", to: "/blog" },
   { label: "About", to: "/about" },
   { label: "Contact", to: "/contact" },
 ];

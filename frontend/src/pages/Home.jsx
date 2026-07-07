@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowUpRight, Phone, ArrowDown } from "lucide-react";
 import { Reveal } from "../components/Reveal";
 import { StatsBar } from "../components/StatsBar";
+import { Marquee } from "../components/Marquee";
 import { ServicesGrid } from "../components/ServicesGrid";
 import { ProcessTimeline } from "../components/ProcessTimeline";
 import { FlowPath } from "../components/FlowPath";
@@ -125,6 +126,8 @@ export default function Home() {
       </section>
 
       <StatsBar />
+
+      <Marquee />
 
       {/* ===== PROBLEM / AGITATION (light) ===== */}
       <section data-testid="problem-section" className="section bg-background">
