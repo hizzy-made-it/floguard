@@ -5,6 +5,7 @@ import { ArrowUpRight, Phone, ArrowDown } from "lucide-react";
 import { Reveal } from "../components/Reveal";
 import { StatsBar } from "../components/StatsBar";
 import { Marquee } from "../components/Marquee";
+import { ThreeBoundary } from "../components/ThreeBoundary";
 import { ServicesGrid } from "../components/ServicesGrid";
 import { ProcessTimeline } from "../components/ProcessTimeline";
 import { FlowPath } from "../components/FlowPath";
@@ -14,48 +15,39 @@ import { FinalCTA } from "../components/FinalCTA";
 import { LeadForm } from "../components/LeadForm";
 import { COMPANY, IMAGES, SERVICE_AREAS } from "../data/site";
 import { wordContainer, wordChild, fadeUp, EASE } from "../lib/animations";
+import { Seo } from "../components/Seo";
 
-const FlowHero = lazy(() => import("../components/three/FlowHero"));
+const FlowHero = lazy(() => import("../components/three/TrenchHero"));
 
-const HeroFallback = () => <div className="absolute inset-0" />;
+const HeroFallback = () => (
+  <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, #dfeecb 0%, #b6d08a 42%, #7d9e59 100%)" }} />
+);
 
 const headline = ["Protected", "flow.", "Engineered", "trust."];
 
 export default function Home() {
   return (
     <>
+      <Seo
+        title="FloGuard LLC — French Drain & Sump Pump Flood Solutions | Central Florida"
+        description="Flooded yard, wet crawlspace or foundation damage? FloGuard engineers custom French drain and sump pump systems that keep Central Florida homes dry. Request a free drainage assessment."
+        path="/"
+      />
       {/* ===== 3D HERO ===== */}
-      <section data-testid="home-hero" className="relative h-[100svh] min-h-[640px] w-full overflow-hidden bg-brand-ink grain">
-        {/* cinematic backdrop — always premium, even before/without WebGL */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(120% 90% at 78% 12%, rgba(245,124,31,0.20), transparent 52%), radial-gradient(90% 80% at 12% 95%, rgba(30,42,82,0.6), transparent 60%), radial-gradient(60% 60% at 60% 55%, rgba(90,124,255,0.10), transparent 60%)",
-          }}
-        />
-        <div
-          className="absolute inset-0 opacity-[0.05]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
-            backgroundSize: "64px 64px",
-            maskImage: "radial-gradient(100% 100% at 70% 20%, black, transparent 70%)",
-            WebkitMaskImage: "radial-gradient(100% 100% at 70% 20%, black, transparent 70%)",
-          }}
-        />
-
+      <section data-testid="home-hero" className="relative h-[100svh] min-h-[640px] w-full overflow-hidden bg-brand-ink">
         <Suspense fallback={<HeroFallback />}>
-          <div className="absolute inset-0 z-[2]">
-            <FlowHero />
-          </div>
+          <ThreeBoundary fallback={<HeroFallback />}>
+            <div className="absolute inset-0 z-[2]">
+              <FlowHero />
+            </div>
+          </ThreeBoundary>
         </Suspense>
 
-        {/* readability gradient — keep the top clear so the 3D reads */}
-        <div className="pointer-events-none absolute inset-0 z-[3] bg-gradient-to-t from-brand-ink via-brand-ink/40 via-45% to-transparent" />
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-2/3 z-[3] bg-gradient-to-r from-brand-ink/50 to-transparent" />
+        {/* readability scrim — darken the lower half so the headline + CTA read cleanly */}
+        <div className="pointer-events-none absolute inset-0 z-[3] bg-gradient-to-t from-brand-ink via-brand-ink/75 via-35% to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-24 z-[3] bg-gradient-to-b from-brand-ink/40 to-transparent" />
 
-        <div className="relative z-10 h-full container-fg flex flex-col justify-end pb-24 pt-28">
+        <div className="pointer-events-none relative z-10 h-full container-fg flex flex-col justify-end pb-24 pt-28">
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -96,7 +88,7 @@ export default function Home() {
             initial="hidden"
             animate="visible"
             transition={{ delay: 1.05 }}
-            className="mt-9 flex flex-wrap items-center gap-4"
+            className="pointer-events-auto mt-9 flex flex-wrap items-center gap-4"
           >
             <Link
               to="/contact"

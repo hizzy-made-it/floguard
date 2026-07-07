@@ -7,10 +7,16 @@ import { FinalCTA } from "../components/FinalCTA";
 import { CITIES } from "../data/cities";
 import { IMAGES } from "../data/site";
 import { EASE, viewportOnce } from "../lib/animations";
+import { Seo } from "../components/Seo";
 
 export default function Areas() {
   return (
     <>
+      <Seo
+        title="Areas We Serve — Drainage & French Drains Across Central Florida | FloGuard"
+        description="FloGuard installs French drain and sump pump systems across Daytona Beach, Port Orange, Sanford, Orlando and the Central Florida corridor. Free assessments."
+        path="/areas"
+      />
       <PageHero
         overline="Areas We Serve"
         title="Drainage experts across Central Florida."

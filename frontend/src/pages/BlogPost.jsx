@@ -3,7 +3,8 @@ import { Link, useParams, Navigate } from "react-router-dom";
 import { motion, useScroll, useSpring } from "framer-motion";
 import { ArrowLeft, ArrowUpRight, Calendar, Clock, Phone } from "lucide-react";
 import { getPost, POSTS, formatDate } from "../data/blog";
-import { COMPANY } from "../data/site";
+import { COMPANY, IMAGES } from "../data/site";
+import { Seo } from "../components/Seo";
 import { EASE } from "../lib/animations";
 
 function Block({ block }) {
@@ -49,6 +50,31 @@ export default function BlogPost() {
 
   return (
     <>
+      <Seo
+        title={`${post.title} — FloGuard LLC`}
+        description={post.excerpt}
+        path={`/blog/${post.slug}`}
+        image={post.image}
+        type="article"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          headline: post.title,
+          description: post.excerpt,
+          image: post.image,
+          datePublished: post.date,
+          dateModified: post.date,
+          keywords: post.keyword,
+          articleSection: post.category,
+          author: { "@type": "Organization", name: "FloGuard, LLC" },
+          publisher: {
+            "@type": "Organization",
+            name: "FloGuard, LLC",
+            logo: { "@type": "ImageObject", url: IMAGES.logo },
+          },
+          mainEntityOfPage: `https://www.floguardfl.com/blog/${post.slug}`,
+        }}
+      />
       {/* article read progress */}
       <motion.div style={{ scaleX }} className="fixed top-0 left-0 right-0 h-[3px] bg-brand-orange origin-left z-[61]" />
 

@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, ArrowRight, X } from "lucide-react";
 import { PageHero } from "../components/PageHero";
+import { Seo } from "../components/Seo";
 import { Reveal } from "../components/Reveal";
 import { FinalCTA } from "../components/FinalCTA";
 import { CASE_STUDIES, CASE_FILTERS, IMAGES } from "../data/site";
@@ -50,6 +51,7 @@ export default function CaseStudies() {
 
   return (
     <>
+      <Seo title="Results & Case Studies — Before & After Drainage Projects | FloGuard" description="See real Central Florida yards transformed from flooded to bone dry. Drag the before/after slider on our French drain and sump pump projects." path="/case-studies" />
       <PageHero
         overline="Results & Case Studies"
         title="From swamped to bone dry."

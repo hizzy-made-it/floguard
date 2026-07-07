@@ -15,7 +15,7 @@ export const Loader = () => {
     const t = setTimeout(() => {
       sessionStorage.setItem("fg_loaded", "1");
       setDone(true);
-    }, 1400);
+    }, 900);
     return () => clearTimeout(t);
   }, [done]);
 
@@ -49,7 +49,7 @@ export const Loader = () => {
               <motion.div
                 initial={{ width: "0%" }}
                 animate={{ width: "100%" }}
-                transition={{ duration: 1.1, ease: EASE }}
+                transition={{ duration: 0.8, ease: EASE }}
                 className="h-full bg-brand-orange"
               />
             </div>

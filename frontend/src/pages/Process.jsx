@@ -1,4 +1,5 @@
 import { PageHero } from "../components/PageHero";
+import { Seo } from "../components/Seo";
 import { Reveal } from "../components/Reveal";
 import { FlowPath } from "../components/FlowPath";
 import { ProcessTimeline } from "../components/ProcessTimeline";
@@ -10,6 +11,7 @@ import { Link } from "react-router-dom";
 export default function Process() {
   return (
     <>
+      <Seo title="How It Works — French Drain to Sump Pump to Safe Discharge | FloGuard" description="See exactly how FloGuard's engineered drainage works: surface water → gravel trench → perforated pipe → sump basin → safe discharge. Free assessments." path="/process" />
       <PageHero
         overline="Technology & Process"
         title="How FloGuard keeps your home dry."

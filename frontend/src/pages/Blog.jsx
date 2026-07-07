@@ -8,6 +8,7 @@ import { POSTS, BLOG_CATEGORIES, formatDate } from "../data/blog";
 import { GuideDownload } from "../components/GuideDownload";
 import { IMAGES } from "../data/site";
 import { EASE, viewportOnce } from "../lib/animations";
+import { Seo } from "../components/Seo";
 
 export default function Blog() {
   const [filter, setFilter] = useState("All");
@@ -18,6 +19,11 @@ export default function Blog() {
 
   return (
     <>
+      <Seo
+        title="Florida Drainage Blog — French Drains, Sump Pumps & Flood Tips | FloGuard"
+        description="Practical guides on French drains, sump pumps, standing water and flood protection for Central Florida homeowners, from the FloGuard crew."
+        path="/blog"
+      />
       <PageHero
         overline="FloGuard Journal"
         title="Drainage know-how for Florida homeowners."

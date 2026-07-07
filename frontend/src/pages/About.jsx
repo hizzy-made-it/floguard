@@ -1,4 +1,5 @@
 import { PageHero } from "../components/PageHero";
+import { Seo } from "../components/Seo";
 import { Reveal, RevealGroup, RevealItem } from "../components/Reveal";
 import { FinalCTA } from "../components/FinalCTA";
 import { VALUES, IMAGES, COMPANY, STATS } from "../data/site";
@@ -9,6 +10,7 @@ const VALUE_ICONS = [ShieldCheck, Users, MapPin, Award];
 export default function About() {
   return (
     <>
+      <Seo title="About FloGuard — Local, Family-Run Drainage Experts in Central Florida" description="FloGuard is a local, family-run flood & drainage contractor engineering custom French drain and sump pump systems for Central Florida homes." path="/about" />
       <PageHero
         overline="About FloGuard"
         title="A local team that takes flooding personally."

@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { Phone, MessageSquare, Mail, MapPin, Clock } from "lucide-react";
 import { Reveal } from "../components/Reveal";
 import { LeadForm } from "../components/LeadForm";
+import { Seo } from "../components/Seo";
+import { ThreeBoundary } from "../components/ThreeBoundary";
 import { COMPANY } from "../data/site";
 import { wordContainer, wordChild, fadeUp, EASE } from "../lib/animations";
 
@@ -18,6 +20,7 @@ export default function Contact() {
   const title = "Request your free assessment.".split(" ");
   return (
     <>
+      <Seo title="Contact FloGuard — Request a Free Drainage Assessment | Central Florida" description="Book a free, on-site drainage assessment. Call (386) 259-0023 or request an inspection online. Serving Daytona, Port Orange, Sanford & Orlando." path="/contact" />
       {/* Animated hero (no full 3D) */}
       <section data-testid="contact-hero" className="relative bg-brand-ink text-white grain overflow-hidden pt-36 pb-16">
         <div className="container-fg relative z-10 grid lg:grid-cols-12 gap-10 items-center">
@@ -34,7 +37,9 @@ export default function Contact() {
           </div>
           <div className="lg:col-span-4 h-52 lg:h-64 rounded-sm overflow-hidden border border-white/10">
             <Suspense fallback={<div className="w-full h-full bg-brand-surface" />}>
-              <MiniShield />
+              <ThreeBoundary fallback={<div className="w-full h-full bg-brand-surface flex items-center justify-center text-white/20 font-display text-3xl">FloGuard</div>}>
+                <MiniShield />
+              </ThreeBoundary>
             </Suspense>
           </div>
         </div>

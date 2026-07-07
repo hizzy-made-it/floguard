@@ -10,6 +10,7 @@ import { Testimonials } from "../components/Testimonials";
 import { FinalCTA } from "../components/FinalCTA";
 import { getCity, CITIES } from "../data/cities";
 import { COMPANY } from "../data/site";
+import { Seo } from "../components/Seo";
 import { EASE, viewportOnce } from "../lib/animations";
 
 export default function CityPage() {
@@ -29,6 +30,30 @@ export default function CityPage() {
 
   return (
     <>
+      <Seo
+        title={`French Drains & Drainage in ${city.name}, FL — FloGuard LLC`}
+        description={`Professional French drain, sump pump & yard drainage in ${city.name}, ${city.county}. Stop standing water and protect your foundation. Free assessments.`}
+        path={`/areas/${city.slug}`}
+        image={city.image}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          name: `FloGuard, LLC — Drainage in ${city.name}`,
+          description: city.intro,
+          telephone: "+13862590023",
+          url: `https://www.floguardfl.com/areas/${city.slug}`,
+          areaServed: { "@type": "City", name: city.name },
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: "5114 S Ridgewood Ave",
+            addressLocality: "Port Orange",
+            addressRegion: "FL",
+            postalCode: "32127",
+            addressCountry: "US",
+          },
+          aggregateRating: { "@type": "AggregateRating", ratingValue: "5.0", reviewCount: "2" },
+        }}
+      />
       <PageHero
         overline={`${city.county} · Serving ${city.name}`}
         title={`French Drain & Drainage in ${city.name}, FL`}

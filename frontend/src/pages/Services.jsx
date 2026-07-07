@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus, Check } from "lucide-react";
 import { PageHero } from "../components/PageHero";
+import { Seo } from "../components/Seo";
 import { Reveal } from "../components/Reveal";
 import { ServicesGrid } from "../components/ServicesGrid";
 import { FlowPath } from "../components/FlowPath";
@@ -63,6 +64,7 @@ export default function Services() {
 
   return (
     <>
+      <Seo title="Drainage Services — French Drains, Sump Pumps & Yard Drainage | FloGuard" description="Exterior & interior French drains, sump pump systems, yard drainage, catch basins and maintenance plans for Central Florida homes." path="/services" />
       <PageHero
         overline="Services & Solutions"
         title="Every drainage problem has a custom fix."
