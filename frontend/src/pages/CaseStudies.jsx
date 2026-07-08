@@ -41,7 +41,7 @@ function BeforeAfter({ before, after, title }) {
     <div
       ref={ref}
       data-testid="before-after-slider"
-      className="group relative w-full h-[280px] md:h-[480px] overflow-hidden rounded-sm select-none cursor-ew-resize shadow-2xl ring-1 ring-black/5 focus:outline-none focus:ring-2 focus:ring-brand-orange/60"
+      className="group relative w-full h-[260px] sm:h-[320px] md:h-[480px] overflow-hidden rounded-sm select-none cursor-ew-resize shadow-2xl ring-1 ring-black/5 focus:outline-none focus:ring-2 focus:ring-brand-orange/60 touch-pan-x"
       tabIndex={0}
       onMouseMove={(e) => e.buttons === 1 && move(e.clientX)}
       onClick={(e) => move(e.clientX)}
@@ -93,7 +93,7 @@ function BeforeAfter({ before, after, title }) {
 
       {/* Subtle hint */}
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-[2px] text-white/40 bg-black/40 px-2 py-px rounded pointer-events-none">
-        drag • arrows • double-click reset
+        drag • arrows • double-tap reset
       </div>
     </div>
   );

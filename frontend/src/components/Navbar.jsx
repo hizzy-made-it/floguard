@@ -90,7 +90,7 @@ export const Navbar = () => {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.35, ease: EASE }}
-            className="lg:hidden glass border-t border-white/10 overflow-hidden"
+            className="lg:hidden glass border-t border-white/10 overflow-hidden pb-[env(safe-area-inset-bottom)]"
           >
             <div className="container-fg py-6 flex flex-col gap-1">
               {NAV_LINKS.map((l, i) => (
@@ -103,13 +103,13 @@ export const Navbar = () => {
                   <Link
                     to={l.to}
                     data-testid={`mobile-nav-link-${l.label.toLowerCase().replace(/\s+/g, "-")}`}
-                    className="block py-3 text-lg font-medium text-white/90 border-b border-white/5"
+                    className="block py-4 text-lg font-medium text-white/90 border-b border-white/5 active:bg-white/5"
                   >
                     {l.label}
                   </Link>
                 </motion.div>
               ))}
-              <a href={COMPANY.phoneHref} className="mt-4 inline-flex items-center gap-2 text-brand-orange font-semibold">
+              <a href={COMPANY.phoneHref} className="mt-4 inline-flex items-center gap-2 text-brand-orange font-semibold py-1">
                 <Phone size={16} /> {COMPANY.phone}
               </a>
             </div>

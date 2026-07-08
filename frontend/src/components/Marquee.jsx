@@ -1,12 +1,27 @@
+import { useState } from "react";
 import { SERVICE_AREAS } from "../data/site";
 
 // Infinite service-area ticker — a premium, editorial touch.
+// Slowed on mobile + pauses on touch/hold.
 export const Marquee = () => {
+  const [paused, setPaused] = useState(false);
   const items = [...SERVICE_AREAS, "Serving Central Florida"];
   const doubled = [...items, ...items];
+
+  const pause = () => setPaused(true);
+  const resume = () => setPaused(false);
+
   return (
-    <div data-testid="area-marquee" className="relative bg-brand-ink border-b border-white/10 py-5 overflow-hidden group">
-      <div className="flex whitespace-nowrap marquee-track group-hover:[animation-play-state:paused]">
+    <div
+      data-testid="area-marquee"
+      className="relative bg-brand-ink border-b border-white/10 py-5 overflow-hidden group"
+      onTouchStart={pause}
+      onTouchEnd={resume}
+      onTouchCancel={resume}
+    >
+      <div
+        className={`flex whitespace-nowrap marquee-track group-hover:[animation-play-state:paused] ${paused ? "[animation-play-state:paused]" : ""}`}
+      >
         {doubled.map((a, i) => (
           <span key={i} className="mx-6 inline-flex items-center gap-6 text-sm uppercase tracking-[0.2em] text-white/40">
             {a}

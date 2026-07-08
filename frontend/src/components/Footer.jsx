@@ -57,8 +57,18 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-16 pt-6 border-t border-white/10 text-xs text-white/40 flex flex-col sm:flex-row justify-between gap-2">
+        <div className="mt-16 pt-6 border-t border-white/10 text-xs text-white/40 flex flex-col sm:flex-row items-center justify-between gap-y-2">
           <div>© {new Date().getFullYear()} {COMPANY.legal}. All rights reserved.</div>
+          <a 
+            href="https://hdconnex.com" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="flex items-center gap-1.5 hover:text-white transition-colors"
+            aria-label="Site built by HDCONNEX"
+          >
+            <img src="/images/hdconnex.gif" alt="HDCONNEX" className="h-3.5 w-auto" />
+            <span>Site built by HDCONNEX</span>
+          </a>
           <div>{COMPANY.hours} · Serving Central Florida</div>
         </div>
       </div>

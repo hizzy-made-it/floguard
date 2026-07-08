@@ -35,6 +35,12 @@
     font-family: "Outfit", ui-sans-serif, system-ui, sans-serif;
     @apply bg-background text-foreground;
     overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent; /* clean mobile taps */
+  }
+
+  /* Mobile-friendly form defaults */
+  input, textarea, button, select {
+    font-size: 16px; /* prevents iOS zoom */
   }
   ::selection { background: #F57C1F; color: #0B0F1A; }
 }
@@ -42,7 +48,7 @@
 @layer components {
   .font-display { font-family: "Clash Display", ui-sans-serif, system-ui, sans-serif; }
   .container-fg { @apply mx-auto w-full max-w-[1320px] px-6 md:px-12; }
-  .section { @apply py-24 md:py-32; }
+  .section { @apply py-16 sm:py-20 md:py-32; } /* tighter vertical rhythm on mobile */
   .overline { @apply text-xs font-bold uppercase tracking-[0.22em] text-brand-orange; }
 
   .glass {
@@ -75,6 +81,11 @@
   }
 
   .marquee-track { animation: fg-marquee 32s linear infinite; }
+
+  /* Mobile: slow the ticker so it is readable (not 100mph) */
+  @media (max-width: 768px) {
+    .marquee-track { animation-duration: 58s; }
+  }
 }
 
 @keyframes fg-marquee {
@@ -106,7 +117,15 @@
 ::-webkit-scrollbar-thumb { background: #334155; border-radius: 0; }
 ::-webkit-scrollbar-thumb:hover { background: #F57C1F; }
 
+/* Respect reduced motion globally */
 @media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .section,
+  [class*="motion-"],
+  [class*="animate-"] {
+    animation: none !important;
+    transition: none !important;
+  }
   html { scroll-behavior: auto; }
   * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
 }

@@ -169,7 +169,7 @@ export const AssessmentQuiz = () => {
                     type="button"
                     data-testid={`quiz-option-${step.id}-${idx}`}
                     onClick={() => (step.type === "single" ? pickSingle(opt) : toggleMulti(opt))}
-                    className={`flex items-center gap-3 text-left px-4 py-3.5 rounded-sm border text-sm transition-colors ${
+                    className={`flex items-center gap-3 text-left px-4 py-3.5 min-h-[48px] rounded-sm border text-sm transition-colors active:bg-white/10 ${
                       active ? "border-brand-orange bg-brand-orange/10 text-white" : "border-white/15 text-white/70 hover:border-white/40"
                     }`}
                   >

@@ -12,7 +12,14 @@ export const Layout = ({ children }) => {
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) return;
-    const lenis = new Lenis({ duration: 1.1, smoothWheel: true, lerp: 0.1 });
+
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    // Lighter or native-feeling scroll on mobile
+    const lenis = new Lenis({
+      duration: isTouch ? 0.8 : 1.1,
+      smoothWheel: !isTouch,
+      lerp: isTouch ? 0.2 : 0.1,
+    });
     let raf;
     const loop = (t) => { lenis.raf(t); raf = requestAnimationFrame(loop); };
     raf = requestAnimationFrame(loop);

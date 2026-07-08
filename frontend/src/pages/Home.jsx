@@ -189,7 +189,7 @@ export default function Home() {
         <div className="pointer-events-none absolute inset-0 z-[3] bg-gradient-to-t from-[#0B0F1A] via-[#0B0F1A]/75 via-35% to-transparent" />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-24 z-[3] bg-gradient-to-b from-[#0B0F1A]/40 to-transparent" />
 
-        <div className="pointer-events-none relative z-10 h-full container-fg flex flex-col justify-end pb-24 pt-28">
+        <div className="pointer-events-none relative z-10 h-full container-fg flex flex-col justify-end pb-16 pt-24 sm:pb-20 sm:pt-28">
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -249,7 +249,7 @@ export default function Home() {
           </motion.div>
 
           {/* Scroll/drag-synced journey indicator — explicit premium narrative control */}
-          <div className="mt-5 flex items-center gap-3 text-[10px] uppercase tracking-[2px] text-white/35">
+          <div className="mt-4 sm:mt-5 flex items-center gap-2 sm:gap-3 text-[9px] sm:text-[10px] uppercase tracking-[2px] text-white/35">
             <div className="flex-1 h-px bg-white/15 overflow-hidden rounded">
               <div 
                 className="h-px bg-brand-orange transition-[width] duration-100" 
@@ -257,8 +257,8 @@ export default function Home() {
               />
             </div>
             FOLLOW THE WATER
-            <span className="ml-2 text-brand-orange/70 tabular-nums">{getJourneyLabel(heroProgress)}</span>
-            <span className="ml-auto hidden md:inline text-white/30">{isTouchDevice ? 'or swipe' : 'or drag horizontally'}</span>
+            <span className="ml-1 text-brand-orange/70 tabular-nums">{getJourneyLabel(heroProgress)}</span>
+            <span className="ml-auto text-white/30">{isTouchDevice ? 'swipe' : 'drag'}</span>
           </div>
         </div>
 
@@ -266,7 +266,7 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.6 }}
-          className="absolute bottom-8 right-8 md:right-14 z-10 flex items-center gap-2 text-white/40 text-[10px] font-medium uppercase tracking-[2px]"
+          className="absolute bottom-6 right-6 sm:bottom-8 sm:right-8 md:right-14 z-10 flex items-center gap-2 text-white/40 text-[9px] sm:text-[10px] font-medium uppercase tracking-[2px]"
         >
           {isTouchDevice ? 'Swipe' : 'Scroll'} to explore <ArrowDown size={13} className="animate-bounce" />
         </motion.div>

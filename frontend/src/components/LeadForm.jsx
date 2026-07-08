@@ -60,7 +60,7 @@ export const LeadForm = () => {
   };
 
   const fieldBase =
-    "w-full bg-white/5 border border-white/15 text-white px-4 py-3 rounded-sm text-base placeholder-white/30 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange outline-none transition-colors";
+    "w-full bg-white/5 border border-white/15 text-white px-4 py-3.5 sm:py-3 min-h-[52px] rounded-sm text-base placeholder-white/30 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange outline-none transition-colors";
 
   return (
     <div data-testid="lead-form" className="bg-brand-surface border border-white/10 rounded-sm p-6 sm:p-10">
