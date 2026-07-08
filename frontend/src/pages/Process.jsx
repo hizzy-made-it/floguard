@@ -5,7 +5,7 @@ import { Reveal } from "../components/Reveal";
 import { FlowPath } from "../components/FlowPath";
 import { ProcessTimeline } from "../components/ProcessTimeline";
 import { FinalCTA } from "../components/FinalCTA";
-import { IMAGES, SYSTEM_EXPLANATION } from "../data/site";
+import { SYSTEM_EXPLANATION } from "../data/site";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { StatsBar } from "../components/StatsBar";
@@ -102,6 +102,11 @@ export default function Process() {
                 <p className="text-brand-slate leading-relaxed">{part.desc}</p>
               </Reveal>
             ))}
+          </div>
+          <div className="mt-8">
+            <Link to="/services" className="inline-flex items-center gap-2 text-brand-navy font-bold link-underline">
+              See our specific service packages <ArrowUpRight size={18} />
+            </Link>
           </div>
         </div>
       </section>

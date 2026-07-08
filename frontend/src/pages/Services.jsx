@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Minus, Check } from "lucide-react";
+import { Plus, Minus, Check, ArrowUpRight } from "lucide-react";
 import { PageHero } from "../components/PageHero";
 import { Seo } from "../components/Seo";
 import { Reveal } from "../components/Reveal";
 import { ServicesGrid } from "../components/ServicesGrid";
-import { FlowPath } from "../components/FlowPath";
 import { FinalCTA } from "../components/FinalCTA";
-import { SERVICES, IMAGES, SYSTEM_EXPLANATION } from "../data/site";
+import { Link } from "react-router-dom";
+import { SERVICES } from "../data/site";
 import { EASE } from "../lib/animations";
 import { StatsBar } from "../components/StatsBar";
 
@@ -62,16 +62,6 @@ function Accordion({ service, open, onToggle, index }) {
 
 export default function Services() {
   const [open, setOpen] = useState(SERVICES[0].id);
-  const [hoveredService, setHoveredService] = useState(null);
-
-  // Simple mapping: highlight flow steps most relevant to hovered service
-  const serviceToFlow = {
-    exterior: 1,
-    interior: 3,
-    yard: 0,
-    maintenance: 4,
-  };
-  const flowActive = hoveredService ? (serviceToFlow[hoveredService] ?? -1) : -1;
 
   return (
     <>
@@ -79,7 +69,7 @@ export default function Services() {
       <PageHero
         overline="Services & Solutions"
         title="Every drainage problem has a custom fix."
-        subtitle="From exterior French drains to interior sump systems and yard grading — we install the right combination. A sump pump + French drain system is one of the most effective ways to protect Central Florida homes."
+        subtitle="Exterior French drains, interior sump systems, yard drainage & grading, plus ongoing pump maintenance. We install the right combination for Central Florida homes."
         image="/images/storm.jpg"
         primary={{ label: "Request an assessment", to: "/contact" }}
       />
@@ -95,42 +85,7 @@ export default function Services() {
               Systems that work together.
             </h2>
           </Reveal>
-          <ServicesGrid onHover={setHoveredService} />
-        </div>
-      </section>
-
-      {/* System Explanation - site wide integration */}
-      <section className="section bg-secondary">
-        <div className="container-fg">
-          <div className="max-w-3xl mb-14">
-            <Reveal>
-              <p className="overline mb-5">How It Works</p>
-              <h2 className="font-display text-4xl sm:text-5xl tracking-tight text-brand-navy leading-tight">
-                A sump pump + French drain system is one of the most effective protections.
-              </h2>
-            </Reveal>
-          </div>
-
-          <div className="grid lg:grid-cols-12 gap-12">
-            <div className="lg:col-span-5">
-              <Reveal>
-                <p className="text-lg text-brand-slate leading-relaxed mb-6">
-                  {SYSTEM_EXPLANATION.intro}
-                </p>
-                <p className="text-lg text-brand-slate leading-relaxed">
-                  {SYSTEM_EXPLANATION.whyMatters}
-                </p>
-              </Reveal>
-            </div>
-            <div className="lg:col-span-7 space-y-8">
-              {SYSTEM_EXPLANATION.parts.map((part, i) => (
-                <Reveal key={i} delay={i * 0.05}>
-                  <h3 className="font-display text-2xl text-brand-navy mb-2">{part.title}</h3>
-                  <p className="text-brand-slate leading-relaxed">{part.desc}</p>
-                </Reveal>
-              ))}
-            </div>
-          </div>
+          <ServicesGrid />
         </div>
       </section>
 
@@ -160,16 +115,23 @@ export default function Services() {
         </div>
       </section>
 
-      {/* How it works centerpiece */}
-      <section data-testid="services-how" className="section bg-brand-ink grain relative">
-        <div className="container-fg relative z-10">
-          <Reveal className="mb-14 max-w-2xl">
-            <p className="overline mb-5">How it works</p>
-            <h2 className="font-display text-4xl sm:text-5xl tracking-tight text-white leading-tight">
-              One controlled path for every drop.
+      {/* How these services work together — link out to avoid duplication with /process */}
+      <section className="section bg-background border-t border-border">
+        <div className="container-fg max-w-3xl">
+          <Reveal>
+            <p className="overline mb-5">Engineered as one system</p>
+            <h2 className="font-display text-3xl sm:text-4xl tracking-tight text-brand-navy">
+              Our services combine into a complete French drain + sump pump solution.
             </h2>
+            <p className="mt-4 text-lg text-brand-slate">
+              The water path, Florida-specific challenges, what it protects (and what it doesn&apos;t), plus our 4-step installation process are explained in detail on the How It Works page.
+            </p>
           </Reveal>
-          <FlowPath dark activeIndex={flowActive} />
+          <div className="mt-8">
+            <Link to="/process" className="inline-flex items-center gap-2 text-brand-navy font-bold link-underline">
+              See exactly how it works <ArrowUpRight size={18} />
+            </Link>
+          </div>
         </div>
       </section>
 
