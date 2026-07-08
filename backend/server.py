@@ -25,6 +25,9 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
+# GridFS for file storage (free, uses existing MongoDB)
+fs = AsyncIOMotorGridFSBucket(db)
+
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
@@ -36,56 +39,33 @@ RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'onboarding@resend.dev')
 LEAD_NOTIFICATION_EMAIL = os.environ.get('LEAD_NOTIFICATION_EMAIL', 'sales@floguardfl.com')
 
-# ---- Cloudflare R2 Storage (best fit with Cloudflare frontend) ----
-R2_ACCOUNT_ID = os.environ.get("R2_ACCOUNT_ID", "")
-R2_ACCESS_KEY = os.environ.get("R2_ACCESS_KEY_ID", "")
-R2_SECRET_KEY = os.environ.get("R2_SECRET_ACCESS_KEY", "")
-R2_BUCKET = os.environ.get("R2_BUCKET", "floguard-photos")
-R2_PUBLIC_DOMAIN = os.environ.get("R2_PUBLIC_DOMAIN", "")  # e.g. https://pub-xxx.r2.dev or your custom domain
-
+# ---- GridFS Storage (free using MongoDB, no extra paid services needed) ----
 APP_NAME = "floguard"
 
 MIME_TYPES = {"jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png",
               "gif": "image/gif", "webp": "image/webp", "heic": "image/heic"}
 
-_r2_client = None
 
-def get_r2_client():
-    global _r2_client
-    if _r2_client is None:
-        import boto3
-        from botocore.config import Config
-        _r2_client = boto3.client(
-            "s3",
-            endpoint_url=f"https://{R2_ACCOUNT_ID}.r2.cloudflarestorage.com",
-            aws_access_key_id=R2_ACCESS_KEY,
-            aws_secret_access_key=R2_SECRET_KEY,
-            config=Config(signature_version="s3v4"),
-            region_name="auto",
-        )
-    return _r2_client
-
-
-def get_r2_public_url(path: str) -> str:
-    """Return public URL. Set R2_PUBLIC_DOMAIN to your R2 public dev URL or custom domain."""
-    if R2_PUBLIC_DOMAIN:
-        return f"{R2_PUBLIC_DOMAIN.rstrip('/')}/{path}"
-    # Fallback (may not be public unless bucket configured)
-    return f"https://{R2_BUCKET}.{R2_ACCOUNT_ID}.r2.cloudflarestorage.com/{path}"
-
-
-def upload_to_r2(path: str, data: bytes, content_type: str) -> dict:
-    """Upload to Cloudflare R2 using boto3 (S3 compatible)."""
-    if not R2_ACCOUNT_ID or not R2_ACCESS_KEY or not R2_SECRET_KEY:
-        raise RuntimeError("R2 credentials not configured (R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY)")
-    client = get_r2_client()
-    client.put_object(
-        Bucket=R2_BUCKET,
-        Key=path,
-        Body=data,
-        ContentType=content_type,
+async def upload_file_to_gridfs(data: bytes, filename: str, content_type: str) -> dict:
+    """Upload file to MongoDB GridFS. Returns path (file_id) and url for serving."""
+    file_id = await fs.upload_from_stream(
+        filename,
+        data,
+        metadata={"contentType": content_type}
     )
-    return {"path": path, "url": get_r2_public_url(path)}
+    file_id_str = str(file_id)
+    return {"path": file_id_str, "url": f"/api/files/{file_id_str}"}
+
+
+async def get_file_from_gridfs(file_id_str: str):
+    """Retrieve file data and content type from GridFS."""
+    try:
+        grid_out = await fs.open_download_stream(ObjectId(file_id_str))
+        data = await grid_out.read()
+        content_type = grid_out.metadata.get("contentType", "application/octet-stream") if grid_out.metadata else "application/octet-stream"
+        return data, content_type
+    except Exception:
+        return None, None
 
 
 # ---- Auth config ----
@@ -345,11 +325,11 @@ async def upload(file: UploadFile = File(...)):
     data = await file.read()
     if len(data) > 12 * 1024 * 1024:
         raise HTTPException(status_code=413, detail="Image too large (max 12MB).")
-    path = f"{APP_NAME}/leads/{uuid.uuid4()}.{ext}"
+    filename = f"{APP_NAME}/leads/{uuid.uuid4()}.{ext}"
     try:
-        result = await asyncio.to_thread(upload_to_r2, path, data, content_type)
+        result = await upload_file_to_gridfs(data, filename, content_type)
     except Exception as e:
-        logger.error("Upload to R2 failed: %s", str(e))
+        logger.error("Upload to GridFS failed: %s", str(e))
         raise HTTPException(status_code=502, detail="Upload failed. Please try again.")
     await db.files.insert_one({
         "id": str(uuid.uuid4()),
@@ -360,24 +340,23 @@ async def upload(file: UploadFile = File(...)):
         "is_deleted": False,
         "created_at": datetime.now(timezone.utc).isoformat(),
     })
-    # Return direct R2 public URL
+    # Return url that points to our /files endpoint (served from Mongo GridFS)
     return {"path": result["path"], "url": result["url"]}
 
 
 @api_router.get("/files/{path:path}")
 async def serve_file(path: str):
-    # R2 public URLs preferred. This endpoint kept for compatibility.
+    # Serve from GridFS using the file_id stored as storage_path
     record = await db.files.find_one({"storage_path": path, "is_deleted": False})
     if not record:
         raise HTTPException(status_code=404, detail="File not found")
 
-    # Redirect to R2 public URL (fast via Cloudflare)
-    if R2_PUBLIC_DOMAIN or R2_ACCOUNT_ID:
-        r2_url = get_r2_public_url(path)
-        if r2_url:
-            return Response(status_code=302, headers={"Location": r2_url})
+    data, content_type = await get_file_from_gridfs(path)
+    if data is None:
+        raise HTTPException(status_code=404, detail="File not found")
 
-    raise HTTPException(status_code=404, detail="File not found")
+    return Response(content=data, media_type=content_type,
+                    headers={"Cache-Control": "public, max-age=86400"})
 
 
 @api_router.post("/leads", response_model=Lead)
@@ -461,11 +440,8 @@ async def startup():
         await db.files.create_index("storage_path")
     except Exception as e:
         logger.warning("index creation: %s", e)
-    # Cloudflare R2 Storage configured via env vars.
-    if R2_ACCOUNT_ID and R2_ACCESS_KEY and R2_SECRET_KEY:
-        logger.info("Cloudflare R2 Storage configured")
-    else:
-        logger.warning("R2 credentials not set - file uploads will fail")
+    # Using GridFS (MongoDB) for file storage - no additional services required
+    logger.info("GridFS file storage initialized (using MongoDB)")
     admin_email = os.environ.get("ADMIN_EMAIL", "admin@floguardfl.com").lower()
     admin_password = os.environ.get("ADMIN_PASSWORD", "admin123")
     existing = await db.users.find_one({"email": admin_email})
