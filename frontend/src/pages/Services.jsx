@@ -7,8 +7,9 @@ import { Reveal } from "../components/Reveal";
 import { ServicesGrid } from "../components/ServicesGrid";
 import { FlowPath } from "../components/FlowPath";
 import { FinalCTA } from "../components/FinalCTA";
-import { SERVICES, IMAGES } from "../data/site";
+import { SERVICES, IMAGES, SYSTEM_EXPLANATION } from "../data/site";
 import { EASE } from "../lib/animations";
+import { StatsBar } from "../components/StatsBar";
 
 function Accordion({ service, open, onToggle, index }) {
   return (
@@ -61,6 +62,16 @@ function Accordion({ service, open, onToggle, index }) {
 
 export default function Services() {
   const [open, setOpen] = useState(SERVICES[0].id);
+  const [hoveredService, setHoveredService] = useState(null);
+
+  // Simple mapping: highlight flow steps most relevant to hovered service
+  const serviceToFlow = {
+    exterior: 1,
+    interior: 3,
+    yard: 0,
+    maintenance: 4,
+  };
+  const flowActive = hoveredService ? (serviceToFlow[hoveredService] ?? -1) : -1;
 
   return (
     <>
@@ -68,10 +79,12 @@ export default function Services() {
       <PageHero
         overline="Services & Solutions"
         title="Every drainage problem has a custom fix."
-        subtitle="From exterior French drains to interior sump systems and yard grading — we install the right combination for your property, not a one-size-fits-all kit."
-        image={IMAGES.frenchDrain}
+        subtitle="From exterior French drains to interior sump systems and yard grading — we install the right combination. A sump pump + French drain system is one of the most effective ways to protect Central Florida homes."
+        image="/images/storm.jpg"
         primary={{ label: "Request an assessment", to: "/contact" }}
       />
+
+      <StatsBar />
 
       {/* Bento grid overview */}
       <section data-testid="services-overview" className="section bg-background">
@@ -82,7 +95,42 @@ export default function Services() {
               Systems that work together.
             </h2>
           </Reveal>
-          <ServicesGrid />
+          <ServicesGrid onHover={setHoveredService} />
+        </div>
+      </section>
+
+      {/* System Explanation - site wide integration */}
+      <section className="section bg-secondary">
+        <div className="container-fg">
+          <div className="max-w-3xl mb-14">
+            <Reveal>
+              <p className="overline mb-5">How It Works</p>
+              <h2 className="font-display text-4xl sm:text-5xl tracking-tight text-brand-navy leading-tight">
+                A sump pump + French drain system is one of the most effective protections.
+              </h2>
+            </Reveal>
+          </div>
+
+          <div className="grid lg:grid-cols-12 gap-12">
+            <div className="lg:col-span-5">
+              <Reveal>
+                <p className="text-lg text-brand-slate leading-relaxed mb-6">
+                  {SYSTEM_EXPLANATION.intro}
+                </p>
+                <p className="text-lg text-brand-slate leading-relaxed">
+                  {SYSTEM_EXPLANATION.whyMatters}
+                </p>
+              </Reveal>
+            </div>
+            <div className="lg:col-span-7 space-y-8">
+              {SYSTEM_EXPLANATION.parts.map((part, i) => (
+                <Reveal key={i} delay={i * 0.05}>
+                  <h3 className="font-display text-2xl text-brand-navy mb-2">{part.title}</h3>
+                  <p className="text-brand-slate leading-relaxed">{part.desc}</p>
+                </Reveal>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -121,7 +169,7 @@ export default function Services() {
               One controlled path for every drop.
             </h2>
           </Reveal>
-          <FlowPath dark />
+          <FlowPath dark activeIndex={flowActive} />
         </div>
       </section>
 

@@ -53,8 +53,10 @@ export const AssessmentQuiz = () => {
       const entry = { name: file.name, localUrl, status: "uploading", path: null };
       setPhotos((p) => [...p, entry]);
       try {
-        const { path } = await uploadPhoto(file);
-        setPhotos((p) => p.map((x) => (x.localUrl === localUrl ? { ...x, status: "done", path } : x)));
+        const result = await uploadPhoto(file);
+        // Prefer direct URL (Supabase) when available for best performance
+        const storedValue = result.url || result.path;
+        setPhotos((p) => p.map((x) => (x.localUrl === localUrl ? { ...x, status: "done", path: storedValue } : x)));
       } catch {
         setPhotos((p) => p.map((x) => (x.localUrl === localUrl ? { ...x, status: "error" } : x)));
       }

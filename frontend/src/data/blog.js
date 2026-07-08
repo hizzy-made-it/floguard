@@ -8,12 +8,12 @@ export const POSTS = [
     slug: "french-drain-cost-central-florida-2026",
     title: "How Much Does a French Drain Cost in Central Florida? (2026 Guide)",
     excerpt:
-      "A clear, no-jargon breakdown of what a professional French drain really costs in the Daytona–Orlando corridor — and what actually drives the price.",
+      "A clear, no-jargon breakdown of what a professional French drain + sump pump system really costs in the Daytona–Orlando corridor. Florida's high water table, flat terrain and intense storms make this one of the most effective protections available.",
     category: "Cost & Value",
     date: "2026-07-06",
     readTime: 7,
     keyword: "french drain cost florida",
-    image: IMAGES.frenchDrain,
+    image: "/images/case-studies-hero.jpg",
     content: [
       { type: "p", text: "If you're searching for French drain cost in Central Florida, you've probably found a confusing range of numbers online. Here's the honest answer: most residential French drain projects in the Daytona Beach, Port Orange, Sanford and Orlando area fall between a few thousand dollars for a simple run and considerably more for complex, whole-property systems. The price depends far less on 'pipe per foot' and much more on your specific yard." },
       { type: "h2", text: "What actually drives the price" },
@@ -36,12 +36,12 @@ export const POSTS = [
     slug: "why-is-water-standing-in-my-yard",
     title: "Why Is Water Standing in My Yard? 7 Causes and How to Fix Them",
     excerpt:
-      "Standing water after every storm isn't just annoying — it's a warning sign. Here are the seven most common causes we see in Florida yards.",
+      "Standing water after every storm isn't just annoying — it's a warning sign. Florida has a high water table (2–6 ft), flat terrain, intense rainfall and sandy soils. Here's how a French drain + sump pump system fixes the root causes.",
     category: "Drainage 101",
     date: "2026-06-29",
     readTime: 6,
     keyword: "standing water in yard",
-    image: IMAGES.beforeFlooded,
+    image: "/images/case2-before.jpg",
     content: [
       { type: "p", text: "Standing water in your yard that lingers for hours or days after rain is one of the clearest signs your property has a drainage problem. In Central Florida — with our sandy-then-clay soils, flat lots and heavy summer storms — it's extremely common. Here's what's usually behind it." },
       { type: "h2", text: "The 7 usual suspects" },
@@ -69,7 +69,7 @@ export const POSTS = [
     date: "2026-06-22",
     readTime: 6,
     keyword: "french drain vs sump pump",
-    image: IMAGES.sumpPump,
+    image: "/images/after.jpg",
     content: [
       { type: "p", text: "A lot of homeowners ask us whether they need a French drain or a sump pump. The truth is they solve different halves of the same problem — and in much of Central Florida, the best protection comes from pairing them." },
       { type: "h2", text: "What a French drain does" },
@@ -96,7 +96,7 @@ export const POSTS = [
     date: "2026-06-15",
     readTime: 5,
     keyword: "foundation drainage problem",
-    image: IMAGES.foundation,
+    image: "/images/case2-after.jpg",
     content: [
       { type: "p", text: "Your foundation is the most expensive thing water can damage — and drainage problems usually give warning signs long before cracks appear. Here's what to watch for." },
       { type: "h2", text: "The 5 signs" },
@@ -122,7 +122,7 @@ export const POSTS = [
     date: "2026-06-08",
     readTime: 6,
     keyword: "florida rainy season yard prep",
-    image: IMAGES.storm,
+    image: "/images/blog-storm-alt.jpg",
     content: [
       { type: "p", text: "Central Florida's rainy season doesn't ease in — it arrives with afternoon downpours that can drop inches of water in an hour. Here's how to get your property ready before the worst of it." },
       { type: "h2", text: "A pre-season checklist" },
@@ -148,7 +148,7 @@ export const POSTS = [
     date: "2026-06-01",
     readTime: 6,
     keyword: "wet crawl space waterproofing",
-    image: IMAGES.diagram,
+    image: "/images/case3-before.jpg",
     content: [
       { type: "p", text: "A wet or musty crawl space is more than a nuisance — moisture under your home invites mold, rots wood framing, and signals water pressing against your foundation. The good news: it's a very solvable problem." },
       { type: "h2", text: "How interior drainage works" },
@@ -173,7 +173,7 @@ export const POSTS = [
     date: "2026-05-25",
     readTime: 5,
     keyword: "catch basin yard grading",
-    image: IMAGES.catchBasin,
+    image: "/images/case4-before.jpg",
     content: [
       { type: "p", text: "Not every drainage problem needs a full French drain. Surface water — the kind that pools on patios, lanais and low lawn spots — is often best handled with catch basins, grading, and swales. Here's how each one works." },
       { type: "h2", text: "Catch basins" },
@@ -199,7 +199,7 @@ export const POSTS = [
     date: "2026-05-18",
     readTime: 5,
     keyword: "french drain home value",
-    image: IMAGES.afterDry,
+    image: "/images/case3-after.jpg",
     content: [
       { type: "p", text: "When homeowners weigh the cost of a drainage system, they often ask: will this add value to my home? For Florida properties especially, the answer is a strong yes — both in resale price and in avoided damage." },
       { type: "h2", text: "Why buyers care about drainage" },

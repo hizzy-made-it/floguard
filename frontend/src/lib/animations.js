@@ -67,3 +67,26 @@ export const pageTransition = {
 };
 
 export const viewportOnce = { once: true, margin: "-80px" };
+
+// Premium award-level additions
+export const magneticHover = {
+  rest: { scale: 1, transition: { duration: 0.2, ease: EASE } },
+  hover: { scale: 1.015, transition: { duration: 0.2, ease: EASE } },
+};
+
+export const editorialStagger = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.09, delayChildren: 0.06 },
+  },
+};
+
+export const subtleLift = {
+  hidden: { opacity: 0, y: 18 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.85, ease: EASE } },
+};
+
+export const cardTilt = {
+  rest: { rotateX: 0, rotateY: 0, scale: 1 },
+  hover: { rotateX: 2, rotateY: -3, scale: 1.005, transition: { duration: 0.25, ease: EASE } },
+};

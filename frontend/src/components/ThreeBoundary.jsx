@@ -12,7 +12,7 @@ export class ThreeBoundary extends React.Component {
   }
   componentDidCatch(error) {
     // eslint-disable-next-line no-console
-    console.warn("3D scene disabled (WebGL unavailable):", error?.message);
+    console.error("3D scene error (check stack for details):", error);
   }
   render() {
     if (this.state.failed) return this.props.fallback || null;

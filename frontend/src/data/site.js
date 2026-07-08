@@ -19,29 +19,30 @@ export const COMPANY = {
 };
 
 export const IMAGES = {
-  logo: "https://customer-assets.emergentagent.com/job_171d6f38-0b46-45ff-9e6c-f9747eec3455/artifacts/rks20kgd_image.png",
-  logoAlt:
-    "https://customer-assets.emergentagent.com/job_171d6f38-0b46-45ff-9e6c-f9747eec3455/artifacts/s0lwckrx_image.png",
-  storm:
-    "https://customer-assets.emergentagent.com/job_171d6f38-0b46-45ff-9e6c-f9747eec3455/artifacts/2kpa208u_image.png",
-  diagram:
-    "https://customer-assets.emergentagent.com/job_171d6f38-0b46-45ff-9e6c-f9747eec3455/artifacts/raba3tpe_image.png",
-  crew:
-    "https://customer-assets.emergentagent.com/job_171d6f38-0b46-45ff-9e6c-f9747eec3455/artifacts/ehy3alqa_image.png",
-  beforeFlooded:
-    "https://static.prod-images.emergentagent.com/jobs/171d6f38-0b46-45ff-9e6c-f9747eec3455/images/aca0cebc3026500817ffec8887d4139bd286b6061b806447e1cadfa3432790c3.png",
-  afterDry:
-    "https://static.prod-images.emergentagent.com/jobs/171d6f38-0b46-45ff-9e6c-f9747eec3455/images/32ba8bced66d063652eb8d61fa4709e5be26a6049cea97579b69424656c7f83e.png",
-  frenchDrain:
-    "https://static.prod-images.emergentagent.com/jobs/171d6f38-0b46-45ff-9e6c-f9747eec3455/images/0a99594e0710576b965a69c17eead7f48f364e0a93c71c40ec43d24609bafceb.png",
-  sumpPump:
-    "https://static.prod-images.emergentagent.com/jobs/171d6f38-0b46-45ff-9e6c-f9747eec3455/images/aa9413f2caa5bc6539c7ebffd1d2d9c0e533c5c63780fee501a4d78532e6362b.png",
-  catchBasin:
-    "https://static.prod-images.emergentagent.com/jobs/171d6f38-0b46-45ff-9e6c-f9747eec3455/images/4d486eab3a005e5ad287d4185b02e4f96ab33ebec20c4cdb36407577a44d7017.png",
-  foundation:
-    "https://static.prod-images.emergentagent.com/jobs/171d6f38-0b46-45ff-9e6c-f9747eec3455/images/8e843fbb01660c9f2238aaa807dd3be29ffef13413ff7f1beca5176a5fde23df.png",
-  landscaped:
-    "https://images.pexels.com/photos/17897581/pexels-photo-17897581.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+  // Logo (lettering diagram) — DO NOT REPLACE
+  logo: "https://customer-assets.emergentagent.com/job_171d6f38-0b46-45ff-9e6c-f9747eec3455/artifacts/raba3tpe_image.png",
+  // Small icon fallback for logo — DO NOT REPLACE
+  logoIcon: "https://customer-assets.emergentagent.com/job_171d6f38-0b46-45ff-9e6c-f9747eec3455/artifacts/rks20kgd_image.png",
+
+  // All images are unique per usage (no duplicates)
+  storm: "/images/storm.jpg",
+  diagram: "/images/diagram.jpg",
+  crew: "/images/crew.jpg",
+  case1Before: "/images/case1-before.jpg",
+  case1After: "/images/case1-after.jpg",
+  case2Before: "/images/case2-before.jpg",
+  case2After: "/images/case2-after.jpg",
+  case3Before: "/images/case3-before.jpg",
+  case3After: "/images/case3-after.jpg",
+  case4Before: "/images/case4-before.jpg",
+  case4After: "/images/case4-after.jpg",
+  frenchDrain: "/images/french-drain.jpg",
+  sumpPump: "/images/sump-pump.jpg",
+  catchBasin: "/images/catch-basin.jpg",
+  foundation: "/images/foundation.jpg",
+  landscaped: "/images/landscaped.jpg",
+  yardDry: "/images/yard-dry.jpg",
+  blogStormAlt: "/images/blog-storm-alt.jpg",
 };
 
 export const NAV_LINKS = [
@@ -56,10 +57,10 @@ export const NAV_LINKS = [
 ];
 
 export const STATS = [
-  { value: 100, suffix: "+", label: "Yards protected across Central Florida" },
-  { value: 5.0, suffix: "★", label: "Average Google review rating", decimals: 1 },
-  { value: 24, suffix: "hr", label: "Typical response for assessments" },
-  { value: 15, suffix: "yr", label: "Warranty-backed system designs" },
+  { value: 100, suffix: "+", label: "Yards Protected" },
+  { value: 5.0, suffix: "★", label: "Google Rating", decimals: 1 },
+  { value: 24, suffix: "hr", label: "Response Time" },
+  { value: 5, suffix: "yr", label: "Warranty" },
 ];
 
 export const SERVICE_AREAS = [
@@ -73,8 +74,8 @@ export const SERVICES = [
     id: "exterior",
     title: "Exterior French Drains",
     blurb:
-      "Perimeter trench systems that intercept surface runoff and groundwater before it reaches your foundation or pools on the lawn.",
-    image: IMAGES.frenchDrain,
+      "Perimeter trench systems that intercept surface runoff and groundwater before it reaches your foundation or pools on the lawn. Contains perforated pipe in clean gravel wrapped with filter fabric to keep sediment out.",
+    image: IMAGES.case1Before,
     features: ["Custom trench + slope design", "Filter fabric + clean gravel", "Perforated collection pipe"],
     span: "wide",
   },
@@ -82,8 +83,8 @@ export const SERVICES = [
     id: "interior",
     title: "Interior Drains + Sump Pumps",
     blurb:
-      "For crawlspaces and low, flat lots: a sub-surface drain routed to a sump basin that automatically lifts water to a safe discharge.",
-    image: IMAGES.sumpPump,
+      "For crawlspaces and low, flat lots: a sub-surface drain routed to a sump basin that automatically lifts water to a safe discharge. The active defense when gravity alone isn’t enough. A waterproof basin collects water; a submersible pump with float switch pushes it far away.",
+    image: IMAGES.case2Before,
     features: ["Automatic float-switch pumps", "Sealed basin + discharge line", "Battery / monitoring options"],
     span: "tall",
   },
@@ -92,7 +93,7 @@ export const SERVICES = [
     title: "Yard Drainage & Grading",
     blurb:
       "Catch basins, channel drains and precision grading that move water off patios, lanais and low spots without eroding your landscape.",
-    image: IMAGES.catchBasin,
+    image: IMAGES.case3Before,
     features: ["Catch basins & channel drains", "Re-grading & swales", "Downspout tie-ins"],
     span: "tall",
   },
@@ -101,7 +102,7 @@ export const SERVICES = [
     title: "Pump Maintenance & Monitoring",
     blurb:
       "Seasonal service plans and smart monitoring that keep your system storm-ready year round — so it works the day you need it most.",
-    image: IMAGES.foundation,
+    image: IMAGES.case4Before,
     features: ["Scheduled inspections", "Pump testing & cleaning", "Storm-season readiness"],
     span: "wide",
   },
@@ -137,11 +138,55 @@ export const PROCESS = [
 // The technical water path: surface water -> gravel -> pipe -> sump -> discharge
 export const FLOW_PATH = [
   { label: "Surface Water", desc: "Rain and runoff collect in problem areas around the home." },
-  { label: "Gravel Trench", desc: "Water filters through fabric-lined gravel into the system." },
-  { label: "Perforated Pipe", desc: "A buried pipe captures water and carries it by gravity." },
-  { label: "Sump Basin", desc: "On flat lots, water gathers in a basin with an automatic pump." },
-  { label: "Safe Discharge", desc: "The pump pushes water far from your foundation — dry and safe." },
+  { label: "Gravel Trench", desc: "A trench with clean gravel and filter fabric intercepts water before it reaches the foundation." },
+  { label: "Perforated Pipe", desc: "4\" perforated pipe in the trench captures water and carries it by gravity to the sump pit." },
+  { label: "Sump Basin", desc: "Waterproof basin at the lowest point collects water. Automatic pump activates via float switch." },
+  { label: "Safe Discharge", desc: "Pump pushes water far from the foundation (10–20+ ft) to a swale, storm drain, or approved location." },
 ];
+
+// Detailed system explanation distributed across the site (Florida-specific)
+export const SYSTEM_EXPLANATION = {
+  intro: "A sump pump + French drain system is one of the most effective ways to protect a home from water damage caused by heavy Florida rain and high groundwater. It is especially useful in places like Daytona Beach and Volusia County.",
+  whyMatters: "Florida has a high water table (often only 2–6 feet below the surface), flat terrain where gravity drainage alone often doesn’t work well, intense rainfall (2+ inches per hour during summer thunderstorms or tropical systems), and sandy soils that drain quickly but can shift or allow fine sediment to clog pipes.",
+  benefits: "A properly installed French drain + sump pump system actively lowers the water table around your foundation and removes water before it can damage your home, crawl space, or slab.",
+  parts: [
+    {
+      title: "1. French Drain (Perimeter Drain)",
+      desc: "A trench is dug around the outside or inside of the foundation. It contains a perforated pipe (usually 4\"), clean gravel or crushed stone surrounding the pipe, and filter fabric wrapped around the gravel to keep sand and sediment out. Water flows into the gravel, then into the pipe, which slopes by gravity toward the sump pit.",
+    },
+    {
+      title: "2. Sump Pump + Sump Pit",
+      desc: "A waterproof basin (sump pit) is installed at the lowest point. A submersible pump sits inside. When water reaches a certain level, a float switch turns the pump on and pushes water out through a discharge pipe to a safe location away from the house (10–20+ feet to a swale, storm drain, or lower area). Many systems include a check valve and battery backup for power outages.",
+    },
+  ],
+  howItWorks: [
+    "Heavy rain soaks the ground around your house.",
+    "Water tries to push against the foundation (hydrostatic pressure).",
+    "The French drain intercepts the water in the gravel trench before it reaches the walls or slab.",
+    "Water enters the perforated pipe and flows by gravity to the sump pit.",
+    "Water level rises in the pit → float switch activates the pump.",
+    "The pump turns on and forcefully pushes the water out the discharge pipe, far away from your foundation.",
+    "Once the water level drops, the pump shuts off.",
+  ],
+  floridaSpecific: [
+    "High water table — During the wet season (May–October), the sump pump actively removes water even when gravity alone can’t move it.",
+    "Flat lots — Many homes in Daytona Beach and surrounding areas need a sump pump because there isn’t enough natural slope.",
+    "Crawl spaces (very common in Florida) — Interior French drains are often installed under the crawl space floor and tied into the sump.",
+    "Power outages — Hurricanes frequently knock out power. Battery backup is highly recommended.",
+    "Sandy soil — Proper filter fabric is essential to prevent clogging.",
+    "Discharge rules — Water must be directed to an approved location. Local stormwater rules apply.",
+  ],
+  protects: "Groundwater seepage, heavy rain soaking the soil, minor yard flooding near the house, musty smells and mold in crawl spaces.",
+  doesNotProtect: "Major hurricane storm surge, river or street flooding above slab/crawl space, extremely prolonged rainfall that overwhelms pump capacity.",
+  maintenance: [
+    "Test the pump monthly (pour water into the pit).",
+    "Check/replace battery backup every 2–3 years.",
+    "Professional service once a year, especially before hurricane season.",
+    "Keep the discharge area clear.",
+    "Watch for roots or sediment buildup (common in Florida’s warm, wet environment).",
+  ],
+  bottomLine: "A French drain + sump pump system is like giving your house an active drainage system that fights back against Florida’s high water table and heavy rains. It won’t stop a direct hurricane flood, but it dramatically reduces the risk of foundation damage, crawl space flooding, and moisture problems that are very common in our area. Professional installation with proper sizing, filter fabric, check valves, and battery backup makes a big difference.",
+};
 
 export const CASE_STUDIES = [
   {
@@ -149,10 +194,10 @@ export const CASE_STUDIES = [
     title: "Chronic Backyard Flooding",
     location: "Port Orange, FL",
     category: "Yard Drainage",
-    before: IMAGES.beforeFlooded,
-    after: IMAGES.afterDry,
+    before: IMAGES.case1Before,
+    after: IMAGES.case1After,
     summary:
-      "A low backyard held water for days after every storm. We installed catch basins, an exterior French drain and re-graded the turf.",
+      "A low backyard held water for days after every storm. We installed catch basins, an exterior French drain (perforated pipe in gravel with filter fabric) and re-graded the turf. The system actively lowers the water table.",
     result: "Dry within hours of heavy rain — lawn fully restored.",
   },
   {
@@ -160,10 +205,10 @@ export const CASE_STUDIES = [
     title: "Wet Crawlspace & Foundation Moisture",
     location: "Daytona Beach, FL",
     category: "Interior + Sump",
-    before: IMAGES.foundation,
-    after: IMAGES.sumpPump,
+    before: IMAGES.case2Before,
+    after: IMAGES.case2After,
     summary:
-      "Standing water under the home threatened the foundation. An interior drain routed to a sealed sump basin with an automatic pump.",
+      "Standing water under the home threatened the foundation. An interior drain routed to a sealed sump basin with an automatic pump. A sump pump + French drain system is one of the most effective ways to protect homes here from high groundwater.",
     result: "Zero standing water through a full storm season.",
   },
   {
@@ -171,10 +216,10 @@ export const CASE_STUDIES = [
     title: "Eroding Slope Behind Retaining Wall",
     location: "New Smyrna Beach, FL",
     category: "Exterior French Drain",
-    before: IMAGES.frenchDrain,
-    after: IMAGES.landscaped,
+    before: IMAGES.case3Before,
+    after: IMAGES.case3After,
     summary:
-      "Runoff was undermining a retaining wall and washing out mulch beds. A hidden French drain intercepts water uphill of the wall.",
+      "Runoff was undermining a retaining wall and washing out mulch beds. A hidden French drain (trench with perforated pipe in gravel + filter fabric) intercepts water uphill of the wall before it causes damage.",
     result: "Erosion stopped; planting beds thriving.",
   },
   {
@@ -182,10 +227,10 @@ export const CASE_STUDIES = [
     title: "Flooded Lanai & Patio",
     location: "Sanford, FL",
     category: "Yard Drainage",
-    before: IMAGES.storm,
-    after: IMAGES.afterDry,
+    before: "/images/foundation.jpg",
+    after: "/images/after.jpg",
     summary:
-      "A screened lanai flooded during summer storms. Channel drains and a discharge line now carry water to a safe swale.",
+      "A screened lanai flooded during summer storms. Catch basins, channel drains, and a French drain + sump system carry water to a safe discharge point far from the foundation.",
     result: "Usable patio all summer, even in heavy rain.",
   },
 ];

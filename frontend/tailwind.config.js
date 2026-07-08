@@ -20,6 +20,7 @@ module.exports = {
           orange: '#F57C1F',
           orangeDark: '#E06A12',
           lime: '#D9F844',
+          orange: '#F57C1F',
         },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',

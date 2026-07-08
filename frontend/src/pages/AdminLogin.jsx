@@ -44,7 +44,7 @@ export default function AdminLogin() {
         className="relative z-10 w-full max-w-md"
       >
         <div className="flex items-center gap-3 mb-8 justify-center">
-          <img src={IMAGES.logo} alt="FloGuard" className="h-11 w-11 object-contain rounded-sm bg-white/95 p-0.5" />
+          <img src={IMAGES.logoIcon} alt="FloGuard" className="h-11 w-11 object-contain rounded-sm bg-white/95 p-0.5" />
           <span className="font-display text-2xl text-white">Flo<span className="text-brand-orange">Guard</span></span>
         </div>
         <div className="bg-brand-surface border border-white/10 rounded-sm p-8">

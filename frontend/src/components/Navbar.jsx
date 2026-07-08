@@ -33,13 +33,13 @@ export const Navbar = () => {
     >
       <nav className="container-fg flex items-center justify-between h-20">
         <Link to="/" data-testid="nav-logo" className="flex items-center gap-3 group">
-          <img src={IMAGES.logo} alt="FloGuard LLC" className="h-11 w-11 object-contain rounded-sm bg-white/95 p-0.5" />
+          <img src={IMAGES.logo} alt="FloGuard LLC" className="h-8 object-contain" />
           <span className="font-display text-xl tracking-tight text-white leading-none">
             Flo<span className="text-brand-orange">Guard</span>
           </span>
         </Link>
 
-        <div className="hidden lg:flex items-center gap-6 xl:gap-8">
+        <div className="hidden lg:flex items-center gap-6 xl:gap-8 text-sm">
           {NAV_LINKS.map((l) => {
             const active = location.pathname === l.to;
             return (
@@ -47,9 +47,7 @@ export const Navbar = () => {
                 key={l.to}
                 to={l.to}
                 data-testid={`nav-link-${l.label.toLowerCase().replace(/\s+/g, "-")}`}
-                className={`link-underline text-sm font-medium tracking-wide transition-colors ${
-                  active ? "text-brand-orange" : "text-white/80 hover:text-white"
-                }`}
+                className={`link-underline font-medium tracking-[0.3px] transition-colors ${active ? "text-brand-orange" : "text-white/75 hover:text-white"}`}
               >
                 {l.label}
               </Link>

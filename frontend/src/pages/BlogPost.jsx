@@ -109,14 +109,16 @@ export default function BlogPost() {
         </div>
       </section>
 
-      {/* body */}
+      {/* body - elite reading experience */}
       <article data-testid="blogpost-body" className="bg-background">
         <div className="container-fg py-16 md:py-24 grid lg:grid-cols-12 gap-12">
           <div className="lg:col-span-8 lg:col-start-2">
-            <p className="text-xl text-brand-navy font-medium leading-relaxed mb-8">{post.excerpt}</p>
-            {post.content.map((b, i) => (
-              <Block key={i} block={b} />
-            ))}
+            <p className="text-[21px] text-brand-navy font-medium leading-tight tracking-[-0.2px] mb-10 max-w-[42ch]">{post.excerpt}</p>
+            <div className="prose prose-slate max-w-none text-[17px] leading-relaxed text-brand-slate">
+              {post.content.map((b, i) => (
+                <Block key={i} block={b} />
+              ))}
+            </div>
 
             {/* inline CTA */}
             <div className="mt-14 rounded-sm bg-brand-navy text-white p-8 sm:p-10">
@@ -135,19 +137,22 @@ export default function BlogPost() {
         </div>
       </article>
 
-      {/* related */}
+      {/* related - premium */}
       <section data-testid="blog-related" className="section bg-secondary">
         <div className="container-fg">
-          <h2 className="font-display text-3xl sm:text-4xl tracking-tight text-brand-navy mb-10">Keep reading</h2>
+          <h2 className="font-display text-3xl sm:text-4xl tracking-tight text-brand-navy mb-9">More from the journal</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {suggestions.map((p) => (
-              <Link key={p.slug} to={`/blog/${p.slug}`} className="group bg-card border border-border rounded-sm overflow-hidden">
+              <Link key={p.slug} to={`/blog/${p.slug}`} className="group bg-white border border-border rounded-sm overflow-hidden flex flex-col">
                 <div className="relative h-44 overflow-hidden">
-                  <img src={p.image} alt={p.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
+                  <img src={p.image} alt={p.title} className="w-full h-full object-cover transition-all duration-700 group-hover:scale-[1.03]" loading="lazy" />
                 </div>
-                <div className="p-6">
-                  <span className="text-brand-orange font-bold uppercase tracking-widest text-[10px]">{p.category}</span>
-                  <h3 className="font-display text-lg tracking-tight text-brand-navy leading-snug mt-2 group-hover:text-brand-orange transition-colors">{p.title}</h3>
+                <div className="p-6 flex-1 flex flex-col">
+                  <span className="text-brand-orange font-bold uppercase tracking-[1px] text-[10px]">{p.category}</span>
+                  <h3 className="font-display text-[19px] tracking-tight text-brand-navy leading-snug mt-2.5 group-hover:text-brand-orange transition-colors flex-1">{p.title}</h3>
+                  <span className="mt-4 text-sm font-semibold text-brand-navy group-hover:text-brand-orange inline-flex items-center">
+                    Read article <ArrowUpRight size={15} className="ml-1.5 group-hover:translate-x-0.5 transition" />
+                  </span>
                 </div>
               </Link>
             ))}

@@ -113,7 +113,7 @@ export default function AdminDashboard() {
       <header className="glass border-b border-white/10 sticky top-0 z-20">
         <div className="container-fg h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src={IMAGES.logo} alt="FloGuard" className="h-9 w-9 object-contain rounded-sm bg-white/95 p-0.5" />
+            <img src={IMAGES.logoIcon} alt="FloGuard" className="h-9 w-9 object-contain rounded-sm bg-white/95 p-0.5" />
             <span className="font-display text-lg">FloGuard <span className="text-white/40 text-sm">Leads</span></span>
           </div>
           <div className="flex items-center gap-4">

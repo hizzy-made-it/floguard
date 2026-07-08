@@ -5,6 +5,7 @@ import { Reveal } from "../components/Reveal";
 import { AssessmentQuiz } from "../components/AssessmentQuiz";
 import { Seo } from "../components/Seo";
 import { COMPANY, IMAGES, LANDING_FAQ, TESTIMONIALS } from "../data/site";
+import { StatsBar } from "../components/StatsBar";
 import { fadeUp, EASE } from "../lib/animations";
 
 const trustPoints = [
@@ -91,17 +92,19 @@ export default function Contact() {
         </div>
       </section>
 
+      <StatsBar />
+
       {/* ===== PROOF ===== */}
       <section className="section bg-brand-ink border-t border-white/10 grain relative">
         <div className="container-fg grid lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-6">
             <Reveal className="grid grid-cols-2 gap-4">
               <div className="rounded-sm overflow-hidden border border-white/10">
-                <img src={IMAGES.beforeFlooded} alt="Flooded Florida backyard before FloGuard" className="w-full h-64 object-cover" loading="lazy" />
+                <img src="/images/blog-storm-alt.jpg" alt="Flooded Central Florida backyard with standing water before drainage work" className="w-full h-64 object-cover" loading="lazy" />
                 <div className="bg-brand-surface text-xs uppercase tracking-widest text-white/50 px-3 py-2">Before</div>
               </div>
               <div className="rounded-sm overflow-hidden border border-white/10">
-                <img src={IMAGES.afterDry} alt="Dry, restored Florida yard after FloGuard drainage" className="w-full h-64 object-cover" loading="lazy" />
+                <img src="/images/contact-after.jpg" alt="Dry, lush restored Central Florida yard after FloGuard French drain system" className="w-full h-64 object-cover" loading="lazy" />
                 <div className="bg-brand-surface text-xs uppercase tracking-widest text-brand-orange px-3 py-2">After</div>
               </div>
             </Reveal>

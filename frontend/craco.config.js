@@ -98,6 +98,16 @@ let webpackConfig = {
         ],
       };
 
+      // Suppress noisy source-map warnings from transitive deps (e.g. @mediapipe/tasks-vision pulled by @react-three/drei)
+      // These are harmless and pollute the build output.
+      webpackConfig.ignoreWarnings = [
+        ...(webpackConfig.ignoreWarnings || []),
+        {
+          module: /@mediapipe\/tasks-vision/,
+        },
+        /Failed to parse source map/,
+      ];
+
       // Add health check plugin to webpack if enabled
       if (config.enableHealthCheck && healthPluginInstance) {
         webpackConfig.plugins.push(healthPluginInstance);

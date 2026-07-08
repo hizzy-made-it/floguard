@@ -10,7 +10,7 @@ const spanClass = {
   tall: "md:col-span-5",
 };
 
-export const ServicesGrid = () => (
+export const ServicesGrid = ({ onHover }) => (
   <div data-testid="services-grid" className="grid md:grid-cols-12 gap-5 md:gap-6">
     {SERVICES.map((s, i) => (
       <motion.article
@@ -20,17 +20,20 @@ export const ServicesGrid = () => (
         whileInView={{ opacity: 1, y: 0 }}
         viewport={viewportOnce}
         transition={{ duration: 0.7, ease: EASE, delay: (i % 2) * 0.1 }}
-        className={`group relative overflow-hidden rounded-sm border border-border bg-card ${spanClass[s.span]}`}
+        whileHover="hover"
+        onMouseEnter={() => onHover && onHover(s.id)}
+        onMouseLeave={() => onHover && onHover(null)}
+        className={`group relative overflow-hidden rounded-sm border border-border bg-card ${spanClass[s.span]} will-change-transform`}
       >
         <div className="relative h-56 md:h-64 overflow-hidden">
           <img
             src={s.image}
             alt={s.title}
             loading="lazy"
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            className="w-full h-full object-cover transition-all duration-700 group-hover:scale-[1.035] group-hover:brightness-[0.92]"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-brand-ink/70 to-transparent" />
-          <span className="absolute top-4 left-4 text-xs font-bold uppercase tracking-widest text-white/80">
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-ink/75 via-brand-ink/30 to-transparent" />
+          <span className="absolute top-4 left-4 text-xs font-bold uppercase tracking-[1px] text-white/70 bg-black/20 px-2 py-px rounded-sm">
             0{i + 1}
           </span>
         </div>

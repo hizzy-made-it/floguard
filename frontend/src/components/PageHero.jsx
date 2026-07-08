@@ -19,8 +19,9 @@ export const PageHero = ({ overline, title, subtitle, image, primary, secondary,
           className="absolute inset-0 w-full h-full object-cover"
         />
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-brand-ink via-brand-ink/55 to-brand-ink/20" />
-      <div className="absolute inset-0 bg-gradient-to-r from-brand-ink/70 via-brand-ink/20 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-brand-ink via-brand-ink/60 to-brand-ink/15" />
+      <div className="absolute inset-0 bg-gradient-to-r from-brand-ink/75 via-brand-ink/15 to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(#ffffff_0.6px,transparent_1px)] bg-[length:3px_3px] opacity-[0.035]" />
 
       <div className={`container-fg relative z-10 pb-16 pt-40 ${align === "center" ? "text-center mx-auto" : ""}`}>
         {overline && (
@@ -37,7 +38,7 @@ export const PageHero = ({ overline, title, subtitle, image, primary, secondary,
           initial={{ opacity: 0, y: 24, filter: "blur(10px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 0.9, ease: EASE, delay: 0.12 }}
-          className="font-display text-5xl sm:text-6xl lg:text-7xl tracking-tight leading-[0.95] max-w-4xl"
+          className="font-display text-5xl sm:text-6xl lg:text-7xl tracking-[-1.2px] leading-[0.92] max-w-4xl"
         >
           {title}
         </motion.h1>

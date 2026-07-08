@@ -45,7 +45,7 @@ export const GuideDownload = () => {
             you shouldn't ignore. Free, instant download.
           </p>
           <div className="mt-8 hidden lg:block">
-            <img src={IMAGES.diagram} alt="Florida Drainage Guide preview" className="w-full max-w-md rounded-sm border border-white/10" loading="lazy" />
+            <img src="/images/case4-before.jpg" alt="FloGuard French drain and sump pump system cross-section diagram" className="w-full max-w-md rounded-sm border border-white/10" loading="lazy" />
           </div>
         </div>
 

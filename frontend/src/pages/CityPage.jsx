@@ -9,9 +9,10 @@ import { ServicesGrid } from "../components/ServicesGrid";
 import { Testimonials } from "../components/Testimonials";
 import { FinalCTA } from "../components/FinalCTA";
 import { getCity, CITIES } from "../data/cities";
-import { COMPANY } from "../data/site";
+import { COMPANY, SYSTEM_EXPLANATION } from "../data/site";
 import { Seo } from "../components/Seo";
 import { EASE, viewportOnce } from "../lib/animations";
+import { StatsBar } from "../components/StatsBar";
 
 export default function CityPage() {
   const { slug } = useParams();
@@ -63,6 +64,8 @@ export default function CityPage() {
         secondary={{ label: `Call ${COMPANY.phone}`, to: "/contact" }}
       />
 
+      <StatsBar />
+
       {/* Local problems */}
       <section className="section bg-background">
         <div className="container-fg grid lg:grid-cols-12 gap-12">
@@ -81,7 +84,7 @@ export default function CityPage() {
               </a>
             </Reveal>
           </div>
-          <div className="lg:col-span-7 space-y-4">
+          <div className="lg:col-span-7 space-y-3">
             {city.problems.map((p, i) => (
               <motion.div
                 key={p}
@@ -89,12 +92,34 @@ export default function CityPage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={viewportOnce}
                 transition={{ duration: 0.6, ease: EASE, delay: i * 0.1 }}
-                className="flex items-start gap-4 bg-card border border-border rounded-sm p-6"
+                className="flex items-start gap-4 bg-white border border-border rounded-sm p-6 group"
               >
-                <span className="font-display text-2xl text-brand-orange">0{i + 1}</span>
-                <p className="text-lg text-brand-slate leading-relaxed">{p}</p>
+                <span className="font-display text-2xl text-brand-orange group-hover:text-brand-lime transition">0{i + 1}</span>
+                <p className="text-[17px] text-brand-slate leading-relaxed">{p}</p>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* System solution explanation - site wide */}
+      <section className="section bg-secondary">
+        <div className="container-fg">
+          <div className="max-w-3xl mb-12">
+            <Reveal>
+              <p className="overline mb-5">The Proven Solution</p>
+              <h2 className="font-display text-4xl sm:text-5xl tracking-tight text-brand-navy leading-tight">
+                French drain + sump pump: the most effective protection for {city.name}.
+              </h2>
+            </Reveal>
+          </div>
+          <div className="grid md:grid-cols-2 gap-8 text-lg text-brand-slate">
+            <Reveal>
+              <p>{SYSTEM_EXPLANATION.benefits}</p>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <p>{SYSTEM_EXPLANATION.bottomLine}</p>
+            </Reveal>
           </div>
         </div>
       </section>

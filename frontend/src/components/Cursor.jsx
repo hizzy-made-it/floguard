@@ -20,7 +20,11 @@ export const Cursor = () => {
       if (dot.current) dot.current.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
       const t = e.target;
       const interactive = t.closest("a, button, [role='button'], input, textarea, select, [data-cursor='hover']");
-      if (ring.current) ring.current.dataset.hover = interactive ? "true" : "false";
+      const isPrimary = !!t.closest('[data-testid*="cta"], .bg-brand-orange, [data-cursor="primary"]');
+      if (ring.current) {
+        ring.current.dataset.hover = interactive ? "true" : "false";
+        ring.current.dataset.primary = isPrimary ? "true" : "false";
+      }
     };
     const loop = () => {
       rx += (tx - rx) * 0.18; ry += (ty - ry) * 0.18;
@@ -46,7 +50,8 @@ export const Cursor = () => {
       <div
         ref={ring}
         data-hover="false"
-        className="pointer-events-none fixed top-0 left-0 z-[9998] -ml-4 -mt-4 w-8 h-8 rounded-full border border-brand-orange/60 transition-[width,height,margin,background-color,border-color] duration-200 data-[hover=true]:w-12 data-[hover=true]:h-12 data-[hover=true]:-ml-6 data-[hover=true]:-mt-6 data-[hover=true]:bg-brand-orange/10 data-[hover=true]:border-brand-orange"
+        data-primary="false"
+        className="fg-cursor-ring pointer-events-none fixed top-0 left-0 z-[9998] -ml-4 -mt-4 w-8 h-8 rounded-full border border-brand-orange/60 transition-[width,height,margin,background-color,border-color] duration-200"
       />
     </>
   );

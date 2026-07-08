@@ -27,7 +27,13 @@ export async function uploadPhoto(file) {
   const { data } = await client.post("/upload", fd, { headers: { "Content-Type": "multipart/form-data" } });
   return data; // { path, url }
 }
-export const fileUrl = (path) => `${API}/files/${path}`;
+export const fileUrl = (pathOrUrl) => {
+  if (!pathOrUrl) return '';
+  // If it's already a full URL (e.g. from Supabase), use it directly
+  if (pathOrUrl.startsWith('http')) return pathOrUrl;
+  // Fallback to backend proxy (legacy or non-public)
+  return `${API}/files/${pathOrUrl}`;
+};
 export async function submitGuide(payload) {
   const { data } = await client.post("/guide", payload);
   return data;
