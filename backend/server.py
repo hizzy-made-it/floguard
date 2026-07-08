@@ -21,9 +21,31 @@ import bcrypt
 import jwt
 
 # MongoDB connection
-mongo_url = os.environ['MONGO_URL']
+mongo_url = os.environ.get('MONGO_URL', '').strip()
+db_name = os.environ.get('DB_NAME', 'floguard')
+
+if not mongo_url:
+    raise RuntimeError("MONGO_URL environment variable is required")
+
+# Ensure the URI has the database name before options for reliable parsing
+if db_name:
+    if '?' in mongo_url:
+        base, opts = mongo_url.split('?', 1)
+        if not base.endswith('/' + db_name) and not base.endswith(db_name):
+            if base.endswith('/'):
+                base += db_name
+            else:
+                base += '/' + db_name
+        mongo_url = f"{base}?{opts}"
+    else:
+        if not mongo_url.endswith('/' + db_name):
+            if mongo_url.endswith('/'):
+                mongo_url += db_name
+            else:
+                mongo_url += '/' + db_name
+
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+db = client[db_name]
 
 # GridFS for file storage (free, uses existing MongoDB)
 fs = AsyncIOMotorGridFSBucket(db)
