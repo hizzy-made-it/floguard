@@ -41,7 +41,7 @@ export const POSTS = [
     date: "2026-06-29",
     readTime: 6,
     keyword: "standing water in yard",
-    image: "/images/case2-before.jpg",
+    image: "/images/case3-before.jpg",
     content: [
       { type: "p", text: "Standing water in your yard that lingers for hours or days after rain is one of the clearest signs your property has a drainage problem. In Central Florida — with our sandy-then-clay soils, flat lots and heavy summer storms — it's extremely common. Here's what's usually behind it." },
       { type: "h2", text: "The 7 usual suspects" },
@@ -69,7 +69,7 @@ export const POSTS = [
     date: "2026-06-22",
     readTime: 6,
     keyword: "french drain vs sump pump",
-    image: "/images/after.jpg",
+    image: "/images/case4-after.jpg",
     content: [
       { type: "p", text: "A lot of homeowners ask us whether they need a French drain or a sump pump. The truth is they solve different halves of the same problem — and in much of Central Florida, the best protection comes from pairing them." },
       { type: "h2", text: "What a French drain does" },
@@ -148,7 +148,7 @@ export const POSTS = [
     date: "2026-06-01",
     readTime: 6,
     keyword: "wet crawl space waterproofing",
-    image: "/images/case3-before.jpg",
+    image: "/images/case2-before.jpg",
     content: [
       { type: "p", text: "A wet or musty crawl space is more than a nuisance — moisture under your home invites mold, rots wood framing, and signals water pressing against your foundation. The good news: it's a very solvable problem." },
       { type: "h2", text: "How interior drainage works" },

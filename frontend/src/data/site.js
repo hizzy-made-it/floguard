@@ -227,8 +227,8 @@ export const CASE_STUDIES = [
     title: "Flooded Lanai & Patio",
     location: "Sanford, FL",
     category: "Yard Drainage",
-    before: "/images/foundation.jpg",
-    after: "/images/after.jpg",
+    before: IMAGES.case4Before,
+    after: IMAGES.case4After,
     summary:
       "A screened lanai flooded during summer storms. Catch basins, channel drains, and a French drain + sump system carry water to a safe discharge point far from the foundation.",
     result: "Usable patio all summer, even in heavy rain.",

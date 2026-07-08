@@ -111,7 +111,7 @@ export default function CaseStudies() {
         overline="Results & Case Studies"
         title="From swamped to bone dry."
         subtitle="Real Central Florida properties we've protected with French drain + sump pump systems. Drag the slider to see the transformation from flooded to dry."
-        image="/images/landscaped.jpg"
+        image="/images/case-studies-hero.jpg"
         primary={{ label: "Get your transformation", to: "/contact" }}
       />
 

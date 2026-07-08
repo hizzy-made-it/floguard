@@ -332,7 +332,7 @@ export default function Home() {
           <FlowPath />
 
           <Reveal delay={0.1} className="mt-14 rounded-sm overflow-hidden border border-border">
-            <img src="/images/case-studies-hero.jpg" alt="Technical cross-section of FloGuard French drain and sump pump drainage system" className="w-full object-cover" loading="lazy" />
+            <img src="/images/diagram.jpg" alt="Technical diagram of FloGuard French drain and sump pump drainage system" className="w-full object-cover" loading="lazy" />
           </Reveal>
 
           <div className="mt-10">

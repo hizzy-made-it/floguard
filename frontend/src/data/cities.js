@@ -36,7 +36,7 @@ export const CITIES = [
     slug: "sanford",
     name: "Sanford",
     county: "Seminole County",
-    image: "/images/before.jpg",
+    image: "/images/case4-before.jpg",
     intro:
       "Near Lake Monroe, Sanford homes deal with rising groundwater and slow-draining soils. FloGuard engineers custom drainage that channels water safely away from your home and landscaping.",
     problems: [
@@ -96,7 +96,7 @@ export const CITIES = [
     slug: "deland",
     name: "DeLand",
     county: "Volusia County",
-    image: "/images/diagram.jpg",
+    image: "/images/landscaped.jpg",
     intro:
       "Inland DeLand's soils and seasonal rain call for smart grading and French drains. We design systems that protect historic and new homes from standing water and erosion.",
     problems: [

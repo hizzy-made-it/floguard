@@ -157,7 +157,7 @@ export default function Process() {
           </div>
           <div className="lg:col-span-7">
             <Reveal className="rounded-sm overflow-hidden border border-border">
-              <img src="/images/case4-after.jpg" alt="FloGuard drainage system cross-section" className="w-full object-cover" loading="lazy" />
+              <img src="/images/diagram.jpg" alt="FloGuard drainage system diagram" className="w-full object-cover" loading="lazy" />
             </Reveal>
           </div>
         </div>

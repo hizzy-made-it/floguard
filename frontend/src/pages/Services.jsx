@@ -70,7 +70,7 @@ export default function Services() {
         overline="Services & Solutions"
         title="Every drainage problem has a custom fix."
         subtitle="Exterior French drains, interior sump systems, yard drainage & grading, plus ongoing pump maintenance. We install the right combination for Central Florida homes."
-        image="/images/storm.jpg"
+        image="/images/case1-after.jpg"
         primary={{ label: "Request an assessment", to: "/contact" }}
       />
 
