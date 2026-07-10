@@ -21,9 +21,15 @@ export default function Blog() {
   return (
     <>
       <Seo
-        title="Florida Drainage Blog — French Drains, Sump Pumps & Flood Tips | FloGuard"
-        description="Practical guides on French drains, sump pumps, standing water and flood protection for Central Florida homeowners, from the FloGuard crew."
+        title="Central Florida French Drain & Drainage Blog | FloGuard"
+        description="Expert guides on French drains, sump pumps, yard flooding and foundation protection for Daytona, Orlando, Port Orange and Central Florida homes."
         path="/blog"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Blog",
+          "name": "FloGuard Drainage Blog",
+          "description": "Practical advice on French drains, sump pumps and Florida drainage solutions."
+        }}
       />
       <PageHero
         overline="FloGuard Journal"

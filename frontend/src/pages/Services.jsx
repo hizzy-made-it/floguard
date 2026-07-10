@@ -65,7 +65,45 @@ export default function Services() {
 
   return (
     <>
-      <Seo title="Drainage Services — French Drains, Sump Pumps & Yard Drainage | FloGuard" description="Exterior & interior French drains, sump pump systems, yard drainage, catch basins and maintenance plans for Central Florida homes." path="/services" />
+      <Seo 
+        title="French Drain & Sump Pump Services | Central Florida | FloGuard" 
+        description="Expert French drain installation, sump pumps, and yard drainage in Port Orange, Daytona, Orlando and Central Florida. Custom engineered systems for high water tables and heavy rain. Free assessments." 
+        path="/services" 
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              "name": "FloGuard, LLC",
+              "url": "https://www.floguardfl.com",
+              "logo": "https://www.floguardfl.com/images/logo.png",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "5114 S Ridgewood Ave",
+                "addressLocality": "Port Orange",
+                "addressRegion": "FL",
+                "postalCode": "32127",
+                "addressCountry": "US"
+              },
+              "telephone": "(386) 259-0023"
+            },
+            {
+              "@type": "Service",
+              "serviceType": "Exterior French Drains",
+              "provider": { "@id": "https://www.floguardfl.com/#organization" },
+              "areaServed": ["Port Orange", "Daytona Beach", "Orlando", "Central Florida"],
+              "description": "Perimeter French drain systems with perforated pipe in gravel and filter fabric to protect foundations from groundwater and runoff."
+            },
+            {
+              "@type": "Service",
+              "serviceType": "Interior Drains + Sump Pumps",
+              "provider": { "@id": "https://www.floguardfl.com/#organization" },
+              "areaServed": ["Port Orange", "Daytona Beach", "Orlando", "Central Florida"],
+              "description": "Interior drainage systems and automatic sump pumps for crawlspaces and flat lots with high water tables."
+            }
+          ]
+        }}
+      />
       <PageHero
         overline="Services & Solutions"
         title="Every drainage problem has a custom fix."

@@ -32,8 +32,8 @@ export default function CityPage() {
   return (
     <>
       <Seo
-        title={`French Drains & Drainage in ${city.name}, FL — FloGuard LLC`}
-        description={`Professional French drain, sump pump & yard drainage in ${city.name}, ${city.county}. Stop standing water and protect your foundation. Free assessments.`}
+        title={`French Drain & Sump Pump Installation in ${city.name}, FL | FloGuard`}
+        description={`Professional French drain, sump pump & yard drainage in ${city.name}, ${city.county}. Stop standing water and protect your foundation from Florida's high water table. Free assessments.`}
         path={`/areas/${city.slug}`}
         image={city.image}
         jsonLd={{
@@ -53,6 +53,15 @@ export default function CityPage() {
             addressCountry: "US",
           },
           aggregateRating: { "@type": "AggregateRating", ratingValue: "5.0", reviewCount: "2" },
+          hasOfferCatalog: {
+            "@type": "OfferCatalog",
+            name: "Drainage Services",
+            itemListElement: [
+              { "@type": "Offer", itemOffered: { "@type": "Service", name: "French Drain Installation" } },
+              { "@type": "Offer", itemOffered: { "@type": "Service", name: "Sump Pump Systems" } },
+              { "@type": "Offer", itemOffered: { "@type": "Service", name: "Yard Drainage & Grading" } }
+            ]
+          }
         }}
       />
       <PageHero
@@ -118,7 +127,7 @@ export default function CityPage() {
               <p>{SYSTEM_EXPLANATION.benefits}</p>
             </Reveal>
             <Reveal delay={0.1}>
-              <p>{SYSTEM_EXPLANATION.bottomLine}</p>
+              <p>{SYSTEM_EXPLANATION.bottomLine} <Link to="/services" className="text-brand-orange hover:underline">See our full services for {city.name}.</Link></p>
             </Reveal>
           </div>
         </div>
@@ -147,6 +156,7 @@ export default function CityPage() {
             </h2>
           </Reveal>
           <ServicesGrid />
+          <p className="mt-4 text-brand-slate">Learn exactly <Link to="/process" className="text-brand-orange hover:underline">how our process works</Link> for homes in {city.name}.</p>
         </div>
       </section>
 

@@ -15,6 +15,7 @@ import { LeadForm } from "../components/LeadForm";
 import { COMPANY, IMAGES, SERVICE_AREAS } from "../data/site";
 import { wordContainer, wordChild, fadeUp, EASE } from "../lib/animations";
 import { Seo } from "../components/Seo";
+import { LANDING_FAQ } from "../data/site";
 
 const headline = ["Protected", "flow.", "Engineered", "trust."];
 
@@ -139,9 +140,21 @@ export default function Home() {
   return (
     <>
       <Seo
-        title="FloGuard LLC — French Drain & Sump Pump Flood Solutions | Central Florida"
-        description="Flooded yard, wet crawlspace or foundation damage? FloGuard engineers custom French drain and sump pump systems that keep Central Florida homes dry. Request a free drainage assessment."
+        title="French Drain & Sump Pump Installation | Central Florida | FloGuard"
+        description="Stop flooded yards, wet crawlspaces, and foundation damage in Central Florida. FloGuard designs and installs custom French drains and sump pumps. Free on-site assessments in Daytona, Port Orange, Orlando area."
         path="/"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": LANDING_FAQ.slice(0, 5).map(faq => ({
+            "@type": "Question",
+            "name": faq.q,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": faq.a
+            }
+          }))
+        }}
       />
       {/* ===== CINEMATIC HERO (video) ===== */}
       <section 

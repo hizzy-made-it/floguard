@@ -14,9 +14,20 @@ export default function Areas() {
   return (
     <>
       <Seo
-        title="Areas We Serve — Drainage & French Drains Across Central Florida | FloGuard"
-        description="FloGuard installs French drain and sump pump systems across Daytona Beach, Port Orange, Sanford, Orlando and the Central Florida corridor. Free assessments."
+        title="Areas We Serve | French Drain & Sump Pump Services Central Florida | FloGuard"
+        description="French drain and sump pump installation across Daytona Beach, Port Orange, Sanford, Orlando, New Smyrna and Central Florida. Free assessments in all service areas."
         path="/areas"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          "name": "FloGuard Service Areas",
+          "itemListElement": CITIES.map((c, i) => ({
+            "@type": "ListItem",
+            "position": i + 1,
+            "name": c.name,
+            "url": `https://www.floguardfl.com/areas/${c.slug}`
+          }))
+        }}
       />
       <PageHero
         overline="Areas We Serve"

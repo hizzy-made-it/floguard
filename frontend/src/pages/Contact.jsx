@@ -38,9 +38,15 @@ export default function Contact() {
   return (
     <>
       <Seo
-        title="Free Florida Drainage Assessment — Stop Yard Flooding | FloGuard"
-        description="Flooded yard or wet foundation? Answer a few quick questions and get a FREE on-site drainage assessment from FloGuard. Serving Daytona, Port Orange, Sanford & Orlando."
+        title="Free French Drain & Sump Pump Assessment | Central Florida | FloGuard"
+        description="Get a free on-site drainage assessment for your flooded yard, wet crawlspace or foundation issues. Serving Daytona Beach, Port Orange, Orlando and Central Florida."
         path="/contact"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "ContactPage",
+          "name": "Contact FloGuard for Free Drainage Assessment",
+          "description": "Free assessments for French drain and sump pump systems in Central Florida."
+        }}
       />
 
       {/* ===== HERO + QUIZ ===== */}

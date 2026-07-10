@@ -12,7 +12,35 @@ const VALUE_ICONS = [ShieldCheck, Users, MapPin, Award];
 export default function About() {
   return (
     <>
-      <Seo title="About FloGuard — Local, Family-Run Drainage Experts in Central Florida" description="FloGuard is a local, family-run flood & drainage contractor engineering custom French drain and sump pump systems for Central Florida homes." path="/about" />
+      <Seo 
+        title="About FloGuard | Local French Drain & Sump Pump Experts Central Florida" 
+        description="Family-run Central Florida drainage contractor. Learn about our engineered French drain and sump pump systems for high water table homes in Daytona, Port Orange, and Orlando areas." 
+        path="/about" 
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "name": "FloGuard, LLC",
+          "description": "Local family-run contractor engineering custom French drain and sump pump systems for Central Florida homes.",
+          "url": "https://www.floguardfl.com",
+          "telephone": "(386) 259-0023",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "5114 S Ridgewood Ave",
+            "addressLocality": "Port Orange",
+            "addressRegion": "FL",
+            "postalCode": "32127"
+          },
+          "areaServed": "Central Florida",
+          "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Drainage Services",
+            "itemListElement": [
+              {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "French Drain Installation"}},
+              {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Sump Pump Systems"}}
+            ]
+          }
+        }}
+      />
       <PageHero
         overline="About FloGuard"
         title="A local team that takes flooding personally."

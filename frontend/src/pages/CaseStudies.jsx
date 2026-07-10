@@ -106,7 +106,24 @@ export default function CaseStudies() {
 
   return (
     <>
-      <Seo title="Results & Case Studies — Before & After Drainage Projects | FloGuard" description="See real Central Florida yards transformed from flooded to bone dry. Drag the before/after slider on our French drain and sump pump projects." path="/case-studies" />
+      <Seo 
+        title="Before & After French Drain & Sump Pump Results | Central Florida | FloGuard" 
+        description="Real Central Florida case studies: flooded yards and crawlspaces transformed by our French drain and sump pump systems. Drag to see the difference." 
+        path="/case-studies" 
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          "name": "FloGuard Case Studies",
+          "description": "Before and after results for French drain and sump pump installations in Central Florida.",
+          "hasPart": {
+            "@type": "ItemList",
+            "itemListElement": [
+              {"@type": "ListItem", "position": 1, "name": "Chronic Backyard Flooding - Port Orange"},
+              {"@type": "ListItem", "position": 2, "name": "Wet Crawlspace - Daytona Beach"}
+            ]
+          }
+        }}
+      />
       <PageHero
         overline="Results & Case Studies"
         title="From swamped to bone dry."
@@ -135,6 +152,10 @@ export default function CaseStudies() {
                 {f}
               </button>
             ))}
+          </div>
+
+          <div className="max-w-3xl mb-8">
+            <p className="text-lg text-brand-slate">Our before-and-after results prove that a properly designed French drain and sump pump system can transform flooded Central Florida properties. Most clients see standing water gone within hours of storms after installation.</p>
           </div>
 
           <motion.div layout className="grid md:grid-cols-2 gap-6">

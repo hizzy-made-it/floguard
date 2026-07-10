@@ -8,7 +8,7 @@ export const CITIES = [
     county: "Volusia County",
     image: "/images/crew.jpg",
     intro:
-      "Coastal Daytona Beach homes face a high water table and intense summer storms. A sump pump + French drain system is one of the most effective ways to protect a home from water damage caused by heavy Florida rain and high groundwater. FloGuard designs these systems built to keep your yard dry and your foundation protected — even feet from the Atlantic.",
+      "Coastal Daytona Beach homes face a high water table and intense summer storms. A sump pump + French drain system is one of the most effective ways to protect a home from water damage caused by heavy Florida rain and high groundwater. FloGuard designs these systems built to keep your yard dry and your foundation protected — even feet from the Atlantic. Learn more on our [services page](/services) or [how it works](/process).",
     problems: [
       "High water table saturating soil quickly near the coast",
       "Flooded yards and lanais after afternoon storms",
@@ -23,7 +23,7 @@ export const CITIES = [
     county: "Volusia County",
     image: "/images/french-drain.jpg",
     intro:
-      "Right here in our hometown of Port Orange, flat lots and clay-heavy soil trap water against foundations. A sump pump + French drain system is one of the most effective ways to protect a home from water damage caused by heavy Florida rain and high groundwater. Florida's high water table, flat terrain, and intense storms make this the ideal solution. As your local drainage crew, we know exactly how Port Orange properties flood — and how to stop it.",
+      "Right here in our hometown of Port Orange, flat lots and clay-heavy soil trap water against foundations. A sump pump + French drain system is one of the most effective ways to protect a home from water damage caused by heavy Florida rain and high groundwater. Florida's high water table, flat terrain, and intense storms make this the ideal solution. As your local drainage crew, we know exactly how Port Orange properties flood — and how to stop it. See our [services](/services) and [process](/process).",
     problems: [
       "Flat lots with no natural downhill discharge",
       "Standing water on patios, driveways and low lawns",
@@ -38,7 +38,7 @@ export const CITIES = [
     county: "Seminole County",
     image: "/images/case4-before.jpg",
     intro:
-      "Near Lake Monroe, Sanford homes deal with rising groundwater and slow-draining soils. FloGuard engineers custom drainage that channels water safely away from your home and landscaping.",
+      "Near Lake Monroe, Sanford homes deal with rising groundwater and slow-draining soils. FloGuard engineers custom drainage that channels water safely away from your home and landscaping. Check our [services](/services) and [areas](/areas) for more.",
     problems: [
       "Rising groundwater near Lake Monroe and the St. Johns River",
       "Chronic standing water in historic-district yards",
@@ -53,7 +53,7 @@ export const CITIES = [
     county: "Orange County",
     image: "/images/case1-after.jpg",
     intro:
-      "Across the Orlando metro, heavy seasonal rain overwhelms yards and threatens foundations. FloGuard brings engineered French drain and sump pump systems to homeowners and investors throughout the region.",
+      "Across the Orlando metro, heavy seasonal rain overwhelms yards and threatens foundations. FloGuard brings engineered French drain and sump pump systems to homeowners and investors throughout the region. Explore our [services](/services) for Orlando or read the [how it works](/process).",
     problems: [
       "Intense wet-season downpours overwhelming yards",
       "Rental and flip properties needing reliable drainage fixes",

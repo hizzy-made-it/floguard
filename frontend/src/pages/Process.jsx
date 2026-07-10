@@ -21,7 +21,23 @@ export default function Process() {
 
   return (
     <>
-      <Seo title="How It Works — French Drain + Sump Pump Systems in Florida | FloGuard" description="Learn why a French drain + sump pump system is one of the most effective protections against Florida's high water table, flat terrain, and heavy rain. Detailed explanation for Daytona Beach and Central Florida homes." path="/process" />
+      <Seo 
+        title="How French Drains + Sump Pumps Work in Florida | FloGuard" 
+        description="Step-by-step explanation of French drain and sump pump systems for high water tables, flat lots, and heavy Florida rain. Engineered protection for Central Florida homes." 
+        path="/process" 
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "HowTo",
+          "name": "How a French Drain + Sump Pump System Works",
+          "description": "Detailed process of how FloGuard systems protect homes from Florida flooding.",
+          "step": [
+            { "@type": "HowToStep", "name": "Site Evaluation", "text": "Walk the property and map water entry points." },
+            { "@type": "HowToStep", "name": "Custom Design", "text": "Engineer trench layout, slopes, and discharge for your yard." },
+            { "@type": "HowToStep", "name": "Installation", "text": "Install French drain, sump basin, pump, and safe discharge line." },
+            { "@type": "HowToStep", "name": "Maintenance", "text": "Test and service the system for long-term performance." }
+          ]
+        }}
+      />
       <PageHero
         overline="Technology & Process"
         title="How FloGuard keeps your home dry."
