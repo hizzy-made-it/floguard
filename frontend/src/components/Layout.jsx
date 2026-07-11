@@ -5,6 +5,7 @@ import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import { ScrollProgress } from "./ScrollProgress";
 import { Cursor } from "./Cursor";
+import { ChatWidget } from "./chat/ChatWidget";
 
 export const Layout = ({ children }) => {
   const { pathname } = useLocation();
@@ -35,6 +36,7 @@ export const Layout = ({ children }) => {
       <Navbar />
       <main>{children}</main>
       <Footer />
+      <ChatWidget />
     </div>
   );
 };

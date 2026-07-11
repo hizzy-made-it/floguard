@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Phone, Star, ShieldCheck, Clock, MapPin, Check, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Reveal } from "../components/Reveal";
 import { AssessmentQuiz } from "../components/AssessmentQuiz";
 import { Seo } from "../components/Seo";
@@ -35,6 +35,16 @@ const FaqItem = ({ q, a, idx }) => {
 };
 
 export default function Contact() {
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.location.hash !== "#assessment") return;
+    // After layout scroll-to-top on route change, re-scroll to quiz
+    const t = setTimeout(() => {
+      document.getElementById("assessment")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 80);
+    return () => clearTimeout(t);
+  }, []);
+
   return (
     <>
       <Seo
@@ -50,7 +60,11 @@ export default function Contact() {
       />
 
       {/* ===== HERO + QUIZ ===== */}
-      <section data-testid="landing-hero" className="relative bg-brand-ink text-white grain overflow-hidden pt-32 pb-16 lg:pt-40 lg:pb-24">
+      <section
+        id="assessment"
+        data-testid="landing-hero"
+        className="relative bg-brand-ink text-white grain overflow-hidden pt-32 pb-16 lg:pt-40 lg:pb-24 scroll-mt-24"
+      >
         <div className="pointer-events-none absolute -top-24 -left-24 w-[36rem] h-[36rem] rounded-full bg-brand-orange/10 blur-3xl" />
         <div className="container-fg relative z-10 grid lg:grid-cols-12 gap-12 items-start">
           {/* Left: value prop */}

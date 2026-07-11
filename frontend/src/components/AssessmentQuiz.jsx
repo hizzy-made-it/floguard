@@ -1,9 +1,10 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ArrowRight, ArrowLeft, Loader2, PhoneCall, Upload, X, ImagePlus } from "lucide-react";
 import { submitLead, uploadPhoto } from "../lib/api";
-import { QUIZ, COMPANY } from "../data/site";
+import { QUIZ, COMPANY, SERVICE_AREAS } from "../data/site";
 import { EASE } from "../lib/animations";
+import { consumeChatHandoff, formatHandoffMessage } from "../lib/chatHandoff";
 
 const fieldBase =
   "w-full bg-white/5 border border-white/15 text-white px-4 py-3 rounded-sm text-base placeholder-white/30 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange outline-none transition-colors";
@@ -16,6 +17,27 @@ export const AssessmentQuiz = () => {
   const [status, setStatus] = useState("idle");
   const [errors, setErrors] = useState({});
   const advancing = useRef(false);
+  const handoffSource = useRef("landing");
+
+  useEffect(() => {
+    const handoff = consumeChatHandoff();
+    if (!handoff) return;
+    handoffSource.current = "chatbot";
+    const note = formatHandoffMessage(handoff);
+    setContact((c) => ({
+      ...c,
+      message: c.message?.trim() ? c.message : note,
+    }));
+    if (handoff.inferredLocation) {
+      const loc = handoff.inferredLocation;
+      const match =
+        SERVICE_AREAS.find((a) => a.toLowerCase() === loc.toLowerCase()) ||
+        (loc ? "Other / nearby" : "");
+      if (match) {
+        setAnswers((a) => (a.location ? a : { ...a, location: match }));
+      }
+    }
+  }, []);
 
   const step = QUIZ[index];
   const last = QUIZ.length - 1;
@@ -99,7 +121,7 @@ export const AssessmentQuiz = () => {
         address: contact.address,
         message: contact.message,
         photos: photos.filter((p) => p.status === "done").map((p) => p.path),
-        source: "landing",
+        source: handoffSource.current || "landing",
       });
       setStatus("success");
     } catch {
