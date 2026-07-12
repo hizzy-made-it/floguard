@@ -4,7 +4,7 @@ import { motion, useScroll, useSpring } from "framer-motion";
 import { ArrowLeft, ArrowUpRight, Calendar, Clock, Phone } from "lucide-react";
 import { getPost, POSTS, formatDate } from "../data/blog";
 import { COMPANY, IMAGES } from "../data/site";
-import { Seo } from "../components/Seo";
+import { Seo, organizationLd, faqPageLd, SITE } from "../components/Seo";
 import { EASE } from "../lib/animations";
 
 function Block({ block }) {
@@ -85,21 +85,27 @@ export default function BlogPost() {
         type="article"
         jsonLd={{
           "@context": "https://schema.org",
-          "@type": "BlogPosting",
-          headline: post.title,
-          description: post.excerpt,
-          image: post.image,
-          datePublished: post.date,
-          dateModified: post.date,
-          keywords: post.keyword,
-          articleSection: post.category,
-          author: { "@type": "Organization", name: "FloGuard, LLC" },
-          publisher: {
-            "@type": "Organization",
-            name: "FloGuard, LLC",
-            logo: { "@type": "ImageObject", url: IMAGES.logo },
-          },
-          mainEntityOfPage: `https://www.floguardfl.com/blog/${post.slug}`,
+          "@graph": [
+            {
+              "@type": "BlogPosting",
+              headline: post.title,
+              description: post.excerpt,
+              image: post.image?.startsWith("http") ? post.image : `${SITE}${post.image}`,
+              datePublished: post.date,
+              dateModified: post.date,
+              keywords: post.keyword,
+              articleSection: post.category,
+              author: { "@id": organizationLd["@id"] },
+              publisher: {
+                "@type": "Organization",
+                name: "FloGuard, LLC",
+                logo: { "@type": "ImageObject", url: IMAGES.logo },
+              },
+              mainEntityOfPage: `${SITE}/blog/${post.slug}`,
+            },
+            organizationLd,
+            faqPageLd(post.faqs || []),
+          ].filter(Boolean),
         }}
       />
       {/* article read progress */}
@@ -146,6 +152,22 @@ export default function BlogPost() {
                 <Block key={i} block={b} />
               ))}
             </div>
+
+            {post.faqs?.length > 0 && (
+              <section className="mt-14" aria-labelledby="blog-faq-heading">
+                <h2 id="blog-faq-heading" className="font-display text-2xl sm:text-3xl tracking-tight text-brand-navy mb-6">
+                  Frequently asked questions
+                </h2>
+                <div className="space-y-6">
+                  {post.faqs.map((f) => (
+                    <div key={f.q} className="border-b border-border pb-6">
+                      <h3 className="font-display text-xl text-brand-navy">{f.q}</h3>
+                      <p className="mt-2 text-brand-slate leading-relaxed">{f.a}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
 
             {/* inline CTA */}
             <div className="mt-14 rounded-sm bg-brand-navy text-white p-8 sm:p-10">

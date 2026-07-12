@@ -1,6 +1,51 @@
+# FloGuard — search + AI answer engines
+# Canonical host: https://www.floguardfl.com
+# Note: If Cloudflare Managed robots overrides this file, disable AI crawl blocks
+# for GPTBot/ClaudeBot/PerplexityBot/Google-Extended in the CF dashboard for AEO.
+
+# --- Search engines ---
 User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /admin/login
+Disallow: /studio
 
+# --- AI / answer engines (explicit allow for GEO/AEO) ---
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GoogleOther
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+# --- Sitemap ---
 Sitemap: https://www.floguardfl.com/sitemap.xml

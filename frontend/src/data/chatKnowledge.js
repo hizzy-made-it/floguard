@@ -20,16 +20,19 @@ function serviceEntry(s) {
     id: `service-${s.id}`,
     category: "service",
     title: s.title,
-    answer: `${s.title}: ${s.blurb} Key details: ${s.features.join("; ")}.`,
+    answer: `${s.answerFirst || s.blurb} Details: ${s.features.join("; ")}. Learn more: /services/${s.slug || s.id}. Free assessment: /contact.`,
     keywords: [
       s.title.toLowerCase(),
       s.id,
+      s.slug || "",
       ...s.features.map((f) => f.toLowerCase()),
       "service",
       "services",
       "install",
       "installation",
-    ],
+      "french drain",
+      "sump",
+    ].filter(Boolean),
     relatedChips: ["What's the process?", "Book free assessment", "Do you serve my area?"],
   };
 }
@@ -268,7 +271,7 @@ export const CHAT_KNOWLEDGE = [
     id: `city-${city.slug}`,
     category: "area",
     title: `${city.name} drainage`,
-    answer: `${city.name} (${city.county}): ${city.intro} Common issues: ${city.problems.join("; ")}. Neighborhoods we know well include ${city.neighborhoods.slice(0, 4).join(", ")}.`,
+    answer: `${city.name} (${city.county}): ${city.intro} ${city.deepDive ? city.deepDive.slice(0, 280) + "…" : ""} Common issues: ${city.problems.join("; ")}. Neighborhoods: ${city.neighborhoods.slice(0, 4).join(", ")}. ${(city.faqs || []).slice(0, 1).map((f) => `${f.q} ${f.a}`).join(" ")} More: /areas/${city.slug}. Free assessment: /contact.`,
     keywords: [
       city.name.toLowerCase(),
       city.slug.replace(/-/g, " "),

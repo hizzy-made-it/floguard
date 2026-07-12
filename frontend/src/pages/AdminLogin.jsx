@@ -5,6 +5,7 @@ import { Loader2, Lock } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { IMAGES } from "../data/site";
 import { EASE } from "../lib/animations";
+import { Seo } from "../components/Seo";
 
 function formatErr(detail) {
   if (!detail) return "Login failed. Please try again.";
@@ -37,6 +38,7 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen bg-brand-ink grain flex items-center justify-center p-6">
+      <Seo title="Admin Login | FloGuard" description="FloGuard admin sign-in." path="/admin/login" noindex />
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}

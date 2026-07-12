@@ -14,6 +14,12 @@ export const POSTS = [
     readTime: 12,
     keyword: "french drain cost florida",
     image: "/images/case-studies-hero.jpg",
+    faqs: [
+      { q: "How much does a French drain cost in Central Florida in 2026?", a: "Most professional French drain + sump systems for a single-family home cost about $4,500–$12,000. Simple perimeter work can start near $3,500; complex multi-sump systems can exceed $15,000." },
+      { q: "Why can’t you quote over the phone?", a: "Florida lots vary by water table, slope, soil, and discharge path. A free on-site assessment produces an accurate engineered price." },
+      { q: "Does the price usually include a sump pump?", a: "On flat Central Florida lots, yes — most complete systems include a sump because gravity alone is not enough." },
+      { q: "What makes a cheap French drain fail?", a: "Missing filter fabric, wrong slope, undersized pipe, or bad discharge. Failures often require full re-digs within a few rainy seasons." },
+    ],
     content: [
       { type: "p", text: "Professional French drain and sump pump systems in Central Florida typically cost between $4,500 and $12,000 for a standard single-family home. Simple perimeter drains on smaller properties can start around $3,500, while complex whole-yard systems with multiple sumps and long discharge runs often reach $15,000 or more. These numbers reflect custom engineering for Florida's high water tables, flat terrain, sandy soils, and heavy seasonal storms — not generic per-foot pricing." },
       { type: "h2", text: "2026 Cost Breakdown by Project Type" },
@@ -54,6 +60,12 @@ export const POSTS = [
     readTime: 6,
     keyword: "standing water in yard",
     image: "/images/case3-before.jpg",
+        faqs: [
+      { q: "Why is water standing in my Florida yard?", a: "Common causes include poor grading, high water table, compacted soil, downspouts dumping into low spots, and no collection system. Florida rain and flat lots make this very common." },
+      { q: "How do I fix standing water after rain?", a: "Professional fixes usually combine French drains, catch basins or re-grading, and often a sump pump to discharge water safely away from the foundation." },
+      { q: "Is standing water bad for my foundation?", a: "Yes. Prolonged moisture raises hydrostatic pressure, encourages crawlspace mold, and can lead to structural moisture issues." },
+      { q: "Should I DIY a French drain?", a: "DIY kits often fail in Florida sand without proper fabric and slope. Engineered installs last longer and protect the foundation correctly." }
+    ],
     content: [
       { type: "p", text: "Standing water in your yard that lingers for hours or days after rain is one of the clearest signs your property has a drainage problem. In Central Florida — with our sandy-then-clay soils, flat lots and heavy summer storms — it's extremely common. Here's what's usually behind it." },
       { type: "h2", text: "The 7 usual suspects" },
@@ -82,6 +94,12 @@ export const POSTS = [
     readTime: 10,
     keyword: "french drain vs sump pump",
     image: "/images/case4-after.jpg",
+        faqs: [
+      { q: "Do I need a French drain or a sump pump?", a: "In Central Florida you often need both: the French drain collects water; the sump lifts it when the lot is too flat or the water table is high." },
+      { q: "Can a French drain work without a sump pump?", a: "Only if there is enough natural slope and a legal gravity discharge. Many Florida lots do not have that." },
+      { q: "Can a sump pump work without a French drain?", a: "A sump alone helps a pit area but will not intercept perimeter groundwater as effectively as a combined system." },
+      { q: "What does FloGuard recommend for high water table homes?", a: "A fabric-lined French drain routed to a sealed sump with check valve and battery backup options for storm outages." }
+    ],
     content: [
       { type: "p", text: "Most homes in Central Florida need both a French drain and a sump pump working together. A French drain collects water by gravity in a gravel trench and pipe. A sump pump actively lifts that water out when gravity alone isn't enough — which is the case for the majority of flat lots and high water table properties here. Pairing them solves yard flooding, foundation pressure, and crawlspace issues at once." },
       { type: "h2", text: "French Drain vs. Sump Pump Comparison" },
@@ -120,6 +138,12 @@ export const POSTS = [
     readTime: 9,
     keyword: "foundation drainage problem",
     image: "/images/case2-after.jpg",
+        faqs: [
+      { q: "What are signs of a foundation drainage problem?", a: "Standing water near the foundation, damp crawlspaces, musty smells, soil erosion, cracks or moisture at the slab edge, and water after every storm." },
+      { q: "Can drainage problems cause mold?", a: "Persistent moisture under or around the home supports mold growth in crawlspaces and wall cavities." },
+      { q: "When should I call a pro?", a: "If water lingers for hours after rain, the crawlspace is wet, or you see foundation moisture — request a free assessment." },
+      { q: "Will a French drain protect the foundation?", a: "A properly designed French drain lowers hydrostatic pressure around the foundation and is one of the most effective protections in Florida." }
+    ],
     content: [
       { type: "p", text: "Your foundation is the most expensive thing water can damage — and drainage problems usually give warning signs long before cracks appear. In Central Florida's high water table and heavy rain environment, catching these early can save you thousands in repairs. Here are the five key signs to watch for, plus what to do about them." },
       { type: "h2", text: "The 5 Warning Signs" },
@@ -148,6 +172,12 @@ export const POSTS = [
     readTime: 8,
     keyword: "florida rainy season yard prep",
     image: "/images/blog-storm-alt.jpg",
+        faqs: [
+      { q: "When is Florida rainy season?", a: "Typically late spring through early fall (roughly May–October), with intense afternoon storms and tropical systems." },
+      { q: "How should I prepare my yard for rainy season?", a: "Clear gutters, test sump pumps monthly, clear discharge lines, and schedule professional drainage service before peak storms." },
+      { q: "Should I test my sump pump before hurricane season?", a: "Yes. Pour water into the basin monthly and service batteries every few years. Professional checks before wet season are ideal." },
+      { q: "What if my yard already floods every summer?", a: "You likely need engineered drainage — French drains, grading, and/or a sump. Book a free FloGuard assessment." }
+    ],
     content: [
       { type: "p", text: "Central Florida's rainy season arrives with afternoon downpours that can drop inches of water in an hour. Proper preparation now prevents flooded yards, foundation damage, and costly repairs later. The best defense combines proactive maintenance with a professionally designed French drain and sump pump system." },
       { type: "h2", text: "Pre-Season Checklist for Central Florida Homes" },
@@ -176,6 +206,12 @@ export const POSTS = [
     readTime: 6,
     keyword: "wet crawl space waterproofing",
     image: "/images/case2-before.jpg",
+        faqs: [
+      { q: "How do you fix a wet crawlspace in Florida?", a: "Interior French drains to a sealed sump pump are common. We also address vapor and discharge so water leaves the home safely." },
+      { q: "Is a wet crawlspace dangerous?", a: "It can promote mold, wood rot, pest issues, and poor indoor air quality. Address moisture promptly." },
+      { q: "Do I need a dehumidifier only?", a: "Dehumidifiers help symptoms but do not remove the groundwater source. Drainage fixes the cause." },
+      { q: "Can FloGuard install interior drains?", a: "Yes. Interior drains + sump pumps are a core service for crawlspace and flat-lot homes." }
+    ],
     content: [
       { type: "p", text: "A wet or musty crawl space is more than a nuisance — moisture under your home invites mold, rots wood framing, and signals water pressing against your foundation. The good news: it's a very solvable problem." },
       { type: "h2", text: "How interior drainage works" },
@@ -201,6 +237,12 @@ export const POSTS = [
     readTime: 7,
     keyword: "catch basin yard grading",
     image: "/images/case4-before.jpg",
+        faqs: [
+      { q: "What is a catch basin used for?", a: "Catch basins collect surface water from low spots, driveways, and patios and route it into a drain pipe system." },
+      { q: "Do catch basins replace French drains?", a: "No. Catch basins handle surface water; French drains intercept subsurface/groundwater. Many yards need both." },
+      { q: "Will re-grading fix standing water alone?", a: "Sometimes for mild surface pooling. High water tables usually need subsurface collection and discharge." },
+      { q: "Can you fix flooded patios and lanais?", a: "Yes — channel drains, catch basins, and French drain/sump systems are common patio fixes." }
+    ],
     content: [
       { type: "p", text: "Not every drainage problem in Central Florida requires a full French drain system. For surface water pooling on patios, driveways, and low lawn areas, catch basins, re-grading, and swales are often the most effective and cost-efficient solutions. These tools work alone or combined with French drains for complete protection." },
       { type: "h2", text: "Catch Basins vs Grading vs Swales Comparison" },
@@ -235,6 +277,12 @@ export const POSTS = [
     readTime: 5,
     keyword: "french drain home value",
     image: "/images/case3-after.jpg",
+        faqs: [
+      { q: "Does a French drain add home value?", a: "It protects the foundation and improves usability of the yard — key factors buyers and inspectors care about, even if ROI is not a fixed percentage." },
+      { q: "Do buyers notice drainage problems?", a: "Yes. Standing water, crawlspace moisture, and inspection flags can delay sales or lower offers." },
+      { q: "Is drainage a good investment before listing?", a: "Fixing active water issues before listing reduces inspection risk and improves curb appeal after storms." },
+      { q: "Will the system be visible after install?", a: "Proper installs are underground; landscaping is restored so the yard looks continuous." }
+    ],
     content: [
       { type: "p", text: "When homeowners weigh the cost of a drainage system, they often ask: will this add value to my home? For Florida properties especially, the answer is a strong yes — both in resale price and in avoided damage." },
       { type: "h2", text: "Why buyers care about drainage" },

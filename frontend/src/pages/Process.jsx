@@ -25,17 +25,78 @@ export default function Process() {
         title="How French Drains + Sump Pumps Work in Florida | FloGuard" 
         description="Step-by-step explanation of French drain and sump pump systems for high water tables, flat lots, and heavy Florida rain. Engineered protection for Central Florida homes." 
         path="/process" 
+        image="/images/case4-after.jpg"
         jsonLd={{
           "@context": "https://schema.org",
-          "@type": "HowTo",
-          "name": "How a French Drain + Sump Pump System Works",
-          "description": "Detailed process of how FloGuard systems protect homes from Florida flooding.",
-          "step": [
-            { "@type": "HowToStep", "name": "Site Evaluation", "text": "Walk the property and map water entry points." },
-            { "@type": "HowToStep", "name": "Custom Design", "text": "Engineer trench layout, slopes, and discharge for your yard." },
-            { "@type": "HowToStep", "name": "Installation", "text": "Install French drain, sump basin, pump, and safe discharge line." },
-            { "@type": "HowToStep", "name": "Maintenance", "text": "Test and service the system for long-term performance." }
-          ]
+          "@graph": [
+            {
+              "@type": "HowTo",
+              name: "How a French Drain + Sump Pump System Works in Florida",
+              description:
+                "Step-by-step: FloGuard intercepts Florida groundwater with a French drain, collects it in a sump, and discharges it safely away from the foundation.",
+              totalTime: "P2D",
+              estimatedCost: {
+                "@type": "MonetaryAmount",
+                currency: "USD",
+                value: "4500-12000",
+              },
+              step: [
+                {
+                  "@type": "HowToStep",
+                  position: 1,
+                  name: "Site Evaluation",
+                  text: "Walk the property, map low spots, water table indicators, and runoff paths to find where water enters and pools.",
+                },
+                {
+                  "@type": "HowToStep",
+                  position: 2,
+                  name: "Custom System Design",
+                  text: "Engineer trench layout, slopes, pipe routing, filter fabric, sump placement, and code-compliant discharge for the specific yard.",
+                },
+                {
+                  "@type": "HowToStep",
+                  position: 3,
+                  name: "Clean Installation",
+                  text: "Install the French drain (perforated pipe in clean gravel with fabric), sump basin, pump, check valve, and discharge line; restore landscaping.",
+                },
+                {
+                  "@type": "HowToStep",
+                  position: 4,
+                  name: "Maintenance & Monitoring",
+                  text: "Test pumps, clear basins, verify discharge, and optionally add battery backup or monitoring for Florida storm season.",
+                },
+              ],
+            },
+            {
+              "@type": "FAQPage",
+              mainEntity: [
+                {
+                  "@type": "Question",
+                  name: "How does a French drain and sump pump work together?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "The French drain intercepts groundwater in a fabric-lined gravel trench. Water flows by gravity to a sump basin; the pump lifts it out a discharge line away from the foundation.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Why do Florida homes often need both systems?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "High water tables and flat lots mean gravity alone often cannot move water far enough. A sump provides the lift needed for safe discharge.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "How long does installation take?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Many residential systems install in 1–3 days depending on trench length, access, and scope. You get a schedule after the free assessment.",
+                  },
+                },
+              ],
+            },
+          ],
         }}
       />
       <PageHero

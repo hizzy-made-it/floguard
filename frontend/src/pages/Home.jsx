@@ -14,7 +14,7 @@ import { FinalCTA } from "../components/FinalCTA";
 import { LeadForm } from "../components/LeadForm";
 import { COMPANY, IMAGES, SERVICE_AREAS } from "../data/site";
 import { wordContainer, wordChild, fadeUp, EASE } from "../lib/animations";
-import { Seo } from "../components/Seo";
+import { Seo, organizationLd, faqPageLd } from "../components/Seo";
 import { LANDING_FAQ } from "../data/site";
 
 const headline = ["Protected", "flow.", "Engineered", "trust."];
@@ -149,39 +149,10 @@ export default function Home() {
         title="French Drain & Sump Pump Installation | Central Florida | FloGuard"
         description="Stop flooded yards, wet crawlspaces, and foundation damage in Central Florida. FloGuard designs and installs custom French drains and sump pumps. Free on-site assessments in Daytona, Port Orange, Orlando area."
         path="/"
+        image="/images/hero-poster.jpg"
         jsonLd={{
           "@context": "https://schema.org",
-          "@graph": [
-            {
-              "@type": "LocalBusiness",
-              "@id": "https://www.floguardfl.com/#organization",
-              "name": "FloGuard, LLC",
-              "url": "https://www.floguardfl.com",
-              "telephone": "+13862590023",
-              "image": "https://www.floguardfl.com/images/hero-poster.jpg",
-              "description": "Residential French drain and sump pump contractor serving Central Florida.",
-              "address": {
-                "@type": "PostalAddress",
-                "streetAddress": "5114 S Ridgewood Ave",
-                "addressLocality": "Port Orange",
-                "addressRegion": "FL",
-                "postalCode": "32127",
-                "addressCountry": "US",
-              },
-              "geo": { "@type": "GeoCoordinates", "latitude": 29.077, "longitude": -80.966 },
-              "areaServed": ["Port Orange", "Daytona Beach", "Sanford", "Orlando", "New Smyrna Beach", "Ormond Beach", "DeLand", "Deltona"],
-              "priceRange": "$$",
-              "openingHours": "Mo-Fr 08:00-17:00",
-            },
-            {
-              "@type": "FAQPage",
-              "mainEntity": LANDING_FAQ.slice(0, 5).map((faq) => ({
-                "@type": "Question",
-                "name": faq.q,
-                "acceptedAnswer": { "@type": "Answer", "text": faq.a },
-              })),
-            },
-          ],
+          "@graph": [organizationLd, faqPageLd(LANDING_FAQ.slice(0, 5))].filter(Boolean),
         }}
       />
       {/* ===== CINEMATIC HERO (video) ===== */}

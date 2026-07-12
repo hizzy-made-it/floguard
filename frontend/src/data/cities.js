@@ -1,6 +1,7 @@
 import { IMAGES } from "./site";
 
 // High-intent local landing pages for Central Florida service areas.
+// Quality gate: each city needs unique intro + deepDive + problems + faqs (not Mad-Libs).
 export const CITIES = [
   {
     slug: "daytona-beach",
@@ -8,9 +9,9 @@ export const CITIES = [
     county: "Volusia County",
     image: "/images/crew.jpg",
     intro:
-      "Coastal Daytona Beach homes face a high water table and intense summer storms. A sump pump + French drain system is one of the most effective ways to protect a home from water damage caused by heavy Florida rain and high groundwater. FloGuard designs these systems built to keep your yard dry and your foundation protected — even feet from the Atlantic.",
+      "Coastal Daytona Beach homes face a high water table and intense summer storms. A sump pump + French drain system is one of the most effective ways to protect a home from water damage caused by heavy Florida rain and high groundwater. FloGuard designs these systems to keep yards dry and foundations protected — even near the Atlantic.",
     deepDive:
-      "Daytona Beach’s proximity to the Halifax River and Atlantic means groundwater responds quickly to rain and tidal influence. Neighborhoods from Daytona Beach Shores through Holly Hill and South Daytona often see yards that stay wet for days, salt-air wear on outdoor equipment, and crawlspaces that never fully dry. We engineer French drains with proper filter fabric for coastal sands, corrosion-aware pump selections, and battery backup recommendations for hurricane outages. Discharge paths are planned for local stormwater rules so water leaves your foundation without creating a neighbor problem. Whether you are near the beachside or inland toward Clyde Morris, the fix is property-specific — not a catalog trench.",
+      "Daytona Beach’s proximity to the Halifax River and Atlantic means groundwater responds quickly to rain and tidal influence. Neighborhoods from Daytona Beach Shores through Holly Hill and South Daytona often see yards that stay wet for days, salt-air wear on outdoor equipment, and crawlspaces that never fully dry. We engineer French drains with proper filter fabric for coastal sands, corrosion-aware pump selections, and battery backup recommendations for hurricane outages. Discharge paths follow local stormwater rules so water leaves your foundation without creating a neighbor problem.",
     problems: [
       "High water table saturating soil quickly near the coast",
       "Flooded yards and lanais after afternoon storms",
@@ -34,7 +35,7 @@ export const CITIES = [
     intro:
       "Right here in our hometown of Port Orange, flat lots and clay-heavy pockets trap water against foundations. FloGuard is your local drainage crew — we know how Port Orange properties flood and how to stop it.",
     deepDive:
-      "Port Orange is FloGuard’s home base at 5114 S Ridgewood Ave. Flat terrain from Spruce Creek to Town Park and Cypress Head means water often has nowhere to go after summer downpours. Older homes can show foundation moisture and soft soil at the slab edge; newer subdivisions still pond on driveways and lanais when grading and downspouts fight each other. We design perimeter and yard systems that match Port Orange’s soils, tie downspouts into controlled paths, and use sump pumps where gravity cannot finish the job. Local knowledge matters: discharge to approved locations, respect for HOA aesthetics, and installs timed around Florida’s rainy season. When neighbors ask who fixed the swampy backyard, the answer is usually a custom French drain + sump — not a store-bought kit.",
+      "Port Orange is FloGuard’s home base at 5114 S Ridgewood Ave. Flat terrain from Spruce Creek to Town Park and Cypress Head means water often has nowhere to go after summer downpours. Older homes can show foundation moisture and soft soil at the slab edge; newer subdivisions still pond on driveways and lanais when grading and downspouts fight each other. We design perimeter and yard systems that match Port Orange soils, tie downspouts into controlled paths, and use sump pumps where gravity cannot finish the job.",
     problems: [
       "Flat lots with no natural downhill discharge",
       "Standing water on patios, driveways and low lawns",
@@ -56,14 +57,23 @@ export const CITIES = [
     county: "Seminole County",
     image: "/images/case4-before.jpg",
     intro:
-      "Near Lake Monroe, Sanford homes deal with rising groundwater and slow-draining soils. FloGuard engineers custom drainage that channels water safely away from your home and landscaping. Check our [services](/services) and [areas](/areas) for more.",
+      "Near Lake Monroe and the St. Johns River, Sanford homes deal with rising groundwater and slow-draining soils. FloGuard engineers custom drainage that channels water safely away from foundations and landscaping.",
+    deepDive:
+      "Sanford’s lakefront and historic districts combine high seasonal water tables with clay-leaning soils that hold moisture after storms. Properties near Lake Monroe, Heathrow, and Markham Woods often report chronic backyard ponds, crawlspace dampness, and erosion on any grade change. We map groundwater influence from the St. Johns corridor, size French drains for saturated soils, and specify sump discharge that respects neighborhood drainage patterns. Historic homes may need careful access planning and interior drain options under crawlspaces.",
     problems: [
       "Rising groundwater near Lake Monroe and the St. Johns River",
       "Chronic standing water in historic-district yards",
       "Erosion on sloped and lakefront lots",
+      "Damp crawlspaces in older Sanford homes",
     ],
     neighborhoods: ["Historic Downtown Sanford", "Lake Forest", "Heathrow", "Markham Woods", "Wynwood"],
     zip: "32771",
+    faqs: [
+      { q: "Does living near Lake Monroe change drainage design?", a: "Yes. High groundwater and lake-influenced soils often require active pumping (sump) plus French drains — not gravity-only trenches." },
+      { q: "Can you work on historic Sanford homes?", a: "Yes. We plan access carefully, protect landscaping, and can use interior crawlspace drains when exterior trenching is limited." },
+      { q: "Do you serve Heathrow and Lake Forest?", a: "Yes. FloGuard serves Sanford neighborhoods including Heathrow, Lake Forest, Markham Woods, and downtown." },
+      { q: "How do I know if I need a sump pump in Sanford?", a: "If water lingers after storms or the crawlspace stays damp, a free on-site assessment will confirm whether a sump is required with your French drain." },
+    ],
   },
   {
     slug: "orlando",
@@ -71,14 +81,23 @@ export const CITIES = [
     county: "Orange County",
     image: "/images/case1-after.jpg",
     intro:
-      "Across the Orlando metro, heavy seasonal rain overwhelms yards and threatens foundations. FloGuard brings engineered French drain and sump pump systems to homeowners and investors throughout the region. Explore our [services](/services) for Orlando or read the [how it works](/process).",
+      "Across the Orlando metro, heavy seasonal rain overwhelms yards and threatens foundations. FloGuard installs engineered French drain and sump pump systems for homeowners and property investors throughout the region.",
+    deepDive:
+      "Orlando’s wet season delivers intense short-duration storms that overwhelm sandy-then-clay soil layers. Winter Park, Baldwin Park, Lake Nona, College Park, and Dr. Phillips each have different lot grades and HOA constraints, but the pattern is similar: water piles against slabs, lanais flood, and rentals need reliable fixes that hold up under tenant turnover. We engineer systems for Florida rainfall rates, recommend battery backup for summer storms, and restore landscapes so properties stay marketable. Investors often pair drainage work with foundation protection as part of long-term asset care.",
     problems: [
       "Intense wet-season downpours overwhelming yards",
       "Rental and flip properties needing reliable drainage fixes",
       "Sandy-then-clay soils that pool water unpredictably",
+      "HOA-sensitive landscaping that must look untouched after install",
     ],
     neighborhoods: ["Winter Park", "Baldwin Park", "Lake Nona", "College Park", "Dr. Phillips"],
     zip: "32801",
+    faqs: [
+      { q: "Do you install French drains in Orlando and Winter Park?", a: "Yes. FloGuard serves the Orlando metro including Winter Park, Baldwin Park, Lake Nona, College Park, and Dr. Phillips." },
+      { q: "Is drainage worth it for investment properties?", a: "Reliable drainage protects foundations and curb appeal — critical for rentals and resale. We design systems that stay invisible after backfill." },
+      { q: "How long does a typical Orlando install take?", a: "Many residential systems complete in 1–3 days depending on trench length, access, and sump requirements." },
+      { q: "Can you fix a flooded lanai in Central Florida?", a: "Yes — channel drains, catch basins, and French drain/sump combinations are common fixes for lanai and patio flooding." },
+    ],
   },
   {
     slug: "new-smyrna-beach",
@@ -86,14 +105,23 @@ export const CITIES = [
     county: "Volusia County",
     image: "/images/catch-basin.jpg",
     intro:
-      "New Smyrna Beach's coastal lots and high water table make drainage essential. We install discreet, durable systems that protect beach homes and inland properties alike.",
+      "New Smyrna Beach coastal and inland lots deal with high water tables and storm runoff. FloGuard installs discreet French drain and sump systems that protect beach homes and neighborhoods from standing water.",
+    deepDive:
+      "From Coronado and Venetian Bay to Sugar Mill and Turnbull Bay, NSB properties sit on coastal sands with a high water table and frequent storm surge-adjacent rainfall (not the same as surge flooding into the home, but enough to saturate yards for days). Filter fabric is essential to keep sand out of perforated pipe. We also plan durable pumps and discharge that won’t undermine dunes or landscaping. Beachside access can be tight; we stage work to minimize disruption and restore finished grade cleanly.",
     problems: [
       "High coastal water table",
-      "Runoff eroding dunes and landscaping",
+      "Runoff eroding landscaping and soft soils",
       "Flooded driveways and crawlspaces",
+      "Sand intrusion clogging poorly built DIY drains",
     ],
     neighborhoods: ["Bethune Beach", "Coronado", "Venetian Bay", "Sugar Mill", "Turnbull Bay"],
     zip: "32168",
+    faqs: [
+      { q: "Why do DIY French drains fail in New Smyrna Beach sand?", a: "Without proper filter fabric and clean gravel, fine sand clogs pipe quickly. We use fabric-wrapped systems sized for coastal soils." },
+      { q: "Do you serve Coronado and Venetian Bay?", a: "Yes. FloGuard serves New Smyrna Beach neighborhoods including Coronado, Venetian Bay, Sugar Mill, and Turnbull Bay." },
+      { q: "Will a French drain stop beach flooding from the ocean?", a: "No. Our systems manage yard groundwater and storm soak — not ocean storm surge entering the structure." },
+      { q: "Should NSB homes use battery backup sumps?", a: "Strongly recommended. Power outages often coincide with the wettest weather." },
+    ],
   },
   {
     slug: "ormond-beach",
@@ -101,14 +129,23 @@ export const CITIES = [
     county: "Volusia County",
     image: "/images/foundation.jpg",
     intro:
-      "Ormond Beach's mature neighborhoods and riverfront lots are prone to pooling and foundation moisture. FloGuard's custom systems keep water where it belongs — away from your home.",
+      "Ormond Beach mature neighborhoods and riverfront lots are prone to pooling and foundation moisture. FloGuard’s custom French drain and sump systems keep water away from your home.",
+    deepDive:
+      "Ormond Beach mixes river-influenced low lots with established canopy neighborhoods like Halifax Plantation, Breakaway Trails, and Plantation Bay. Aging or missing drainage, compacted soils, and flat grades create foundation moisture and chronic puddles. We evaluate legacy French drains that may be clogged, then design replacements with correct slope, fabric, and sump capacity. Riverfront properties often need careful discharge planning so water moves off the structure without worsening low spots.",
     problems: [
       "Riverfront and low-lying lot flooding",
       "Foundation moisture in established homes",
       "Clogged or failing legacy drainage",
+      "Standing water under mature tree canopies with compacted soil",
     ],
     neighborhoods: ["Ormond-by-the-Sea", "Halifax Plantation", "Breakaway Trails", "Plantation Bay", "Tomoka Estates"],
     zip: "32174",
+    faqs: [
+      { q: "Can you replace an old clogged French drain in Ormond Beach?", a: "Yes. We inspect legacy systems and redesign with proper fabric, gravel, slope, and discharge — often adding a sump where gravity failed." },
+      { q: "Do you work in Halifax Plantation and Plantation Bay?", a: "Yes. FloGuard serves Ormond Beach including Halifax Plantation, Breakaway Trails, Plantation Bay, and Ormond-by-the-Sea." },
+      { q: "Why is my foundation damp after rain?", a: "Hydrostatic pressure from a high water table and poor perimeter drainage is common. A free assessment maps where water is entering." },
+      { q: "How soon can you schedule an assessment?", a: "Typically within 24 hours for Ormond Beach and Volusia County properties." },
+    ],
   },
   {
     slug: "deland",
@@ -116,14 +153,23 @@ export const CITIES = [
     county: "Volusia County",
     image: "/images/landscaped.jpg",
     intro:
-      "Inland DeLand's soils and seasonal rain call for smart grading and French drains. We design systems that protect historic and new homes from standing water and erosion.",
+      "Inland DeLand soils and seasonal rain call for smart grading and French drains. FloGuard designs systems that protect historic and new homes from standing water and erosion.",
+    deepDive:
+      "DeLand’s inland soils and larger lots can hold water after multi-day rain events. Historic downtown properties, Victoria Park, Glenwood, and Lake Winnemissett areas each need different trench layouts — especially where trees, septic setbacks, or long discharge runs matter. We combine grading corrections with subsurface French drains and sumps when lots are too flat for gravity alone. Erosion on slopes is addressed with collection points uphill of problem areas so water is captured before it undermines landscaping.",
     problems: [
       "Slow-draining inland soils",
       "Standing water in large-lot yards",
       "Erosion on sloped properties",
+      "Long discharge distances on multi-acre lots",
     ],
     neighborhoods: ["Historic Downtown DeLand", "Victoria Park", "Glenwood", "Lake Winnemissett", "Cresswind"],
     zip: "32720",
+    faqs: [
+      { q: "Do larger DeLand lots need different drainage?", a: "Often yes — longer trenches, multiple collection points, or dual sumps may be required. Design is property-specific." },
+      { q: "Can grading alone fix my yard?", a: "Sometimes for mild surface pooling. Chronic high water table or foundation moisture usually needs subsurface drains plus discharge." },
+      { q: "Do you serve Victoria Park and Cresswind?", a: "Yes. FloGuard serves DeLand including Victoria Park, Glenwood, Lake Winnemissett, and Cresswind." },
+      { q: "Will installation damage mature trees?", a: "We plan trench paths to respect major roots and utilities. Some routes use hand work or alternate layouts to protect canopy trees." },
+    ],
   },
   {
     slug: "deltona",
@@ -131,14 +177,23 @@ export const CITIES = [
     county: "Volusia County",
     image: "/images/sump-pump.jpg",
     intro:
-      "Deltona's many lakes and flat terrain create persistent drainage challenges. A sump pump + French drain system is especially useful here because gravity drainage alone often doesn’t work well. The system actively lowers the water table around foundations using perforated pipe in gravel trenches and automatic pumps. FloGuard installs these systems sized for the region's heavy rainfall.",
+      "Deltona’s many lakes and flat terrain create persistent drainage challenges. FloGuard installs French drain + sump pump systems sized for heavy rainfall when gravity alone is not enough.",
+    deepDive:
+      "Deltona is defined by lakes, flat grades, and subdivisions where water has few natural outlets. Neighborhoods like Deltona Lakes, Arbor Ridge, and Timbercrest often report multi-day standing water, wet crawlspaces, and pumps that run constantly after storms. We design active systems that lower the water table around foundations using fabric-lined trenches, perforated pipe, sealed sumps, and code-aware discharge. Lake-adjacent lots get special attention to groundwater levels and electrical reliability (battery backup recommended for outages).",
     problems: [
       "Flat terrain with poor natural runoff",
-      "High groundwater near Deltona's lakes",
+      "High groundwater near Deltona’s lakes",
       "Wet crawlspaces and yard flooding",
+      "Existing pumps undersized for wet-season storms",
     ],
     neighborhoods: ["Deltona Lakes", "Arbor Ridge", "Saxon Woods", "Timbercrest", "Courtland Estates"],
     zip: "32725",
+    faqs: [
+      { q: "Why doesn’t gravity drainage work well in Deltona?", a: "Lots are often too flat and the water table too high for water to leave by slope alone — a sump provides the lift." },
+      { q: "Do you install battery backup sump pumps in Deltona?", a: "Yes. We strongly recommend battery backup for hurricane and storm outages." },
+      { q: "Can you fix wet crawlspaces?", a: "Yes — interior drains to a sealed sump are a common solution for Florida crawlspaces." },
+      { q: "How much does a system cost in Deltona?", a: "Most complete systems fall roughly in the $4,500–$12,000 range depending on scope. Free assessments provide exact pricing." },
+    ],
   },
 ];
 

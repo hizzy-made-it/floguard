@@ -1,57 +1,65 @@
 # FloGuard SEO + AEO Strategy (Living Source of Truth)
 
 **Domain:** https://www.floguardfl.com  
-**Updated:** 2026-07-11  
-**Stack:** React CRA + FastAPI + MongoDB (no full rewrite until GSC proves need)
+**Updated:** 2026-07-12  
+**Stack:** React CRA + FastAPI + MongoDB
 
-## Goals (12 months)
+## Implementation status (complete for code)
 
-- Map Pack + organic top 5 for Port Orange, Daytona Beach, New Smyrna, Ormond  
-- 3–5× organic sessions; ≥40% qualified leads from organic / AI referral  
-- Weekly AI citation presence on 10 tracked AEO queries  
+| Area | Status |
+|------|--------|
+| Service URLs + FAQ schema | Done |
+| All 8 cities deepDive + FAQs + schema | Done |
+| All 8 blog posts FAQs + FAQPage schema | Done |
+| HowTo + FAQ on /process | Done |
+| Sitemap generator (28 URLs) | Done |
+| robots.txt (search + AI allows; noindex paths) | Done in repo |
+| llms.txt entity + URLs | Done |
+| Chat knowledge aligned to services/cities | Done |
+| Studio/admin noindex | Done |
+| noscript crawl links in index.html | Done |
+| Absolute OG images | Done |
 
-## Architecture (hub and spoke)
+## Cloudflare ops (required for full AEO)
 
-- `/` brand + LocalBusiness + FAQ  
-- `/services` hub + `/services/{slug}` (french-drains, sump-pumps, yard-drainage, pump-maintenance)  
-- `/areas` + `/areas/{city}` (unique deep content; quality gates)  
-- `/blog` pillars (cost, diagnosis, seasonal, comparison)  
-- `/contact` assessment quiz = sole lead form  
+Production may inject **Cloudflare Managed robots** that block GPTBot, ClaudeBot, Google-Extended, etc.
+
+**Do this in Cloudflare dashboard:**
+1. AI Crawl Control / Bot management → allow or do not block: GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, PerplexityBot, Google-Extended (as desired for citations).
+2. Ensure custom `robots.txt` from the repo is not fully replaced without a Sitemap line.
+3. Keep Googlebot allowed for classic SEO.
+
+Until CF policy matches the repo `public/robots.txt`, AEO citations will underperform even though page content is ready.
+
+## GSC / Bing ops (required for indexing)
+
+1. Search Console property: `https://www.floguardfl.com`
+2. Submit sitemap: `https://www.floguardfl.com/sitemap.xml`
+3. URL Inspection → Request indexing for:
+   - `/`
+   - `/services/french-drains`, `/sump-pumps`, `/yard-drainage`, `/pump-maintenance`
+   - `/areas/port-orange`, `/areas/daytona-beach`
+   - `/blog/french-drain-cost-central-florida-2026`
+4. Bing Webmaster → import from GSC or submit same sitemap
+5. Optional: set `REACT_APP_GA_MEASUREMENT_ID` on Cloudflare Pages and rebuild
 
 ## Quality gates
 
-| Page type | Min unique depth | Notes |
-|-----------|------------------|-------|
-| Service | 800+ words equivalent | answer-first + FAQs + schema |
-| Primary city | 600–800+ unique | deepDive + local FAQs; no Mad-Libs spam |
-| Blog pillar | answer-first + tables | FAQ schema preferred |
+| Page type | Requirement |
+|-----------|-------------|
+| Service | answerFirst + longContent + 4 FAQs + Service+FAQ schema |
+| City | unique intro + deepDive + problems + 4 FAQs + LocalBusiness+FAQ schema |
+| Blog pillar | answer-first intro + faqs[] + BlogPosting+FAQ schema |
+| Process | HowTo steps + FAQ graph |
 
-Hard stop: do not mass-generate thin city pages.
+## North-star outcomes (12 months)
 
-## AEO rules
-
-1. Answer in first ~100 words  
-2. Tables, lists, bold facts  
-3. FAQ schema where FAQs exist  
-4. Keep `public/llms.txt` entity-accurate  
-5. Chatbot knowledge aligns with page FAQs  
-
-## Technical checklist
-
-- [x] Service detail routes  
-- [x] Sitemap generator (`yarn sitemap` / prebuild)  
-- [x] Home LocalBusiness + FAQ graph  
-- [x] Thin AggregateRating removed from shell schema  
-- [x] 3D marketing heroes removed; hero **video** retained  
-- [ ] GA4 + GSC events live in production  
-- [ ] GBP + reviews + citations (ops, not code)  
-
-## Keyword priorities
-
-See `docs/keyword-research-seo-aeo.md`. Content briefs: `docs/content-briefs.md`. Measurement: `docs/measurement-seo-aeo.md`. Off-page: `docs/offpage-link-strategy.md`.
+- Map Pack + organic top 5 for Port Orange, Daytona, NSB, Ormond  
+- 3–5× organic sessions; ≥40% leads organic/AI  
+- Weekly AI citation presence on tracked AEO queries (after CF allowlist)
 
 ## Constraints
 
-- **Do not change** `hero.mp4` or Home video scrub UX  
+- Do not change `hero.mp4` or Home video scrub UX  
 - No LLM chatbot inventing prices  
-- No fake review markup  
+- No fake AggregateRating markup  

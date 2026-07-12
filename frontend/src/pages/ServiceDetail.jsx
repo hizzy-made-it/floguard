@@ -3,7 +3,7 @@ import { Check, ArrowUpRight, Phone } from "lucide-react";
 import { PageHero } from "../components/PageHero";
 import { Reveal } from "../components/Reveal";
 import { FinalCTA } from "../components/FinalCTA";
-import { Seo } from "../components/Seo";
+import { Seo, organizationLd, faqPageLd, SITE } from "../components/Seo";
 import { getService, SERVICES, COMPANY } from "../data/site";
 
 export default function ServiceDetail() {
@@ -23,29 +23,17 @@ export default function ServiceDetail() {
         jsonLd={{
           "@context": "https://schema.org",
           "@graph": [
+            organizationLd,
             {
               "@type": "Service",
-              "name": service.title,
-              "description": service.answerFirst || service.blurb,
-              "provider": {
-                "@type": "LocalBusiness",
-                "@id": "https://www.floguardfl.com/#organization",
-                "name": "FloGuard, LLC",
-                "telephone": "+13862590023",
-                "url": "https://www.floguardfl.com",
-              },
-              "areaServed": ["Port Orange", "Daytona Beach", "Orlando", "Central Florida"],
-              "url": `https://www.floguardfl.com/services/${service.slug}`,
+              name: service.title,
+              description: service.answerFirst || service.blurb,
+              provider: { "@id": organizationLd["@id"] },
+              areaServed: organizationLd.areaServed,
+              url: `${SITE}/services/${service.slug}`,
             },
-            {
-              "@type": "FAQPage",
-              "mainEntity": (service.faqs || []).map((f) => ({
-                "@type": "Question",
-                "name": f.q,
-                "acceptedAnswer": { "@type": "Answer", "text": f.a },
-              })),
-            },
-          ],
+            faqPageLd(service.faqs || []),
+          ].filter(Boolean),
         }}
       />
 
