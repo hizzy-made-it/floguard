@@ -34,9 +34,9 @@ function makeId() {
 }
 
 /**
- * @param {{ onClose: () => void, open: boolean }} props
+ * @param {{ onClose: () => void, open: boolean, titleId?: string }} props
  */
-export function ChatPanel({ onClose, open }) {
+export function ChatPanel({ onClose, open, titleId = "fg-chat-title" }) {
   const navigate = useNavigate();
   const listRef = useRef(null);
   const inputRef = useRef(null);
@@ -144,14 +144,14 @@ export function ChatPanel({ onClose, open }) {
     <div
       role="dialog"
       aria-modal="true"
-      aria-labelledby="fg-chat-title"
+      aria-labelledby={titleId}
       data-testid="chat-panel"
       className="flex flex-col w-[min(100vw-1.5rem,380px)] h-[min(70vh,520px)] bg-brand-surface border border-white/15 shadow-2xl rounded-sm overflow-hidden"
     >
       {/* header */}
       <div className="flex items-center gap-3 px-4 py-3 bg-brand-ink text-white border-b border-white/10">
         <div className="flex-1 min-w-0">
-          <h2 id="fg-chat-title" className="font-display text-lg leading-tight">
+          <h2 id={titleId} className="font-display text-lg leading-tight">
             FloGuard Assistant
           </h2>
           <p className="text-xs text-white/55 truncate">Drainage help · Central Florida</p>

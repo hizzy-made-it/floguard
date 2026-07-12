@@ -15,8 +15,12 @@ function Accordion({ service, open, onToggle, index }) {
   return (
     <div data-testid={`service-accordion-${service.id}`} className="border-b border-border">
       <button
+        type="button"
         onClick={onToggle}
-        className="w-full flex items-center justify-between gap-6 py-7 text-left group"
+        aria-expanded={open}
+        aria-controls={`service-panel-${service.id}`}
+        id={`service-trigger-${service.id}`}
+        className="w-full flex items-center justify-between gap-6 py-7 text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
         data-testid={`accordion-toggle-${service.id}`}
       >
         <div className="flex items-baseline gap-5">
@@ -32,6 +36,9 @@ function Accordion({ service, open, onToggle, index }) {
       <AnimatePresence initial={false}>
         {open && (
           <motion.div
+            id={`service-panel-${service.id}`}
+            role="region"
+            aria-labelledby={`service-trigger-${service.id}`}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}

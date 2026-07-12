@@ -1,2 +1,5 @@
-# Cloudflare Pages SPA redirect for React Router
+# Canonical host: apex → www (Cloudflare Pages / Netlify-style)
+https://floguardfl.com/*  https://www.floguardfl.com/:splat  301!
+
+# SPA fallback for React Router
 /*    /index.html   200

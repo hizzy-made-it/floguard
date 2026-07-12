@@ -12,7 +12,7 @@ const fieldBase =
 export const AssessmentQuiz = () => {
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [contact, setContact] = useState({ name: "", phone: "", email: "", address: "", message: "" });
+  const [contact, setContact] = useState({ name: "", phone: "", email: "", address: "", message: "", website: "" });
   const [photos, setPhotos] = useState([]);
   const [status, setStatus] = useState("idle");
   const [errors, setErrors] = useState({});
@@ -120,10 +120,17 @@ export const AssessmentQuiz = () => {
         phone: contact.phone,
         address: contact.address,
         message: contact.message,
+        website: contact.website || "",
         photos: photos.filter((p) => p.status === "done").map((p) => p.path),
         source: handoffSource.current || "landing",
       });
       setStatus("success");
+      try {
+        const { trackEvent } = await import("../components/Analytics");
+        trackEvent("quiz_complete", { source: handoffSource.current || "landing" });
+      } catch {
+        /* ignore */
+      }
     } catch {
       setStatus("error");
     }
@@ -159,12 +166,24 @@ export const AssessmentQuiz = () => {
       {/* progress */}
       <div className="mb-8">
         <div className="flex items-center justify-between text-xs text-white/50 mb-2">
-          <span>Step {index + 1} of {QUIZ.length}</span>
+          <span id="quiz-step-label">
+            Step {index + 1} of {QUIZ.length}
+          </span>
           <span>{progress}% complete</span>
         </div>
-        <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+        <div
+          className="h-1.5 rounded-full bg-white/10 overflow-hidden"
+          role="progressbar"
+          aria-valuenow={progress}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-labelledby="quiz-step-label"
+        >
           <motion.div className="h-full bg-brand-orange" animate={{ width: `${progress}%` }} transition={{ duration: 0.5, ease: EASE }} />
         </div>
+        <p className="sr-only" aria-live="polite" aria-atomic="true">
+          Step {index + 1} of {QUIZ.length}: {step.q}
+        </p>
       </div>
 
       <AnimatePresence mode="wait">
@@ -260,32 +279,95 @@ export const AssessmentQuiz = () => {
           {/* CONTACT */}
           {step.type === "contact" && (
             <div className="space-y-5">
+              {/* Honeypot — leave empty */}
+              <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
+                <label htmlFor="quiz-website">Website</label>
+                <input
+                  id="quiz-website"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={contact.website || ""}
+                  onChange={(e) => setContact({ ...contact, website: e.target.value })}
+                />
+              </div>
               <div className="grid sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="text-sm text-white/60 mb-2 block">Full name</label>
-                  <input data-testid="quiz-input-name" value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} className={fieldBase} placeholder="Jane Homeowner" />
-                  {errors.name && <p className="text-red-400 text-sm mt-1">{errors.name}</p>}
+                  <label htmlFor="quiz-input-name" className="text-sm text-white/60 mb-2 block">Full name</label>
+                  <input
+                    id="quiz-input-name"
+                    data-testid="quiz-input-name"
+                    value={contact.name}
+                    onChange={(e) => setContact({ ...contact, name: e.target.value })}
+                    className={fieldBase}
+                    placeholder="Jane Homeowner"
+                    autoComplete="name"
+                    aria-invalid={!!errors.name}
+                    aria-describedby={errors.name ? "quiz-err-name" : undefined}
+                  />
+                  {errors.name && <p id="quiz-err-name" className="text-red-400 text-sm mt-1" role="alert">{errors.name}</p>}
                 </div>
                 <div>
-                  <label className="text-sm text-white/60 mb-2 block">Phone</label>
-                  <input data-testid="quiz-input-phone" value={contact.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value })} className={fieldBase} placeholder="(386) 000-0000" />
-                  {errors.phone && <p className="text-red-400 text-sm mt-1">{errors.phone}</p>}
+                  <label htmlFor="quiz-input-phone" className="text-sm text-white/60 mb-2 block">Phone</label>
+                  <input
+                    id="quiz-input-phone"
+                    data-testid="quiz-input-phone"
+                    value={contact.phone}
+                    onChange={(e) => setContact({ ...contact, phone: e.target.value })}
+                    className={fieldBase}
+                    placeholder="(386) 000-0000"
+                    autoComplete="tel"
+                    aria-invalid={!!errors.phone}
+                    aria-describedby={errors.phone ? "quiz-err-phone" : undefined}
+                  />
+                  {errors.phone && <p id="quiz-err-phone" className="text-red-400 text-sm mt-1" role="alert">{errors.phone}</p>}
                 </div>
               </div>
               <div>
-                <label className="text-sm text-white/60 mb-2 block">Email</label>
-                <input data-testid="quiz-input-email" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} className={fieldBase} placeholder="you@email.com" />
-                {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
+                <label htmlFor="quiz-input-email" className="text-sm text-white/60 mb-2 block">Email</label>
+                <input
+                  id="quiz-input-email"
+                  data-testid="quiz-input-email"
+                  type="email"
+                  value={contact.email}
+                  onChange={(e) => setContact({ ...contact, email: e.target.value })}
+                  className={fieldBase}
+                  placeholder="you@email.com"
+                  autoComplete="email"
+                  aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? "quiz-err-email" : undefined}
+                />
+                {errors.email && <p id="quiz-err-email" className="text-red-400 text-sm mt-1" role="alert">{errors.email}</p>}
               </div>
               <div>
-                <label className="text-sm text-white/60 mb-2 block">Street address (optional)</label>
-                <input data-testid="quiz-input-address" value={contact.address} onChange={(e) => setContact({ ...contact, address: e.target.value })} className={fieldBase} placeholder="123 Palm Ave, Port Orange" />
+                <label htmlFor="quiz-input-address" className="text-sm text-white/60 mb-2 block">Street address (optional)</label>
+                <input
+                  id="quiz-input-address"
+                  data-testid="quiz-input-address"
+                  value={contact.address}
+                  onChange={(e) => setContact({ ...contact, address: e.target.value })}
+                  className={fieldBase}
+                  placeholder="123 Palm Ave, Port Orange"
+                  autoComplete="street-address"
+                />
               </div>
               <div>
-                <label className="text-sm text-white/60 mb-2 block">Anything else? (optional)</label>
-                <textarea data-testid="quiz-input-message" value={contact.message} onChange={(e) => setContact({ ...contact, message: e.target.value })} rows={2} className={fieldBase} placeholder="Add any detail that helps us prepare…" />
+                <label htmlFor="quiz-input-message" className="text-sm text-white/60 mb-2 block">Anything else? (optional)</label>
+                <textarea
+                  id="quiz-input-message"
+                  data-testid="quiz-input-message"
+                  value={contact.message}
+                  onChange={(e) => setContact({ ...contact, message: e.target.value })}
+                  rows={2}
+                  className={fieldBase}
+                  placeholder="Add any detail that helps us prepare…"
+                />
               </div>
-              {status === "error" && <p className="text-red-400 text-sm">Something went wrong. Please call us at {COMPANY.phone}.</p>}
+              {status === "error" && (
+                <p className="text-red-400 text-sm" role="alert">
+                  Something went wrong. Please call us at {COMPANY.phone} or check your connection and try again.
+                </p>
+              )}
             </div>
           )}
         </motion.div>

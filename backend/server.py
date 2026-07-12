@@ -12,9 +12,12 @@ import os
 import io
 import asyncio
 import logging
-import requests
+import html
+import time
+from collections import defaultdict
 from pydantic import BaseModel, Field, ConfigDict, EmailStr
-from typing import List, Optional
+from typing import List, Optional, Dict, Deque
+from collections import deque
 from datetime import datetime, timezone, timedelta
 import uuid
 import bcrypt
@@ -93,6 +96,42 @@ async def get_file_from_gridfs(file_id_str: str):
 # ---- Auth config ----
 JWT_ALGORITHM = "HS256"
 ACCESS_TOKEN_HOURS = 8
+JWT_SECRET = os.environ.get("JWT_SECRET", "").strip()
+if not JWT_SECRET:
+    if os.environ.get("ALLOW_INSECURE_JWT", "").lower() not in ("1", "true", "yes"):
+        raise RuntimeError("JWT_SECRET environment variable is required")
+    JWT_SECRET = "insecure-dev-only-change-me"
+
+
+# ---- Simple in-memory rate limiting (per-process; enough for single-instance deploy) ----
+_rate_buckets: Dict[str, Deque[float]] = defaultdict(deque)
+
+
+def _client_ip(request: Request) -> str:
+    forwarded = request.headers.get("x-forwarded-for") or request.headers.get("X-Forwarded-For")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
+def rate_limit(request: Request, *, key: str, limit: int, window_sec: int = 60) -> None:
+    """Raise 429 if more than `limit` hits for (ip, key) within window_sec."""
+    ip = _client_ip(request)
+    bucket_key = f"{key}:{ip}"
+    now = time.time()
+    q = _rate_buckets[bucket_key]
+    while q and q[0] < now - window_sec:
+        q.popleft()
+    if len(q) >= limit:
+        raise HTTPException(status_code=429, detail="Too many requests. Please try again shortly.")
+    q.append(now)
+
+
+def esc(value) -> str:
+    """HTML-escape user-controlled strings for email bodies."""
+    if value is None:
+        return ""
+    return html.escape(str(value), quote=True)
 
 
 def hash_password(password: str) -> str:
@@ -113,7 +152,7 @@ def create_access_token(user_id: str, email: str) -> str:
         "type": "access",
         "exp": datetime.now(timezone.utc) + timedelta(hours=ACCESS_TOKEN_HOURS),
     }
-    return jwt.encode(payload, os.environ["JWT_SECRET"], algorithm=JWT_ALGORITHM)
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
 async def get_current_admin(request: Request) -> dict:
@@ -122,7 +161,7 @@ async def get_current_admin(request: Request) -> dict:
     if not token:
         raise HTTPException(status_code=401, detail="Not authenticated")
     try:
-        payload = jwt.decode(token, os.environ["JWT_SECRET"], algorithms=[JWT_ALGORITHM])
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         if payload.get("type") != "access":
             raise HTTPException(status_code=401, detail="Invalid token type")
         user = await db.users.find_one({"_id": ObjectId(payload["sub"])})
@@ -159,6 +198,8 @@ class LeadCreate(BaseModel):
     photos: List[str] = []
     message: Optional[str] = ""
     source: Optional[str] = "contact"
+    # Honeypot: bots fill this; humans leave empty. Never persist.
+    website: Optional[str] = ""
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -192,12 +233,13 @@ class GuideRequest(BaseModel):
 
 
 def _row(label, value):
-    return f'<tr><td style="padding:6px 0;"><b>{label}</b></td><td>{value or "&mdash;"}</td></tr>'
+    safe = esc(value) if value else "&mdash;"
+    return f'<tr><td style="padding:6px 0;"><b>{esc(label)}</b></td><td>{safe}</td></tr>'
 
 
 def build_lead_email(lead: Lead) -> str:
     def li(items):
-        return "".join(f"<li>{i}</li>" for i in items) or "<li>None specified</li>"
+        return "".join(f"<li>{esc(i)}</li>" for i in items) or "<li>None specified</li>"
     header = 'Guide Download' if lead.source == 'guide' else 'Assessment Request'
     photos_html = ""
     if lead.photos:
@@ -223,15 +265,20 @@ def build_lead_email(lead: Lead) -> str:
       <p style="color:#334155;"><b>Existing drainage:</b></p><ul style="color:#334155;">{li(lead.existing_drainage)}</ul>
       <p style="color:#334155;"><b>Damage seen:</b></p><ul style="color:#334155;">{li(lead.damages)}</ul>
       {photos_html}
-      <p style="color:#334155;"><b>Message:</b> {lead.message or '&mdash;'}</p>
-      <p style="color:#F57C1F;font-size:12px;">Submitted {lead.created_at}</p>
+      <p style="color:#334155;"><b>Message:</b> {esc(lead.message) if lead.message else '&mdash;'}</p>
+      <p style="color:#F57C1F;font-size:12px;">Submitted {esc(lead.created_at)}</p>
     </div>"""
 
 
-async def send_lead_email(lead: Lead):
+async def send_lead_email(lead: Lead) -> bool:
+    """Returns True if email sent successfully. Always logs failures loudly for ops."""
     if not RESEND_API_KEY:
-        logger.warning("RESEND_API_KEY not set — skipping email for lead %s", lead.id)
-        return
+        logger.error(
+            "LEAD_EMAIL_SKIPPED lead_id=%s reason=RESEND_API_KEY_missing source=%s",
+            lead.id,
+            lead.source,
+        )
+        return False
     try:
         import resend
         resend.api_key = RESEND_API_KEY
@@ -242,9 +289,16 @@ async def send_lead_email(lead: Lead):
             "html": build_lead_email(lead),
         }
         await asyncio.to_thread(resend.Emails.send, params)
-        logger.info("Lead email sent for %s", lead.id)
+        logger.info("LEAD_EMAIL_SENT lead_id=%s source=%s", lead.id, lead.source)
+        return True
     except Exception as e:
-        logger.error("Failed to send lead email: %s", str(e))
+        logger.error(
+            "LEAD_EMAIL_FAILED lead_id=%s source=%s error=%s",
+            lead.id,
+            lead.source,
+            str(e),
+        )
+        return False
 
 
 def generate_guide_pdf() -> bytes:
@@ -338,8 +392,20 @@ async def root():
     return {"message": "FloGuard API"}
 
 
+@api_router.get("/health")
+async def health():
+    """Liveness + Mongo connectivity for uptime monitors."""
+    try:
+        await db.command("ping")
+        return {"status": "ok", "mongo": "up", "ts": datetime.now(timezone.utc).isoformat()}
+    except Exception as e:
+        logger.error("HEALTH_CHECK_FAILED error=%s", str(e))
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+
 @api_router.post("/upload")
-async def upload(file: UploadFile = File(...)):
+async def upload(request: Request, file: UploadFile = File(...)):
+    rate_limit(request, key="upload", limit=20, window_sec=3600)
     ext = (file.filename.rsplit(".", 1)[-1] if "." in (file.filename or "") else "jpg").lower()
     content_type = file.content_type or MIME_TYPES.get(ext, "application/octet-stream")
     if not content_type.startswith("image/"):
@@ -362,13 +428,11 @@ async def upload(file: UploadFile = File(...)):
         "is_deleted": False,
         "created_at": datetime.now(timezone.utc).isoformat(),
     })
-    # Return url that points to our /files endpoint (served from Mongo GridFS)
     return {"path": result["path"], "url": result["url"]}
 
 
 @api_router.get("/files/{path:path}")
 async def serve_file(path: str):
-    # Serve from GridFS using the file_id stored as storage_path
     record = await db.files.find_one({"storage_path": path, "is_deleted": False})
     if not record:
         raise HTTPException(status_code=404, detail="File not found")
@@ -382,7 +446,10 @@ async def serve_file(path: str):
 
 
 @api_router.post("/leads", response_model=Lead)
-async def create_lead(payload: LeadCreate):
+async def create_lead(payload: LeadCreate, request: Request):
+    rate_limit(request, key="leads", limit=8, window_sec=600)
+    if (payload.website or "").strip():
+        return Lead(name="ignored", email=str(payload.email), source="honeypot")
     if not payload.name.strip():
         raise HTTPException(status_code=422, detail="Name is required.")
     lead = Lead(
@@ -395,13 +462,16 @@ async def create_lead(payload: LeadCreate):
         timeline=payload.timeline or "", photos=payload.photos or [],
         message=payload.message or "", source=payload.source or "contact",
     )
-    await db.leads.insert_one(lead.model_dump())
+    doc = lead.model_dump()
+    await db.leads.insert_one(doc)
+    # Fire-and-forget email; failures are logged as LEAD_EMAIL_FAILED for alerting
     asyncio.create_task(send_lead_email(lead))
     return lead
 
 
 @api_router.post("/guide")
-async def request_guide(payload: GuideRequest):
+async def request_guide(payload: GuideRequest, request: Request):
+    rate_limit(request, key="guide", limit=10, window_sec=600)
     lead = Lead(name=payload.name.strip() or "Homeowner", email=payload.email, source="guide",
                 message="Downloaded the Florida Drainage Guide")
     await db.leads.insert_one(lead.model_dump())
@@ -445,10 +515,12 @@ async def update_lead_status(lead_id: str, body: dict, admin: dict = Depends(get
 
 app.include_router(api_router)
 
+_cors_raw = os.environ.get("CORS_ORIGINS", "https://www.floguardfl.com,https://floguardfl.com").strip()
+_cors_origins = [o.strip() for o in _cors_raw.split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=False,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=_cors_origins if _cors_origins else ["https://www.floguardfl.com"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -460,20 +532,34 @@ async def startup():
         await db.users.create_index("email", unique=True)
         await db.login_attempts.create_index("identifier")
         await db.files.create_index("storage_path")
+        await db.leads.create_index("created_at")
+        await db.leads.create_index("source")
+        await db.leads.create_index("status")
     except Exception as e:
         logger.warning("index creation: %s", e)
-    # Using GridFS (MongoDB) for file storage - no additional services required
     logger.info("GridFS file storage initialized (using MongoDB)")
-    admin_email = os.environ.get("ADMIN_EMAIL", "admin@floguardfl.com").lower()
-    admin_password = os.environ.get("ADMIN_PASSWORD", "admin123")
-    existing = await db.users.find_one({"email": admin_email})
-    if existing is None:
-        await db.users.insert_one({"email": admin_email, "password_hash": hash_password(admin_password),
-                                   "name": "FloGuard Admin", "role": "admin", "created_at": datetime.now(timezone.utc).isoformat()})
-        logger.info("Seeded admin %s", admin_email)
-    elif not verify_password(admin_password, existing["password_hash"]):
-        await db.users.update_one({"email": admin_email}, {"$set": {"password_hash": hash_password(admin_password)}})
-        logger.info("Updated admin password for %s", admin_email)
+    admin_email = os.environ.get("ADMIN_EMAIL", "").strip().lower()
+    admin_password = os.environ.get("ADMIN_PASSWORD", "").strip()
+    force_reset = os.environ.get("FORCE_ADMIN_PASSWORD_RESET", "").lower() in ("1", "true", "yes")
+    if not admin_email or not admin_password:
+        logger.warning("ADMIN_EMAIL / ADMIN_PASSWORD not set — skipping admin seed")
+    else:
+        existing = await db.users.find_one({"email": admin_email})
+        if existing is None:
+            await db.users.insert_one({
+                "email": admin_email,
+                "password_hash": hash_password(admin_password),
+                "name": "FloGuard Admin",
+                "role": "admin",
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            })
+            logger.info("Seeded admin %s", admin_email)
+        elif force_reset:
+            await db.users.update_one(
+                {"email": admin_email},
+                {"$set": {"password_hash": hash_password(admin_password)}},
+            )
+            logger.info("Force-reset admin password for %s", admin_email)
 
 
 @app.on_event("shutdown")

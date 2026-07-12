@@ -8,14 +8,23 @@ export const CITIES = [
     county: "Volusia County",
     image: "/images/crew.jpg",
     intro:
-      "Coastal Daytona Beach homes face a high water table and intense summer storms. A sump pump + French drain system is one of the most effective ways to protect a home from water damage caused by heavy Florida rain and high groundwater. FloGuard designs these systems built to keep your yard dry and your foundation protected — even feet from the Atlantic. Learn more on our [services page](/services) or [how it works](/process).",
+      "Coastal Daytona Beach homes face a high water table and intense summer storms. A sump pump + French drain system is one of the most effective ways to protect a home from water damage caused by heavy Florida rain and high groundwater. FloGuard designs these systems built to keep your yard dry and your foundation protected — even feet from the Atlantic.",
+    deepDive:
+      "Daytona Beach’s proximity to the Halifax River and Atlantic means groundwater responds quickly to rain and tidal influence. Neighborhoods from Daytona Beach Shores through Holly Hill and South Daytona often see yards that stay wet for days, salt-air wear on outdoor equipment, and crawlspaces that never fully dry. We engineer French drains with proper filter fabric for coastal sands, corrosion-aware pump selections, and battery backup recommendations for hurricane outages. Discharge paths are planned for local stormwater rules so water leaves your foundation without creating a neighbor problem. Whether you are near the beachside or inland toward Clyde Morris, the fix is property-specific — not a catalog trench.",
     problems: [
       "High water table saturating soil quickly near the coast",
       "Flooded yards and lanais after afternoon storms",
       "Salt-air corrosion demanding durable, monitored pumps",
+      "Crawlspace humidity and musty odors after multi-day wet periods",
     ],
     neighborhoods: ["Daytona Beach Shores", "Ormond-by-the-Sea", "Holly Hill", "South Daytona", "Wilbur-by-the-Sea"],
     zip: "32118",
+    faqs: [
+      { q: "What drainage works best for coastal Daytona Beach homes?", a: "Most coastal lots need a French drain that intercepts groundwater plus a sump pump to lift water to a safe discharge — gravity alone rarely works on flat, high water table properties." },
+      { q: "Do salt air and storms affect sump pumps?", a: "Yes. We specify durable components, recommend sealed basins, check valves, and battery backup so the system survives outages during tropical weather." },
+      { q: "How fast can FloGuard assess a Daytona Beach property?", a: "We typically schedule free on-site assessments within 24 hours and prioritize active flooding." },
+      { q: "Is French drain installation disruptive on beachside lots?", a: "We plan access carefully, restore landscaping, and leave systems invisible under the lawn when finished." },
+    ],
   },
   {
     slug: "port-orange",
@@ -23,14 +32,23 @@ export const CITIES = [
     county: "Volusia County",
     image: "/images/french-drain.jpg",
     intro:
-      "Right here in our hometown of Port Orange, flat lots and clay-heavy soil trap water against foundations. A sump pump + French drain system is one of the most effective ways to protect a home from water damage caused by heavy Florida rain and high groundwater. Florida's high water table, flat terrain, and intense storms make this the ideal solution. As your local drainage crew, we know exactly how Port Orange properties flood — and how to stop it. See our [services](/services) and [process](/process).",
+      "Right here in our hometown of Port Orange, flat lots and clay-heavy pockets trap water against foundations. FloGuard is your local drainage crew — we know how Port Orange properties flood and how to stop it.",
+    deepDive:
+      "Port Orange is FloGuard’s home base at 5114 S Ridgewood Ave. Flat terrain from Spruce Creek to Town Park and Cypress Head means water often has nowhere to go after summer downpours. Older homes can show foundation moisture and soft soil at the slab edge; newer subdivisions still pond on driveways and lanais when grading and downspouts fight each other. We design perimeter and yard systems that match Port Orange’s soils, tie downspouts into controlled paths, and use sump pumps where gravity cannot finish the job. Local knowledge matters: discharge to approved locations, respect for HOA aesthetics, and installs timed around Florida’s rainy season. When neighbors ask who fixed the swampy backyard, the answer is usually a custom French drain + sump — not a store-bought kit.",
     problems: [
       "Flat lots with no natural downhill discharge",
       "Standing water on patios, driveways and low lawns",
       "Foundation moisture in older Port Orange homes",
+      "Downspouts dumping roof water into the lowest corner of the yard",
     ],
     neighborhoods: ["Cypress Head", "Sabal Creek", "Waters Edge", "Spruce Creek", "Town Park"],
     zip: "32127",
+    faqs: [
+      { q: "Why do Port Orange yards flood so easily?", a: "Flat lots, high water tables, and intense seasonal rain mean water sits unless you intercept and pump it to a safe discharge." },
+      { q: "Are you a local Port Orange company?", a: "Yes. FloGuard is based in Port Orange and serves Volusia, Seminole, and Orange County corridors." },
+      { q: "How much does a French drain cost in Port Orange?", a: "Most complete systems range roughly $4,500–$12,000 depending on scope. We give a firm number only after a free on-site assessment." },
+      { q: "Can you fix standing water without wrecking my landscaping?", a: "Yes. We restore turf and beds after install so the system is underground and the yard looks continuous." },
+    ],
   },
   {
     slug: "sanford",

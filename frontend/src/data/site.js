@@ -72,41 +72,111 @@ export const SERVICE_AREAS = [
 export const SERVICES = [
   {
     id: "exterior",
+    slug: "french-drains",
     title: "Exterior French Drains",
     blurb:
       "Perimeter trench systems that intercept surface runoff and groundwater before it reaches your foundation or pools on the lawn. Contains perforated pipe in clean gravel wrapped with filter fabric to keep sediment out.",
     image: IMAGES.case1Before,
     features: ["Custom trench + slope design", "Filter fabric + clean gravel", "Perforated collection pipe"],
     span: "wide",
+    seoTitle: "French Drain Installation Central Florida | FloGuard",
+    seoDescription:
+      "Professional exterior French drain installation for Central Florida homes. Filter fabric, clean gravel, and proper slope for high water tables. Free assessments in Daytona, Port Orange, Orlando.",
+    answerFirst:
+      "An exterior French drain is a fabric-lined, gravel-filled trench with perforated pipe that intercepts groundwater and surface runoff before it reaches your foundation. In Central Florida’s high water table and flat lots, it is usually paired with a sump pump so water can be lifted to a safe discharge.",
+    longContent: [
+      "Florida homes often sit on sandy soils over a water table only a few feet down. After summer storms, hydrostatic pressure pushes water toward slabs and crawlspaces. A correctly engineered French drain lowers that pressure zone around the perimeter.",
+      "We size trench depth, pipe diameter (typically 4\" perforated), slope, and discharge path for your lot — never a one-size kit. Filter fabric is non-negotiable in Florida sand or the system clogs within seasons.",
+      "Typical perimeter systems run 150–350 linear feet. Complex yards may need catch basins, downspout tie-ins, or dual trenches. Every install includes clean gravel, proper backfill, and landscape restoration so the system is invisible when finished.",
+    ],
+    faqs: [
+      { q: "How much does a French drain cost in Central Florida?", a: "Most professional French drain + sump systems for a single-family home fall between $4,500 and $12,000 depending on trench length, sump needs, and discharge run. We quote only after a free on-site assessment." },
+      { q: "Do I need a sump pump with my French drain?", a: "On flat Central Florida lots and high water tables, gravity alone often cannot move water far enough. Most FloGuard exterior systems include or connect to a sump for reliable discharge." },
+      { q: "Will my yard look torn up?", a: "We dig, install, backfill, and restore turf and beds. When complete, the system is underground and the lawn looks continuous." },
+      { q: "How long does installation take?", a: "Many residential perimeter systems install in 1–3 days depending on access, soil, and scope. You get a clear schedule at assessment." },
+    ],
   },
   {
     id: "interior",
+    slug: "sump-pumps",
     title: "Interior Drains + Sump Pumps",
     blurb:
       "For crawlspaces and low, flat lots: a sub-surface drain routed to a sump basin that automatically lifts water to a safe discharge. The active defense when gravity alone isn’t enough. A waterproof basin collects water; a submersible pump with float switch pushes it far away.",
     image: IMAGES.case2Before,
     features: ["Automatic float-switch pumps", "Sealed basin + discharge line", "Battery / monitoring options"],
     span: "tall",
+    seoTitle: "Sump Pump Installation Florida | Crawlspace Drainage | FloGuard",
+    seoDescription:
+      "Sump pump and interior drain installation for Florida crawlspaces and flat lots. Battery backup options for hurricanes. Free assessments across Central Florida.",
+    answerFirst:
+      "A sump pump system collects water in a sealed basin and automatically pumps it away when the float switch rises. Combined with interior French drains under crawlspaces, it is one of the most effective defenses against Florida’s high groundwater — especially with battery backup for outages.",
+    longContent: [
+      "Interior drains capture water under the home before it pools in the crawlspace. Water flows by gravity to the sump pit; the pump then forces it out a solid discharge line to an approved location 10–20+ feet from the foundation.",
+      "We recommend check valves, properly sized pumps, and battery backup or dual-pump setups for hurricane season when grid power fails. Smart monitoring is available so you know the system worked overnight.",
+      "This service is ideal when yards are too flat for gravity-only discharge, when crawlspaces stay damp, or when exterior access is limited.",
+    ],
+    faqs: [
+      { q: "Do I need a battery backup sump pump in Florida?", a: "Strongly recommended. Hurricanes and storms often knock out power exactly when groundwater rises. Battery backups keep the pump running when the grid is down." },
+      { q: "How often should a sump pump be serviced?", a: "Test monthly by pouring water into the pit. Professional service at least once a year — ideally before rainy/hurricane season." },
+      { q: "Can a sump pump stop all flooding?", a: "It dramatically reduces foundation and crawlspace moisture from groundwater and storm soak. It does not stop major storm surge or river flooding above the home’s openings." },
+      { q: "Where does the water discharge?", a: "To a code-compliant location: swale, storm system, or lower area far from the foundation — never dumping against a neighbor’s slab." },
+    ],
   },
   {
     id: "yard",
+    slug: "yard-drainage",
     title: "Yard Drainage & Grading",
     blurb:
       "Catch basins, channel drains and precision grading that move water off patios, lanais and low spots without eroding your landscape.",
     image: IMAGES.case3Before,
     features: ["Catch basins & channel drains", "Re-grading & swales", "Downspout tie-ins"],
     span: "tall",
+    seoTitle: "Yard Drainage & Grading Central Florida | FloGuard",
+    seoDescription:
+      "Fix standing water in yards, lanais, and driveways with catch basins, channel drains, and re-grading. Engineered for Florida storms. Free assessments.",
+    answerFirst:
+      "Yard drainage combines surface collection (catch basins, channel drains), re-grading, and often French drains so water leaves patios and low spots within hours of a Florida storm instead of sitting for days.",
+    longContent: [
+      "Standing water kills grass, breeds mosquitoes, and softens soil against foundations. We map flow paths, install collection points at low spots, and route water to safe discharge — often the same sump or storm connection as your French drain system.",
+      "Downspouts that dump next to the house are a common culprit; we tie them into the drainage network. Hardscape (driveways, pool decks) is redirected so it does not create new bowls.",
+      "Work is planned to protect landscaping and restore finished grade so the fix is functional and presentable.",
+    ],
+    faqs: [
+      { q: "Why does water stand in my Florida yard after rain?", a: "Flat lots, high water tables, poor grading, compacted soil, and downspouts dumping into low spots. Multiple causes usually stack — we diagnose on site." },
+      { q: "Is re-grading enough without a French drain?", a: "Sometimes for mild surface pooling. Chronic high water table or foundation-side moisture usually needs subsurface collection plus discharge." },
+      { q: "Can you fix a flooded lanai or patio?", a: "Yes — channel drains, catch basins, and proper slope away from the structure are common fixes, often tied into a larger drainage system." },
+      { q: "How soon can I use the yard after install?", a: "Access returns quickly; turf establishment varies. We explain restoration timing during the assessment." },
+    ],
   },
   {
     id: "maintenance",
+    slug: "pump-maintenance",
     title: "Pump Maintenance & Monitoring",
     blurb:
       "Seasonal service plans and smart monitoring that keep your system storm-ready year round — so it works the day you need it most.",
     image: IMAGES.case4Before,
     features: ["Scheduled inspections", "Pump testing & cleaning", "Storm-season readiness"],
     span: "wide",
+    seoTitle: "Sump Pump Maintenance & Storm Readiness | FloGuard",
+    seoDescription:
+      "Seasonal sump pump maintenance, testing, cleaning, and monitoring for Central Florida. Stay ready for rainy season and hurricanes.",
+    answerFirst:
+      "Sump and French drain systems need periodic testing, basin cleaning, and battery checks. FloGuard maintenance plans verify the system before peak storm season so it works when groundwater rises.",
+    longContent: [
+      "Pumps fail silently if never tested. We check float switches, discharge lines, check valves, battery backup health, and sediment in basins — common issues in Florida’s sandy, root-prone soils.",
+      "Annual service before May–October wet season is ideal. Monitoring options alert you if the pump runs excessively or power is lost.",
+      "Whether FloGuard installed your system or you inherited one, we can inspect and bring it up to a storm-ready standard.",
+    ],
+    faqs: [
+      { q: "How often should I service my sump pump?", a: "Homeowner monthly pour-test; professional inspection at least yearly, especially before hurricane season." },
+      { q: "What does a maintenance visit include?", a: "Pump test, basin inspection/cleaning as needed, discharge check, battery status, and recommendations for repairs or upgrades." },
+      { q: "Do you service systems you didn’t install?", a: "Yes. We assess condition and can repair, upgrade, or integrate into a better overall drainage plan." },
+      { q: "When should I schedule storm-season prep?", a: "Late spring before peak rainy season is best; we can also prioritize urgent post-storm issues." },
+    ],
   },
 ];
+
+export const getService = (slug) => SERVICES.find((s) => s.slug === slug || s.id === slug);
 
 export const PROCESS = [
   {

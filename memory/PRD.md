@@ -52,8 +52,9 @@ hero blending into a clean, trust-focused light body. Phone (386) 259-0023, 5.0 
 
 ## Session 3 additions (2026-07-07)
 - **Local SEO**: `/areas` index + dynamic `/areas/:slug` city pages for 8 Central Florida cities (`data/cities.js`); "Areas" added to nav (8 links).
-- **Lead engine**: JWT (Bearer/localStorage) admin auth — `/admin/login` + protected `/admin` dashboard (stats cards, searchable leads table, source filter, per-lead status update). Backend: `/api/auth/login`, `/api/auth/me`, protected `GET /api/leads`, `/api/leads/stats`, `PATCH /api/leads/{id}`; idempotent admin seed. Admin: admin@floguardfl.com / FloGuard2026!.
+- **Lead engine**: JWT (Bearer/localStorage) admin auth — `/admin/login` + protected `/admin` dashboard (stats cards, searchable leads table, source filter, per-lead status update). Backend: `/api/auth/login`, `/api/auth/me`, protected `GET /api/leads`, `/api/leads/stats`, `PATCH /api/leads/{id}`; admin seed via `ADMIN_EMAIL` / `ADMIN_PASSWORD` env (never commit credentials).
 - **Lead magnet**: "Florida Drainage Guide" auto-generated PDF, email-gated (`POST /api/guide`, `GET /api/guide/download` via reportlab); `GuideDownload` on Blog; leads saved source="guide".
 - **Proof**: Google-style `GoogleReviews` section on Home.
-- **Elite polish**: cinematic Bloom postprocessing on the 3D rain/water hero.
+- **Hero**: cinematic **video** scroll/scrub on Home (`hero.mp4` — locked creative). 3D marketing heroes removed.
+
 - Testing iteration_2: **backend 100% (11/11), frontend 100%**. Fixed dashboard contrast; set CORS `allow_credentials=False` (Bearer-token app). Cleared all test/seed leads for a clean production start.

@@ -128,13 +128,19 @@ export default function Home() {
   // Kick off the autoplay cinematic loop (browsers require muted for autoplay)
   useEffect(() => {
     const v = videoRef.current;
-    if (v) {
-      const tryPlay = () => v.play().catch(() => {});
-      tryPlay();
-      // In case metadata not ready yet
-      const t = setTimeout(tryPlay, 400);
-      return () => clearTimeout(t);
-    }
+    if (!v) return;
+    const tryPlay = () => v.play().catch(() => {});
+    tryPlay();
+    const t = setTimeout(tryPlay, 400);
+    const onVis = () => {
+      if (document.hidden) v.pause();
+      else if (!dragActiveRef.current) tryPlay();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      clearTimeout(t);
+      document.removeEventListener("visibilitychange", onVis);
+    };
   }, []);
 
   return (
@@ -145,15 +151,37 @@ export default function Home() {
         path="/"
         jsonLd={{
           "@context": "https://schema.org",
-          "@type": "FAQPage",
-          "mainEntity": LANDING_FAQ.slice(0, 5).map(faq => ({
-            "@type": "Question",
-            "name": faq.q,
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": faq.a
-            }
-          }))
+          "@graph": [
+            {
+              "@type": "LocalBusiness",
+              "@id": "https://www.floguardfl.com/#organization",
+              "name": "FloGuard, LLC",
+              "url": "https://www.floguardfl.com",
+              "telephone": "+13862590023",
+              "image": "https://www.floguardfl.com/images/hero-poster.jpg",
+              "description": "Residential French drain and sump pump contractor serving Central Florida.",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "5114 S Ridgewood Ave",
+                "addressLocality": "Port Orange",
+                "addressRegion": "FL",
+                "postalCode": "32127",
+                "addressCountry": "US",
+              },
+              "geo": { "@type": "GeoCoordinates", "latitude": 29.077, "longitude": -80.966 },
+              "areaServed": ["Port Orange", "Daytona Beach", "Sanford", "Orlando", "New Smyrna Beach", "Ormond Beach", "DeLand", "Deltona"],
+              "priceRange": "$$",
+              "openingHours": "Mo-Fr 08:00-17:00",
+            },
+            {
+              "@type": "FAQPage",
+              "mainEntity": LANDING_FAQ.slice(0, 5).map((faq) => ({
+                "@type": "Question",
+                "name": faq.q,
+                "acceptedAnswer": { "@type": "Answer", "text": faq.a },
+              })),
+            },
+          ],
         }}
       />
       {/* ===== CINEMATIC HERO (video) ===== */}
@@ -166,15 +194,17 @@ export default function Home() {
         onPointerLeave={onHeroPointerUp}
         onPointerCancel={onHeroPointerUp}
       >
-        {/* High-quality cinematic hero video (replaces fragile 3D). Autoplay + loop + scroll/drag scrub. */}
+        {/* High-quality cinematic hero video. Autoplay + loop + scroll/drag scrub. DO NOT replace hero.mp4. */}
         <video
           ref={videoRef}
           src="/hero.mp4"
+          poster="/images/hero-poster.jpg"
           className="absolute inset-0 z-[2] w-full h-full object-cover"
           autoPlay
           muted
           loop
           playsInline
+          preload="metadata"
           onLoadedMetadata={(e) => {
             const v = e.currentTarget;
             const d = v.duration;

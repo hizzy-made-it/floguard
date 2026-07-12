@@ -5,7 +5,6 @@ import { FinalCTA } from "../components/FinalCTA";
 import { VALUES, IMAGES, COMPANY } from "../data/site";
 import { StatsBar } from "../components/StatsBar";
 import { ShieldCheck, Users, MapPin, Award } from "lucide-react";
-import MiniShield from "../components/three/MiniShield";
 
 const VALUE_ICONS = [ShieldCheck, Users, MapPin, Award];
 
@@ -114,7 +113,7 @@ export default function About() {
         </div>
       </section>
 
-      {/* Signature 3D protection visual */}
+      {/* Signature protection visual (static — no WebGL) */}
       <section className="section bg-brand-ink text-white overflow-hidden">
         <div className="container-fg grid lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-5">
@@ -125,8 +124,17 @@ export default function About() {
             </Reveal>
           </div>
           <div className="lg:col-span-7 h-[420px] relative rounded-sm overflow-hidden border border-white/10">
-            <MiniShield />
-            <div className="absolute bottom-6 left-6 text-sm text-white/40">Engineered for your specific water table</div>
+            <img
+              src={IMAGES.diagram}
+              alt="FloGuard French drain and sump pump system diagram"
+              className="absolute inset-0 w-full h-full object-cover"
+              width={1200}
+              height={800}
+              loading="lazy"
+              decoding="async"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-brand-ink/80 via-transparent to-transparent" />
+            <div className="absolute bottom-6 left-6 text-sm text-white/70">Engineered for your specific water table</div>
           </div>
         </div>
       </section>

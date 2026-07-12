@@ -14,27 +14,45 @@ export const Layout = ({ children }) => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) return;
 
-    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    // Lighter or native-feeling scroll on mobile
+    const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+    // Native scroll on touch devices is faster and more reliable
+    if (isTouch) return;
+
     const lenis = new Lenis({
-      duration: isTouch ? 0.8 : 1.1,
-      smoothWheel: !isTouch,
-      lerp: isTouch ? 0.2 : 0.1,
+      duration: 1.1,
+      smoothWheel: true,
+      lerp: 0.1,
     });
     let raf;
-    const loop = (t) => { lenis.raf(t); raf = requestAnimationFrame(loop); };
+    const loop = (t) => {
+      lenis.raf(t);
+      raf = requestAnimationFrame(loop);
+    };
     raf = requestAnimationFrame(loop);
-    return () => { cancelAnimationFrame(raf); lenis.destroy(); };
+    return () => {
+      cancelAnimationFrame(raf);
+      lenis.destroy();
+    };
   }, []);
 
-  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   return (
     <div className="App bg-background">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:bg-brand-orange focus:text-brand-ink focus:px-4 focus:py-2 focus:rounded-sm focus:font-semibold"
+      >
+        Skip to main content
+      </a>
       <Cursor />
       <ScrollProgress />
       <Navbar />
-      <main>{children}</main>
+      <main id="main-content" tabIndex={-1}>
+        {children}
+      </main>
       <Footer />
       <ChatWidget />
     </div>

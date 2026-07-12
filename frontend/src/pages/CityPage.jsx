@@ -38,30 +38,46 @@ export default function CityPage() {
         image={city.image}
         jsonLd={{
           "@context": "https://schema.org",
-          "@type": "LocalBusiness",
-          name: `FloGuard, LLC — Drainage in ${city.name}`,
-          description: city.intro,
-          telephone: "+13862590023",
-          url: `https://www.floguardfl.com/areas/${city.slug}`,
-          areaServed: { "@type": "City", name: city.name },
-          address: {
-            "@type": "PostalAddress",
-            streetAddress: "5114 S Ridgewood Ave",
-            addressLocality: "Port Orange",
-            addressRegion: "FL",
-            postalCode: "32127",
-            addressCountry: "US",
-          },
-          aggregateRating: { "@type": "AggregateRating", ratingValue: "5.0", reviewCount: "2" },
-          hasOfferCatalog: {
-            "@type": "OfferCatalog",
-            name: "Drainage Services",
-            itemListElement: [
-              { "@type": "Offer", itemOffered: { "@type": "Service", name: "French Drain Installation" } },
-              { "@type": "Offer", itemOffered: { "@type": "Service", name: "Sump Pump Systems" } },
-              { "@type": "Offer", itemOffered: { "@type": "Service", name: "Yard Drainage & Grading" } }
-            ]
-          }
+          "@graph": [
+            {
+              "@type": "LocalBusiness",
+              "@id": "https://www.floguardfl.com/#organization",
+              name: `FloGuard, LLC — Drainage in ${city.name}`,
+              description: city.intro,
+              telephone: "+13862590023",
+              url: `https://www.floguardfl.com/areas/${city.slug}`,
+              areaServed: { "@type": "City", name: city.name },
+              address: {
+                "@type": "PostalAddress",
+                streetAddress: "5114 S Ridgewood Ave",
+                addressLocality: "Port Orange",
+                addressRegion: "FL",
+                postalCode: "32127",
+                addressCountry: "US",
+              },
+              hasOfferCatalog: {
+                "@type": "OfferCatalog",
+                name: "Drainage Services",
+                itemListElement: [
+                  { "@type": "Offer", itemOffered: { "@type": "Service", name: "French Drain Installation" } },
+                  { "@type": "Offer", itemOffered: { "@type": "Service", name: "Sump Pump Systems" } },
+                  { "@type": "Offer", itemOffered: { "@type": "Service", name: "Yard Drainage & Grading" } },
+                ],
+              },
+            },
+            ...(city.faqs?.length
+              ? [
+                  {
+                    "@type": "FAQPage",
+                    mainEntity: city.faqs.map((f) => ({
+                      "@type": "Question",
+                      name: f.q,
+                      acceptedAnswer: { "@type": "Answer", text: f.a },
+                    })),
+                  },
+                ]
+              : []),
+          ],
         }}
       />
       <PageHero
@@ -111,7 +127,7 @@ export default function CityPage() {
         </div>
       </section>
 
-      {/* System solution explanation - site wide */}
+      {/* Local deep dive + system explanation */}
       <section className="section bg-secondary">
         <div className="container-fg">
           <div className="max-w-3xl mb-12">
@@ -122,16 +138,53 @@ export default function CityPage() {
               </h2>
             </Reveal>
           </div>
+          {city.deepDive && (
+            <Reveal className="max-w-3xl mb-10">
+              <p className="text-lg text-brand-slate leading-relaxed">{city.deepDive}</p>
+            </Reveal>
+          )}
           <div className="grid md:grid-cols-2 gap-8 text-lg text-brand-slate">
             <Reveal>
               <p>{SYSTEM_EXPLANATION.benefits}</p>
             </Reveal>
             <Reveal delay={0.1}>
-              <p>{SYSTEM_EXPLANATION.bottomLine} <Link to="/services" className="text-brand-orange hover:underline">See our full services for {city.name}.</Link></p>
+              <p>
+                {SYSTEM_EXPLANATION.bottomLine}{" "}
+                <Link to="/services/french-drains" className="text-brand-orange hover:underline">
+                  French drains
+                </Link>
+                ,{" "}
+                <Link to="/services/sump-pumps" className="text-brand-orange hover:underline">
+                  sump pumps
+                </Link>
+                , and{" "}
+                <Link to="/blog/french-drain-cost-central-florida-2026" className="text-brand-orange hover:underline">
+                  2026 cost guide
+                </Link>
+                .
+              </p>
             </Reveal>
           </div>
         </div>
       </section>
+
+      {city.faqs?.length > 0 && (
+        <section className="section bg-background">
+          <div className="container-fg max-w-3xl">
+            <h2 className="font-display text-3xl tracking-tight text-brand-navy mb-8">
+              Drainage FAQs for {city.name}
+            </h2>
+            <div className="space-y-6">
+              {city.faqs.map((f) => (
+                <div key={f.q} className="border-b border-border pb-6">
+                  <h3 className="font-display text-xl text-brand-navy">{f.q}</h3>
+                  <p className="mt-2 text-brand-slate leading-relaxed">{f.a}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* How it works */}
       <section className="section bg-brand-ink grain relative">

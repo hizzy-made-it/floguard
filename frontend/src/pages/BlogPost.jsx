@@ -26,6 +26,33 @@ function Block({ block }) {
         ))}
       </ul>
     );
+  if (block.type === "table")
+    return (
+      <div className="my-8 overflow-x-auto rounded-sm border border-border">
+        <table className="w-full text-left text-sm sm:text-base">
+          <thead className="bg-secondary">
+            <tr>
+              {(block.headers || []).map((h) => (
+                <th key={h} className="px-4 py-3 font-semibold text-brand-navy border-b border-border">
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {(block.rows || []).map((row, i) => (
+              <tr key={i} className="border-b border-border last:border-0">
+                {row.map((cell, j) => (
+                  <td key={j} className="px-4 py-3 text-brand-slate align-top">
+                    {cell}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
   return <p className="my-5 text-lg text-brand-slate leading-relaxed">{block.text}</p>;
 }
 
@@ -82,7 +109,7 @@ export default function BlogPost() {
       <section data-testid="blogpost-hero" className="relative min-h-[68vh] flex items-end overflow-hidden bg-brand-ink text-white grain">
         <motion.img
           src={post.image}
-          alt=""
+          alt={post.title}
           initial={{ scale: 1.12 }}
           animate={{ scale: 1 }}
           transition={{ duration: 2, ease: EASE }}

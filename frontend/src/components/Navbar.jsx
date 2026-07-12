@@ -15,6 +15,11 @@ export const Navbar = () => {
   useMotionValueEvent(scrollY, "change", (latest) => {
     const prev = scrollY.getPrevious() ?? 0;
     setScrolled(latest > 40);
+    // Don't auto-hide nav while keyboard focus is inside header (a11y)
+    if (typeof document !== "undefined" && document.activeElement?.closest?.("[data-testid='site-navbar']")) {
+      setHidden(false);
+      return;
+    }
     if (latest > prev && latest > 240) setHidden(true);
     else setHidden(false);
   });

@@ -66,7 +66,7 @@ export const Footer = () => {
             className="flex items-center gap-1.5 hover:text-white transition-colors"
             aria-label="Site built by HDCONNEX"
           >
-            <img src="/images/hdconnex.gif" alt="HDCONNEX" className="h-3.5 w-auto" />
+            <img src="/images/hdconnex.svg" alt="HDCONNEX" className="h-3.5 w-auto" width="88" height="14" loading="lazy" decoding="async" />
             <span>Site built by HDCONNEX</span>
           </a>
           <div>{COMPANY.hours} · Serving Central Florida</div>

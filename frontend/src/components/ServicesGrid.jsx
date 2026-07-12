@@ -25,37 +25,41 @@ export const ServicesGrid = ({ onHover }) => (
         onMouseLeave={() => onHover && onHover(null)}
         className={`group relative overflow-hidden rounded-sm border border-border bg-card ${spanClass[s.span]} will-change-transform`}
       >
-        <div className="relative h-56 md:h-64 overflow-hidden">
-          <img
-            src={s.image}
-            alt={s.title}
-            loading="lazy"
-            className="w-full h-full object-cover transition-all duration-700 group-hover:scale-[1.035] group-hover:brightness-[0.92]"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-brand-ink/75 via-brand-ink/30 to-transparent" />
-          <span className="absolute top-4 left-4 text-xs font-bold uppercase tracking-[1px] text-white/70 bg-black/20 px-2 py-px rounded-sm">
-            0{i + 1}
-          </span>
-        </div>
-        <div className="p-7">
-          <div className="flex items-start justify-between gap-4">
-            <h3 className="font-display text-2xl tracking-tight text-brand-navy">{s.title}</h3>
-            <ArrowUpRight className="text-brand-slate group-hover:text-brand-orange transition-colors shrink-0" size={22} />
-          </div>
-          <p className="mt-3 text-brand-slate leading-relaxed">{s.blurb}</p>
-          <ul className="mt-5 space-y-2">
-            {s.features.map((f) => (
-              <li key={f} className="flex items-center gap-2.5 text-sm text-brand-slate">
-                <Check size={15} className="text-brand-orange shrink-0" /> {f}
-              </li>
-            ))}
-          </ul>
-        </div>
         <Link
-          to="/services"
-          className="absolute inset-0"
+          to={`/services/${s.slug || s.id}`}
+          className="block h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
           aria-label={`Learn more about ${s.title}`}
-        />
+        >
+          <div className="relative h-56 md:h-64 overflow-hidden">
+            <img
+              src={s.image}
+              alt={s.title}
+              loading="lazy"
+              width={800}
+              height={500}
+              decoding="async"
+              className="w-full h-full object-cover transition-all duration-700 group-hover:scale-[1.035] group-hover:brightness-[0.92]"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-brand-ink/75 via-brand-ink/30 to-transparent" />
+            <span className="absolute top-4 left-4 text-xs font-bold uppercase tracking-[1px] text-white/70 bg-black/20 px-2 py-px rounded-sm">
+              0{i + 1}
+            </span>
+          </div>
+          <div className="p-7">
+            <div className="flex items-start justify-between gap-4">
+              <h3 className="font-display text-2xl tracking-tight text-brand-navy">{s.title}</h3>
+              <ArrowUpRight className="text-brand-slate group-hover:text-brand-orange transition-colors shrink-0" size={22} />
+            </div>
+            <p className="mt-3 text-brand-slate leading-relaxed">{s.blurb}</p>
+            <ul className="mt-5 space-y-2">
+              {s.features.map((f) => (
+                <li key={f} className="flex items-center gap-2.5 text-sm text-brand-slate">
+                  <Check size={15} className="text-brand-orange shrink-0" /> {f}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Link>
       </motion.article>
     ))}
   </div>

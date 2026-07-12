@@ -13,6 +13,7 @@ export const PageHero = ({ overline, title, subtitle, image, primary, secondary,
         <motion.img
           src={image}
           alt=""
+          role="presentation"
           initial={{ scale: 1.12 }}
           animate={{ scale: 1 }}
           transition={{ duration: 2, ease: EASE }}
