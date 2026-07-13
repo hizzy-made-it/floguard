@@ -62,7 +62,7 @@ logger = logging.getLogger(__name__)
 # ---- Email (Resend) ----
 RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'onboarding@resend.dev')
-LEAD_NOTIFICATION_EMAIL = os.environ.get('LEAD_NOTIFICATION_EMAIL', 'sales@floguardfl.com')
+LEAD_NOTIFICATION_EMAIL = os.environ.get('LEAD_NOTIFICATION_EMAIL', 'heath@hdconnex.com')
 
 # ---- GridFS Storage (free using MongoDB, no extra paid services needed) ----
 APP_NAME = "floguard"
