@@ -55,6 +55,7 @@ export const LeadForm = () => {
       await submitLead(form);
       setStatus("success");
     } catch (err) {
+      console.error("submitLead failed", err);
       setStatus("error");
     }
   };

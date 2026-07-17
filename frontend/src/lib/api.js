@@ -13,7 +13,8 @@ export function assertApiConfigured() {
 export const API = BACKEND_URL ? `${BACKEND_URL}/api` : "/api";
 const TOKEN_KEY = "fg_admin_token";
 
-export const client = axios.create({ baseURL: API });
+// Render free tier can cold-start ~30–50s; leave headroom for lead POST.
+export const client = axios.create({ baseURL: API, timeout: 60000 });
 
 client.interceptors.request.use((config) => {
   const token = localStorage.getItem(TOKEN_KEY);

@@ -515,12 +515,31 @@ async def update_lead_status(lead_id: str, body: dict, admin: dict = Depends(get
 
 app.include_router(api_router)
 
-_cors_raw = os.environ.get("CORS_ORIGINS", "https://www.floguardfl.com,https://floguardfl.com").strip()
-_cors_origins = [o.strip() for o in _cors_raw.split(",") if o.strip()]
+# Production site origins are always allowed so a mis-set CORS_ORIGINS env cannot
+# lock out the live contact form (browsers preflight POST /api/leads).
+_REQUIRED_CORS_ORIGINS = (
+    "https://www.floguardfl.com",
+    "https://floguardfl.com",
+)
+
+
+def parse_cors_origins(raw: str | None = None) -> list[str]:
+    """Merge required prod origins with env list; strip quotes/trailing slashes."""
+    if raw is None:
+        raw = os.environ.get("CORS_ORIGINS", "")
+    origins = set(_REQUIRED_CORS_ORIGINS)
+    for part in (raw or "").split(","):
+        origin = part.strip().strip("\"'").rstrip("/")
+        if origin:
+            origins.add(origin)
+    return sorted(origins)
+
+
+_cors_origins = parse_cors_origins()
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=False,
-    allow_origins=_cors_origins if _cors_origins else ["https://www.floguardfl.com"],
+    allow_origins=_cors_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -528,6 +547,7 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup():
+    logger.info("CORS allow_origins=%s", _cors_origins)
     try:
         await db.users.create_index("email", unique=True)
         await db.login_attempts.create_index("identifier")

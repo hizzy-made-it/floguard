@@ -131,7 +131,8 @@ export const AssessmentQuiz = () => {
       } catch {
         /* ignore */
       }
-    } catch {
+    } catch (err) {
+      console.error("submitLead failed", err);
       setStatus("error");
     }
   };
