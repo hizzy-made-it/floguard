@@ -50,7 +50,7 @@ export function normalizeUser(u) {
 
 /** Comma-separated usernames that always get admin (env ACADEMY_ADMIN_USERNAMES). */
 export function adminUsernameSet() {
-  const raw = String(process.env.ACADEMY_ADMIN_USERNAMES || 'heath,admin,hizzy').toLowerCase();
+  const raw = String(process.env.ACADEMY_ADMIN_USERNAMES || 'heath,hizzy').toLowerCase();
   return new Set(
     raw
       .split(/[,;\s]+/)
