@@ -58,14 +58,22 @@ export const Seo = ({
   );
 };
 
-/** Shared Organization / LocalBusiness entity for graphs */
+/** Shared Organization / LocalBusiness entity for graphs (logo helps Google brand/logo display) */
 export const organizationLd = {
   "@type": "LocalBusiness",
   "@id": ORG_ID,
   name: "FloGuard, LLC",
+  legalName: "FloGuard, LLC",
   url: SITE,
   telephone: "+13862590023",
-  image: `${SITE}/images/hero-poster.jpg`,
+  logo: {
+    "@type": "ImageObject",
+    url: `${SITE}/images/logo-schema.png`,
+    width: 448,
+    height: 448,
+    contentUrl: `${SITE}/images/logo-schema.png`,
+  },
+  image: [`${SITE}/images/logo-schema.png`, `${SITE}/images/hero-poster.jpg`],
   description:
     "Residential French drain and sump pump contractor serving Central Florida — Port Orange, Daytona Beach, Sanford, Orlando corridor.",
   address: {

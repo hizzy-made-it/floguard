@@ -1,8 +1,13 @@
 # FloGuard SEO + AEO Strategy (Living Source of Truth)
 
 **Domain:** https://www.floguardfl.com  
-**Updated:** 2026-07-12  
+**Updated:** 2026-07-14  
 **Stack:** React CRA + FastAPI + MongoDB
+
+> **Elite ranking command center:** [`docs/ELITE-SEO-AEO-GAMEPLAN.md`](./ELITE-SEO-AEO-GAMEPLAN.md)  
+> Keyword → URL map, 14-day ASAP sprint, AEO system, KPIs.  
+> **Operational checklist:** [`docs/SEO-EXECUTION-PLAN.md`](./SEO-EXECUTION-PLAN.md)  
+> This file remains the code/content status + constraints snapshot.
 
 ## Implementation status (complete for code)
 
@@ -54,9 +59,12 @@ Until CF policy matches the repo `public/robots.txt`, AEO citations will underpe
 
 ## North-star outcomes (12 months)
 
-- Map Pack + organic top 5 for Port Orange, Daytona, NSB, Ormond  
-- 3–5× organic sessions; ≥40% leads organic/AI  
-- Weekly AI citation presence on tracked AEO queries (after CF allowlist)
+See **realistic KPIs and leading indicators** in `SEO-EXECUTION-PLAN.md` §3.
+
+Summary:
+- Map Pack + organic visibility for Port Orange, Daytona, NSB, Ormond on core services  
+- Organic sessions growing from baseline (target range in execution plan—not 5k/mo fantasy)  
+- Monthly AI mention checks on a fixed 15-query set (after CF allowlist)
 
 ## Constraints
 

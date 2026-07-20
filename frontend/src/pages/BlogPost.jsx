@@ -3,7 +3,7 @@ import { Link, useParams, Navigate } from "react-router-dom";
 import { motion, useScroll, useSpring } from "framer-motion";
 import { ArrowLeft, ArrowUpRight, Calendar, Clock, Phone } from "lucide-react";
 import { getPost, POSTS, formatDate } from "../data/blog";
-import { COMPANY, IMAGES } from "../data/site";
+import { COMPANY } from "../data/site";
 import { Seo, organizationLd, faqPageLd, SITE } from "../components/Seo";
 import { EASE } from "../lib/animations";
 
@@ -99,7 +99,12 @@ export default function BlogPost() {
               publisher: {
                 "@type": "Organization",
                 name: "FloGuard, LLC",
-                logo: { "@type": "ImageObject", url: IMAGES.logo },
+                logo: {
+                  "@type": "ImageObject",
+                  url: `${SITE}/images/logo-schema.png`,
+                  width: 448,
+                  height: 448,
+                },
               },
               mainEntityOfPage: `${SITE}/blog/${post.slug}`,
             },

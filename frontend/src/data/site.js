@@ -19,10 +19,10 @@ export const COMPANY = {
 };
 
 export const IMAGES = {
-  // Logo (lettering diagram) — DO NOT REPLACE
-  logo: "https://customer-assets.emergentagent.com/job_171d6f38-0b46-45ff-9e6c-f9747eec3455/artifacts/raba3tpe_image.png",
-  // Small icon fallback for logo — DO NOT REPLACE
-  logoIcon: "https://customer-assets.emergentagent.com/job_171d6f38-0b46-45ff-9e6c-f9747eec3455/artifacts/rks20kgd_image.png",
+  // First-party brand assets (also used for favicon + Google Organization logo schema)
+  logo: "/images/logo.png",
+  logoIcon: "/images/logo-icon.png",
+  logoSchema: "/images/logo-schema.png",
 
   // All images are unique per usage (no duplicates)
   storm: "/images/storm.jpg",
