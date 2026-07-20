@@ -1,0 +1,8 @@
+.env
+.env.local
+.vercel/
+node_modules/
+LeadAgent/.venv/
+LeadAgent/data/
+__pycache__/
+*.pyc

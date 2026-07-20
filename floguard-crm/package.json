@@ -1,0 +1,12 @@
+{
+  "name": "floguard-crm",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "FLOGUARD SALES REV — drainage sales training & lead command center (floguardfl.com/crm)",
+  "scripts": {
+    "dev": "node scripts/dev-server.mjs",
+    "sync-docs": "node scripts/sync-sales-docs.mjs",
+    "seed-storage": "node scripts/seed-storage.mjs"
+  }
+}

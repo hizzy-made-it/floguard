@@ -1,0 +1,92 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-07-17T17:34:11.371Z",
+  "source": "Sales Docs/ + Sales Docs/training/",
+  "note": "Synced for all authenticated FLOGUARD SALES REV users. Run npm run sync-docs after adding files.",
+  "categories": [
+    "Playbook",
+    "Pricing",
+    "Scripts",
+    "Product",
+    "Leads"
+  ],
+  "documents": [
+    {
+      "id": "floguard_drainage_sales_playbook_md",
+      "title": "Drainage Sales Playbook",
+      "category": "Playbook",
+      "description": "The consultative cold-selling system: ROI reframe, triggers, assumptive close, real urgency, category discipline.",
+      "file": "FloGuard_Drainage_Sales_Playbook.md",
+      "href": "/crm/docs/FloGuard_Drainage_Sales_Playbook.md",
+      "type": "md",
+      "bytes": 3202,
+      "updated_at": "2026-07-17T17:32:14.517Z"
+    },
+    {
+      "id": "floguard_pricing_and_offers_md",
+      "title": "Pricing & Offers (SSOT)",
+      "category": "Pricing",
+      "description": "The single source of truth for what reps may quote — the $4,500–$12,000 band, proof points, and the never-quote list.",
+      "file": "FloGuard_Pricing_and_Offers.md",
+      "href": "/crm/docs/FloGuard_Pricing_and_Offers.md",
+      "type": "md",
+      "bytes": 2837,
+      "updated_at": "2026-07-17T17:31:59.283Z"
+    },
+    {
+      "id": "floguard_call_scripts_md",
+      "title": "Call Scripts",
+      "category": "Scripts",
+      "description": "First-call openers, sump/maintenance/B2B variants, voicemail, follow-up text, and the never-say list.",
+      "file": "FloGuard_Call_Scripts.md",
+      "href": "/crm/docs/FloGuard_Call_Scripts.md",
+      "type": "md",
+      "bytes": 2931,
+      "updated_at": "2026-07-17T17:32:28.593Z"
+    },
+    {
+      "id": "floguard_objection_encyclopedia_md",
+      "title": "Objection Encyclopedia",
+      "category": "Scripts",
+      "description": "Validate → reframe → proof → assessment close, for every objection from \"just regrade it\" to the B2B approval chain.",
+      "file": "FloGuard_Objection_Encyclopedia.md",
+      "href": "/crm/docs/FloGuard_Objection_Encyclopedia.md",
+      "type": "md",
+      "bytes": 3122,
+      "updated_at": "2026-07-17T17:32:46.123Z"
+    },
+    {
+      "id": "floguard_system_explainer_md",
+      "title": "How the System Works",
+      "category": "Product",
+      "description": "Florida water physics, the five-step water path, what the system does and does NOT protect against, install story.",
+      "file": "FloGuard_System_Explainer.md",
+      "href": "/crm/docs/FloGuard_System_Explainer.md",
+      "type": "md",
+      "bytes": 2297,
+      "updated_at": "2026-07-17T17:32:56.877Z"
+    },
+    {
+      "id": "floguard_quiz_lead_reading_guide_md",
+      "title": "Quiz Lead Reading Guide",
+      "category": "Leads",
+      "description": "How to read floguardfl.com quiz submissions as pre-done discovery and dial with speed.",
+      "file": "FloGuard_Quiz_Lead_Reading_Guide.md",
+      "href": "/crm/docs/FloGuard_Quiz_Lead_Reading_Guide.md",
+      "type": "md",
+      "bytes": 1998,
+      "updated_at": "2026-07-17T17:33:08.811Z"
+    },
+    {
+      "id": "drainage_need_score_md",
+      "title": "Drainage Need Score (DNS)",
+      "category": "Leads",
+      "description": "0–100 sales-urgency score: wire format, scoring model, grades/bands, talk-track generation.",
+      "file": "DRAINAGE-NEED-SCORE.md",
+      "href": "/crm/docs/DRAINAGE-NEED-SCORE.md",
+      "type": "md",
+      "bytes": 2130,
+      "updated_at": "2026-07-17T17:33:20.931Z"
+    }
+  ]
+}

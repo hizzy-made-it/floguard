@@ -1,0 +1,14 @@
+.venv/
+node_modules/
+.next/
+.env
+.env.local
+__pycache__/
+*.pyc
+
+# Bulk geodata — never commit. Re-fetch via pipeline/ingest_*.py
+data/
+*.tif
+*.tiff
+*.laz
+*.pmtiles

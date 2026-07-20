@@ -1,0 +1,22 @@
+# Channel routing and safety
+
+email:
+  provider: outlook_mcp  # primary: create draft via Outlook MCP / manual paste
+  fallback: file_export  # write draft to data/exports/
+  daily_send_cap: 25
+  require_yes_to_send: true
+
+linkedin:
+  provider: brave_cdp
+  daily_dm_cap: 15
+  draft_only_default: true
+
+facebook:
+  provider: brave_cdp
+  read_only: true
+
+defaults:
+  # Prefer email for local service cold outreach
+  primary_channel: email
+  always_create_draft_before_send: true
+  never_auto_send: true

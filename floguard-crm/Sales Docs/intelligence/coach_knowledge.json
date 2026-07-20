@@ -1,0 +1,173 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-07-17T00:00:00.000Z",
+  "pricing_ssot": "Sales Docs/FloGuard_Pricing_and_Offers.md",
+  "source_docs": [
+    "FloGuard_Drainage_Sales_Playbook.md",
+    "FloGuard_Pricing_and_Offers.md",
+    "FloGuard_Call_Scripts.md",
+    "FloGuard_Objection_Encyclopedia.md",
+    "FloGuard_System_Explainer.md",
+    "FloGuard_Quiz_Lead_Reading_Guide.md",
+    "DRAINAGE-NEED-SCORE.md"
+  ],
+  "safety": [
+    "Never quote a firm system price by phone — the band is $4,500-$12,000 for complete French drain + sump systems and the real number comes from the free on-site assessment",
+    "Never invent prices, discounts, warranty terms, deposit or financing details — anything marked [CONFIRM WITH OWNER] must be confirmed before quoting",
+    "Never claim insurance will cover the work or advise on coverage — homeowners policies generally exclude gradual seepage; say that and stop",
+    "Never promise protection against hurricane storm surge or river flooding above the slab — the system fights groundwater and storm soak, be honest about the line",
+    "Never diagnose a yard you have not seen — the assessment exists because every lot's soil, slope, and water table differ",
+    "Never invent customer names, review counts, or guaranteed outcomes",
+    "Never teach fake urgency or fake deadlines — Florida's wet season and named storms are real urgency enough",
+    "No scare tactics — state real risks plainly (foundation, mold, resale) without dramatizing",
+    "Respect do-not-call requests immediately and log them",
+    "No auto-send: every outbound draft requires human approval in the desk"
+  ],
+  "products": {
+    "FrenchDrain": {
+      "label": "French Drains",
+      "tagline": "Engineered, not guessed — perimeter systems that lower the water around your foundation.",
+      "icp": "Central Florida homeowners with chronic standing water, soggy yards days after rain, water at the foundation or lanai; flat lots; high-water-table neighborhoods (Port Orange, Daytona, NSB, Ormond, Sanford, Orlando, DeLand, Deltona).",
+      "not_icp": "Renters (route to landlord/PropertyMgmt), storm-surge/river flooding cases (be honest — not our fight), homes with a one-time surface puddle that drains in an hour (YardDrainage or no-sale honesty).",
+      "offer": "Exterior French drain: fabric-lined trench, clean gravel, 4-inch perforated pipe, custom trench/slope/discharge design, typically 150-350 linear feet, usually paired with a sump basin + pump for discharge on flat lots. Includes full landscape restoration — invisible when done.",
+      "pricing": "Complete French drain + sump systems typically $4,500-$12,000 depending on trench length, sump needs, and discharge run. Quoted ONLY after the free on-site assessment. Most quotes land mid-band, not the top.",
+      "payment_terms": "[CONFIRM WITH OWNER] — never state deposit, financing, or payment-method details until confirmed.",
+      "turnaround": "Free assessment scheduled within 24 hours; many residential installs complete in 1-3 days depending on access, soil, and scope.",
+      "discovery": [
+        "After a hard rain, how long does water stand?",
+        "Has water reached the foundation, lanai, or inside?",
+        "What have you already tried — regrading, gutters, a trench?",
+        "How long have you owned the home — any plans to sell?"
+      ],
+      "objections": {
+        "just_regrade": "Regrading moves the puddle; it cannot lower a water table sitting 2-6 feet down. Chronic groundwater needs subsurface collection (fabric, gravel, pipe) plus pumped discharge.",
+        "too_expensive": "The assessment is free — get the real number for YOUR yard. Anchor against foundation repair ($10k+), mold remediation, yearly re-sodding, and failed inspections at resale.",
+        "insurance": "Homeowners policies exclude gradual seepage and groundwater damage. Flood insurance pays after a disaster — it doesn't prevent the damage or the claims history.",
+        "landscaper": "Filter fabric, slope math, pump sizing, and code-compliant discharge separate a system from a ditch that clogs in a year in Florida sand. And we warranty the work.",
+        "after_hurricane_season": "Dry-season installs are easier on the yard and you're protected before the water arrives.",
+        "selling_soon": "A wet crawlspace kills inspections. A dry yard is a listing asset."
+      },
+      "dns": {
+        "format": "DNS <0-100>/<A-F> (<urgent|priority|monitor>) | signal1; signal2",
+        "A_urgent": "85-100: water is touching the structure or standing for days. Talk track: lead with the specific signals, the compounding-damage frame, and book the assessment within 24-48 hours.",
+        "B_urgent": "70-84: strong chronic signals. Talk track: neighborhood social proof + wet-season timing, close a concrete slot this week.",
+        "C_priority": "50-69: recurring but not structural yet. Talk track: 'cheaper to fix before it reaches the slab' — offer the free assessment as a no-risk fact-finding step.",
+        "D_monitor": "30-49: intermittent surface pooling. Talk track: YardDrainage entry offer, keep on nurture for wet season.",
+        "F_monitor": "0-29: little evidence of need. Be honest, offer seasonal check-in, do not push."
+      },
+      "crm_status_path": "New → Contacted → Assessment booked → Assessed/Quoted → Won (install scheduled) | Lost / Do not contact",
+      "close_discipline": "The phone close is a booked free assessment slot — day and time, within 24-48 hours. The contract close happens on-site with the custom design. Never leave with 'call me later' — lock a specific time.",
+      "never": ["Firm price by phone", "Insurance coverage claims", "Storm-surge protection promises", "Diagnosing unseen yards"]
+    },
+    "SumpPump": {
+      "label": "Sump Pumps",
+      "tagline": "The active defense — because flat Florida lots give gravity nowhere to go.",
+      "icp": "Homes with damp/wet crawlspaces, musty smells, mold worries, flat lots, existing French drains without discharge, garages/AC pads that take on water; landlords with tenant complaints.",
+      "not_icp": "Yards with pure surface pooling and healthy slope (YardDrainage), storm-surge exposure sold as 'flood proofing' (never).",
+      "offer": "Interior drains routed to a sealed sump basin; submersible pump with float switch; check valve; discharge line 10-20+ feet from the foundation to a code-compliant location. Battery backup and smart monitoring options — hurricanes cut power exactly when groundwater peaks.",
+      "pricing": "Scoped per home; often part of a complete $4,500-$12,000 system. Battery backup and monitoring are add-ons every Florida homeowner should hear about. Quote only after the free assessment.",
+      "payment_terms": "[CONFIRM WITH OWNER]",
+      "turnaround": "Free assessment within 24 hours; installs commonly 1-2 days.",
+      "discovery": [
+        "Any musty smell, mold, or damp insulation under the house?",
+        "Does the yard stay wet days after rain?",
+        "What happens at your place when a storm knocks out power?",
+        "Existing pump? When was it last tested?"
+      ],
+      "objections": {
+        "overkill": "On a flat lot gravity has nowhere to send water. The pump is what actually moves it away — everything else just collects it.",
+        "power_outage": "That's why we spec battery backup — the storm cutting your power is the same storm pushing groundwater at your foundation.",
+        "have_pump": "Float switches stick and check valves fail silently. We test, service, and upgrade systems we didn't install.",
+        "mold_fear": "Moisture under the house feeds mold and rots framing. Drying the crawlspace is the fix; treatment without drainage is a bandage."
+      },
+      "dns": {
+        "format": "Same DNS format; musty smell / crawlspace signals push scores up.",
+        "note": "Crawlspace + mold signals usually score B or higher — book fast."
+      },
+      "crm_status_path": "New → Contacted → Assessment booked → Assessed/Quoted → Won | Lost",
+      "close_discipline": "Close the free crawlspace + yard assessment. Existing-pump mentions convert to inspection visits, upgrades, and Maintenance plans.",
+      "never": ["Storm-surge or river-flood protection claims", "Firm quotes by phone", "Mold-remediation promises (we fix the water, not the spores)"]
+    },
+    "YardDrainage": {
+      "label": "Yard Drainage",
+      "tagline": "Get the lanai back — surface water gone in hours, not days.",
+      "icp": "Flooded lanais/patios, pooling driveways, dead-grass low spots, downspouts dumping at the slab, erosion at beds and retaining walls, mosquito ponds.",
+      "not_icp": "Chronic groundwater/water-table cases (French drain conversation), structural flooding (be honest).",
+      "offer": "Catch basins, channel drains, swales, downspout tie-ins, precision re-grading; routed to safe discharge — often the same sump or storm connection as a French drain system. Landscape protected and restored.",
+      "pricing": "Scope varies by yard — lower entry ticket than full systems; quoted at the free assessment. Often the first job that becomes a full system later.",
+      "payment_terms": "[CONFIRM WITH OWNER]",
+      "turnaround": "Free assessment within 24 hours; most surface jobs are quick installs.",
+      "discovery": [
+        "Where exactly does water collect — lanai, driveway, low spot?",
+        "How long before it drains on its own?",
+        "Where do your downspouts dump?",
+        "Erosion, dead grass, or mosquitoes?"
+      ],
+      "objections": {
+        "eventually_drains": "Days of standing water kills grass, breeds mosquitoes, and soaks soil against the slab. 'Eventually' is damage in slow motion.",
+        "too_expensive": "Surface drainage is our most affordable work — and the assessment that scopes it is free.",
+        "add_dirt": "New dirt without an engineered flow path moves the pool somewhere else — often closer to the house."
+      },
+      "dns": {
+        "note": "Surface-only signals usually score C-D — sell the entry offer, watch for groundwater signals that upgrade the conversation."
+      },
+      "crm_status_path": "New → Contacted → Assessment booked → Assessed/Quoted → Won | Lost",
+      "close_discipline": "Fast close on the free assessment — lowest-friction offer in the lineup. The upsell to a full system happens on-site, never on the phone.",
+      "never": ["Overselling a full system when surface work solves it — honesty converts neighbors"]
+    },
+    "Maintenance": {
+      "label": "Maintenance",
+      "tagline": "Storm-ready, every season — because pumps fail silently.",
+      "icp": "Anyone with an existing sump or French drain (ours or inherited), past FloGuard customers, sellers prepping inspections, property managers.",
+      "not_icp": "Homes with no drainage infrastructure at all (that's an assessment conversation, not a plan).",
+      "offer": "Seasonal storm-readiness service: pump test, basin inspection/cleaning, discharge + check-valve check, battery health, recommendations; monitoring options that alert on excessive run time or power loss. FloGuard services systems it did not install.",
+      "pricing": "Plan pricing: [CONFIRM WITH OWNER] — never invent a number. Frame against what a silent pump failure costs in the first storm of the season.",
+      "payment_terms": "[CONFIRM WITH OWNER]",
+      "turnaround": "Book service visits late spring, before the May-October wet season; urgent post-storm issues prioritized.",
+      "discovery": [
+        "When was the pump last tested or serviced?",
+        "Installed it, or inherited it with the house?",
+        "Battery backup — how old is the battery?",
+        "Plans to sell in the next couple of years?"
+      ],
+      "objections": {
+        "test_myself": "The monthly bucket test is great — keep it. Our visit covers what you can't see: basin sediment, a sticking float, a tired battery, a blocked discharge line.",
+        "been_fine": "Pumps fail silently — right up until the first big storm of the season.",
+        "not_your_install": "We service inherited systems all the time — inspect, repair, or bring it to storm-ready standard."
+      },
+      "dns": {
+        "note": "Maintenance leads aren't scored on need — timing is the lever: pre-season beats post-storm."
+      },
+      "crm_status_path": "New → Contacted → Visit booked → Serviced → Plan active | Lost",
+      "close_discipline": "Book the seasonal visit on a specific date — late spring ideally. Recurring plan close beats one-off visit. Batteries every 2-3 years is the natural re-touch.",
+      "never": ["Inventing plan prices", "Scare tactics — the first-storm story is real enough"]
+    },
+    "PropertyMgmt": {
+      "label": "Property Mgmt (B2B)",
+      "tagline": "One vendor, scheduled seasons, fewer tenant complaints.",
+      "icp": "Property management companies, HOA boards, landlords with multiple rentals, vacation-rental managers across Central Florida.",
+      "not_icp": "Single-home owners (homeowner playbooks), commercial civil-engineering scale projects (refer out honestly).",
+      "offer": "Portfolio drainage programs: pilot assessment of the worst property with a written scope for the owner, prioritized fixes, seasonal maintenance across the portfolio, one vendor, clean invoicing, scheduled service.",
+      "pricing": "Per-property scoping after the pilot walk-through; portfolio programs in a simple agreement. Numbers: [CONFIRM WITH OWNER]. Never invent volume discounts.",
+      "payment_terms": "[CONFIRM WITH OWNER] — invoicing terms for management companies to be confirmed.",
+      "turnaround": "Pilot walk-through within the week; written scope suitable to forward to owners.",
+      "discovery": [
+        "How many doors, and which properties flood?",
+        "What do drainage complaints cost per season — calls, visits, turnover?",
+        "Who approves maintenance spend — you or the owners?",
+        "One-off fixes today, or would a scheduled seasonal program help?"
+      ],
+      "objections": {
+        "owners_approve": "Start with one free pilot assessment and a written scope you can hand the owner — real numbers, their call, you look prepared.",
+        "have_handyman": "Handymen patch symptoms. Chronic drainage is an engineering problem and returns every wet season until the water has somewhere to go.",
+        "too_busy": "That's the pitch: one vendor, scheduled seasonal service, no more 2am emergency calls during a tropical storm."
+      },
+      "dns": {
+        "note": "Score per-property, not per-account. The worst property's DNS is the pilot pitch."
+      },
+      "crm_status_path": "New → Contacted → Pilot booked → Scope delivered → Program active | Lost",
+      "close_discipline": "Close the pilot: free assessment of the single worst property this week + written scope for the owner. Land, prove, expand. Sell to the approval chain, never around it.",
+      "never": ["Volume-discount invention", "Bypassing the owner-approval chain", "Per-door pricing without owner confirmation"]
+    }
+  }
+}

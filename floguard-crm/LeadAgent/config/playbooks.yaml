@@ -1,0 +1,194 @@
+# FloGuard outreach playbooks — goals by lead classification
+# Prices and claims must come from this file only (never invent).
+# The phone close is ALWAYS the free on-site assessment appointment (day + time),
+# never a contract and never a firm price.
+
+brand:
+  company: "FloGuard, LLC"
+  tagline: "Smart drainage systems for Florida homes"
+  address: "5114 S Ridgewood Ave, Port Orange, FL 32127"
+  phone: "(386) 259-0023"
+  email: "sales@floguardfl.com"
+  website: "FloGuardFL.com"
+  territory: >
+    Port Orange, Daytona Beach, New Smyrna Beach, Ormond Beach, Sanford, Orlando,
+    DeLand, Deltona, Lake Mary, Winter Park, Edgewater, DeBary
+  service_lines:
+    exterior_french_drains:
+      description: >
+        Complete French drain + sump systems: fabric-lined trench, clean gravel,
+        4" perforated pipe, custom slope/discharge design; typically 150–350
+        linear ft, usually paired with a sump.
+      price_band: "$4,500–$12,000 typical for a single-family home"
+      price_rule: >
+        Quoted ONLY after the free on-site assessment — never a firm price by
+        phone. Band + assessment caveat is the only number reps may say.
+    interior_sump_pumps:
+      description: >
+        Sealed basin, float-switch pump, check valve; battery backup emphasized
+        for hurricane season (the storm that cuts power is the storm pushing
+        groundwater).
+      price_rule: "Scoped per home after the free assessment; often part of the combined band"
+    yard_drainage_grading:
+      description: "Catch basins, channel drains, swales, downspout tie-ins, re-grading"
+      positioning: "Lower entry ticket"
+      price_rule: "Assessment-quoted"
+    pump_maintenance:
+      description: "Seasonal storm-readiness plans; services inherited systems"
+      price: "[CONFIRM WITH OWNER]"
+    property_mgmt_b2b:
+      description: >
+        Pilot assessment of the manager's worst property + written scope the
+        manager can forward to the owner; portfolio seasonal programs.
+      price: "[CONFIRM WITH OWNER]"
+  payment_terms:
+    deposit: "[CONFIRM WITH OWNER]"
+    financing: "[CONFIRM WITH OWNER]"
+    methods: "[CONFIRM WITH OWNER]"
+    note: "Never invent deposits, financing, or payment methods in any copy."
+  phone_close: >
+    The close on every call and email is the FREE on-site assessment
+    appointment — a specific day + time window — not a contract, not a price.
+  commission_note: "Internal only — never put commission in outbound copy; structure [CONFIRM WITH OWNER]"
+
+forbidden_claims:
+  - "fake urgency or invented deadlines"
+  - "invented customer names or stats"
+  - "guaranteed outcomes"
+  - "firm system prices quoted by phone or email"
+  - "insurance-coverage claims of any kind"
+  - "storm-surge or flood-proof protection claims"
+  - "invented warranty terms"
+  - "mold-remediation promises"
+  - "buzzwords synergy unlock revolutionize game-changer"
+
+types:
+  french_drain:
+    goal: "Book the free on-site assessment for a French drain + sump candidate"
+    # Drainage Need Score (DNS): use score when present — see Sales Docs/DRAINAGE-NEED-SCORE.md
+    # Bands: urgent = dial first / 24–48h slot; priority = normal cadence; monitor = nurture only
+    primary_cta: "morning or afternoon better for a free 30-minute walk-through?"
+    channel_priority: ["email"]
+    value_hooks:
+      - "standing water that lingers after storms compounds toward the foundation"
+      - "engineered for the specific soil, slope, and water table — not guessed"
+      - "the assessment that tells you what YOUR yard actually needs is free"
+    objections:
+      - "price"
+      - "I'll just regrade / add dirt"
+      - "need to talk to my spouse"
+      - "not urgent right now"
+    pricing_anchor: >
+      Complete French drain + sump systems typically $4,500–$12,000 — quoted
+      only after the free on-site assessment; most quotes land mid-band.
+    email_length: [50, 120]
+    close_step: "booked free assessment appointment (day + time)"
+
+  sump_pump:
+    goal: "Book the free assessment for a crawlspace / interior water candidate"
+    primary_cta: "worth a free look under the house before storm season?"
+    channel_priority: ["email"]
+    value_hooks:
+      - "musty crawlspace after rain is a water signal, not a smell problem"
+      - "sealed basin, float switch, check valve — and battery backup, because the storm that cuts power is the one pushing groundwater"
+      - "free assessment tells you if it's a pump problem or a drainage problem"
+    objections:
+      - "already have a pump"
+      - "crawlspace has always been like that"
+      - "price"
+    pricing_anchor: >
+      Scoped per home — often part of the combined $4,500–$12,000 system band;
+      quoted only after the free on-site assessment.
+    email_length: [50, 120]
+    close_step: "booked free assessment appointment (day + time)"
+
+  yard_drainage:
+    goal: "Book the free assessment for a yard / hardscape drainage fix (lower entry ticket)"
+    primary_cta: "want a free 30-minute walk-through of where the water actually goes?"
+    channel_priority: ["email"]
+    value_hooks:
+      - "catch basins, channel drains, swales, and downspout tie-ins — smaller fix than a full system"
+      - "water pooling on a lanai, patio, or driveway rarely stays there"
+      - "lower entry ticket than a full French drain system"
+    objections:
+      - "it drains eventually"
+      - "price"
+      - "I'll wait for the dry season"
+    pricing_anchor: "Lower entry ticket than a full system — quoted after the free assessment"
+    email_length: [50, 120]
+    close_step: "booked free assessment appointment (day + time)"
+
+  maintenance:
+    goal: "Book a seasonal storm-readiness service visit for an existing system"
+    primary_cta: "want me to grab you a storm-readiness slot before the season?"
+    channel_priority: ["email"]
+    value_hooks:
+      - "pumps fail silently — the first storm of the season is a bad time to find out"
+      - "full check: pump test, basin, discharge line, battery"
+      - "we service inherited systems, not just our own installs"
+    objections:
+      - "it worked last year"
+      - "not now"
+      - "how much is the plan"
+    pricing_anchor: "Plan pricing [CONFIRM WITH OWNER] — never state a number until confirmed"
+    email_length: [50, 120]
+    close_step: "booked storm-readiness service visit (day + time)"
+
+  property_mgmt:
+    goal: "Open a B2B relationship: free pilot assessment of the manager's worst property + written scope"
+    primary_cta: "which property gives you the most grief — worth a free walk this week?"
+    channel_priority: ["email", "linkedin"]
+    value_hooks:
+      - "every wet season brings the same tenant calls: musty smell, flooded yard, standing water at move-out"
+      - "free pilot assessment of the single worst property — no commitment"
+      - "written scope the manager can forward straight to the owner"
+    objections:
+      - "we have a handyman for that"
+      - "owners won't approve spend"
+      - "no time"
+    pricing_anchor: "Per-property scoping [CONFIRM WITH OWNER] — pilot assessment is free"
+    email_length: [70, 140]
+    close_step: "booked pilot assessment of the worst property (day + time)"
+
+  client:
+    goal: "Expand an existing relationship: seasonal check, maintenance plan, or referral"
+    primary_cta: "want me to pencil in a seasonal check before the storms?"
+    channel_priority: ["email"]
+    value_hooks:
+      - "seasonal storm-readiness check on the installed system"
+      - "battery backup / monitoring add-on conversation"
+      - "referral to a neighbor with the same water problem"
+    objections:
+      - "not now"
+      - "system seems fine"
+      - "budget"
+    pricing_anchor: "Maintenance plan pricing [CONFIRM WITH OWNER] — never state a number until confirmed"
+    email_length: [50, 120]
+    close_step: "booked service visit or one warm referral intro"
+
+  partnership:
+    goal: "Create a mutual-upside referral relationship (adjacent trades, local pros)"
+    primary_cta: "open to mapping mutual upside in one short note?"
+    channel_priority: ["email", "linkedin"]
+    value_hooks:
+      - "drainage problems surface in adjacent work — a clean referral path helps both sides"
+      - "shared local audience without heavy lift"
+      - "we stay in our lane: water in, water out — nothing that competes with yours"
+    objections:
+      - "unclear mutual benefit"
+      - "no bandwidth"
+    pricing_anchor: "structure TBD"
+    email_length: [60, 130]
+    close_step: "exploratory reply or brief chat"
+
+custom_types: {}
+# Example:
+#   affiliate:
+#     goal: "..."
+#     primary_cta: "..."
+#     channel_priority: ["email"]
+#     value_hooks: []
+#     objections: []
+#     pricing_anchor: ""
+#     email_length: [50, 120]
+#     close_step: ""

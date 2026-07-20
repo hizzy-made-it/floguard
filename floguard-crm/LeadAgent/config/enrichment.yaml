@@ -1,0 +1,78 @@
+# Apify + free contact enrichment
+# Finds website, phone, and email for prospects when leadagent researches / drafts.
+
+default_ttl_hours: 168  # 7 days — do not re-run Apify within this window
+apify_skip_if_ran: true  # master switch: skip paid actors if already ran (TTL)
+apify_once_forever: false  # if true, only --force re-runs Apify (TTL ignored)
+max_actors_per_lead: 3
+
+# Free (no Apify) discovery — always fills gaps after actors, or alone in dry-run
+free_discovery:
+  enabled: true
+  search_website: true   # DuckDuckGo HTML search for official site when missing
+  scrape_website: true   # Fetch homepage + /contact for emails & phones
+  max_pages: 4
+
+actors:
+  google_maps:
+    # Phone + website + address + rating — COMMERCIAL leads only
+    actor_id: "compass/crawler-google-places"
+    enabled: true
+    for_types: ["property_mgmt", "partnership", "client"]
+  website_content:
+    # Page text used to extract emails/phones
+    actor_id: "apify/website-content-crawler"
+    enabled: true
+    for_types: ["property_mgmt", "partnership", "client"]
+  contact_info:
+    # Dedicated contact scraper (emails, phones, socials)
+    actor_id: "vdrmota/contact-info-scraper"
+    enabled: true
+    for_types: ["property_mgmt", "partnership", "client"]
+
+# Per lead_type actor sequence. google_maps first so a website is available to
+# the scrapers that follow.
+#
+# RESIDENTIAL vs COMMERCIAL:
+#   Residential homeowner leads are private addresses — Google Places and site
+#   crawlers find nothing and burn paid Apify credits. Those types get an
+#   explicitly EMPTY plan, which the pipeline honours as "spend nothing"
+#   (free discovery still runs and still fills phone/email gaps).
+#   Only commercial accounts run actors.
+type_plans:
+  default:
+    - google_maps
+    - website_content
+    - contact_info
+
+  # --- Residential: no paid actors ---
+  french_drain: []
+  sump_pump: []
+  yard_drainage: []
+  maintenance: []
+
+  # --- Commercial / B2B ---
+  property_mgmt:
+    - google_maps
+    - website_content
+    - contact_info
+  partnership:
+    - google_maps
+    - website_content
+  client:
+    - website_content
+    - contact_info
+
+research_brief_fields:
+  - business_name
+  - category
+  - phone
+  - address
+  - website_present
+  - website_notes
+  - rating
+  - review_themes
+  - hook_candidates
+  - risk_flags
+  - emails_found
+  - drainage_score
