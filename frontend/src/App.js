@@ -74,6 +74,22 @@ function MarketingApp() {
   );
 }
 
+/** Hard redirect to the Sales Rev CRM (Vercel). Keeps marketing SPA from swallowing /crm. */
+function CrmRedirect() {
+  if (typeof window !== "undefined") {
+    const path = window.location.pathname.replace(/^\/crm\/?/, "") || "";
+    const qs = window.location.search || "";
+    const hash = window.location.hash || "";
+    const target = `https://floguard-crm.vercel.app/crm/${path}${qs}${hash}`;
+    window.location.replace(target);
+  }
+  return (
+    <div className="min-h-[40vh] grid place-items-center text-brand-slate text-sm" role="status">
+      Opening FloGuard Sales Rev…
+    </div>
+  );
+}
+
 function App() {
   return (
     <ErrorBoundary>
@@ -85,6 +101,8 @@ function App() {
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
               <Route path="/studio" element={<Studio />} />
+              <Route path="/crm/*" element={<CrmRedirect />} />
+              <Route path="/crm" element={<CrmRedirect />} />
               <Route path="/*" element={<MarketingApp />} />
             </Routes>
           </Suspense>

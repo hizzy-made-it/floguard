@@ -1,5 +1,11 @@
 # Canonical host: apex → www (Cloudflare Pages / Netlify-style)
 https://floguardfl.com/*  https://www.floguardfl.com/:splat  301!
 
+# FloGuard Sales Rev CRM lives on Vercel (separate project).
+# Marketing SPA catch-all must not swallow /crm.
+# Prefer branded host when DNS is live; vercel.app always works.
+/crm    https://floguard-crm.vercel.app/crm/  302!
+/crm/*  https://floguard-crm.vercel.app/crm/:splat  302!
+
 # SPA fallback for React Router
 /*    /index.html   200
