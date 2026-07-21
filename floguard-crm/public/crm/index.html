@@ -233,11 +233,20 @@ a.maplink{color:var(--accent2);text-decoration:none;font-weight:600;}
 .fsi-side-head h2{margin:0;font-size:14px;color:var(--accent);}
 .fsi-list-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
 .fsi-list-tools input[type=search]{min-width:140px;flex:1;padding:7px 9px;border:1px solid #cdd4da;border-radius:7px;}
+.fsi-list-tools select{padding:7px 9px;border:1px solid #cdd4da;border-radius:7px;font-size:12.5px;background:#fff;max-width:160px;}
+.fsi-bulk{display:none;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 10px;background:#f6f8fa;border:1px solid var(--line);border-radius:8px;font-size:12px;}
+.fsi-bulk.on{display:flex;}
+.fsi-bulk b{font-variant-numeric:tabular-nums;}
+.fsi-bulk .btn{font-size:11.5px;padding:5px 9px;}
 .fsi-list{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:auto;max-height:min(42vh,360px);flex:1;}
-.fsi-row{display:grid;grid-template-columns:28px 1fr;gap:8px;padding:9px 11px;border-bottom:1px solid var(--line);cursor:pointer;align-items:start;}
+.fsi-row{display:grid;grid-template-columns:22px 28px 1fr;gap:8px;padding:9px 11px;border-bottom:1px solid var(--line);cursor:pointer;align-items:start;}
 .fsi-row:hover{background:#fbfcfd;}
 .fsi-row.on{background:#fff6ec;box-shadow:inset 3px 0 0 var(--accent);}
+.fsi-row .ck{margin-top:3px;accent-color:var(--accent);}
 .fsi-row .rk{font-weight:800;font-size:12px;color:var(--muted);padding-top:2px;}
+.fsi-city-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;}
+.fsi-city-chips button{font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:999px;border:1px solid #d5dce4;background:#fff;color:#5b636b;cursor:pointer;}
+.fsi-city-chips button.on{background:#eef7f5;border-color:#0d7d6f;color:#0d7d6f;}
 .fsi-row .main{min-width:0;}
 .fsi-row .addr{font-weight:700;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .fsi-row .story{font-size:11px;color:var(--muted);margin:2px 0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -686,8 +695,9 @@ a.maplink{color:var(--accent2);text-decoration:none;font-weight:600;}
  <div class="field"><label>Max parcels</label><input type="text" id="fsiLimit" value="200" inputmode="numeric" style="width:92px" title="Must dial defaults to top 200"></div>
  <button type="button" class="btn p" id="fsiSearchArea">Search this area</button>
  <button type="button" class="btn o" id="fsiTop">Top countywide</button>
- <div class="field"><label>Overlay</label>
+ <div class="field"><label>Overlays</label>
  <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;text-transform:none;letter-spacing:0;color:var(--ink);font-weight:400"><input type="checkbox" id="fsiNfhl"> FEMA flood zones</label>
+ <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;text-transform:none;letter-spacing:0;color:var(--ink);font-weight:400;margin-top:4px" title="Neighborhood NFIP claim density — not personal claims"><input type="checkbox" id="fsiClaimHeat"> Claim heat</label>
  </div>
  <span class="spacer"></span>
  <span class="fsi-source" id="fsiSource" title="Data source">—</span>
@@ -708,6 +718,17 @@ a.maplink{color:var(--accent2);text-decoration:none;font-weight:600;}
  </div>
  <div class="fsi-list-tools">
  <input type="search" id="fsiSearchText" placeholder="Search address, owner, id…" autocomplete="off">
+ <select id="fsiCityFilter" aria-label="Filter by city" title="Territory city">
+ <option value="">All cities</option>
+ </select>
+ </div>
+ <div class="fsi-city-chips" id="fsiCityChips" aria-label="Quick city filters"></div>
+ <div class="fsi-bulk" id="fsiBulk" role="toolbar" aria-label="Bulk actions">
+ <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="fsiSelectAll" class="ck"> Select all shown</label>
+ <span><b id="fsiSelCount">0</b> selected</span>
+ <button type="button" class="btn o" id="fsiBulkLeads">Add to Leads</button>
+ <button type="button" class="btn" id="fsiBulkCsv">Export CSV</button>
+ <button type="button" class="btn ghost" id="fsiBulkClear">Clear</button>
  </div>
  <div class="fsi-list" id="fsiList" role="listbox" aria-label="Ranked parcels"></div>
  <div class="fsi-drawer" id="fsiDrawer" aria-live="polite">
@@ -728,7 +749,7 @@ a.maplink{color:var(--accent2);text-decoration:none;font-weight:600;}
  </div>
  </div>
  </div>
- <p class="hint">FSI ranks a call list from public terrain, soil, and flood-zone data. Weights are literature defaults pending calibration against closed jobs.</p>
+ <p class="hint">FSI ranks a call list from public terrain, soil, flood-zone, and neighborhood claim-heat data. Residential + commercial + condos stay dialable. Weights are literature defaults. Claim heat is never a personal claim. Scrub DNC before dialing.</p>
 </section>
 
 
@@ -2983,8 +3004,9 @@ const FSI_BANDS=[
 const FSI_HSG={A:0.2,B:0.4,C:0.7,D:1.0};
 const FSI_ZONE={AE:1,VE:1,AO:0.8,AH:0.8,'X-SHADED':0.6,X:0.45};
 let _fsiMap=null, _fsiInited=false, _fsiMoved=false, _fsiFitting=false, _fsiPopup=null;
-let _fsiState={raw:[], filtered:[], selectedId:null, source:'', preset:'must', bandFilter:null, q:''};
+let _fsiState={raw:[], filtered:[], selectedId:null, source:'', preset:'must', bandFilter:null, q:'', city:'', selected:Object.create(null)};
 let _fsiSearchTimer=null;
+const FSI_FOCUS_CITIES=['PORT ORANGE','DAYTONA BEACH','ORMOND BEACH','NEW SMYRNA BEACH','DEBARY','DELAND','EDGEWATER','SOUTH DAYTONA','HOLLY HILL','DAYTONA BEACH SHORES'];
 
 function fsiSay(msg,isHtml){
  const el=document.getElementById('fsiStats'); if(!el) return;
@@ -3097,10 +3119,56 @@ function fsiRenderLegend(){
  }).join('')+(_fsiState.bandFilter!=null?'<span class="k" data-band="all" role="button">Show all</span>':'');
 }
 
+function fsiParcelCity(p){
+ if(p.city&&String(p.city).trim()) return String(p.city).trim().toUpperCase();
+ const a=String(p.address||'');
+ const m=a.match(/,\s*([^,]+),\s*FL/i);
+ return m?m[1].trim().toUpperCase():'';
+}
+function fsiSelectedCount(){
+ return Object.keys(_fsiState.selected).filter(function(id){ return _fsiState.selected[id]; }).length;
+}
+function fsiSyncBulkBar(){
+ const bar=document.getElementById('fsiBulk');
+ const n=fsiSelectedCount();
+ const el=document.getElementById('fsiSelCount');
+ if(el) el.textContent=String(n);
+ if(bar) bar.classList.toggle('on', n>0||_fsiState.filtered.length>0);
+ const sa=document.getElementById('fsiSelectAll');
+ if(sa){
+  const all=_fsiState.filtered.length&&_fsiState.filtered.every(function(p){ return _fsiState.selected[p.parcel_id]; });
+  sa.checked=!!all;
+  sa.indeterminate=n>0&&!all;
+ }
+}
+function fsiRebuildCityUi(){
+ const cities={};
+ _fsiState.raw.forEach(function(p){
+  const c=fsiParcelCity(p);
+  if(c) cities[c]=(cities[c]||0)+1;
+ });
+ const sorted=Object.keys(cities).sort(function(a,b){ return cities[b]-cities[a]||a.localeCompare(b); });
+ const sel=document.getElementById('fsiCityFilter');
+ if(sel){
+  const cur=_fsiState.city||'';
+  sel.innerHTML='<option value="">All cities</option>'+sorted.slice(0,80).map(function(c){
+   return '<option value="'+esc(c)+'"'+(c===cur?' selected':'')+'>'+esc(c)+' ('+cities[c]+')</option>';
+  }).join('');
+ }
+ const chips=document.getElementById('fsiCityChips');
+ if(chips){
+  const quick=FSI_FOCUS_CITIES.filter(function(c){ return cities[c]; }).slice(0,8);
+  chips.innerHTML=quick.map(function(c){
+   const on=(_fsiState.city||'')===c?' on':'';
+   return '<button type="button" data-city="'+esc(c)+'" class="'+on.trim()+'">'+esc(c.replace(/ BEACH/,' Bch'))+' · '+cities[c]+'</button>';
+  }).join('')+(_fsiState.city?'<button type="button" data-city="">All</button>':'');
+ }
+}
 function fsiApplyFilters(){
  const minLive=Number(document.getElementById('fsiMinScore')?.value);
  const min=isFinite(minLive)?minLive:0;
  const q=(_fsiState.q||'').trim().toLowerCase();
+ const city=(_fsiState.city||'').toUpperCase();
  const bandOf=fsiBander(_fsiState.raw);
  let list=_fsiState.raw.map(function(p){
   return Object.assign({},p,{_band:bandOf(Number(p.fsi_static)||0)});
@@ -3126,9 +3194,12 @@ function fsiApplyFilters(){
  if(_fsiState.bandFilter!=null){
   list=list.filter(function(p){ return p._band===_fsiState.bandFilter; });
  }
+ if(city){
+  list=list.filter(function(p){ return fsiParcelCity(p)===city; });
+ }
  if(q){
   list=list.filter(function(p){
-   return [p.address,p.owner_name,p.parcel_id,p.fema_zone,p.hsg,p.city,p.must_have_band].join(' ').toLowerCase().includes(q);
+   return [p.address,p.owner_name,p.parcel_id,p.fema_zone,p.hsg,p.city,p.must_have_band,p.use_desc].join(' ').toLowerCase().includes(q);
   });
  }
  if(preset==='must'){
@@ -3148,6 +3219,7 @@ function fsiPaint(){
   return isFinite(Number(p.lon))&&isFinite(Number(p.lat));
  }).map(function(p){
   const live=Number(p.fsi_live)||0;
+  const heat=Number(p.claim_heat)||0;
   return {
    type:'Feature',
    geometry:{type:'Point',coordinates:[Number(p.lon),Number(p.lat)]},
@@ -3155,6 +3227,7 @@ function fsiPaint(){
     parcel_id:String(p.parcel_id||''),
     address:p.address||'', owner_name:p.owner_name||'',
     fsi_live:live, fsi_static:Number(p.fsi_static)||0,
+    claim_heat:heat, claim_count_10y:Number(p.claim_count_10y)||0,
     fema_zone:p.fema_zone||'', hsg:p.hsg||'',
     band:p._band||0, selected:p.parcel_id===_fsiState.selectedId?1:0,
     r:4+Math.min(10, live/10)
@@ -3175,6 +3248,7 @@ function fsiRenderList(){
   box.innerHTML='<div class="hint" style="padding:14px">'+(_fsiState.preset==='must'
    ? 'No Must-band parcels in this load. Run score-must-have, or raise Max parcels / switch to Top risk.'
    : 'No parcels match filters. Clear presets or load Top countywide.')+'</div>';
+  fsiSyncBulkBar();
   return;
  }
  box.innerHTML=list.map(function(p,i){
@@ -3185,7 +3259,9 @@ function fsiRenderList(){
   const on=p.parcel_id===_fsiState.selectedId?' on':'';
   const zc=fsiZoneClass(p.fema_zone), sc=fsiSoilClass(p.hsg);
   const heat=Number(p.claim_heat)||0;
+  const checked=_fsiState.selected[p.parcel_id]?' checked':'';
   return '<div class="fsi-row'+on+'" role="option" data-id="'+esc(String(p.parcel_id))+'" aria-selected="'+(on?'true':'false')+'">'+
+   '<input type="checkbox" class="ck fsi-row-ck" data-id="'+esc(String(p.parcel_id))+'"'+checked+' aria-label="Select parcel" title="Select for bulk">'+
    '<div class="rk">'+(i+1)+'</div>'+
    '<div class="main">'+
    '<div class="addr">'+esc(p.address||p.parcel_id||'Parcel')+'</div>'+
@@ -3196,9 +3272,11 @@ function fsiRenderList(){
    (p.fema_zone?'<span class="fsi-chip '+zc+'">'+esc(p.fema_zone)+'</span>':'')+
    (p.hsg?'<span class="fsi-chip '+sc+'">Soil '+esc(p.hsg)+'</span>':'')+
    (heat>=0.45?'<span class="fsi-chip">Claims hot</span>':'')+
+   (Number(p.just_value)>=900000?'<span class="fsi-chip">Commercial scale</span>':'')+
    '<span class="fsi-chip">S '+esc(fsiNum(p.fsi_static,2))+'</span>'+
    '</div></div></div>';
  }).join('');
+ fsiSyncBulkBar();
 }
 
 function fsiRenderDrawer(){
@@ -3278,6 +3356,7 @@ function fsiRefreshView(fit){
  const feats=fsiPaint();
  fsiRenderList();
  fsiRenderLegend();
+ fsiRebuildCityUi();
  fsiRenderDrawer();
  if(fit) fsiFit(feats);
  const ban=document.getElementById('fsiBanner');
@@ -3291,7 +3370,7 @@ function fsiRefreshView(fit){
   }else ban.classList.remove('on');
  }
  const ls=document.getElementById('fsiListStats');
- if(ls) ls.textContent=_fsiState.filtered.length+' of '+_fsiState.raw.length;
+ if(ls) ls.textContent=_fsiState.filtered.length+' of '+_fsiState.raw.length+(fsiSelectedCount()?' · '+fsiSelectedCount()+' selected':'');
 }
 
 function fsiFit(features){
@@ -3370,13 +3449,45 @@ async function fsiLoad(action){
 function fsiNfhlToggle(on){
  if(!_fsiMap) return;
  const has=!!_fsiMap.getSource('nfhl');
- const before=_fsiMap.getLayer('fsi-clusters')?'fsi-clusters':(_fsiMap.getLayer('fsi-dots')?'fsi-dots':undefined);
+ const before=_fsiMap.getLayer('fsi-claim-heat')?'fsi-claim-heat':(_fsiMap.getLayer('fsi-clusters')?'fsi-clusters':(_fsiMap.getLayer('fsi-dots')?'fsi-dots':undefined));
  if(on&&!has){
   _fsiMap.addSource('nfhl',{type:'raster',tiles:[FSI_NFHL],tileSize:256,attribution:'FEMA NFHL'});
   _fsiMap.addLayer({id:'nfhl',type:'raster',source:'nfhl',paint:{'raster-opacity':0.45}}, before);
  }else if(!on&&has){
   if(_fsiMap.getLayer('nfhl')) _fsiMap.removeLayer('nfhl');
   _fsiMap.removeSource('nfhl');
+ }
+}
+/** Claim heat = neighborhood aggregate from OpenFEMA (not personal claims). */
+function fsiClaimHeatToggle(on){
+ if(!_fsiMap) return;
+ const has=!!_fsiMap.getLayer('fsi-claim-heat');
+ if(on&&!has&&_fsiMap.getSource('fsi')){
+  const before=_fsiMap.getLayer('fsi-clusters')?'fsi-clusters':(_fsiMap.getLayer('fsi-dots')?'fsi-dots':undefined);
+  _fsiMap.addLayer({
+   id:'fsi-claim-heat', type:'heatmap', source:'fsi',
+   maxzoom:16,
+   paint:{
+    'heatmap-weight':[
+     'interpolate',['linear'],['coalesce',['get','claim_heat'],0],
+     0,0, 0.25,0.35, 0.5,0.7, 0.75,0.9, 1,1
+    ],
+    'heatmap-intensity':['interpolate',['linear'],['zoom'], 8,0.6, 12,1.2, 15,1.6],
+    'heatmap-color':[
+     'interpolate',['linear'],['heatmap-density'],
+     0,'rgba(0,0,0,0)',
+     0.15,'rgba(255,235,180,0.35)',
+     0.35,'rgba(255,170,80,0.55)',
+     0.55,'rgba(230,90,40,0.7)',
+     0.75,'rgba(180,30,40,0.8)',
+     1,'rgba(100,0,30,0.9)'
+    ],
+    'heatmap-radius':['interpolate',['linear'],['zoom'], 8,18, 11,28, 14,40],
+    'heatmap-opacity':0.72
+   }
+  }, before);
+ }else if(!on&&has){
+  _fsiMap.removeLayer('fsi-claim-heat');
  }
 }
 
@@ -3456,6 +3567,7 @@ function fsiInit(){
   });
   fsiRenderLegend();
   if(document.getElementById('fsiNfhl')?.checked) fsiNfhlToggle(true);
+  if(document.getElementById('fsiClaimHeat')?.checked) fsiClaimHeatToggle(true);
   fsiLoad('top');
  });
  _fsiMap.on('error',function(ev){
@@ -3465,22 +3577,23 @@ function fsiInit(){
  return _fsiMap;
 }
 
-async function fsiAddLead(){
- const p=_fsiState.filtered.find(function(x){ return x.parcel_id===_fsiState.selectedId; })
-  || _fsiState.raw.find(function(x){ return x.parcel_id===_fsiState.selectedId; });
- if(!p){ fsiDrMsg('Select a parcel first.','err'); return; }
+function fsiLeadFromParcel(p){
  const story=fsiStory(p);
  const primary='FrenchDrain';
- const city=(function(){
+ const city=fsiParcelCity(p)||(function(){
   const a=String(p.address||'');
   const m=a.match(/,\s*([^,]+),\s*FL/i); return m?m[1].trim():'Volusia';
  })();
+ const jv=Number(p.just_value)||0;
+ const industry=jv>=900000?'Commercial':'Residential';
  const notes=['FSI map import',
   'Must-Have: '+(isFinite(Number(p.must_have_score))?fsiNum(p.must_have_score):'—')+' ('+(p.must_have_band||'—')+')',
   'Live FSI: '+fsiNum(p.fsi_live),
   'Terrain S: '+fsiNum(p.fsi_static,3),
   'FEMA: '+(p.fema_zone||'—'),
   'Soil: '+(p.hsg||'—'),
+  'Just value: '+(jv?('$'+Math.round(jv).toLocaleString()):'—'),
+  'Use: '+(p.use_desc||p.dor_use||'—'),
   'Claim heat (neighborhood): '+(isFinite(Number(p.claim_heat))?fsiNum(p.claim_heat,2):'—')+' / n~'+(p.claim_count_10y||0),
   'Parcel: '+(p.parcel_id||''),
   story,
@@ -3489,15 +3602,73 @@ async function fsiAddLead(){
  const lead={
   id:nextId(),
   name:p.owner_name||p.address||('Parcel '+p.parcel_id),
-  city:city, industry:'Residential', list:primary, lists:[primary], list_status:{},
+  city:city, industry:industry, list:primary, lists:[primary], list_status:{},
   phone:'', website:'', contact:'', email:'', status:'New', notes:notes, source:'FSI map',
   lists_touched:true
  };
  setListStatus(lead, primary, 'New');
+ return lead;
+}
+async function fsiAddLead(){
+ const p=_fsiState.filtered.find(function(x){ return x.parcel_id===_fsiState.selectedId; })
+  || _fsiState.raw.find(function(x){ return x.parcel_id===_fsiState.selectedId; });
+ if(!p){ fsiDrMsg('Select a parcel first.','err'); return; }
+ const lead=fsiLeadFromParcel(p);
  state.unshift(lead);
  saveLeads();
  if(typeof render==='function') render();
- fsiDrMsg('Added to Leads · FrenchDrain · New. Open Leads tab to dial.','ok');
+ fsiDrMsg('Added to Leads · FrenchDrain · New · '+lead.industry+'. Open Leads tab to dial.','ok');
+}
+function fsiBulkAddLeads(){
+ const ids=Object.keys(_fsiState.selected).filter(function(id){ return _fsiState.selected[id]; });
+ if(!ids.length){ fsiSay('Select one or more parcels first.'); return; }
+ let n=0;
+ ids.forEach(function(id){
+  const p=_fsiState.filtered.find(function(x){ return String(x.parcel_id)===String(id); })
+   || _fsiState.raw.find(function(x){ return String(x.parcel_id)===String(id); });
+  if(!p) return;
+  state.unshift(fsiLeadFromParcel(p));
+  n++;
+ });
+ saveLeads();
+ if(typeof render==='function') render();
+ _fsiState.selected=Object.create(null);
+ fsiRenderList();
+ fsiSay('<b>'+n+'</b> leads added · FrenchDrain · New. Scrub DNC before dialing.',true);
+}
+function fsiBulkExportCsv(){
+ const ids=Object.keys(_fsiState.selected).filter(function(id){ return _fsiState.selected[id]; });
+ const rows=ids.length
+  ? ids.map(function(id){
+     return _fsiState.filtered.find(function(x){ return String(x.parcel_id)===String(id); })
+      || _fsiState.raw.find(function(x){ return String(x.parcel_id)===String(id); });
+    }).filter(Boolean)
+  : _fsiState.filtered.slice();
+ if(!rows.length){ fsiSay('Nothing to export.'); return; }
+ const cols=['parcel_id','owner_name','address','city','fema_zone','hsg','fsi_live','must_have_score','must_have_band','claim_heat','claim_count_10y','just_value','year_built','use_desc','story'];
+ const escCsv=function(v){
+  const s=String(v==null?'':v);
+  return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;
+ };
+ const lines=[cols.join(',')];
+ rows.forEach(function(p){
+  const city=fsiParcelCity(p);
+  const rec={
+   parcel_id:p.parcel_id, owner_name:p.owner_name, address:p.address, city:city,
+   fema_zone:p.fema_zone, hsg:p.hsg, fsi_live:p.fsi_live, must_have_score:p.must_have_score,
+   must_have_band:p.must_have_band, claim_heat:p.claim_heat, claim_count_10y:p.claim_count_10y,
+   just_value:p.just_value, year_built:p.year_built, use_desc:p.use_desc||'',
+   story:fsiOneLiner(p)
+  };
+  lines.push(cols.map(function(c){ return escCsv(rec[c]); }).join(','));
+ });
+ const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'});
+ const a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);
+ a.download='floguard-fsi-targets-'+new Date().toISOString().slice(0,10)+'.csv';
+ a.click();
+ URL.revokeObjectURL(a.href);
+ fsiSay('Exported <b>'+rows.length+'</b> rows. Scrub DNC / CAN-SPAM before outreach.',true);
 }
 async function fsiQueueDraft(){
  const p=_fsiState.filtered.find(function(x){ return x.parcel_id===_fsiState.selectedId; })
@@ -3523,17 +3694,50 @@ async function fsiQueueDraft(){
 document.getElementById('fsiSearchArea')?.addEventListener('click',function(){ fsiLoad('viewport'); });
 document.getElementById('fsiTop')?.addEventListener('click',function(){ fsiLoad('top'); });
 document.getElementById('fsiNfhl')?.addEventListener('change',function(){ fsiNfhlToggle(this.checked); });
+document.getElementById('fsiClaimHeat')?.addEventListener('change',function(){
+ fsiClaimHeatToggle(this.checked);
+ if(this.checked) fsiSay('Claim heat = neighborhood NFIP aggregate (OpenFEMA). Not a personal claim flag.');
+});
 document.getElementById('fsiMinScore')?.addEventListener('change',function(){ fsiRefreshView(false); });
 document.getElementById('fsiSearchText')?.addEventListener('input',function(){
  const v=this.value;
  clearTimeout(_fsiSearchTimer);
  _fsiSearchTimer=setTimeout(function(){ _fsiState.q=v; fsiRefreshView(false); },150);
 });
+document.getElementById('fsiCityFilter')?.addEventListener('change',function(){
+ _fsiState.city=this.value||'';
+ fsiRefreshView(false);
+});
+document.getElementById('fsiCityChips')?.addEventListener('click',function(e){
+ const b=e.target.closest('button[data-city]'); if(!b) return;
+ _fsiState.city=b.getAttribute('data-city')||'';
+ const sel=document.getElementById('fsiCityFilter'); if(sel) sel.value=_fsiState.city;
+ fsiRefreshView(false);
+});
+document.getElementById('fsiSelectAll')?.addEventListener('change',function(){
+ const on=this.checked;
+ _fsiState.filtered.forEach(function(p){ if(on) _fsiState.selected[p.parcel_id]=true; else delete _fsiState.selected[p.parcel_id]; });
+ fsiRenderList();
+});
+document.getElementById('fsiBulkLeads')?.addEventListener('click',function(){ fsiBulkAddLeads(); });
+document.getElementById('fsiBulkCsv')?.addEventListener('click',function(){ fsiBulkExportCsv(); });
+document.getElementById('fsiBulkClear')?.addEventListener('click',function(){
+ _fsiState.selected=Object.create(null);
+ fsiRenderList();
+});
 document.getElementById('fsiPresets')?.addEventListener('click',function(e){
  const b=e.target.closest('button[data-preset]'); if(!b) return;
  const pre=b.getAttribute('data-preset');
  _fsiState.preset=pre==='clear'?'must':pre;
- if(pre==='clear'){ _fsiState.bandFilter=null; _fsiState.q=''; const si=document.getElementById('fsiSearchText'); if(si) si.value=''; }
+ if(pre==='clear'){
+  _fsiState.bandFilter=null; _fsiState.q=''; _fsiState.city='';
+  const si=document.getElementById('fsiSearchText'); if(si) si.value='';
+  const cf=document.getElementById('fsiCityFilter'); if(cf) cf.value='';
+ }
+ if(pre==='claim_hot'){
+  const ch=document.getElementById('fsiClaimHeat');
+  if(ch&&!ch.checked){ ch.checked=true; fsiClaimHeatToggle(true); }
+ }
  [...document.querySelectorAll('#fsiPresets button')].forEach(function(x){
   x.classList.toggle('on', pre==='clear'?x.getAttribute('data-preset')==='must':x===b);
  });
@@ -3548,6 +3752,14 @@ document.getElementById('fsiLegend')?.addEventListener('click',function(e){
  fsiRefreshView(false);
 });
 document.getElementById('fsiList')?.addEventListener('click',function(e){
+ const ck=e.target.closest('.fsi-row-ck');
+ if(ck){
+  e.stopPropagation();
+  const id=ck.getAttribute('data-id');
+  if(ck.checked) _fsiState.selected[id]=true; else delete _fsiState.selected[id];
+  fsiSyncBulkBar();
+  return;
+ }
  const row=e.target.closest('.fsi-row'); if(!row) return;
  fsiSelect(row.getAttribute('data-id'),{fly:true});
 });
