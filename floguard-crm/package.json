@@ -11,6 +11,9 @@
     "apply-fsi-sql": "node scripts/apply-fsi-sql.mjs",
     "ingest-parcels": "node scripts/ingest-volusia-parcels.mjs",
     "enrich-static-lite": "node scripts/enrich-static-lite.mjs",
+    "enrich-dem-lite": "node scripts/enrich-dem-lite.mjs",
+    "join-tracts": "node scripts/join-census-tracts.mjs",
+    "refresh-rainfall": "node scripts/refresh-rainfall.mjs",
     "ingest-claims": "node scripts/ingest-nfip-claims.mjs",
     "score-must-have": "node scripts/score-must-have.mjs"
   }

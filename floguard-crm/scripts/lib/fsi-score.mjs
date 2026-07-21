@@ -99,6 +99,50 @@ export function fsiLiveFromStatic(s, d = 0.5, alpha = ALPHA) {
   return 100.0 * s ** alpha * (0.5 + 0.5 * d);
 }
 
+export const W_API = 0.6;
+export const W_RAIN24 = 0.4;
+export const API_CAP_MM = 150;
+export const RAIN24_CAP_MM = 75;
+export const API_DECAY_K = 0.87;
+
+export function dynamicScore(apiN, rain24N) {
+  return W_API * clamp01(apiN) + W_RAIN24 * clamp01(rain24N);
+}
+
+export function advanceApi(prevApi, rainToday) {
+  return API_DECAY_K * prevApi + rainToday;
+}
+
+/** Normalize raw API / rain24 mm to 0–1 via saturating caps (not county min/max). */
+export function normalizeRain(apiMm, rain24Mm) {
+  return {
+    api_n: clamp01((Number(apiMm) || 0) / API_CAP_MM),
+    rain24_n: clamp01((Number(rain24Mm) || 0) / RAIN24_CAP_MM),
+  };
+}
+
+/**
+ * Percentile-clip then 0–1 scale. Used for DEM-lite TWI/HAND.
+ * @param {number[]} values
+ * @param {number} loPct  e.g. 2
+ * @param {number} hiPct  e.g. 98
+ */
+export function percentileNormalize(values, loPct = 2, hiPct = 98) {
+  const clean = values.filter((v) => isFinite(v)).slice().sort((a, b) => a - b);
+  if (clean.length < 2) return () => 0.5;
+  const at = (p) => {
+    const i = Math.max(0, Math.min(clean.length - 1, Math.floor((p / 100) * (clean.length - 1))));
+    return clean[i];
+  };
+  const lo = at(loPct);
+  const hi = at(hiPct);
+  const span = hi - lo || 1;
+  return (v) => {
+    if (!isFinite(v)) return 0.5;
+    return Math.max(0, Math.min(1, (v - lo) / span));
+  };
+}
+
 /**
  * Keep residential, commercial, and condos — all can be big-money drainage jobs.
  * Hard-skip only vacant land / pure ag / ROW / water / unimproved shells.

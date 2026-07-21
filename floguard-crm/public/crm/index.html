@@ -3328,9 +3328,21 @@ function fsiRenderDrawer(){
    const pct=Math.round(Math.max(0,Math.min(1,f.v))*100);
    return '<div class="fsi-bd-row"><span>'+esc(f.l)+' · '+(f.w*100).toFixed(0)+'%</span><span class="bar"><i style="width:'+pct+'%"></i></span><span>'+pct+'%</span></div>';
   }).join('');
+ }else if(isFinite(twi)||isFinite(hand)){
+  const factors=[
+   {l:'TWI', w:0.40, v:isFinite(twi)?twi:0.55},
+   {l:'HAND', w:0.25, v:isFinite(hand)?Math.max(0,1-hand):0.55},
+   {l:'Soil', w:0.20, v:fsiHsgScore(p.hsg)},
+   {l:'FEMA', w:0.15, v:fsiZoneScore(p.fema_zone)}
+  ];
+  bd.style.display='block';
+  bd.innerHTML='<h4>Terrain factors (DEM-lite · display only)</h4>'+factors.map(function(f){
+   const pct=Math.round(Math.max(0,Math.min(1,f.v))*100);
+   return '<div class="fsi-bd-row"><span>'+esc(f.l)+' · '+(f.w*100).toFixed(0)+'%</span><span class="bar"><i style="width:'+pct+'%"></i></span><span>'+pct+'%</span></div>';
+  }).join('');
  }else{
   bd.style.display='block';
-  bd.innerHTML='<h4>Terrain factors</h4><p class="hint" style="margin:0">Scores only on this parcel — TWI/HAND appear after full terrain ingest.</p>';
+  bd.innerHTML='<h4>Terrain factors</h4><p class="hint" style="margin:0">Run enrich-dem-lite for TWI/HAND proxies, or full LiDAR for engineering-grade terrain.</p>';
  }
  fsiDrMsg('');
 }
