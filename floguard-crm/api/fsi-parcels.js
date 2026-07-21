@@ -18,6 +18,8 @@ export const config = { maxDuration: 30 };
 
 const MAX_LIMIT = 2000;
 const DEFAULT_LIMIT = 500;
+/** Must dial default page size — tight weekly list, not entire must band. */
+const DEFAULT_MUST_LIMIT = 200;
 
 // Never ship owner_name to the browser without a session; never ship phone at all.
 // twi_n / hand_n enable client score-breakdown UI when real terrain factors exist.
@@ -25,7 +27,7 @@ const DEFAULT_LIMIT = 500;
 const COLUMNS =
   'parcel_id,address,owner_name,lat,lon,fsi_live,fsi_static,fema_zone,hsg,twi_n,hand_n,' +
   'claim_heat,claim_count_10y,claim_last_year,must_have_score,must_have_band,must_have_reasons,' +
-  'year_built,living_area,just_value,city,zip,homestead';
+  'year_built,living_area,just_value,city,zip,homestead,dor_use,use_desc';
 
 function bearer(req) {
   const h = req.headers?.authorization || req.headers?.Authorization || '';
@@ -101,11 +103,18 @@ export default async function handler(req, res) {
   if (!body) return json(res, 400, { error: 'Invalid JSON body' });
 
   const action = String(body.action || 'viewport');
-  const limit = clampLimit(body.limit);
   const minFsi = Number.isFinite(Number(body.minFsi)) ? Number(body.minFsi) : 0;
   const minMust = Number.isFinite(Number(body.minMust)) ? Number(body.minMust) : 0;
   const mustBand = body.mustBand ? String(body.mustBand).toLowerCase() : '';
   const sort = String(body.sort || 'fsi').toLowerCase(); // fsi | must | heat
+  // Default smaller page for Must dial so reps see top N, not thousands
+  const rawLimit = body.limit;
+  const limit =
+    rawLimit != null && rawLimit !== ''
+      ? clampLimit(rawLimit)
+      : mustBand === 'must' || sort === 'must'
+        ? DEFAULT_MUST_LIMIT
+        : DEFAULT_LIMIT;
 
   let box = null;
   if (action === 'viewport') {

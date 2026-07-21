@@ -1,6 +1,9 @@
 /**
  * FSI + Must-Have scoring (JS port of fsi/pipeline/config.py + sales MHS).
  * Literature defaults — not calibrated. Never present as an inspection result.
+ *
+ * Dial targets include residential AND commercial/condos (big-ticket jobs).
+ * Only vacant land / pure ag / ROW / water are hard-skipped.
  */
 
 export const W_TWI = 0.4;
@@ -24,6 +27,11 @@ export const FEMA_ZONE_DEFAULT = 0.6;
 /** Neutral terrain when LiDAR TWI/HAND not yet computed. */
 export const LITE_TWI_N = 0.55;
 export const LITE_HAND_N = 0.45;
+
+/** Percentile targets for county bands (of dial-eligible parcels only). */
+export const BAND_MUST_TOP = 0.03; // top 3% → must
+export const BAND_SHOULD_TOP = 0.15; // top 15% cumulative → should (excl must)
+export const BAND_MAYBE_TOP = 0.4; // top 40% cumulative → maybe
 
 export function hsgScore(hsg) {
   if (!hsg) return HSG_DEFAULT;
@@ -92,18 +100,41 @@ export function fsiLiveFromStatic(s, d = 0.5, alpha = ALPHA) {
 }
 
 /**
- * Must-Have Score — sales prioritization (0–100).
- * Not insurance advice. Tract claim heat is neighborhood aggregate only.
- *
- * Weights (uncalibrated):
- *  0.35 risk (fsi_live)
- *  0.20 claim neighborhood heat
- *  0.15 FloGuard story fit (Zone X + clay)
- *  0.15 capacity (just_value / living area proxies)
- *  0.10 building age pressure (older homes)
- *  0.05 homestead / owner-occ
+ * Keep residential, commercial, and condos — all can be big-money drainage jobs.
+ * Hard-skip only vacant land / pure ag / ROW / water / unimproved shells.
  */
-export function mustHaveScore(row) {
+export function isDialTarget(row) {
+  const la = Number(row.living_area) || 0;
+  const jv = Number(row.just_value) || 0;
+  const yb = Number(row.year_built) || 0;
+  const blob = `${row.use_desc || ''} ${row.dor_use || ''} ${row.address || ''}`.toUpperCase();
+
+  const vacantLike =
+    /\bVACANT\b|\bVAC\b|RIGHT.?OF.?WAY|\bROW\b|WETLAND|MARSH|\bLAKE\b|\bPOND\b|\bRIVER\b|RAILROAD|SUBMERGED|COMMON AREA|CONSERVATION|TIMBER|PASTURE|GRAZING|AGRICULT|ORCHARD|GROVE|MINING|DUMP|LANDFILL|UNIMPROVED/.test(
+      blob,
+    );
+
+  // Improved footprint: living area, significant just value, or year built
+  const improved = la > 0 || jv >= 75000 || yb > 1800;
+
+  if (vacantLike && !improved) return false;
+  if (!improved) return false;
+  return true;
+}
+
+/**
+ * Must-Have Score — sales prioritization (0–100 raw).
+ * Band assignment is percentile-based in score-must-have.mjs (county calibration).
+ * Not insurance advice. Claim heat is neighborhood aggregate only.
+ */
+export function mustHaveScore(row, opts = {}) {
+  const assignBand = opts.assignBand !== false; // default true for fixtures / ad-hoc
+  const cuts = opts.cuts || null; // { must, should, maybe } score floors
+
+  if (!isDialTarget(row)) {
+    return { score: 0, band: 'skip', reasons: ['not_dial_target'] };
+  }
+
   const live = Number(row.fsi_live);
   const sStat = Number(row.fsi_static);
   const hasFsi = isFinite(live) || isFinite(sStat);
@@ -119,21 +150,22 @@ export function mustHaveScore(row) {
   const hsg = String(row.hsg || '').toUpperCase();
   const clay = hsg === 'D' || hsg.includes('D') ? 1 : hsg === 'C' || hsg.includes('C') ? 0.55 : 0.15;
   const zoneX = zone === 'X' || zone === 'X-SHADED' ? 1 : ['AE', 'VE', 'AO', 'AH'].includes(zone) ? 0.45 : 0.3;
-  // Zone X clay = best FloGuard segment (unserved standing-water)
-  const story = clamp01(0.55 * clay + 0.45 * zoneX + (zone === 'X' && clay >= 0.9 ? 0.15 : 0));
+  // Zone X + poor drain = FloGuard gold (unserved standing water)
+  const story = clamp01(0.55 * clay + 0.45 * zoneX + (zoneX >= 0.9 && clay >= 0.55 ? 0.2 : 0));
 
   const jv = Number(row.just_value) || 0;
   const la = Number(row.living_area) || 0;
-  // Soft capacity: sweet spot ~$200k–$600k just value, 1200–2800 sf
+  // Capacity: residential sweet spot AND commercial/condo big jobs (high JV)
   let capacity = 0.35;
   if (jv > 0) {
-    if (jv >= 180000 && jv <= 650000) capacity = 0.9;
-    else if (jv >= 120000 && jv < 180000) capacity = 0.7;
-    else if (jv > 650000 && jv <= 900000) capacity = 0.75;
-    else if (jv > 900000) capacity = 0.55;
+    if (jv >= 2_000_000) capacity = 0.95; // large commercial / multi-unit
+    else if (jv >= 900_000) capacity = 0.88;
+    else if (jv >= 180_000 && jv < 900_000) capacity = 0.9;
+    else if (jv >= 120_000) capacity = 0.7;
     else capacity = 0.4;
   }
-  if (la >= 1200 && la <= 3000) capacity = Math.min(1, capacity + 0.1);
+  if (la >= 1200 && la <= 3500) capacity = Math.min(1, capacity + 0.08);
+  if (la > 3500) capacity = Math.min(1, capacity + 0.12); // large building / multi-unit shell
 
   const yb = Number(row.year_built) || 0;
   let age = 0.4;
@@ -148,40 +180,80 @@ export function mustHaveScore(row) {
   const hx = String(row.homestead || '')
     .trim()
     .toUpperCase();
+  // Homestead helps residential; commercial is neutral (not penalized)
   const ownerOcc = hx === 'Y' || hx === 'YES' || hx === '1' || hx === 'X' ? 1 : hx ? 0.4 : 0.55;
 
-  // With FSI: risk-led. Without FSI yet: claim heat + capacity + age drive dial list.
   let raw;
   if (hasFsi) {
     raw =
-      0.35 * risk + 0.2 * heat + 0.15 * story + 0.15 * capacity + 0.1 * age + 0.05 * ownerOcc;
+      0.32 * risk + 0.22 * heat + 0.18 * story + 0.15 * capacity + 0.08 * age + 0.05 * ownerOcc;
   } else {
     raw =
       0.35 * heat + 0.2 * capacity + 0.18 * age + 0.12 * story + 0.1 * ownerOcc + 0.05;
-    // Claim-hot neighborhoods get a hard boost so Must dial works pre-LiDAR
-    if (heat >= 0.55) raw = Math.min(1, raw + 0.12);
-    if (heat >= 0.75 && capacity >= 0.7) raw = Math.min(1, raw + 0.08);
+    if (heat >= 0.55) raw = Math.min(1, raw + 0.1);
   }
+
+  // FloGuard gold: Zone X/X-shaded + clay/dual + neighborhood claim heat
+  const gold =
+    (zone === 'X' || zone === 'X-SHADED') && clay >= 0.55 && heat >= 0.35;
+  if (gold) raw = Math.min(1, raw + 0.14);
+
+  // Secondary: SFHA without soil/claim story — still dialable, slightly demoted vs gold
+  if (['AE', 'VE', 'AO', 'AH'].includes(zone) && clay < 0.5 && heat < 0.3) {
+    raw *= 0.9;
+  }
+
+  // Big commercial in claim-hot / clay zones: boost (big-money jobs)
+  if (jv >= 900_000 && (heat >= 0.4 || clay >= 0.55)) {
+    raw = Math.min(1, raw + 0.06);
+  }
+
   const score = Math.round(Math.min(100, Math.max(0, raw * 100)) * 10) / 10;
 
   const reasons = [];
-  if (risk >= 0.55) reasons.push('high_fsi');
-  if (heat >= 0.45) reasons.push('claim_hot_tract');
+  if (risk >= 0.45) reasons.push('high_fsi');
+  if (heat >= 0.4) reasons.push('claim_hot_tract');
   if (zone === 'X' || zone === 'X-SHADED') reasons.push('zone_x');
-  if (clay >= 0.9) reasons.push('clay_soil');
-  if (age >= 0.85) reasons.push('older_home');
+  if (clay >= 0.55) reasons.push(clay >= 0.9 ? 'clay_soil' : 'poor_drain_soil');
+  if (gold) reasons.push('gold_segment');
+  if (age >= 0.85) reasons.push('older_building');
   if (capacity >= 0.75) reasons.push('pay_capacity');
+  if (jv >= 900_000) reasons.push('commercial_scale');
   if (ownerOcc >= 0.9) reasons.push('homestead');
   if (!hasFsi) reasons.push('pre_fsi');
 
   let band = 'skip';
-  // Lite ranking (no LiDAR) compresses fsi_live into ~30–50; bands sit lower
-  // until terrain terms expand the spread. Recalibrate after full TWI/HAND.
-  if (score >= 58) band = 'must';
-  else if (score >= 45) band = 'should';
-  else if (score >= 30) band = 'maybe';
+  if (assignBand) {
+    if (cuts) {
+      if (score >= cuts.must) band = 'must';
+      else if (score >= cuts.should) band = 'should';
+      else if (score >= cuts.maybe) band = 'maybe';
+      else band = 'skip';
+    } else {
+      // Fallback fixed cuts when percentiles not provided (fixtures / unit tests)
+      if (score >= 62) band = 'must';
+      else if (score >= 48) band = 'should';
+      else if (score >= 32) band = 'maybe';
+    }
+  }
 
-  return { score, band, reasons };
+  return { score, band, reasons, gold };
+}
+
+/** Given sorted scores ascending, return { must, should, maybe } floors. */
+export function percentileCuts(sortedAsc, mustTop = BAND_MUST_TOP, shouldTop = BAND_SHOULD_TOP, maybeTop = BAND_MAYBE_TOP) {
+  if (!sortedAsc.length) return { must: 100, should: 100, maybe: 100 };
+  const n = sortedAsc.length;
+  const at = (p) => {
+    // top p fraction → index from high end
+    const idx = Math.max(0, Math.min(n - 1, Math.floor(n * (1 - p))));
+    return sortedAsc[idx];
+  };
+  return {
+    must: at(mustTop),
+    should: at(shouldTop),
+    maybe: at(maybeTop),
+  };
 }
 
 function clamp01(x) {

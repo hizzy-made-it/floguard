@@ -36,10 +36,12 @@ function enrichFixture(p, i) {
   const live = Number(p.fsi_live) || 0;
   const heat = Math.min(1, Math.max(0, (live - 20) / 80));
   const mhs = Math.round(Math.min(100, live * 0.9 + heat * 15 + (String(p.hsg || '').includes('D') ? 8 : 0)));
+  // Rough top-tier fixtures as must so Must dial preset works offline
   let band = 'skip';
-  if (mhs >= 70) band = 'must';
-  else if (mhs >= 50) band = 'should';
-  else if (mhs >= 30) band = 'maybe';
+  if (mhs >= 58) band = 'must';
+  else if (mhs >= 42) band = 'should';
+  else if (mhs >= 28) band = 'maybe';
+  const commercial = i % 7 === 0;
   return {
     ...p,
     claim_heat: Math.round(heat * 1000) / 1000,
@@ -47,13 +49,20 @@ function enrichFixture(p, i) {
     claim_last_year: heat > 0.4 ? 2024 : null,
     must_have_score: mhs,
     must_have_band: band,
-    must_have_reasons: band === 'must' ? ['high_fsi', 'fixture'] : [],
+    must_have_reasons:
+      band === 'must'
+        ? commercial
+          ? ['high_fsi', 'commercial_scale', 'fixture']
+          : ['high_fsi', 'gold_segment', 'fixture']
+        : [],
     year_built: 1975 + (i % 40),
-    living_area: 1400 + i * 50,
-    just_value: 220000 + i * 12000,
+    living_area: commercial ? 8000 + i * 200 : 1400 + i * 50,
+    just_value: commercial ? 1_200_000 + i * 50000 : 220000 + i * 12000,
     city: 'Port Orange',
     zip: '32127',
-    homestead: i % 3 === 0 ? 'Y' : null,
+    homestead: commercial ? null : i % 3 === 0 ? 'Y' : null,
+    dor_use: commercial ? '11' : '01',
+    use_desc: commercial ? 'COMMERCIAL STORE' : 'SINGLE FAMILY',
   };
 }
 

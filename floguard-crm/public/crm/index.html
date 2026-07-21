@@ -683,7 +683,7 @@ a.maplink{color:var(--accent2);text-decoration:none;font-weight:600;}
  </div>
  </div>
  <div class="field"><label>Min live score</label><input type="text" id="fsiMinScore" value="0" inputmode="decimal" style="width:92px"></div>
- <div class="field"><label>Max parcels</label><input type="text" id="fsiLimit" value="500" inputmode="numeric" style="width:92px"></div>
+ <div class="field"><label>Max parcels</label><input type="text" id="fsiLimit" value="200" inputmode="numeric" style="width:92px" title="Must dial defaults to top 200"></div>
  <button type="button" class="btn p" id="fsiSearchArea">Search this area</button>
  <button type="button" class="btn o" id="fsiTop">Top countywide</button>
  <div class="field"><label>Overlay</label>
@@ -3036,9 +3036,16 @@ function fsiStory(p){
  const heat=Number(p.claim_heat)||0;
  const c10=Number(p.claim_count_10y)||0;
  const mhs=Number(p.must_have_score);
+ const jv=Number(p.just_value)||0;
+ const reasons=Array.isArray(p.must_have_reasons)?p.must_have_reasons:[];
+ const commercial=reasons.indexOf('commercial_scale')>=0||jv>=900000;
  // Claim-hot is neighborhood aggregate only — never a personal claim statement.
+ if(reasons.indexOf('gold_segment')>=0||((zone==='X'||zone==='X-SHADED')&&(hsg.includes('D')||hsg.includes('C'))&&heat>=0.35))
+  return (commercial?'Commercial/condo gold: ':'')+'Zone '+zone+' + poor-drain soil + claim-hot neighborhood — FloGuard\'s best unserved segment. Free assessment, not insurance advice.';
  if(heat>=0.55||c10>=8)
   return 'Claim-hot neighborhood (OpenFEMA tract/grid aggregate, not this owner): ~'+c10+' NFIP claims nearby in recent years. Standing water still needs a free assessment — not an insurance quote.';
+ if(commercial&&(heat>=0.35||hsg.includes('D')||hsg.includes('C')))
+  return 'Higher-value improved parcel (commercial/condo scale) in a wet-soil or claim-hot area — larger drainage job potential. Walk the free assessment before quoting.';
  if((zone==='X'||zone==='X-SHADED')&&(band>=3||hsg.includes('D')||hsg==='C'))
   return 'Zone '+zone+' clay-friendly bowl — high drainage need, often ignored by FEMA maps. Strong FloGuard segment.';
  if(hsg==='D'||hsg.includes('D'))
@@ -3049,8 +3056,8 @@ function fsiStory(p){
   return 'Low height above drainage — little freeboard once water arrives.';
  if(['AE','VE'].includes(zone))
   return 'FEMA '+zone+' on file — riverine/coastal risk; still sell standing-water drainage, not insurance.';
- if(isFinite(mhs)&&mhs>=70)
-  return 'Must-Have score '+fsiNum(mhs)+' — top dial priority from risk, soil/zone fit, and neighborhood claim heat.';
+ if(isFinite(mhs)&&String(p.must_have_band||'').toLowerCase()==='must')
+  return 'Must dial (top county percentile) — score '+fsiNum(mhs)+' from risk, soil/zone fit, capacity, and neighborhood claim heat.';
  const live=fsiNum(p.fsi_live), s=fsiNum(p.fsi_static,2);
  return 'Live FSI '+live+' · terrain '+s+'. Rank and walk the free assessment before quoting.';
 }
@@ -3101,24 +3108,9 @@ function fsiApplyFilters(){
  list=list.filter(function(p){ return (Number(p.fsi_live)||0)>=min; });
  const preset=_fsiState.preset;
  if(preset==='must'){
-  list=list.filter(function(p){
-   const band=String(p.must_have_band||'').toLowerCase();
-   const mhs=Number(p.must_have_score)||0;
-   return band==='must'||mhs>=58;
-  });
-  // If no MUST band yet, include SHOULD so dial list is never empty mid-enrichment
-  if(!list.length){
-   list=_fsiState.raw.map(function(p){ return Object.assign({},p,{_band:bandOf(Number(p.fsi_static)||0)}); })
-    .filter(function(p){
-     const band=String(p.must_have_band||'').toLowerCase();
-     const mhs=Number(p.must_have_score)||0;
-     return band==='should'||mhs>=48||(Number(p.fsi_live)||0)>=min+40;
-    });
-  }
-  if(!list.length){
-   list=_fsiState.raw.map(function(p){ return Object.assign({},p,{_band:bandOf(Number(p.fsi_static)||0)}); })
-    .filter(function(p){ return (Number(p.fsi_live)||0)>=min||(Number(p.must_have_score)||0)>0; });
-  }
+  // Strict: only percentile "must" band (server already returns top N by score).
+  // Residential + commercial + condos all eligible — vacant land is scored skip.
+  list=list.filter(function(p){ return String(p.must_have_band||'').toLowerCase()==='must'; });
  }else if(preset==='claim_hot'){
   list=list.filter(function(p){ return (Number(p.claim_heat)||0)>=0.45||(Number(p.claim_count_10y)||0)>=5; });
  }else if(preset==='zone_x'){
@@ -3178,9 +3170,11 @@ function fsiRenderList(){
  const stats=document.getElementById('fsiListStats');
  if(!box) return;
  const list=_fsiState.filtered;
- if(stats) stats.textContent=list.length? (list.length+' shown') : 'No matches';
+ if(stats) stats.textContent=list.length? (list.length+' shown'+(_fsiState.preset==='must'?' · Must':'')) : 'No matches';
  if(!list.length){
-  box.innerHTML='<div class="hint" style="padding:14px">No parcels match filters. Clear presets or load Top countywide.</div>';
+  box.innerHTML='<div class="hint" style="padding:14px">'+(_fsiState.preset==='must'
+   ? 'No Must-band parcels in this load. Run score-must-have, or raise Max parcels / switch to Top risk.'
+   : 'No parcels match filters. Clear presets or load Top countywide.')+'</div>';
   return;
  }
  box.innerHTML=list.map(function(p,i){
@@ -3334,10 +3328,11 @@ async function fsiLoad(action){
  const minRaw=Number(document.getElementById('fsiMinScore').value);
  const limRaw=Number(document.getElementById('fsiLimit').value);
  const preset=_fsiState.preset;
+ const defaultLim=preset==='must'?200:500;
  const payload={
   action:action,
   minFsi:isFinite(minRaw)?minRaw:0,
-  limit:isFinite(limRaw)?limRaw:500,
+  limit:isFinite(limRaw)&&limRaw>0?limRaw:defaultLim,
   sort: preset==='must'?'must':(preset==='claim_hot'?'heat':'fsi')
  };
  if(preset==='must'){ payload.mustBand='must'; payload.minMust=0; }
@@ -3351,23 +3346,20 @@ async function fsiLoad(action){
  }
  fsiSay('Loading…');
  try{
-  let data=await fsiFetch(payload);
-  // If Must dial has no scored rows yet, retry without band so map still works mid-enrichment
-  if(preset==='must'&&(!data.parcels||!data.parcels.length)&&payload.mustBand){
-   delete payload.mustBand;
-   payload.sort='fsi';
-   data=await fsiFetch(payload);
-  }
+  const data=await fsiFetch(payload);
   _fsiState.raw=Array.isArray(data.parcels)?data.parcels:[];
   _fsiState.source=data.source||'';
   fsiSetSourceBadge(_fsiState.source);
   fsiRefreshView(action==='top');
   if(!_fsiState.raw.length){
-   fsiSay(action==='top'
-    ? 'No parcels scored yet. Run enrich-static-lite + score-must-have, or wait for ingest.'
-    : 'No parcels in this view above the score filter.');
+   fsiSay(preset==='must'
+    ? 'No Must-band parcels yet. Run npm run score-must-have (keeps commercial + condos).'
+    : (action==='top'
+     ? 'No parcels scored yet. Run enrich-static-lite + score-must-have, or wait for ingest.'
+     : 'No parcels in this view above the score filter.'));
   }else{
-   fsiSay('<b>'+_fsiState.raw.length+'</b> loaded · <b>'+_fsiState.filtered.length+'</b> after filters'+(data.truncated?' · truncated at limit':''),true);
+   const mustNote=preset==='must'?' · Must dial top '+_fsiState.raw.length+(data.truncated?' (raise Max parcels for more)':''):'';
+   fsiSay('<b>'+_fsiState.raw.length+'</b> loaded · <b>'+_fsiState.filtered.length+'</b> after filters'+mustNote+(data.truncated&&preset!=='must'?' · truncated at limit':''),true);
   }
  }catch(err){
   fsiSay(err.message||String(err));
