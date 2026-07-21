@@ -3006,7 +3006,37 @@ const FSI_ZONE={AE:1,VE:1,AO:0.8,AH:0.8,'X-SHADED':0.6,X:0.45};
 let _fsiMap=null, _fsiInited=false, _fsiMoved=false, _fsiFitting=false, _fsiPopup=null;
 let _fsiState={raw:[], filtered:[], selectedId:null, source:'', preset:'must', bandFilter:null, q:'', city:'', selected:Object.create(null)};
 let _fsiSearchTimer=null;
-const FSI_FOCUS_CITIES=['PORT ORANGE','DAYTONA BEACH','ORMOND BEACH','NEW SMYRNA BEACH','DEBARY','DELAND','EDGEWATER','SOUTH DAYTONA','HOLLY HILL','DAYTONA BEACH SHORES'];
+const FSI_FOCUS_CITIES=['Port Orange','Daytona Beach','Ormond Beach','New Smyrna Beach','Debary','Deland','Edgewater','South Daytona','Holly Hill','Daytona Beach Shores'];
+/** Collapse whitespace + uppercase for city matching keys. */
+function fsiNormCityKey(s){
+ return String(s||'').replace(/\s+/g,' ').trim().toUpperCase();
+}
+/** Title Case: first letter of each word capital (UI display). */
+function fsiTitleCase(s){
+ return fsiNormCityKey(s).toLowerCase().replace(/\b([a-z])/g,function(m,c){ return c.toUpperCase(); });
+}
+/** Known Volusia spellings that should collapse to one city. */
+const FSI_CITY_ALIASES={
+ 'DE BARY':'DEBARY',
+ 'DE-BARY':'DEBARY',
+ 'DE LAND':'DELAND',
+ 'DE-LAND':'DELAND',
+ 'DAYTONA':'DAYTONA BEACH',
+ 'DAYTONA BCH':'DAYTONA BEACH',
+ 'DAYTONA BCH SHORES':'DAYTONA BEACH SHORES',
+ 'DB SHORES':'DAYTONA BEACH SHORES',
+ 'NEW SMYRNA':'NEW SMYRNA BEACH',
+ 'NSB':'NEW SMYRNA BEACH',
+ 'ORMOND':'ORMOND BEACH',
+ 'P O':'PORT ORANGE',
+ 'PO':'PORT ORANGE'
+};
+function fsiCanonicalCityKey(raw){
+ let k=fsiNormCityKey(raw);
+ if(!k) return '';
+ if(FSI_CITY_ALIASES[k]) k=FSI_CITY_ALIASES[k];
+ return k;
+}
 
 function fsiSay(msg,isHtml){
  const el=document.getElementById('fsiStats'); if(!el) return;
@@ -3120,10 +3150,15 @@ function fsiRenderLegend(){
 }
 
 function fsiParcelCity(p){
- if(p.city&&String(p.city).trim()) return String(p.city).trim().toUpperCase();
- const a=String(p.address||'');
- const m=a.match(/,\s*([^,]+),\s*FL/i);
- return m?m[1].trim().toUpperCase():'';
+ // Always returns canonical KEY (uppercase). Display with fsiTitleCase(key).
+ let raw='';
+ if(p.city&&String(p.city).trim()) raw=String(p.city).trim();
+ else{
+  const a=String(p.address||'');
+  const m=a.match(/,\s*([^,]+),\s*FL/i);
+  if(m) raw=m[1].trim();
+ }
+ return fsiCanonicalCityKey(raw);
 }
 function fsiSelectedCount(){
  return Object.keys(_fsiState.selected).filter(function(id){ return _fsiState.selected[id]; }).length;
@@ -3142,33 +3177,52 @@ function fsiSyncBulkBar(){
  }
 }
 function fsiRebuildCityUi(){
+ // Deduplicate by canonical key; label is Title Case
  const cities={};
  _fsiState.raw.forEach(function(p){
   const c=fsiParcelCity(p);
   if(c) cities[c]=(cities[c]||0)+1;
  });
- const sorted=Object.keys(cities).sort(function(a,b){ return cities[b]-cities[a]||a.localeCompare(b); });
+ const sorted=Object.keys(cities).sort(function(a,b){
+  return cities[b]-cities[a]||fsiTitleCase(a).localeCompare(fsiTitleCase(b));
+ });
+ const cur=fsiCanonicalCityKey(_fsiState.city||'');
+ if(cur&&_fsiState.city!==cur) _fsiState.city=cur;
  const sel=document.getElementById('fsiCityFilter');
  if(sel){
-  const cur=_fsiState.city||'';
-  sel.innerHTML='<option value="">All cities</option>'+sorted.slice(0,80).map(function(c){
-   return '<option value="'+esc(c)+'"'+(c===cur?' selected':'')+'>'+esc(c)+' ('+cities[c]+')</option>';
+  sel.innerHTML='<option value="">All Cities</option>'+sorted.slice(0,80).map(function(c){
+   const label=fsiTitleCase(c);
+   return '<option value="'+esc(c)+'"'+(c===cur?' selected':'')+'>'+esc(label)+' ('+cities[c]+')</option>';
   }).join('');
  }
  const chips=document.getElementById('fsiCityChips');
  if(chips){
-  const quick=FSI_FOCUS_CITIES.filter(function(c){ return cities[c]; }).slice(0,8);
+  const focusKeys=FSI_FOCUS_CITIES.map(fsiCanonicalCityKey);
+  const seen={};
+  const quick=[];
+  focusKeys.forEach(function(k){
+   if(!k||seen[k]||!cities[k]) return;
+   seen[k]=true;
+   quick.push(k);
+  });
+  // fill remaining top cities if focus list short
+  sorted.forEach(function(k){
+   if(quick.length>=8||seen[k]) return;
+   seen[k]=true;
+   quick.push(k);
+  });
   chips.innerHTML=quick.map(function(c){
-   const on=(_fsiState.city||'')===c?' on':'';
-   return '<button type="button" data-city="'+esc(c)+'" class="'+on.trim()+'">'+esc(c.replace(/ BEACH/,' Bch'))+' · '+cities[c]+'</button>';
-  }).join('')+(_fsiState.city?'<button type="button" data-city="">All</button>':'');
+   const on=cur===c?' on':'';
+   const label=fsiTitleCase(c);
+   return '<button type="button" data-city="'+esc(c)+'" class="'+on.trim()+'">'+esc(label)+' · '+cities[c]+'</button>';
+  }).join('')+(cur?'<button type="button" data-city="">All</button>':'');
  }
 }
 function fsiApplyFilters(){
  const minLive=Number(document.getElementById('fsiMinScore')?.value);
  const min=isFinite(minLive)?minLive:0;
  const q=(_fsiState.q||'').trim().toLowerCase();
- const city=(_fsiState.city||'').toUpperCase();
+ const city=fsiCanonicalCityKey(_fsiState.city||'');
  const bandOf=fsiBander(_fsiState.raw);
  let list=_fsiState.raw.map(function(p){
   return Object.assign({},p,{_band:bandOf(Number(p.fsi_static)||0)});
@@ -3592,9 +3646,10 @@ function fsiInit(){
 function fsiLeadFromParcel(p){
  const story=fsiStory(p);
  const primary='FrenchDrain';
- const city=fsiParcelCity(p)||(function(){
+ const cityKey=fsiParcelCity(p);
+ const city=cityKey?fsiTitleCase(cityKey):(function(){
   const a=String(p.address||'');
-  const m=a.match(/,\s*([^,]+),\s*FL/i); return m?m[1].trim():'Volusia';
+  const m=a.match(/,\s*([^,]+),\s*FL/i); return m?fsiTitleCase(m[1].trim()):'Volusia';
  })();
  const jv=Number(p.just_value)||0;
  const industry=jv>=900000?'Commercial':'Residential';
@@ -3664,7 +3719,7 @@ function fsiBulkExportCsv(){
  };
  const lines=[cols.join(',')];
  rows.forEach(function(p){
-  const city=fsiParcelCity(p);
+  const city=fsiTitleCase(fsiParcelCity(p)||'');
   const rec={
    parcel_id:p.parcel_id, owner_name:p.owner_name, address:p.address, city:city,
    fema_zone:p.fema_zone, hsg:p.hsg, fsi_live:p.fsi_live, must_have_score:p.must_have_score,
@@ -3717,12 +3772,12 @@ document.getElementById('fsiSearchText')?.addEventListener('input',function(){
  _fsiSearchTimer=setTimeout(function(){ _fsiState.q=v; fsiRefreshView(false); },150);
 });
 document.getElementById('fsiCityFilter')?.addEventListener('change',function(){
- _fsiState.city=this.value||'';
+ _fsiState.city=fsiCanonicalCityKey(this.value||'');
  fsiRefreshView(false);
 });
 document.getElementById('fsiCityChips')?.addEventListener('click',function(e){
  const b=e.target.closest('button[data-city]'); if(!b) return;
- _fsiState.city=b.getAttribute('data-city')||'';
+ _fsiState.city=fsiCanonicalCityKey(b.getAttribute('data-city')||'');
  const sel=document.getElementById('fsiCityFilter'); if(sel) sel.value=_fsiState.city;
  fsiRefreshView(false);
 });
