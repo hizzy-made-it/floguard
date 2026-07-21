@@ -210,18 +210,77 @@ a.maplink{color:var(--accent2);text-decoration:none;font-weight:600;}
 .login-msg.ok{color:#0d7d6f;}
 .pin-hint{font-size:11px;color:var(--muted);margin-top:2px;}
 
-/* ---- FSI flood map. NOT .maps — that class is the Google Maps paste helper. ---- */
-.fsimap{height:560px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#e8edf1;}
-.fsimap-legend{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:10px 0 4px;font-size:11.5px;color:var(--muted);}
-.fsimap-legend .k{display:inline-flex;align-items:center;gap:5px;}
+/* ---- FSI flood map command center. NOT .maps (Google Maps paste helper). ---- */
+.fsi-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:end;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;}
+.fsi-presets{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+.fsi-presets button{font-size:11.5px;font-weight:700;padding:5px 10px;border-radius:999px;border:1px solid #d5dce4;background:#f4f6f8;color:#5b636b;cursor:pointer;}
+.fsi-presets button.on{background:#fff6ec;border-color:var(--accent);color:#a2540f;}
+.fsi-presets button:hover{background:#eef2f5;}
+.fsi-source{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:#eef2f5;color:#334;}
+.fsi-source.live{background:#eef7f5;color:#0d7d6f;border:1px solid #bfe3dc;}
+.fsi-source.demo{background:#fff6ec;color:#a2540f;border:1px solid #f0d0a8;}
+.fsi-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,1fr);gap:12px;align-items:stretch;margin-bottom:8px;}
+.fsi-mapcol,.fsi-sidecol{display:flex;flex-direction:column;gap:8px;min-height:0;}
+.fsimap{height:min(62vh,560px);min-height:320px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#e8edf1;position:relative;}
+.fsi-banner{font-size:12px;padding:8px 12px;border-radius:8px;background:#fff6ec;border:1px solid #f0d0a8;color:#8a5a2b;display:none;}
+.fsi-banner.on{display:block;}
+.fsimap-legend{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:11.5px;color:var(--muted);}
+.fsimap-legend .k{display:inline-flex;align-items:center;gap:5px;cursor:pointer;padding:3px 8px;border-radius:999px;border:1px solid transparent;user-select:none;}
+.fsimap-legend .k:hover{background:#f4f6f8;border-color:#e2e6ea;}
+.fsimap-legend .k.on{background:#eef7f5;border-color:#bfe3dc;color:#0d7d6f;font-weight:700;}
 .fsimap-legend .sw{width:12px;height:12px;border-radius:50%;border:1px solid rgba(0,0,0,.25);display:inline-block;}
-.fsipop{font-family:'Segoe UI',Helvetica,Arial,sans-serif;font-size:12.5px;color:var(--ink);min-width:215px;}
+.fsi-side-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;}
+.fsi-side-head h2{margin:0;font-size:14px;color:var(--accent);}
+.fsi-list-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.fsi-list-tools input[type=search]{min-width:140px;flex:1;padding:7px 9px;border:1px solid #cdd4da;border-radius:7px;}
+.fsi-list{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:auto;max-height:min(42vh,360px);flex:1;}
+.fsi-row{display:grid;grid-template-columns:28px 1fr;gap:8px;padding:9px 11px;border-bottom:1px solid var(--line);cursor:pointer;align-items:start;}
+.fsi-row:hover{background:#fbfcfd;}
+.fsi-row.on{background:#fff6ec;box-shadow:inset 3px 0 0 var(--accent);}
+.fsi-row .rk{font-weight:800;font-size:12px;color:var(--muted);padding-top:2px;}
+.fsi-row .main{min-width:0;}
+.fsi-row .addr{font-weight:700;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fsi-row .story{font-size:11px;color:var(--muted);margin:2px 0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fsi-row .meta{display:flex;flex-wrap:wrap;gap:5px;align-items:center;}
+.fsi-chip{font-size:10px;font-weight:800;padding:2px 6px;border-radius:999px;background:#eef2f5;color:#445;border:1px solid #d5dce4;line-height:1.3;}
+.fsi-chip.zone-x{background:#eef7f5;border-color:#bfe3dc;color:#0d7d6f;}
+.fsi-chip.zone-f{background:#eaf3fb;border-color:#b7d4ef;color:#0b63b8;}
+.fsi-chip.soil-d{background:#f7f0e8;border-color:#e2c9a8;color:#8a5a2b;}
+.fsi-chip.soil-a{background:#eef7f5;border-color:#bfe3dc;color:#0d7d6f;}
+.fsi-meter{height:6px;background:#e8edf2;border-radius:99px;overflow:hidden;min-width:48px;flex:1;max-width:90px;}
+.fsi-meter > i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#0d7d6f,var(--accent));}
+.fsi-meter-wrap{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;color:var(--ink);}
+.fsi-drawer{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:none;}
+.fsi-drawer.on{display:block;}
+.fsi-drawer h3{margin:0 0 2px;font-size:15px;}
+.fsi-drawer .addr{color:var(--muted);font-size:12px;margin:0 0 8px;}
+.fsi-drawer .headline{font-size:13px;font-weight:700;color:var(--ink);margin:0 0 10px;line-height:1.35;}
+.fsi-drawer .meters{display:grid;gap:8px;margin:0 0 10px;}
+.fsi-drawer .meter-row{display:grid;grid-template-columns:88px 1fr 40px;gap:8px;align-items:center;font-size:11.5px;}
+.fsi-drawer .meter-row label{color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.3px;font-size:10px;}
+.fsi-drawer .meter-row .fsi-meter{max-width:none;height:8px;}
+.fsi-drawer .meter-row b{text-align:right;font-variant-numeric:tabular-nums;}
+.fsi-breakdown{margin:0 0 10px;padding:10px;background:#f6f8fa;border-radius:8px;border:1px solid var(--line);}
+.fsi-breakdown h4{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);}
+.fsi-bd-row{display:grid;grid-template-columns:70px 1fr 36px;gap:6px;align-items:center;font-size:11px;margin:4px 0;}
+.fsi-bd-row .bar{height:7px;background:#e2e6ea;border-radius:99px;overflow:hidden;}
+.fsi-bd-row .bar i{display:block;height:100%;background:var(--accent2);}
+.fsi-acts{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 6px;}
+.fsi-acts .btn{font-size:12px;padding:7px 10px;}
+.fsi-msg{font-size:12px;min-height:1.2em;color:var(--muted);}
+.fsi-msg.ok{color:#0d7d6f;font-weight:600;}
+.fsi-msg.err{color:#b42318;font-weight:600;}
+.fsi-disclaimer{font-size:10.5px;color:var(--muted);margin:8px 0 0;line-height:1.35;}
+.fsipop{font-family:'Segoe UI',Helvetica,Arial,sans-serif;font-size:12.5px;color:var(--ink);min-width:200px;}
 .fsipop h4{margin:0 0 3px;font-size:13px;}
 .fsipop .addr{color:var(--muted);font-size:11.5px;margin:0 0 8px;}
-.fsipop dl{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;margin:0 0 8px;}
-.fsipop dt{color:var(--muted);font-size:11px;}
-.fsipop dd{margin:0;font-weight:600;}
+.fsipop .btn{margin-top:6px;}
 .maplibregl-popup-content{padding:12px 14px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);}
+@media (max-width:900px){
+ .fsi-layout{grid-template-columns:1fr;}
+ .fsimap{height:280px;min-height:240px;}
+ .fsi-list{max-height:280px;}
+}
 
 @media print{.controls,.maps,.fsimap,.nav,.side,.composer,#loginGate{display:none !important;}body{background:#fff;}}
 </style>
@@ -606,11 +665,23 @@ a.maplink{color:var(--accent2);text-decoration:none;font-weight:600;}
  </div>
 </section>
 
-<!-- ============ FSI FLOOD MAP ============ -->
+<!-- ============ FSI FLOOD MAP COMMAND CENTER ============ -->
 <section class="panel" id="p-fsi">
  <h1>Flood Susceptibility Map</h1>
- <p class="sub">Volusia parcels ranked by how likely they are to hold standing water. <b>Terrain is the gate, rainfall is the trigger</b> — a clay bowl in Zone X outranks a sandy ridge in Zone AE, which is why the best prospects are the ones FEMA never flagged. Color shows the terrain score; the popup badge shows today's live score.</p>
- <div class="controls">
+ <p class="sub">Volusia dial list + territory map. <b>Terrain is the gate, rainfall is the trigger</b> — Zone X clay bowls often outrank FEMA AE ridges. Color = terrain band; size/list rank = live FSI.</p>
+
+ <div class="fsi-toolbar">
+ <div class="field" style="min-width:100%"><label>Presets</label>
+ <div class="fsi-presets" id="fsiPresets" role="group" aria-label="Filter presets">
+ <button type="button" data-preset="must" class="on">Must dial</button>
+ <button type="button" data-preset="top">Top risk</button>
+ <button type="button" data-preset="claim_hot">Claim-hot neighborhood</button>
+ <button type="button" data-preset="zone_x">Zone X bowls</button>
+ <button type="button" data-preset="clay">Clay / D soils</button>
+ <button type="button" data-preset="fema">FEMA mapped</button>
+ <button type="button" data-preset="clear">Clear filters</button>
+ </div>
+ </div>
  <div class="field"><label>Min live score</label><input type="text" id="fsiMinScore" value="0" inputmode="decimal" style="width:92px"></div>
  <div class="field"><label>Max parcels</label><input type="text" id="fsiLimit" value="500" inputmode="numeric" style="width:92px"></div>
  <button type="button" class="btn p" id="fsiSearchArea">Search this area</button>
@@ -619,11 +690,45 @@ a.maplink{color:var(--accent2);text-decoration:none;font-weight:600;}
  <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;text-transform:none;letter-spacing:0;color:var(--ink);font-weight:400"><input type="checkbox" id="fsiNfhl"> FEMA flood zones</label>
  </div>
  <span class="spacer"></span>
- <span class="stats" id="fsiStats">Loading map…</span>
+ <span class="fsi-source" id="fsiSource" title="Data source">—</span>
+ <span class="stats" id="fsiStats">Open this tab to load the map…</span>
  </div>
- <div class="fsimap" id="fsiMap"></div>
+
+ <div class="fsi-banner" id="fsiBanner" role="status"></div>
+
+ <div class="fsi-layout">
+ <div class="fsi-mapcol">
+ <div class="fsimap" id="fsiMap" role="application" aria-label="Flood susceptibility map"></div>
  <div class="fsimap-legend" id="fsiLegend" aria-label="Terrain score bands"></div>
- <p class="hint">FSI ranks a call list from public terrain, soil, and flood-zone data. It is <b>not</b> a measurement, not an inspection result, and implies nothing about flood insurance — the free on-site assessment does the diagnosing. Weights are literature defaults pending calibration against closed jobs. Parcel records are public in Florida; DNC and CAN-SPAM still govern outreach.</p>
+ </div>
+ <div class="fsi-sidecol">
+ <div class="fsi-side-head">
+ <h2>Ranked targets</h2>
+ <span class="stats" id="fsiListStats"></span>
+ </div>
+ <div class="fsi-list-tools">
+ <input type="search" id="fsiSearchText" placeholder="Search address, owner, id…" autocomplete="off">
+ </div>
+ <div class="fsi-list" id="fsiList" role="listbox" aria-label="Ranked parcels"></div>
+ <div class="fsi-drawer" id="fsiDrawer" aria-live="polite">
+ <h3 id="fsiDrName">Select a parcel</h3>
+ <p class="addr" id="fsiDrAddr"></p>
+ <p class="headline" id="fsiDrHeadline"></p>
+ <div class="meters" id="fsiDrMeters"></div>
+ <div class="fsi-breakdown" id="fsiDrBreakdown" style="display:none"></div>
+ <div class="meta" id="fsiDrChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
+ <div class="fsi-acts" id="fsiDrActs">
+ <button type="button" class="btn p" data-fsi-act="maps">Open in Maps</button>
+ <button type="button" class="btn" data-fsi-act="copy">Copy address</button>
+ <button type="button" class="btn o" data-fsi-act="lead">Add to Leads</button>
+ <button type="button" class="btn" data-fsi-act="draft">Queue draft</button>
+ </div>
+ <div class="fsi-msg" id="fsiDrMsg"></div>
+ <p class="fsi-disclaimer">Not an inspection, insurance quote, or guarantee. Free on-site assessment does the diagnosing. Parcel records are public; DNC / CAN-SPAM still govern outreach.</p>
+ </div>
+ </div>
+ </div>
+ <p class="hint">FSI ranks a call list from public terrain, soil, and flood-zone data. Weights are literature defaults pending calibration against closed jobs.</p>
 </section>
 
 
@@ -2860,26 +2965,14 @@ document.getElementById('docsCats')?.addEventListener('click', function(e){
  renderDocsGrid();
 });
 
-/* ================= FSI FLOOD MAP ================= */
-/* Spec: fsi/../docs/FLOOD-SUSCEPTIBILITY-INDEX.md. Client for api/fsi-parcels.js.
-   That endpoint projects nine columns and deliberately omits geometry and phone
-   numbers, so parcels render as points from lat/lon, never polygons.
-
-   Color bands on fsi_static, NOT fsi_live. fsi_live is fsi_static multiplied by a
-   county-uniform rainfall term in the 50-100 range, so fixed cuts on it would
-   empty the top band on any dry day and paint the whole county safe — the
-   opposite of what the spec's half-score floor is for. Ranking is identical
-   under either field; banding on the rainfall-stable term stops the colors
-   shifting under the reps day to day. fsi_live still shows in the popup. */
-/* Volusia County. Zoom 10.9 keeps the widest possible viewport (the .wrap caps
-   at 1236px) under the endpoint's 1-degree bbox limit, so "Search this area"
-   is legal straight away without zooming. */
+/* ================= FSI FLOOD MAP COMMAND CENTER ================= */
+/* Spec: docs/FLOOD-SUSCEPTIBILITY-INDEX.md +
+   docs/superpowers/specs/2026-07-21-flood-map-command-center-design.md
+   Color bands on fsi_static; list rank on fsi_live. */
 const FSI_CENTER=[-81.10,29.05];
 const FSI_ZOOM=10.9;
 const FSI_STYLE='https://tiles.openfreemap.org/styles/liberty';
 const FSI_NFHL='https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer/export?bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=256,256&format=png32&transparent=true&f=image';
-/* Low -> high risk. Hexes are the existing .wfs-pill grade scale, so the map
-   matches the badges used elsewhere in the CRM. */
 const FSI_BANDS=[
  {c:'#027a48',l:'Lowest'},
  {c:'#0d7d6f',l:'Low'},
@@ -2887,16 +2980,31 @@ const FSI_BANDS=[
  {c:'#c2410c',l:'High'},
  {c:'#b42318',l:'Highest'}
 ];
-let _fsiMap=null, _fsiInited=false, _fsiMoved=false, _fsiFitting=false;
+const FSI_HSG={A:0.2,B:0.4,C:0.7,D:1.0};
+const FSI_ZONE={AE:1,VE:1,AO:0.8,AH:0.8,'X-SHADED':0.6,X:0.45};
+let _fsiMap=null, _fsiInited=false, _fsiMoved=false, _fsiFitting=false, _fsiPopup=null;
+let _fsiState={raw:[], filtered:[], selectedId:null, source:'', preset:'must', bandFilter:null, q:''};
+let _fsiSearchTimer=null;
 
 function fsiSay(msg,isHtml){
  const el=document.getElementById('fsiStats'); if(!el) return;
  if(isHtml) el.innerHTML=msg; else el.textContent=msg;
 }
+function fsiDrMsg(msg,cls){
+ const el=document.getElementById('fsiDrMsg'); if(!el) return;
+ el.textContent=msg||''; el.className='fsi-msg'+(cls?' '+cls:'');
+}
 function fsiNum(v,d){ const n=Number(v); return isFinite(n)?n.toFixed(d==null?1:d):'—'; }
-
-/** Equal-count quintiles of fsi_static, so the map shows contrast even when the
-    returned set is narrow. Returns a classifier for one value. */
+function fsiHsgScore(hsg){
+ if(!hsg) return 0.55;
+ const u=String(hsg).toUpperCase();
+ if(u.includes('/')){ const parts=u.split('/'); return Math.max(FSI_HSG[parts[0]]||0.55, FSI_HSG[parts[1]]||0.55); }
+ return FSI_HSG[u]||0.55;
+}
+function fsiZoneScore(z){
+ if(!z) return 0.6;
+ return FSI_ZONE[String(z).toUpperCase()]!=null?FSI_ZONE[String(z).toUpperCase()]:0.6;
+}
 function fsiBander(list){
  const vals=list.map(function(p){ return Number(p.fsi_static)||0; }).sort(function(a,b){ return a-b; });
  if(!vals.length) return function(){ return 0; };
@@ -2908,9 +3016,46 @@ function fsiBander(list){
   return b;
  };
 }
+function fsiZoneClass(z){
+ const u=String(z||'').toUpperCase();
+ if(u==='X'||u==='X-SHADED') return 'zone-x';
+ if(['AE','VE','AO','AH'].includes(u)) return 'zone-f';
+ return '';
+}
+function fsiSoilClass(h){
+ const u=String(h||'').toUpperCase();
+ if(u==='D'||u.endsWith('/D')||u.startsWith('D/')) return 'soil-d';
+ if(u==='A') return 'soil-a';
+ return '';
+}
+function fsiStory(p){
+ const zone=String(p.fema_zone||'').toUpperCase();
+ const hsg=String(p.hsg||'').toUpperCase();
+ const band=p._band!=null?p._band:0;
+ const twi=Number(p.twi_n), hand=Number(p.hand_n);
+ const heat=Number(p.claim_heat)||0;
+ const c10=Number(p.claim_count_10y)||0;
+ const mhs=Number(p.must_have_score);
+ // Claim-hot is neighborhood aggregate only — never a personal claim statement.
+ if(heat>=0.55||c10>=8)
+  return 'Claim-hot neighborhood (OpenFEMA tract/grid aggregate, not this owner): ~'+c10+' NFIP claims nearby in recent years. Standing water still needs a free assessment — not an insurance quote.';
+ if((zone==='X'||zone==='X-SHADED')&&(band>=3||hsg.includes('D')||hsg==='C'))
+  return 'Zone '+zone+' clay-friendly bowl — high drainage need, often ignored by FEMA maps. Strong FloGuard segment.';
+ if(hsg==='D'||hsg.includes('D'))
+  return 'Poor-draining soil (HSG '+hsg+'). Water sits after storms even without a FEMA flood map flag.';
+ if(isFinite(twi)&&twi>=0.75)
+  return 'High wetness index — water collects here from surrounding ground. Terrain is the story.';
+ if(isFinite(hand)&&hand<=0.25)
+  return 'Low height above drainage — little freeboard once water arrives.';
+ if(['AE','VE'].includes(zone))
+  return 'FEMA '+zone+' on file — riverine/coastal risk; still sell standing-water drainage, not insurance.';
+ if(isFinite(mhs)&&mhs>=70)
+  return 'Must-Have score '+fsiNum(mhs)+' — top dial priority from risk, soil/zone fit, and neighborhood claim heat.';
+ const live=fsiNum(p.fsi_live), s=fsiNum(p.fsi_static,2);
+ return 'Live FSI '+live+' · terrain '+s+'. Rank and walk the free assessment before quoting.';
+}
+function fsiOneLiner(p){ return fsiStory(p).split(/[.—]/)[0]; }
 
-/** POST /crm/api/fsi-parcels. Mirrors adminFetch, but surfaces the 503 `hint`
-    because that one names the fix (run the migration + ingest). */
 async function fsiFetch(payload){
  const tok=getToken();
  if(!tok) throw new Error('Session expired — log in again.');
@@ -2927,32 +3072,100 @@ async function fsiFetch(payload){
  return data;
 }
 
-function fsiRenderLegend(){
- const el=document.getElementById('fsiLegend'); if(!el) return;
- el.innerHTML='<span>Terrain score (S):</span>'+FSI_BANDS.map(function(b){
-  return '<span class="k"><i class="sw" style="background:'+b.c+'"></i>'+esc(b.l)+'</span>';
- }).join('')+'<span>· equal-count bands across the parcels shown</span>';
+function fsiSetSourceBadge(src){
+ const el=document.getElementById('fsiSource'); if(!el) return;
+ if(src==='postgres'){ el.textContent='Live data'; el.className='fsi-source live'; }
+ else if(src==='fixtures'){ el.textContent='Demo fixtures'; el.className='fsi-source demo'; }
+ else { el.textContent='—'; el.className='fsi-source'; }
 }
-
 function fsiSyncSearchBtn(){
  const b=document.getElementById('fsiSearchArea'); if(!b) return;
  b.textContent=_fsiMoved?'Search this area':'Refresh this area';
 }
+function fsiRenderLegend(){
+ const el=document.getElementById('fsiLegend'); if(!el) return;
+ el.innerHTML='<span>Terrain (S) · click to filter:</span>'+FSI_BANDS.map(function(b,i){
+  const on=_fsiState.bandFilter===i?' on':'';
+  return '<span class="k'+on+'" data-band="'+i+'" role="button" tabindex="0"><i class="sw" style="background:'+b.c+'"></i>'+esc(b.l)+'</span>';
+ }).join('')+(_fsiState.bandFilter!=null?'<span class="k" data-band="all" role="button">Show all</span>':'');
+}
 
-function fsiPaint(list){
- const src=_fsiMap&&_fsiMap.getSource('fsi'); if(!src) return;
- const bandOf=fsiBander(list);
+function fsiApplyFilters(){
+ const minLive=Number(document.getElementById('fsiMinScore')?.value);
+ const min=isFinite(minLive)?minLive:0;
+ const q=(_fsiState.q||'').trim().toLowerCase();
+ const bandOf=fsiBander(_fsiState.raw);
+ let list=_fsiState.raw.map(function(p){
+  return Object.assign({},p,{_band:bandOf(Number(p.fsi_static)||0)});
+ });
+ list=list.filter(function(p){ return (Number(p.fsi_live)||0)>=min; });
+ const preset=_fsiState.preset;
+ if(preset==='must'){
+  list=list.filter(function(p){
+   const band=String(p.must_have_band||'').toLowerCase();
+   const mhs=Number(p.must_have_score)||0;
+   return band==='must'||mhs>=58;
+  });
+  // If no MUST band yet, include SHOULD so dial list is never empty mid-enrichment
+  if(!list.length){
+   list=_fsiState.raw.map(function(p){ return Object.assign({},p,{_band:bandOf(Number(p.fsi_static)||0)}); })
+    .filter(function(p){
+     const band=String(p.must_have_band||'').toLowerCase();
+     const mhs=Number(p.must_have_score)||0;
+     return band==='should'||mhs>=48||(Number(p.fsi_live)||0)>=min+40;
+    });
+  }
+  if(!list.length){
+   list=_fsiState.raw.map(function(p){ return Object.assign({},p,{_band:bandOf(Number(p.fsi_static)||0)}); })
+    .filter(function(p){ return (Number(p.fsi_live)||0)>=min||(Number(p.must_have_score)||0)>0; });
+  }
+ }else if(preset==='claim_hot'){
+  list=list.filter(function(p){ return (Number(p.claim_heat)||0)>=0.45||(Number(p.claim_count_10y)||0)>=5; });
+ }else if(preset==='zone_x'){
+  list=list.filter(function(p){
+   const z=String(p.fema_zone||'').toUpperCase();
+   return (z==='X'||z==='X-SHADED')&&(p._band>=3||String(p.hsg||'').toUpperCase().includes('D'));
+  });
+ }else if(preset==='clay'){
+  list=list.filter(function(p){ const h=String(p.hsg||'').toUpperCase(); return h==='D'||h.includes('D'); });
+ }else if(preset==='fema'){
+  list=list.filter(function(p){ return ['AE','VE','AO','AH'].includes(String(p.fema_zone||'').toUpperCase()); });
+ }
+ if(_fsiState.bandFilter!=null){
+  list=list.filter(function(p){ return p._band===_fsiState.bandFilter; });
+ }
+ if(q){
+  list=list.filter(function(p){
+   return [p.address,p.owner_name,p.parcel_id,p.fema_zone,p.hsg,p.city,p.must_have_band].join(' ').toLowerCase().includes(q);
+  });
+ }
+ if(preset==='must'){
+  list.sort(function(a,b){ return (Number(b.must_have_score)||0)-(Number(a.must_have_score)||0)||(Number(b.fsi_live)||0)-(Number(a.fsi_live)||0); });
+ }else if(preset==='claim_hot'){
+  list.sort(function(a,b){ return (Number(b.claim_heat)||0)-(Number(a.claim_heat)||0)||(Number(b.fsi_live)||0)-(Number(a.fsi_live)||0); });
+ }else{
+  list.sort(function(a,b){ return (Number(b.fsi_live)||0)-(Number(a.fsi_live)||0); });
+ }
+ _fsiState.filtered=list;
+}
+
+function fsiPaint(){
+ const list=_fsiState.filtered;
+ const src=_fsiMap&&_fsiMap.getSource('fsi'); if(!src) return [];
  const features=list.filter(function(p){
   return isFinite(Number(p.lon))&&isFinite(Number(p.lat));
  }).map(function(p){
+  const live=Number(p.fsi_live)||0;
   return {
    type:'Feature',
    geometry:{type:'Point',coordinates:[Number(p.lon),Number(p.lat)]},
    properties:{
-    parcel_id:p.parcel_id, address:p.address, owner_name:p.owner_name,
-    fsi_live:Number(p.fsi_live), fsi_static:Number(p.fsi_static),
-    fema_zone:p.fema_zone, hsg:p.hsg,
-    band:bandOf(Number(p.fsi_static)||0)
+    parcel_id:String(p.parcel_id||''),
+    address:p.address||'', owner_name:p.owner_name||'',
+    fsi_live:live, fsi_static:Number(p.fsi_static)||0,
+    fema_zone:p.fema_zone||'', hsg:p.hsg||'',
+    band:p._band||0, selected:p.parcel_id===_fsiState.selectedId?1:0,
+    r:4+Math.min(10, live/10)
    }
   };
  });
@@ -2960,44 +3173,176 @@ function fsiPaint(list){
  return features;
 }
 
-/** Frame the results. Used after a countywide 'top' query, where the hits are
-    wherever they are and the current view is unlikely to hold them. */
+function fsiRenderList(){
+ const box=document.getElementById('fsiList');
+ const stats=document.getElementById('fsiListStats');
+ if(!box) return;
+ const list=_fsiState.filtered;
+ if(stats) stats.textContent=list.length? (list.length+' shown') : 'No matches';
+ if(!list.length){
+  box.innerHTML='<div class="hint" style="padding:14px">No parcels match filters. Clear presets or load Top countywide.</div>';
+  return;
+ }
+ box.innerHTML=list.map(function(p,i){
+  const live=Number(p.fsi_live)||0;
+  const mhs=Number(p.must_have_score);
+  const showMust=_fsiState.preset==='must'&&isFinite(mhs);
+  const pct=Math.max(0,Math.min(100, showMust?mhs:live));
+  const on=p.parcel_id===_fsiState.selectedId?' on':'';
+  const zc=fsiZoneClass(p.fema_zone), sc=fsiSoilClass(p.hsg);
+  const heat=Number(p.claim_heat)||0;
+  return '<div class="fsi-row'+on+'" role="option" data-id="'+esc(String(p.parcel_id))+'" aria-selected="'+(on?'true':'false')+'">'+
+   '<div class="rk">'+(i+1)+'</div>'+
+   '<div class="main">'+
+   '<div class="addr">'+esc(p.address||p.parcel_id||'Parcel')+'</div>'+
+   '<div class="story">'+esc(fsiOneLiner(p))+'</div>'+
+   '<div class="meta">'+
+   '<span class="fsi-meter-wrap" title="'+(showMust?'Must-Have Score':'Live FSI')+'"><span class="fsi-meter"><i style="width:'+pct+'%"></i></span>'+esc(fsiNum(showMust?mhs:live))+'</span>'+
+   (p.must_have_band?'<span class="fsi-chip">'+esc(String(p.must_have_band).toUpperCase())+'</span>':'')+
+   (p.fema_zone?'<span class="fsi-chip '+zc+'">'+esc(p.fema_zone)+'</span>':'')+
+   (p.hsg?'<span class="fsi-chip '+sc+'">Soil '+esc(p.hsg)+'</span>':'')+
+   (heat>=0.45?'<span class="fsi-chip">Claims hot</span>':'')+
+   '<span class="fsi-chip">S '+esc(fsiNum(p.fsi_static,2))+'</span>'+
+   '</div></div></div>';
+ }).join('');
+}
+
+function fsiRenderDrawer(){
+ const drawer=document.getElementById('fsiDrawer');
+ if(!drawer) return;
+ const p=_fsiState.filtered.find(function(x){ return x.parcel_id===_fsiState.selectedId; })
+  || _fsiState.raw.find(function(x){ return x.parcel_id===_fsiState.selectedId; });
+ if(!p){ drawer.classList.remove('on'); return; }
+ drawer.classList.add('on');
+ const rank=_fsiState.filtered.findIndex(function(x){ return x.parcel_id===p.parcel_id; })+1;
+ const n=_fsiState.filtered.length;
+ document.getElementById('fsiDrName').textContent=p.owner_name||'Owner unknown';
+ document.getElementById('fsiDrAddr').textContent=p.address||'(no address on record)';
+ document.getElementById('fsiDrHeadline').textContent=fsiStory(p);
+ const live=Number(p.fsi_live)||0, s=Number(p.fsi_static)||0;
+ const livePct=Math.max(0,Math.min(100,live));
+ const sPct=Math.max(0,Math.min(100,s*100));
+ const mhs=Number(p.must_have_score);
+ const mhsPct=isFinite(mhs)?Math.max(0,Math.min(100,mhs)):0;
+ const heat=Number(p.claim_heat)||0;
+ const heatPct=Math.max(0,Math.min(100,heat*100));
+ document.getElementById('fsiDrMeters').innerHTML=
+  '<div class="meter-row"><label>Must-Have</label><span class="fsi-meter"><i style="width:'+mhsPct+'%;background:#c45c12"></i></span><b>'+(isFinite(mhs)?esc(fsiNum(mhs)):'—')+'</b></div>'+
+  '<div class="meter-row"><label>Live FSI</label><span class="fsi-meter"><i style="width:'+livePct+'%"></i></span><b>'+esc(fsiNum(live))+'</b></div>'+
+  '<div class="meter-row"><label>Terrain S</label><span class="fsi-meter"><i style="width:'+sPct+'%;background:#1E88C7"></i></span><b>'+esc(fsiNum(s,3))+'</b></div>'+
+  '<div class="meter-row"><label>Claim heat</label><span class="fsi-meter"><i style="width:'+heatPct+'%;background:#8b3a3a"></i></span><b>'+esc(fsiNum(heat,2))+'</b></div>'+
+  '<div class="meter-row"><label>Rank</label><span></span><b>'+(rank>0?('#'+rank+'/'+n):'—')+'</b></div>';
+ const chips=document.getElementById('fsiDrChips');
+ chips.innerHTML=
+  (p.must_have_band?'<span class="fsi-chip">'+esc(String(p.must_have_band).toUpperCase())+'</span>':'')+
+  (p.fema_zone?'<span class="fsi-chip '+fsiZoneClass(p.fema_zone)+'">Zone '+esc(p.fema_zone)+'</span>':'')+
+  (p.hsg?'<span class="fsi-chip '+fsiSoilClass(p.hsg)+'">Soil '+esc(p.hsg)+'</span>':'')+
+  (heat>=0.45?'<span class="fsi-chip">Neighborhood claims ~'+(Number(p.claim_count_10y)||0)+'</span>':'')+
+  (p.year_built?'<span class="fsi-chip">Built '+esc(String(p.year_built))+'</span>':'')+
+  '<span class="fsi-chip">Band '+(FSI_BANDS[p._band||0]?FSI_BANDS[p._band||0].l:'—')+'</span>'+
+  (String(p.parcel_id||'').indexOf('FIXTURE-')===0?'<span class="fsi-chip">Demo parcel</span>':'')+
+  '<span class="fsi-chip" title="Neighborhood aggregate only — not this owner">Claims = tract/grid heat, not personal</span>';
+ const bd=document.getElementById('fsiDrBreakdown');
+ const twi=Number(p.twi_n), hand=Number(p.hand_n);
+ if(isFinite(twi)&&isFinite(hand)){
+  const factors=[
+   {l:'TWI', w:0.40, v:twi},
+   {l:'HAND', w:0.25, v:Math.max(0,1-hand)},
+   {l:'Soil', w:0.20, v:fsiHsgScore(p.hsg)},
+   {l:'FEMA', w:0.15, v:fsiZoneScore(p.fema_zone)}
+  ];
+  bd.style.display='block';
+  bd.innerHTML='<h4>Terrain factors (literature weights · display only)</h4>'+factors.map(function(f){
+   const pct=Math.round(Math.max(0,Math.min(1,f.v))*100);
+   return '<div class="fsi-bd-row"><span>'+esc(f.l)+' · '+(f.w*100).toFixed(0)+'%</span><span class="bar"><i style="width:'+pct+'%"></i></span><span>'+pct+'%</span></div>';
+  }).join('');
+ }else{
+  bd.style.display='block';
+  bd.innerHTML='<h4>Terrain factors</h4><p class="hint" style="margin:0">Scores only on this parcel — TWI/HAND appear after full terrain ingest.</p>';
+ }
+ fsiDrMsg('');
+}
+
+function fsiSelect(id, opts){
+ opts=opts||{};
+ _fsiState.selectedId=id||null;
+ fsiPaint();
+ fsiRenderList();
+ fsiRenderDrawer();
+ if(opts.fly&&_fsiMap&&id){
+  const p=_fsiState.filtered.find(function(x){ return x.parcel_id===id; })
+   || _fsiState.raw.find(function(x){ return x.parcel_id===id; });
+  if(p&&isFinite(Number(p.lon))&&isFinite(Number(p.lat))){
+   _fsiFitting=true;
+   _fsiMap.flyTo({center:[Number(p.lon),Number(p.lat)], zoom:Math.max(_fsiMap.getZoom(),13), essential:true});
+  }
+ }
+}
+
+function fsiRefreshView(fit){
+ fsiApplyFilters();
+ const feats=fsiPaint();
+ fsiRenderList();
+ fsiRenderLegend();
+ fsiRenderDrawer();
+ if(fit) fsiFit(feats);
+ const ban=document.getElementById('fsiBanner');
+ const hasFix=_fsiState.raw.some(function(p){ return String(p.parcel_id||'').indexOf('FIXTURE-')===0; });
+ if(ban){
+  if(_fsiState.source==='fixtures'||hasFix){
+   ban.classList.add('on');
+   ban.textContent=_fsiState.source==='fixtures'
+    ? 'Showing demo FIXTURE parcels (bundled or seed). Replace with county ingest for production dial lists.'
+    : 'Some FIXTURE-* rows are in this set. Real appraiser parcels will use non-FIXTURE ids.';
+  }else ban.classList.remove('on');
+ }
+ const ls=document.getElementById('fsiListStats');
+ if(ls) ls.textContent=_fsiState.filtered.length+' of '+_fsiState.raw.length;
+}
+
 function fsiFit(features){
- if(!features.length) return;
+ if(!_fsiMap||!features||!features.length) return;
  const b=new maplibregl.LngLatBounds();
  features.forEach(function(f){ b.extend(f.geometry.coordinates); });
  _fsiFitting=true;
- _fsiMap.fitBounds(b,{padding:60,maxZoom:12,duration:0});
+ _fsiMap.fitBounds(b,{padding:60,maxZoom:12,duration:400});
 }
 
 function fsiPopup(e){
  const f=e.features&&e.features[0]; if(!f) return;
  const p=f.properties||{};
- const addr=p.address||'(no address on record)';
- const q='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(addr);
- const html='<div class="fsipop">'+
-  '<h4>'+esc(p.owner_name||'Owner unknown')+'</h4>'+
-  '<p class="addr">'+esc(addr)+'</p>'+
-  '<dl>'+
-  '<dt>Live FSI</dt><dd>'+esc(fsiNum(p.fsi_live))+'</dd>'+
-  '<dt>Terrain (S)</dt><dd>'+esc(fsiNum(p.fsi_static,3))+'</dd>'+
-  '<dt>FEMA zone</dt><dd>'+esc(p.fema_zone||'unmapped')+'</dd>'+
-  '<dt>Soil group</dt><dd>'+esc(p.hsg||'unknown')+'</dd>'+
-  '</dl>'+
-  '<a class="btn p" href="'+esc(q)+'" target="_blank" rel="noopener">Open in Maps</a>'+
-  '</div>';
- new maplibregl.Popup({closeButton:true,maxWidth:'300px'}).setLngLat(e.lngLat).setHTML(html).addTo(_fsiMap);
+ fsiSelect(p.parcel_id,{fly:false});
+ const addr=p.address||'(no address)';
+ if(_fsiPopup) _fsiPopup.remove();
+ _fsiPopup=new maplibregl.Popup({closeButton:true,maxWidth:'280px'})
+  .setLngLat(e.lngLat)
+  .setHTML('<div class="fsipop"><h4>'+esc(p.owner_name||'Owner unknown')+'</h4>'+
+   '<p class="addr">'+esc(addr)+'</p>'+
+   '<div class="fsi-meter-wrap">Live <span class="fsi-meter" style="width:80px"><i style="width:'+Math.min(100,Number(p.fsi_live)||0)+'%"></i></span> '+esc(fsiNum(p.fsi_live))+'</div>'+
+   '<button type="button" class="btn p" id="fsiPopDetail" style="margin-top:8px">Open details</button></div>')
+  .addTo(_fsiMap);
+ setTimeout(function(){
+  document.getElementById('fsiPopDetail')?.addEventListener('click',function(){
+   fsiSelect(p.parcel_id,{fly:true});
+   document.getElementById('fsiDrawer')?.scrollIntoView({behavior:'smooth',block:'nearest'});
+  });
+ },0);
 }
 
 async function fsiLoad(action){
  if(!_fsiMap) return;
  const minRaw=Number(document.getElementById('fsiMinScore').value);
  const limRaw=Number(document.getElementById('fsiLimit').value);
- const payload={action:action, minFsi:isFinite(minRaw)?minRaw:0, limit:isFinite(limRaw)?limRaw:500};
+ const preset=_fsiState.preset;
+ const payload={
+  action:action,
+  minFsi:isFinite(minRaw)?minRaw:0,
+  limit:isFinite(limRaw)?limRaw:500,
+  sort: preset==='must'?'must':(preset==='claim_hot'?'heat':'fsi')
+ };
+ if(preset==='must'){ payload.mustBand='must'; payload.minMust=0; }
  if(action==='viewport'){
   const b=_fsiMap.getBounds();
-  // The endpoint refuses spans over 1 degree. Say so here rather than spend a
-  // request against the 60/min budget to be told.
   if(b.getEast()-b.getWest()>1 || b.getNorth()-b.getSouth()>1){
    fsiSay('Zoom in — this view is wider than 1° and the server will refuse it.');
    return;
@@ -3006,16 +3351,23 @@ async function fsiLoad(action){
  }
  fsiSay('Loading…');
  try{
-  const data=await fsiFetch(payload);
-  const list=Array.isArray(data.parcels)?data.parcels:[];
-  const drawn=fsiPaint(list);
-  if(action==='top') fsiFit(drawn||[]);
-  if(!list.length){
+  let data=await fsiFetch(payload);
+  // If Must dial has no scored rows yet, retry without band so map still works mid-enrichment
+  if(preset==='must'&&(!data.parcels||!data.parcels.length)&&payload.mustBand){
+   delete payload.mustBand;
+   payload.sort='fsi';
+   data=await fsiFetch(payload);
+  }
+  _fsiState.raw=Array.isArray(data.parcels)?data.parcels:[];
+  _fsiState.source=data.source||'';
+  fsiSetSourceBadge(_fsiState.source);
+  fsiRefreshView(action==='top');
+  if(!_fsiState.raw.length){
    fsiSay(action==='top'
-    ? 'No parcels scored yet. Run fsi/sql/001_parcel_risk.sql, then 002_seed_fixtures.sql or the ingest pipeline.'
+    ? 'No parcels scored yet. Run enrich-static-lite + score-must-have, or wait for ingest.'
     : 'No parcels in this view above the score filter.');
   }else{
-   fsiSay('<b>'+list.length+'</b> parcels'+(data.truncated?' — capped at the limit, so raise Max parcels or zoom in':''),true);
+   fsiSay('<b>'+_fsiState.raw.length+'</b> loaded · <b>'+_fsiState.filtered.length+'</b> after filters'+(data.truncated?' · truncated at limit':''),true);
   }
  }catch(err){
   fsiSay(err.message||String(err));
@@ -3023,14 +3375,13 @@ async function fsiLoad(action){
  _fsiMoved=false; fsiSyncSearchBtn();
 }
 
-/** FEMA NFHL as a raster overlay. Spec §5 lists it as a live WMS layer; the
-    ArcGIS `export` endpoint serves the same data as slippy tiles. */
 function fsiNfhlToggle(on){
  if(!_fsiMap) return;
  const has=!!_fsiMap.getSource('nfhl');
+ const before=_fsiMap.getLayer('fsi-clusters')?'fsi-clusters':(_fsiMap.getLayer('fsi-dots')?'fsi-dots':undefined);
  if(on&&!has){
   _fsiMap.addSource('nfhl',{type:'raster',tiles:[FSI_NFHL],tileSize:256,attribution:'FEMA NFHL'});
-  _fsiMap.addLayer({id:'nfhl',type:'raster',source:'nfhl',paint:{'raster-opacity':0.45}},'fsi-dots');
+  _fsiMap.addLayer({id:'nfhl',type:'raster',source:'nfhl',paint:{'raster-opacity':0.45}}, before);
  }else if(!on&&has){
   if(_fsiMap.getLayer('nfhl')) _fsiMap.removeLayer('nfhl');
   _fsiMap.removeSource('nfhl');
@@ -3042,62 +3393,193 @@ function fsiInit(){
  const el=document.getElementById('fsiMap');
  if(!el) return null;
  if(typeof maplibregl==='undefined'){
-  fsiSay('Map library did not load. Check that public/crm/vendor/maplibre-gl.js is deployed.');
+  fsiSay('Map library did not load. Check public/crm/vendor/maplibre-gl.js.');
   return null;
  }
  _fsiMap=new maplibregl.Map({container:el,style:FSI_STYLE,center:FSI_CENTER,zoom:FSI_ZOOM});
  _fsiMap.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
- /* 'style.load', not 'load'. We only need the style parsed in order to add a
-    source and a layer. 'load' additionally waits for every source to settle and
-    for the first full render, which stalls on a slow basemap tile and would
-    strand the panel on "Loading map…" with no parcels and no error. */
  _fsiMap.on('style.load',function(){
-  _fsiMap.addSource('fsi',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
+  _fsiMap.addSource('fsi',{
+   type:'geojson',
+   data:{type:'FeatureCollection',features:[]},
+   cluster:true, clusterMaxZoom:14, clusterRadius:52,
+   clusterProperties:{ sum_live:['+',['get','fsi_live']], max_band:['max',['get','band']] }
+  });
+  _fsiMap.addLayer({
+   id:'fsi-clusters', type:'circle', source:'fsi', filter:['has','point_count'],
+   paint:{
+    'circle-color':['step',['get','max_band'], FSI_BANDS[0].c, 1,FSI_BANDS[1].c, 2,FSI_BANDS[2].c, 3,FSI_BANDS[3].c, 4,FSI_BANDS[4].c],
+    'circle-radius':['step',['get','point_count'], 16, 8,20, 25,26, 60,32],
+    'circle-opacity':0.88,
+    'circle-stroke-width':2,
+    'circle-stroke-color':'#fff'
+   }
+  });
+  _fsiMap.addLayer({
+   id:'fsi-cluster-count', type:'symbol', source:'fsi', filter:['has','point_count'],
+   layout:{'text-field':['get','point_count_abbreviated'],'text-size':12},
+   paint:{'text-color':'#fff'}
+  });
+  _fsiMap.addLayer({
+   id:'fsi-halo', type:'circle', source:'fsi',
+   filter:['all',['!',['has','point_count']],['>=',['get','band'],3]],
+   paint:{
+    'circle-radius':['+',['get','r'],6],
+    'circle-color':FSI_BANDS[4].c,
+    'circle-opacity':0.18,
+    'circle-blur':0.6
+   }
+  });
   _fsiMap.addLayer({
    id:'fsi-dots', type:'circle', source:'fsi',
+   filter:['!',['has','point_count']],
    paint:{
-    'circle-radius':['interpolate',['linear'],['zoom'],9,4,13,9,16,14],
+    'circle-radius':['case',['==',['get','selected'],1],['+',['get','r'],3],['get','r']],
     'circle-color':['match',['get','band'],
      0,FSI_BANDS[0].c, 1,FSI_BANDS[1].c, 2,FSI_BANDS[2].c, 3,FSI_BANDS[3].c, 4,FSI_BANDS[4].c,
      FSI_BANDS[0].c],
-    'circle-opacity':0.85,
-    'circle-stroke-width':1,
-    'circle-stroke-color':'rgba(255,255,255,.9)'
+    'circle-opacity':0.9,
+    'circle-stroke-width':['case',['==',['get','selected'],1],3,1],
+    'circle-stroke-color':['case',['==',['get','selected'],1],'#F57C1F','rgba(255,255,255,.95)']
    }
   });
+  _fsiMap.on('click','fsi-clusters',function(e){
+   const feats=_fsiMap.queryRenderedFeatures(e.point,{layers:['fsi-clusters']});
+   const c=feats[0]; if(!c) return;
+   const clusterId=c.properties.cluster_id;
+   _fsiMap.getSource('fsi').getClusterExpansionZoom(clusterId,function(err,zoom){
+    if(err) return;
+    _fsiFitting=true;
+    _fsiMap.easeTo({center:c.geometry.coordinates, zoom:zoom});
+   });
+  });
   _fsiMap.on('click','fsi-dots',fsiPopup);
-  _fsiMap.on('mouseenter','fsi-dots',function(){ _fsiMap.getCanvas().style.cursor='pointer'; });
-  _fsiMap.on('mouseleave','fsi-dots',function(){ _fsiMap.getCanvas().style.cursor=''; });
+  ['fsi-clusters','fsi-dots'].forEach(function(layer){
+   _fsiMap.on('mouseenter',layer,function(){ _fsiMap.getCanvas().style.cursor='pointer'; });
+   _fsiMap.on('mouseleave',layer,function(){ _fsiMap.getCanvas().style.cursor=''; });
+  });
   _fsiMap.on('moveend',function(){
-   // A programmatic fitBounds is not the rep moving the map; do not mark stale.
    if(_fsiFitting){ _fsiFitting=false; return; }
    _fsiMoved=true; fsiSyncSearchBtn();
   });
   fsiRenderLegend();
   if(document.getElementById('fsiNfhl')?.checked) fsiNfhlToggle(true);
-  // Open on the ranked list, not the current rectangle — that is the question
-  // this panel answers, and it sidesteps the 1-degree bbox cap on first paint.
   fsiLoad('top');
  });
  _fsiMap.on('error',function(ev){
-  // Individual tile failures are noise. A style failure leaves a blank panel and
-  // must not pass silently.
   const msg=String((ev&&ev.error&&ev.error.message)||'');
   if(/style/i.test(msg)) fsiSay('Basemap failed to load: '+msg);
  });
  return _fsiMap;
 }
 
+async function fsiAddLead(){
+ const p=_fsiState.filtered.find(function(x){ return x.parcel_id===_fsiState.selectedId; })
+  || _fsiState.raw.find(function(x){ return x.parcel_id===_fsiState.selectedId; });
+ if(!p){ fsiDrMsg('Select a parcel first.','err'); return; }
+ const story=fsiStory(p);
+ const primary='FrenchDrain';
+ const city=(function(){
+  const a=String(p.address||'');
+  const m=a.match(/,\s*([^,]+),\s*FL/i); return m?m[1].trim():'Volusia';
+ })();
+ const notes=['FSI map import',
+  'Must-Have: '+(isFinite(Number(p.must_have_score))?fsiNum(p.must_have_score):'—')+' ('+(p.must_have_band||'—')+')',
+  'Live FSI: '+fsiNum(p.fsi_live),
+  'Terrain S: '+fsiNum(p.fsi_static,3),
+  'FEMA: '+(p.fema_zone||'—'),
+  'Soil: '+(p.hsg||'—'),
+  'Claim heat (neighborhood): '+(isFinite(Number(p.claim_heat))?fsiNum(p.claim_heat,2):'—')+' / n~'+(p.claim_count_10y||0),
+  'Parcel: '+(p.parcel_id||''),
+  story,
+  'Note: claim heat is OpenFEMA tract/grid aggregate — not a personal claim and not insurance advice.'
+ ].join('\n');
+ const lead={
+  id:nextId(),
+  name:p.owner_name||p.address||('Parcel '+p.parcel_id),
+  city:city, industry:'Residential', list:primary, lists:[primary], list_status:{},
+  phone:'', website:'', contact:'', email:'', status:'New', notes:notes, source:'FSI map',
+  lists_touched:true
+ };
+ setListStatus(lead, primary, 'New');
+ state.unshift(lead);
+ saveLeads();
+ if(typeof render==='function') render();
+ fsiDrMsg('Added to Leads · FrenchDrain · New. Open Leads tab to dial.','ok');
+}
+async function fsiQueueDraft(){
+ const p=_fsiState.filtered.find(function(x){ return x.parcel_id===_fsiState.selectedId; })
+  || _fsiState.raw.find(function(x){ return x.parcel_id===_fsiState.selectedId; });
+ if(!p){ fsiDrMsg('Select a parcel first.','err'); return; }
+ const story=fsiStory(p);
+ const name=p.owner_name||'there';
+ const subj='Standing water after storms — free look at '+(p.address||'your property');
+ const body='Hi,\n\n'+story+'\n\nWe install drainage systems for Central Florida properties and always start with a free on-site assessment (no pressure, no price over the phone).\n\nWorth a quick walk-through this week?\n\n- '+(currentUserName()||'FloGuard');
+ try{
+  const tok=getToken();
+  if(!tok){ fsiDrMsg('Sign in required.','err'); return; }
+  const r=await fetch('/crm/api/academy-drafts',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify({action:'append',draft:{
+   lead_key:p.parcel_id||p.address||name, channel:'email', subject:subj, body:body,
+   meta:{name:name, address:p.address||'', fsi_live:p.fsi_live, source:'fsi_map'}
+  }})});
+  const j=await r.json().catch(function(){return {};});
+  if(!r.ok){ fsiDrMsg(j.error||'Could not queue draft','err'); return; }
+  fsiDrMsg('Draft queued — open Outbound tab to approve.','ok');
+ }catch(e){ fsiDrMsg('Queue failed: '+(e.message||e),'err'); }
+}
+
 document.getElementById('fsiSearchArea')?.addEventListener('click',function(){ fsiLoad('viewport'); });
 document.getElementById('fsiTop')?.addEventListener('click',function(){ fsiLoad('top'); });
 document.getElementById('fsiNfhl')?.addEventListener('change',function(){ fsiNfhlToggle(this.checked); });
-/* Init on first open, never at boot: MapLibre sizes to its container, and a
-   hidden .panel is 0x0. The generic nav handler adds .on before this runs. */
+document.getElementById('fsiMinScore')?.addEventListener('change',function(){ fsiRefreshView(false); });
+document.getElementById('fsiSearchText')?.addEventListener('input',function(){
+ const v=this.value;
+ clearTimeout(_fsiSearchTimer);
+ _fsiSearchTimer=setTimeout(function(){ _fsiState.q=v; fsiRefreshView(false); },150);
+});
+document.getElementById('fsiPresets')?.addEventListener('click',function(e){
+ const b=e.target.closest('button[data-preset]'); if(!b) return;
+ const pre=b.getAttribute('data-preset');
+ _fsiState.preset=pre==='clear'?'must':pre;
+ if(pre==='clear'){ _fsiState.bandFilter=null; _fsiState.q=''; const si=document.getElementById('fsiSearchText'); if(si) si.value=''; }
+ [...document.querySelectorAll('#fsiPresets button')].forEach(function(x){
+  x.classList.toggle('on', pre==='clear'?x.getAttribute('data-preset')==='must':x===b);
+ });
+ // Reload from API with sort that matches dial mode
+ if(pre==='must'||pre==='claim_hot'||pre==='top'||pre==='clear') fsiLoad('top');
+ else fsiRefreshView(false);
+});
+document.getElementById('fsiLegend')?.addEventListener('click',function(e){
+ const k=e.target.closest('[data-band]'); if(!k) return;
+ const v=k.getAttribute('data-band');
+ _fsiState.bandFilter=v==='all'?null:Number(v);
+ fsiRefreshView(false);
+});
+document.getElementById('fsiList')?.addEventListener('click',function(e){
+ const row=e.target.closest('.fsi-row'); if(!row) return;
+ fsiSelect(row.getAttribute('data-id'),{fly:true});
+});
+document.getElementById('fsiDrActs')?.addEventListener('click',function(e){
+ const b=e.target.closest('[data-fsi-act]'); if(!b) return;
+ const act=b.getAttribute('data-fsi-act');
+ const p=_fsiState.filtered.find(function(x){ return x.parcel_id===_fsiState.selectedId; })
+  || _fsiState.raw.find(function(x){ return x.parcel_id===_fsiState.selectedId; });
+ if(act==='maps'){
+  const addr=(p&&p.address)||'';
+  window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(addr),'_blank','noopener');
+  fsiDrMsg('Opening Maps…','ok');
+ }else if(act==='copy'){
+  const t=(p&&(p.address||p.owner_name))||'';
+  navigator.clipboard.writeText(t).then(function(){ fsiDrMsg('Copied.','ok'); }).catch(function(){ fsiDrMsg('Copy failed.','err'); });
+ }else if(act==='lead'){ fsiAddLead(); }
+ else if(act==='draft'){ fsiQueueDraft(); }
+});
+/* Init on first open — MapLibre needs a non-zero container. */
 document.getElementById('nav')?.addEventListener('click',function(e){
  const b=e.target.closest('button');
  if(!b||b.dataset.p!=='fsi') return;
  if(!_fsiInited){ _fsiInited=true; fsiInit(); }
- else if(_fsiMap) _fsiMap.resize();
+ else if(_fsiMap){ _fsiMap.resize(); }
 });
 
 </script>

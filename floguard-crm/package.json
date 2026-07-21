@@ -7,6 +7,11 @@
   "scripts": {
     "dev": "node scripts/dev-server.mjs",
     "sync-docs": "node scripts/sync-sales-docs.mjs",
-    "seed-storage": "node scripts/seed-storage.mjs"
+    "seed-storage": "node scripts/seed-storage.mjs",
+    "apply-fsi-sql": "node scripts/apply-fsi-sql.mjs",
+    "ingest-parcels": "node scripts/ingest-volusia-parcels.mjs",
+    "enrich-static-lite": "node scripts/enrich-static-lite.mjs",
+    "ingest-claims": "node scripts/ingest-nfip-claims.mjs",
+    "score-must-have": "node scripts/score-must-have.mjs"
   }
 }
