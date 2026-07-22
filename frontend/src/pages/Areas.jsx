@@ -33,7 +33,7 @@ export default function Areas() {
         overline="Areas We Serve"
         title="Drainage experts across Central Florida."
         subtitle="From the coast to the Orlando corridor, FloGuard designs and installs drainage systems built for your city's soil, water table, and storms."
-        image="/images/yard-dry.jpg"
+        image="/images/yard-dry.webp"
         primary={{ label: "Request a free assessment", to: "/contact" }}
       />
 

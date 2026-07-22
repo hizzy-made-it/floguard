@@ -83,7 +83,7 @@ export default function Services() {
               "@type": "Organization",
               "name": "FloGuard, LLC",
               "url": "https://www.floguardfl.com",
-              "logo": "https://www.floguardfl.com/images/logo.png",
+              "logo": "https://www.floguardfl.com/images/logo-schema.png",
               "address": {
                 "@type": "PostalAddress",
                 "streetAddress": "5114 S Ridgewood Ave",
@@ -115,7 +115,7 @@ export default function Services() {
         overline="Services & Solutions"
         title="Every drainage problem has a custom fix."
         subtitle="Exterior French drains, interior sump systems, yard drainage & grading, plus ongoing pump maintenance. We install the right combination for Central Florida homes."
-        image="/images/case1-after.jpg"
+        image="/images/case1-after.webp"
         primary={{ label: "Request an assessment", to: "/contact" }}
       />
 

@@ -45,7 +45,15 @@ export const GuideDownload = () => {
             you shouldn't ignore. Free, instant download.
           </p>
           <div className="mt-8 hidden lg:block">
-            <img src="/images/diagram.jpg" alt="Technical diagram of FloGuard French drain and sump pump system" className="w-full max-w-md rounded-sm border border-white/10" loading="lazy" />
+            <img
+              src="/images/diagram.webp"
+              alt="Technical diagram of FloGuard French drain and sump pump system"
+              width={960}
+              height={540}
+              className="w-full max-w-md rounded-sm border border-white/10"
+              loading="lazy"
+              decoding="async"
+            />
           </div>
         </div>
 

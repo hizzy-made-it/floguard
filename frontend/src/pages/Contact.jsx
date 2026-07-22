@@ -120,11 +120,11 @@ export default function Contact() {
           <div className="lg:col-span-6">
             <Reveal className="grid grid-cols-2 gap-4">
               <div className="rounded-sm overflow-hidden border border-white/10">
-                <img src="/images/contact-before.jpg" alt="Flooded Central Florida backyard with standing water before drainage work" className="w-full h-64 object-cover" loading="lazy" />
+                <img src="/images/contact-before.webp" alt="Flooded Central Florida backyard with standing water before drainage work" className="w-full h-64 object-cover" loading="lazy" />
                 <div className="bg-brand-surface text-xs uppercase tracking-widest text-white/50 px-3 py-2">Before</div>
               </div>
               <div className="rounded-sm overflow-hidden border border-white/10">
-                <img src="/images/contact-after.jpg" alt="Dry, lush restored Central Florida yard after FloGuard French drain system" className="w-full h-64 object-cover" loading="lazy" />
+                <img src="/images/contact-after.webp" alt="Dry, lush restored Central Florida yard after FloGuard French drain system" className="w-full h-64 object-cover" loading="lazy" />
                 <div className="bg-brand-surface text-xs uppercase tracking-widest text-brand-orange px-3 py-2">After</div>
               </div>
             </Reveal>

@@ -7,7 +7,7 @@ export const CITIES = [
     slug: "daytona-beach",
     name: "Daytona Beach",
     county: "Volusia County",
-    image: "/images/crew.jpg",
+    image: "/images/crew.webp",
     intro:
       "Coastal Daytona Beach homes face a high water table and intense summer storms. A sump pump + French drain system is one of the most effective ways to protect a home from water damage caused by heavy Florida rain and high groundwater. FloGuard designs these systems to keep yards dry and foundations protected — even near the Atlantic.",
     deepDive:
@@ -31,7 +31,7 @@ export const CITIES = [
     slug: "port-orange",
     name: "Port Orange",
     county: "Volusia County",
-    image: "/images/french-drain.jpg",
+    image: "/images/french-drain.webp",
     intro:
       "Right here in our hometown of Port Orange, flat lots and clay-heavy pockets trap water against foundations. FloGuard is your local drainage crew — we know how Port Orange properties flood and how to stop it.",
     deepDive:
@@ -55,7 +55,7 @@ export const CITIES = [
     slug: "sanford",
     name: "Sanford",
     county: "Seminole County",
-    image: "/images/case4-before.jpg",
+    image: "/images/case4-before.webp",
     intro:
       "Near Lake Monroe and the St. Johns River, Sanford homes deal with rising groundwater and slow-draining soils. FloGuard engineers custom drainage that channels water safely away from foundations and landscaping.",
     deepDive:
@@ -79,7 +79,7 @@ export const CITIES = [
     slug: "orlando",
     name: "Orlando",
     county: "Orange County",
-    image: "/images/case1-after.jpg",
+    image: "/images/case1-after.webp",
     intro:
       "Across the Orlando metro, heavy seasonal rain overwhelms yards and threatens foundations. FloGuard installs engineered French drain and sump pump systems for homeowners and property investors throughout the region.",
     deepDive:
@@ -103,7 +103,7 @@ export const CITIES = [
     slug: "new-smyrna-beach",
     name: "New Smyrna Beach",
     county: "Volusia County",
-    image: "/images/catch-basin.jpg",
+    image: "/images/catch-basin.webp",
     intro:
       "New Smyrna Beach coastal and inland lots deal with high water tables and storm runoff. FloGuard installs discreet French drain and sump systems that protect beach homes and neighborhoods from standing water.",
     deepDive:
@@ -127,7 +127,7 @@ export const CITIES = [
     slug: "ormond-beach",
     name: "Ormond Beach",
     county: "Volusia County",
-    image: "/images/foundation.jpg",
+    image: "/images/foundation.webp",
     intro:
       "Ormond Beach mature neighborhoods and riverfront lots are prone to pooling and foundation moisture. FloGuard’s custom French drain and sump systems keep water away from your home.",
     deepDive:
@@ -151,7 +151,7 @@ export const CITIES = [
     slug: "deland",
     name: "DeLand",
     county: "Volusia County",
-    image: "/images/landscaped.jpg",
+    image: "/images/landscaped.webp",
     intro:
       "Inland DeLand soils and seasonal rain call for smart grading and French drains. FloGuard designs systems that protect historic and new homes from standing water and erosion.",
     deepDive:
@@ -175,7 +175,7 @@ export const CITIES = [
     slug: "deltona",
     name: "Deltona",
     county: "Volusia County",
-    image: "/images/sump-pump.jpg",
+    image: "/images/sump-pump.webp",
     intro:
       "Deltona’s many lakes and flat terrain create persistent drainage challenges. FloGuard installs French drain + sump pump systems sized for heavy rainfall when gravity alone is not enough.",
     deepDive:

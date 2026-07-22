@@ -30,17 +30,40 @@
     <meta property="og:image:alt" content="FloGuard drainage systems for Central Florida homes" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://www.floguardfl.com/images/hero-poster.jpg" />
+
+    <!-- LCP: discover hero poster from the initial document (SPA hydrates later) -->
+    <link
+      rel="preload"
+      as="image"
+      href="/images/hero-poster.webp"
+      type="image/webp"
+      fetchpriority="high"
+    />
+    <link rel="preload" as="image" href="/images/logo.webp" type="image/webp" />
+
+    <!-- Fonts: preconnect + non-blocking stylesheet load (avoids ~1s render-block) -->
     <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Fewer weights = smaller CSS/font payload; 400/500/600/700 cover body + UI -->
     <link
-      href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap"
       rel="stylesheet"
+      href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&display=swap"
+      media="print"
+      onload="this.media='all'"
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    </noscript>
+
     <title>French Drain &amp; Sump Pump Installation | Central Florida | FloGuard</title>
     <!-- Organization schema is emitted once per page from React (Seo organizationLd in @graph).
          Do not duplicate LocalBusiness here — duplicate @id confuses parsers. -->
@@ -64,6 +87,18 @@
         <p>Enable JavaScript for the full interactive site experience.</p>
       </div>
     </noscript>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Static LCP shell: paints before React hydrates; replaced on mount -->
+      <img
+        src="/images/hero-poster.webp"
+        alt=""
+        width="1600"
+        height="900"
+        fetchpriority="high"
+        decoding="async"
+        style="position:fixed;inset:0;width:100%;height:100%;object-fit:cover;background:#0B0F1A"
+        aria-hidden="true"
+      />
+    </div>
   </body>
 </html>

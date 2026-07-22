@@ -1,21 +1,12 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
 import { ArrowUpRight, Phone, ArrowDown } from "lucide-react";
-import { Reveal } from "../components/Reveal";
-import { StatsBar } from "../components/StatsBar";
-import { Marquee } from "../components/Marquee";
-import { ServicesGrid } from "../components/ServicesGrid";
-import { ProcessTimeline } from "../components/ProcessTimeline";
-import { FlowPath } from "../components/FlowPath";
-import { Testimonials } from "../components/Testimonials";
-import { GoogleReviews } from "../components/GoogleReviews";
-import { FinalCTA } from "../components/FinalCTA";
-import { LeadForm } from "../components/LeadForm";
-import { COMPANY, IMAGES, SERVICE_AREAS } from "../data/site";
-import { wordContainer, wordChild, fadeUp, EASE } from "../lib/animations";
+import { COMPANY, IMAGES } from "../data/site";
 import { Seo, organizationLd, faqPageLd } from "../components/Seo";
 import { LANDING_FAQ } from "../data/site";
+
+// Below-fold content (framer-motion, forms, testimonials) loads after hero paints
+const HomeBelowFold = lazy(() => import("./HomeBelowFold"));
 
 const headline = ["Protected", "flow.", "Engineered", "trust."];
 
@@ -49,7 +40,7 @@ export default function Home() {
   useEffect(() => {
     const range = 1.35; // scroll distance in viewport heights for full scrub control
     let ticking = false;
-    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
 
     const update = () => {
       const p = Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * range)));
@@ -72,11 +63,11 @@ export default function Home() {
       }
     };
     update();
-    window.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
     return () => {
-      window.removeEventListener('scroll', update);
-      window.removeEventListener('resize', update);
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
     };
   }, [videoDuration]);
 
@@ -100,7 +91,7 @@ export default function Home() {
   const onHeroPointerMove = (e) => {
     if (dragActiveRef.current) {
       const dx = e.clientX - dragStartClientXRef.current;
-      const sensitivity = e.pointerType === 'touch' ? 0.003 : 0.002;
+      const sensitivity = e.pointerType === "touch" ? 0.003 : 0.002;
       let np = dragStartPRef.current + dx * sensitivity;
       np = Math.max(0, Math.min(1, np));
       heroProgressRef.current = np;
@@ -117,7 +108,11 @@ export default function Home() {
   const onHeroPointerUp = (e) => {
     if (dragActiveRef.current) {
       dragActiveRef.current = false;
-      try { e.currentTarget.releasePointerCapture(e.pointerId); } catch (err) {}
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch (err) {
+        /* ignore */
+      }
       // resume beautiful cinematic loop after drag
       if (videoRef.current) {
         videoRef.current.play().catch(() => {});
@@ -126,6 +121,7 @@ export default function Home() {
   };
 
   // Kick off the autoplay cinematic loop (browsers require muted for autoplay)
+  // DO NOT replace hero.mp4 — locked marketing asset.
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
@@ -149,15 +145,15 @@ export default function Home() {
         title="French Drain & Sump Pump Installation | Central Florida | FloGuard"
         description="Stop flooded yards and foundation moisture in Central Florida. FloGuard installs custom French drains and sump pumps. Free assessments in Daytona, Port Orange, Orlando."
         path="/"
-        image="/images/hero-poster.jpg"
+        image={IMAGES.heroPosterJpg}
         jsonLd={{
           "@context": "https://schema.org",
           "@graph": [organizationLd, faqPageLd(LANDING_FAQ.slice(0, 5))].filter(Boolean),
         }}
       />
-      {/* ===== CINEMATIC HERO (video) ===== */}
-      <section 
-        data-testid="home-hero" 
+      {/* ===== CINEMATIC HERO (video) — CSS motion only, no framer-motion on LCP path ===== */}
+      <section
+        data-testid="home-hero"
         className="relative h-[100svh] h-[100dvh] min-h-[520px] sm:min-h-[640px] w-full max-w-[100vw] overflow-hidden"
         onPointerDown={onHeroPointerDown}
         onPointerMove={onHeroPointerMove}
@@ -165,12 +161,22 @@ export default function Home() {
         onPointerLeave={onHeroPointerUp}
         onPointerCancel={onHeroPointerUp}
       >
-        {/* High-quality cinematic hero video. Autoplay + loop + scroll/drag scrub. DO NOT replace hero.mp4. */}
+        {/* LCP image: explicit img + preload in index.html. Video paints on top once ready. */}
+        <img
+          src={IMAGES.heroPoster}
+          alt=""
+          width={1600}
+          height={900}
+          fetchPriority="high"
+          decoding="async"
+          className="hero-media absolute inset-0 z-[1] object-cover"
+          aria-hidden="true"
+        />
         <video
           ref={videoRef}
           src="/hero.mp4"
-          poster="/images/hero-poster.jpg"
-          className="absolute inset-0 z-[2] w-full h-full object-cover"
+          poster={IMAGES.heroPoster}
+          className="hero-media absolute inset-0 z-[2] object-cover"
           autoPlay
           muted
           loop
@@ -180,7 +186,6 @@ export default function Home() {
             const v = e.currentTarget;
             const d = v.duration;
             if (d && d > 0) setVideoDuration(d);
-            // initial sync to current scroll progress (e.g. if reloaded mid-page)
             const p = heroProgressRef.current || 0;
             v.currentTime = p * d;
           }}
@@ -199,55 +204,40 @@ export default function Home() {
           }}
         />
 
-        {/* readability scrim — darken the lower half so the headline + CTA read cleanly */}
         <div className="pointer-events-none absolute inset-0 z-[3] bg-gradient-to-t from-[#0B0F1A] via-[#0B0F1A]/75 via-35% to-transparent" />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-24 z-[3] bg-gradient-to-b from-[#0B0F1A]/40 to-transparent" />
 
         <div className="pointer-events-none relative z-10 h-full container-fg flex flex-col justify-end pb-12 pt-24 sm:pb-20 sm:pt-28 min-w-0">
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: EASE, delay: 0.3 }}
-            className="overline mb-4 sm:mb-6"
-          >
+          <p className="overline mb-4 sm:mb-6 fg-hero-fade" style={{ animationDelay: "0.15s" }}>
             Flood Solutions &amp; Management · Central Florida
-          </motion.p>
+          </p>
 
-          <motion.h1
-            variants={wordContainer}
-            initial="hidden"
-            animate="visible"
-            className="font-display text-white text-[2.5rem] sm:text-7xl lg:text-8xl leading-[0.92] tracking-[-1px] sm:tracking-[-1.5px] max-w-4xl break-words"
-          >
-            {/* Real spaces in the DOM so crawlers read "Protected flow. Engineered trust." not run-together text */}
+          <h1 className="font-display text-white text-[2.5rem] sm:text-7xl lg:text-8xl leading-[0.92] tracking-[-1px] sm:tracking-[-1.5px] max-w-4xl break-words">
             {headline.map((w, i) => (
               <span key={i}>
                 {i > 0 ? " " : null}
                 <span className="inline-block overflow-hidden align-bottom">
-                  <motion.span variants={wordChild} className={`inline-block ${i % 2 ? "text-brand-orange" : ""}`}>
+                  <span
+                    className={`inline-block fg-hero-word ${i % 2 ? "text-brand-orange" : ""}`}
+                    style={{ animationDelay: `${0.25 + i * 0.08}s` }}
+                  >
                     {w}
-                  </motion.span>
+                  </span>
                 </span>
               </span>
             ))}
-          </motion.h1>
+          </h1>
 
-          <motion.p
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.9 }}
-            className="mt-5 sm:mt-8 text-base sm:text-xl text-white/70 max-w-[42ch] leading-snug sm:leading-tight"
+          <p
+            className="mt-5 sm:mt-8 text-base sm:text-xl text-white/70 max-w-[42ch] leading-snug sm:leading-tight fg-hero-fade"
+            style={{ animationDelay: "0.7s" }}
           >
             We engineer the precise path water must take to leave your property forever.
-          </motion.p>
+          </p>
 
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 1.05 }}
-            className="pointer-events-auto mt-7 sm:mt-10 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 sm:gap-4"
+          <div
+            className="pointer-events-auto mt-7 sm:mt-10 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 sm:gap-4 fg-hero-fade"
+            style={{ animationDelay: "0.85s" }}
           >
             <Link
               to="/contact"
@@ -264,167 +254,32 @@ export default function Home() {
             >
               <Phone size={16} /> {COMPANY.phone}
             </a>
-          </motion.div>
+          </div>
 
-          {/* Scroll/drag-synced journey indicator — explicit premium narrative control */}
           <div className="mt-4 sm:mt-5 flex items-center gap-2 sm:gap-3 text-[9px] sm:text-[10px] uppercase tracking-[2px] text-white/35">
             <div className="flex-1 h-px bg-white/15 overflow-hidden rounded">
-              <div 
-                className="h-px bg-brand-orange transition-[width] duration-100" 
-                style={{ width: `${heroProgress * 100}%` }} 
+              <div
+                className="h-px bg-brand-orange transition-[width] duration-100"
+                style={{ width: `${heroProgress * 100}%` }}
               />
             </div>
             FOLLOW THE WATER
             <span className="ml-1 text-brand-orange/70 tabular-nums">{getJourneyLabel(heroProgress)}</span>
-            <span className="ml-auto text-white/30">{isTouchDevice ? 'swipe' : 'drag'}</span>
+            <span className="ml-auto text-white/30">{isTouchDevice ? "swipe" : "drag"}</span>
           </div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.6 }}
-          className="absolute bottom-6 right-6 sm:bottom-8 sm:right-8 md:right-14 z-10 flex items-center gap-2 text-white/40 text-[9px] sm:text-[10px] font-medium uppercase tracking-[2px]"
+        <div
+          className="absolute bottom-6 right-6 sm:bottom-8 sm:right-8 md:right-14 z-10 flex items-center gap-2 text-white/40 text-[9px] sm:text-[10px] font-medium uppercase tracking-[2px] fg-hero-fade"
+          style={{ animationDelay: "1.2s" }}
         >
-          {isTouchDevice ? 'Swipe' : 'Scroll'} to explore <ArrowDown size={13} className="animate-bounce" />
-        </motion.div>
-      </section>
-
-      <StatsBar />
-
-      <Marquee />
-
-      {/* ===== PROBLEM / AGITATION (light) - elite editorial */}
-      <section data-testid="problem-section" className="section bg-background">
-        <div className="container-fg grid lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-5">
-            <Reveal>
-              <p className="overline mb-5">The Florida water problem</p>
-              <h2 className="font-display text-3xl sm:text-5xl md:text-6xl tracking-tight text-brand-navy leading-none break-words">
-                Standing water is quietly destroying your home.
-              </h2>
-              <p className="mt-6 text-[17px] text-brand-slate leading-tight">
-                Florida has a high water table (often only 2–6 feet below the surface), flat terrain, intense rainfall (2+ inches per hour), and sandy soils. Heavy storms push groundwater against foundations, drown lawns, and invade crawlspaces. A properly installed French drain + sump pump system actively lowers the water table and removes water before it can damage your home.
-              </p>
-              <ul className="mt-8 space-y-2.5 text-brand-slate">
-                {["Chronic standing water & flooded patios", "Damp crawlspaces and foundation moisture", "Soil erosion and dying landscaping"].map((x) => (
-                  <li key={x} className="flex items-center gap-3 text-[15px]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-brand-orange" /> {x}
-                  </li>
-                ))}
-              </ul>
-            </Reveal>
-          </div>
-          <div className="lg:col-span-7">
-            <motion.div
-              initial={{ opacity: 0, clipPath: "inset(0 0 100% 0)" }}
-              whileInView={{ opacity: 1, clipPath: "inset(0 0 0% 0)" }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 1, ease: EASE }}
-              className="relative rounded-sm overflow-hidden ring-1 ring-black/5"
-            >
-              <img src="/images/storm.jpg" alt="Central Florida home with standing water in yard during heavy rain" className="w-full h-[520px] object-cover" loading="lazy" />
-              <div className="absolute bottom-6 left-6 glass px-5 py-2.5 rounded-sm text-white text-sm tracking-wide">
-                When the next storm hits, will your home be ready?
-              </div>
-            </motion.div>
-          </div>
+          {isTouchDevice ? "Swipe" : "Scroll"} to explore <ArrowDown size={13} className="animate-bounce" />
         </div>
       </section>
 
-      {/* ===== HOW IT WORKS (light) ===== */}
-      <section data-testid="how-it-works" className="section bg-secondary">
-        <div className="container-fg">
-          <div className="max-w-3xl mb-14">
-            <Reveal>
-              <p className="overline mb-5">How our system works</p>
-              <h2 className="font-display text-4xl sm:text-5xl tracking-tight text-brand-navy leading-tight">
-                French drain → sump pump → safe discharge.
-              </h2>
-              <p className="mt-5 text-lg text-brand-slate">
-                A sump pump + French drain system actively lowers the water table. The French drain (perforated pipe in gravel with filter fabric) intercepts water. The sump pump pushes it far away. It protects against Florida's high water table, flat terrain and heavy rain.
-              </p>
-            </Reveal>
-          </div>
-
-          <FlowPath />
-
-          <Reveal delay={0.1} className="mt-14 rounded-sm overflow-hidden border border-border">
-            <img src="/images/diagram.jpg" alt="Technical diagram of FloGuard French drain and sump pump drainage system" className="w-full object-cover" loading="lazy" />
-          </Reveal>
-
-          <div className="mt-10">
-            <Link to="/process" data-testid="how-learn-more" className="inline-flex items-center gap-2 text-brand-navy font-bold link-underline">
-              See the full process <ArrowUpRight size={18} />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== SERVICES PREVIEW ===== */}
-      <section data-testid="services-preview" className="section bg-background">
-        <div className="container-fg">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
-            <Reveal>
-              <p className="overline mb-5">What we install</p>
-              <h2 className="font-display text-4xl sm:text-5xl tracking-tight text-brand-navy max-w-xl leading-tight">
-                Custom drainage, engineered for your yard.
-              </h2>
-            </Reveal>
-            <Link to="/services" className="inline-flex items-center gap-2 text-brand-navy font-bold link-underline shrink-0">
-              All services <ArrowUpRight size={18} />
-            </Link>
-          </div>
-          <ServicesGrid />
-        </div>
-      </section>
-
-      {/* ===== PROCESS TIMELINE (dark) ===== */}
-      <section data-testid="process-preview" className="section bg-brand-ink grain relative">
-        <div className="container-fg relative z-10">
-          <div className="max-w-2xl mb-16">
-            <Reveal>
-              <p className="overline mb-5">From flooded to dry</p>
-              <h2 className="font-display text-4xl sm:text-5xl tracking-tight text-white leading-tight">
-                Four steps to a permanently dry property.
-              </h2>
-            </Reveal>
-          </div>
-          <ProcessTimeline dark />
-        </div>
-      </section>
-
-      <Testimonials />
-
-      <GoogleReviews />
-
-      {/* ===== LEAD SECTION ===== */}
-      <section data-testid="home-lead" className="section bg-brand-ink grain relative">
-        <div className="container-fg relative z-10 grid lg:grid-cols-12 gap-12 items-start">
-          <div className="lg:col-span-5">
-            <Reveal>
-              <p className="overline mb-5">Free on-site evaluation</p>
-              <h2 className="font-display text-4xl sm:text-5xl tracking-tight text-white leading-tight">
-                Tell us about your water problem.
-              </h2>
-              <p className="mt-6 text-lg text-white/65 leading-relaxed">
-                Answer three quick questions and a FloGuard specialist will schedule a free assessment — no obligation,
-                just a clear plan to keep your home dry.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-2">
-                {SERVICE_AREAS.slice(0, 8).map((a) => (
-                  <span key={a} className="text-xs text-white/50 border border-white/15 px-3 py-1.5 rounded-full">{a}</span>
-                ))}
-              </div>
-            </Reveal>
-          </div>
-          <div className="lg:col-span-7">
-            <LeadForm />
-          </div>
-        </div>
-      </section>
-
-      <FinalCTA />
+      <Suspense fallback={<div className="min-h-[40vh]" aria-hidden="true" />}>
+        <HomeBelowFold />
+      </Suspense>
     </>
   );
 }

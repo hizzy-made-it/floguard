@@ -9,7 +9,15 @@ export const Footer = () => {
         <div className="grid gap-x-8 gap-y-10 sm:gap-y-12 lg:grid-cols-12 min-w-0">
           <div className="lg:col-span-5 min-w-0">
             <div className="flex items-center gap-3 sm:gap-4 mb-6 min-w-0">
-              <img src={IMAGES.logo} alt="FloGuard LLC" className="h-8 sm:h-9 w-auto object-contain shrink-0" />
+              <img
+                src={IMAGES.logo}
+                alt="FloGuard LLC"
+                width={36}
+                height={36}
+                loading="lazy"
+                decoding="async"
+                className="h-8 sm:h-9 w-auto object-contain shrink-0"
+              />
               <span className="font-display text-2xl sm:text-3xl tracking-tight">Flo<span className="text-brand-orange">Guard</span></span>
             </div>
             <p className="text-white/60 max-w-sm text-[15px] leading-relaxed">{COMPANY.tagline}</p>

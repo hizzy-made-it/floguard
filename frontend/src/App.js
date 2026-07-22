@@ -1,15 +1,13 @@
 import "./App.css";
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Layout } from "./components/Layout";
 import { Loader } from "./components/Loader";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Analytics } from "./components/Analytics";
-import { pageTransition } from "./lib/animations";
-// Home stays eager — primary LCP route
+// Home stays eager — primary LCP route (hero video + poster)
 import Home from "./pages/Home";
 
 const About = lazy(() => import("./pages/About"));
@@ -26,12 +24,6 @@ const Studio = lazy(() => import("./pages/Studio"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 
-const Page = ({ children }) => (
-  <motion.div variants={pageTransition} initial="initial" animate="animate" exit="exit">
-    {children}
-  </motion.div>
-);
-
 const RouteFallback = () => (
   <div className="min-h-[40vh] grid place-items-center text-brand-slate text-sm" aria-busy="true" role="status">
     Loading…
@@ -39,25 +31,22 @@ const RouteFallback = () => (
 );
 
 function MarketingRoutes() {
-  const location = useLocation();
   return (
     <ErrorBoundary>
       <Suspense fallback={<RouteFallback />}>
-        <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<Page><Home /></Page>} />
-            <Route path="/about" element={<Page><About /></Page>} />
-            <Route path="/services" element={<Page><Services /></Page>} />
-            <Route path="/services/:slug" element={<Page><ServiceDetail /></Page>} />
-            <Route path="/process" element={<Page><Process /></Page>} />
-            <Route path="/case-studies" element={<Page><CaseStudies /></Page>} />
-            <Route path="/blog" element={<Page><Blog /></Page>} />
-            <Route path="/blog/:slug" element={<Page><BlogPost /></Page>} />
-            <Route path="/areas" element={<Page><Areas /></Page>} />
-            <Route path="/areas/:slug" element={<Page><CityPage /></Page>} />
-            <Route path="/contact" element={<Page><Contact /></Page>} />
-          </Routes>
-        </AnimatePresence>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/services/:slug" element={<ServiceDetail />} />
+          <Route path="/process" element={<Process />} />
+          <Route path="/case-studies" element={<CaseStudies />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="/areas" element={<Areas />} />
+          <Route path="/areas/:slug" element={<CityPage />} />
+          <Route path="/contact" element={<Contact />} />
+        </Routes>
       </Suspense>
     </ErrorBoundary>
   );

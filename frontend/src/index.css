@@ -57,6 +57,12 @@
     max-width: 100%;
     height: auto;
   }
+  /* Full-bleed hero media must fill the frame; height:auto would collapse them */
+  .hero-media {
+    max-width: none;
+    width: 100%;
+    height: 100%;
+  }
   /* Prefer reduced motion: cut smooth scroll + long transitions */
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
@@ -137,6 +143,63 @@
 @keyframes fg-marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
+}
+
+/* Hero LCP path — CSS only (no framer-motion on first paint) */
+@keyframes fg-hero-fade {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fg-hero-word {
+  from { opacity: 0; transform: translateY(110%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fg-hero-fade {
+  opacity: 0;
+  animation: fg-hero-fade 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.fg-hero-word {
+  opacity: 0;
+  animation: fg-hero-word 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Intro loader curtain — CSS only */
+@keyframes fg-loader-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fg-loader-bar {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+@keyframes fg-loader-out {
+  to { transform: translateY(-100%); }
+}
+.fg-loader {
+  animation: fg-loader-out 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.42s forwards;
+}
+.fg-loader-brand {
+  animation: fg-loader-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.fg-loader-sub {
+  animation: fg-loader-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+}
+.fg-loader-bar {
+  width: 0%;
+  animation: fg-loader-bar 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fg-hero-fade,
+  .fg-hero-word,
+  .fg-loader,
+  .fg-loader-brand,
+  .fg-loader-sub,
+  .fg-loader-bar {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 /* Custom cursor (desktop pointer devices only) */

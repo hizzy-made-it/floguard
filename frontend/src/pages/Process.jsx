@@ -25,7 +25,7 @@ export default function Process() {
         title="How French Drains + Sump Pumps Work in Florida | FloGuard" 
         description="Step-by-step explanation of French drain and sump pump systems for high water tables, flat lots, and heavy Florida rain. Engineered protection for Central Florida homes." 
         path="/process" 
-        image="/images/case4-after.jpg"
+        image="/images/case4-after.webp"
         jsonLd={{
           "@context": "https://schema.org",
           "@graph": [
@@ -103,7 +103,7 @@ export default function Process() {
         overline="Technology & Process"
         title="How FloGuard keeps your home dry."
         subtitle="A clear, engineered path — from the first site walk to a system that quietly protects your home for years."
-        image="/images/case4-after.jpg"
+        image="/images/case4-after.webp"
         primary={{ label: "Start with an assessment", to: "/contact" }}
         secondary={{ label: "See our results", to: "/case-studies" }}
       />
@@ -234,7 +234,15 @@ export default function Process() {
           </div>
           <div className="lg:col-span-7">
             <Reveal className="rounded-sm overflow-hidden border border-border">
-              <img src="/images/diagram.jpg" alt="FloGuard drainage system diagram" className="w-full object-cover" loading="lazy" />
+              <img
+                src="/images/diagram.webp"
+                alt="FloGuard drainage system diagram"
+                width={960}
+                height={540}
+                className="w-full object-cover"
+                loading="lazy"
+                decoding="async"
+              />
             </Reveal>
           </div>
         </div>

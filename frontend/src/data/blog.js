@@ -16,7 +16,7 @@ export const POSTS = [
     date: "2026-07-06",
     readTime: 12,
     keyword: "french drain cost florida",
-    image: "/images/case-studies-hero.jpg",
+    image: "/images/case-studies-hero.webp",
     faqs: [
       { q: "How much does a French drain cost in Central Florida in 2026?", a: "Most professional French drain + sump systems for a single-family home cost about $4,500–$12,000. Simple perimeter work can start near $3,500; complex multi-sump systems can exceed $15,000." },
       { q: "Why can’t you quote over the phone?", a: "Florida lots vary by water table, slope, soil, and discharge path. A free on-site assessment produces an accurate engineered price." },
@@ -65,7 +65,7 @@ export const POSTS = [
     date: "2026-06-29",
     readTime: 6,
     keyword: "standing water in yard",
-    image: "/images/case3-before.jpg",
+    image: "/images/case3-before.webp",
         faqs: [
       { q: "Why is water standing in my Florida yard?", a: "Common causes include poor grading, high water table, compacted soil, downspouts dumping into low spots, and no collection system. Florida rain and flat lots make this very common." },
       { q: "How do I fix standing water after rain?", a: "Professional fixes usually combine French drains, catch basins or re-grading, and often a sump pump to discharge water safely away from the foundation." },
@@ -102,7 +102,7 @@ export const POSTS = [
     date: "2026-06-22",
     readTime: 10,
     keyword: "french drain vs sump pump",
-    image: "/images/case4-after.jpg",
+    image: "/images/case4-after.webp",
         faqs: [
       { q: "Do I need a French drain or a sump pump?", a: "In Central Florida you often need both: the French drain collects water; the sump lifts it when the lot is too flat or the water table is high." },
       { q: "Can a French drain work without a sump pump?", a: "Only if there is enough natural slope and a legal gravity discharge. Many Florida lots do not have that." },
@@ -149,7 +149,7 @@ export const POSTS = [
     date: "2026-06-15",
     readTime: 9,
     keyword: "foundation drainage problem",
-    image: "/images/case2-after.jpg",
+    image: "/images/case2-after.webp",
         faqs: [
       { q: "What are signs of a foundation drainage problem?", a: "Standing water near the foundation, damp crawlspaces, musty smells, soil erosion, cracks or moisture at the slab edge, and water after every storm." },
       { q: "Can drainage problems cause mold?", a: "Persistent moisture under or around the home supports mold growth in crawlspaces and wall cavities." },
@@ -186,7 +186,7 @@ export const POSTS = [
     date: "2026-06-08",
     readTime: 8,
     keyword: "florida rainy season yard prep",
-    image: "/images/blog-storm-alt.jpg",
+    image: "/images/blog-storm-alt.webp",
         faqs: [
       { q: "When is Florida rainy season?", a: "Typically late spring through early fall (roughly May–October), with intense afternoon storms and tropical systems." },
       { q: "How should I prepare my yard for rainy season?", a: "Clear gutters, test sump pumps monthly, clear discharge lines, and schedule professional drainage service before peak storms." },
@@ -223,7 +223,7 @@ export const POSTS = [
     date: "2026-06-01",
     readTime: 6,
     keyword: "wet crawl space waterproofing",
-    image: "/images/case2-before.jpg",
+    image: "/images/case2-before.webp",
         faqs: [
       { q: "How do you fix a wet crawlspace in Florida?", a: "Interior French drains to a sealed sump pump are common. We also address vapor and discharge so water leaves the home safely." },
       { q: "Is a wet crawlspace dangerous?", a: "It can promote mold, wood rot, pest issues, and poor indoor air quality. Address moisture promptly." },
@@ -257,7 +257,7 @@ export const POSTS = [
     date: "2026-05-25",
     readTime: 7,
     keyword: "catch basin yard grading",
-    image: "/images/case4-before.jpg",
+    image: "/images/case4-before.webp",
         faqs: [
       { q: "What is a catch basin used for?", a: "Catch basins collect surface water from low spots, driveways, and patios and route it into a drain pipe system." },
       { q: "Do catch basins replace French drains?", a: "No. Catch basins handle surface water; French drains intercept subsurface/groundwater. Many yards need both." },
@@ -300,7 +300,7 @@ export const POSTS = [
     date: "2026-05-18",
     readTime: 5,
     keyword: "french drain home value",
-    image: "/images/case3-after.jpg",
+    image: "/images/case3-after.webp",
         faqs: [
       { q: "Does a French drain add home value?", a: "It protects the foundation and improves usability of the yard — key factors buyers and inspectors care about, even if ROI is not a fixed percentage." },
       { q: "Do buyers notice drainage problems?", a: "Yes. Standing water, crawlspace moisture, and inspection flags can delay sales or lower offers." },

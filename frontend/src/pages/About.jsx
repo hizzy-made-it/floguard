@@ -33,7 +33,7 @@ export default function About() {
         overline="About FloGuard"
         title="A local team that takes flooding personally."
         subtitle="Family-run and Florida-based, we design drainage systems the way engineers do — for the specific water your property faces."
-        image="/images/case3-after.jpg"
+        image="/images/case3-after.webp"
         imageAlt="FloGuard team and completed drainage work for Central Florida homes"
         primary={{ label: "Meet us on-site", to: "/contact" }}
       />

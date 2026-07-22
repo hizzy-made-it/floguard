@@ -35,7 +35,7 @@ export default function Blog() {
         overline="FloGuard Journal"
         title="Drainage know-how for Florida homeowners."
         subtitle="Practical, no-jargon guides on French drains, sump pumps, flooding and protecting your home — written by the crew who installs them."
-        image="/images/case2-after.jpg"
+        image="/images/case2-after.webp"
         primary={{ label: "Get a free assessment", to: "/contact" }}
       />
 

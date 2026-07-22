@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
 
 // Magnetic dot + ring cursor for pointer devices. Disabled for touch / reduced motion.
 export const Cursor = () => {

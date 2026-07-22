@@ -108,6 +108,38 @@ let webpackConfig = {
         /Failed to parse source map/,
       ];
 
+      // Keep heavy motion / 3D libs in async chunks so the home LCP path stays lean
+      if (webpackConfig.optimization) {
+        webpackConfig.optimization.splitChunks = {
+          ...webpackConfig.optimization.splitChunks,
+          chunks: "all",
+          cacheGroups: {
+            ...(webpackConfig.optimization.splitChunks?.cacheGroups || {}),
+            framerMotion: {
+              test: /[\\/]node_modules[\\/](framer-motion|motion-dom|motion-utils)[\\/]/,
+              name: "framer-motion",
+              chunks: "async",
+              priority: 30,
+              reuseExistingChunk: true,
+            },
+            three: {
+              test: /[\\/]node_modules[\\/](three|@react-three)[\\/]/,
+              name: "three",
+              chunks: "async",
+              priority: 30,
+              reuseExistingChunk: true,
+            },
+            lenis: {
+              test: /[\\/]node_modules[\\/]lenis[\\/]/,
+              name: "lenis",
+              chunks: "async",
+              priority: 30,
+              reuseExistingChunk: true,
+            },
+          },
+        };
+      }
+
       // Add health check plugin to webpack if enabled
       if (config.enableHealthCheck && healthPluginInstance) {
         webpackConfig.plugins.push(healthPluginInstance);

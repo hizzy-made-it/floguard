@@ -1,37 +1,48 @@
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { useLocation } from "react-router-dom";
-import Lenis from "lenis";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import { ScrollProgress } from "./ScrollProgress";
 import { Cursor } from "./Cursor";
-import { ChatWidget } from "./chat/ChatWidget";
+
+// Chat is below the fold for interaction — keep out of initial JS
+const ChatWidget = lazy(() =>
+  import("./chat/ChatWidget").then((m) => ({ default: m.ChatWidget }))
+);
 
 export const Layout = ({ children }) => {
   const { pathname } = useLocation();
 
+  // Smooth scroll (Lenis) — dynamic import so it never lands in the critical bundle
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) return;
 
     const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-    // Native scroll on touch devices is faster and more reliable
     if (isTouch) return;
 
-    const lenis = new Lenis({
-      duration: 1.1,
-      smoothWheel: true,
-      lerp: 0.1,
-    });
+    let cancelled = false;
+    let lenis;
     let raf;
-    const loop = (t) => {
-      lenis.raf(t);
+
+    import("lenis").then(({ default: Lenis }) => {
+      if (cancelled) return;
+      lenis = new Lenis({
+        duration: 1.1,
+        smoothWheel: true,
+        lerp: 0.1,
+      });
+      const loop = (t) => {
+        lenis.raf(t);
+        raf = requestAnimationFrame(loop);
+      };
       raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
+    });
+
     return () => {
-      cancelAnimationFrame(raf);
-      lenis.destroy();
+      cancelled = true;
+      if (raf) cancelAnimationFrame(raf);
+      if (lenis) lenis.destroy();
     };
   }, []);
 
@@ -54,7 +65,9 @@ export const Layout = ({ children }) => {
         {children}
       </main>
       <Footer />
-      <ChatWidget />
+      <Suspense fallback={null}>
+        <ChatWidget />
+      </Suspense>
     </div>
   );
 };
