@@ -210,7 +210,8 @@ export default function Home() {
           "@graph": [organizationLd, faqPageLd(LANDING_FAQ.slice(0, 5))].filter(Boolean),
         }}
       />
-      {/* ===== CINEMATIC HERO (video) — poster LCP first; video deferred. DO NOT drop hero.mp4. ===== */}
+      {/* ===== CINEMATIC HERO (video) — poster LCP first; video deferred.
+          Asset: /hero-720.mp4 (web-optimized encode of the locked marketing journey). ===== */}
       <section
         data-testid="home-hero"
         className="relative h-[100svh] h-[100dvh] min-h-[520px] sm:min-h-[640px] w-full max-w-[100vw] overflow-hidden"
@@ -233,7 +234,7 @@ export default function Home() {
         {videoReady && (
           <video
             ref={videoRef}
-            src="/hero.mp4"
+            src="/hero-720.mp4"
             poster={IMAGES.heroPoster}
             className="hero-media absolute inset-0 z-[2] object-cover"
             autoPlay
