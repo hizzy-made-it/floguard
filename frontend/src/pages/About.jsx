@@ -54,7 +54,7 @@ export default function About() {
           <div className="max-w-4xl">
             <Reveal>
               <p className="overline mb-5">Our story</p>
-              <h2 className="font-display text-4xl sm:text-6xl tracking-tight text-brand-navy leading-none">
+              <h2 className="font-display text-3xl sm:text-5xl md:text-6xl tracking-tight text-brand-navy leading-none break-words">
                 We got tired of watching homeowners get sold systems that didn't work.
               </h2>
             </Reveal>

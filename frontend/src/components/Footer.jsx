@@ -5,12 +5,12 @@ import { COMPANY, NAV_LINKS, SERVICE_AREAS, IMAGES } from "../data/site";
 export const Footer = () => {
   return (
     <footer data-testid="site-footer" className="relative bg-brand-ink text-white grain overflow-hidden border-t border-white/10">
-      <div className="container-fg relative z-10 pt-20 pb-12">
-        <div className="grid gap-x-8 gap-y-12 lg:grid-cols-12">
-          <div className="lg:col-span-5">
-            <div className="flex items-center gap-4 mb-6">
-              <img src={IMAGES.logo} alt="FloGuard LLC" className="h-9 object-contain" />
-              <span className="font-display text-3xl tracking-tight">Flo<span className="text-brand-orange">Guard</span></span>
+      <div className="container-fg relative z-10 pt-16 sm:pt-20 pb-[max(3rem,env(safe-area-inset-bottom,0px))]">
+        <div className="grid gap-x-8 gap-y-10 sm:gap-y-12 lg:grid-cols-12 min-w-0">
+          <div className="lg:col-span-5 min-w-0">
+            <div className="flex items-center gap-3 sm:gap-4 mb-6 min-w-0">
+              <img src={IMAGES.logo} alt="FloGuard LLC" className="h-8 sm:h-9 w-auto object-contain shrink-0" />
+              <span className="font-display text-2xl sm:text-3xl tracking-tight">Flo<span className="text-brand-orange">Guard</span></span>
             </div>
             <p className="text-white/60 max-w-sm text-[15px] leading-relaxed">{COMPANY.tagline}</p>
             <div className="mt-8 text-sm text-white/40">

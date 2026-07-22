@@ -43,13 +43,29 @@ python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\act
 pip install -r requirements.txt
 psql "$DATABASE_URL" -f sql/001_parcel_risk.sql
 psql "$DATABASE_URL" -f sql/002_seed_fixtures.sql   # optional: synthetic map data
+# If PostGIS was already installed into public (Supabase linter WARNs):
+psql "$DATABASE_URL" -f sql/003_postgis_security_harden.sql
 ```
+
+Or from repo root: `npm run apply-fsi-sql` (runs 001 + 002 when `DATABASE_URL` is set).
 
 `floguard-crm/.env` currently has `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`
 but **no `DATABASE_URL`**. The read endpoint does not need one — it goes through
 PostgREST via `server/lib/supabase-rest.js`. Applying these migrations and
-running the rainfall cron both do. Either add `DATABASE_URL`, or paste the two
+running the rainfall cron both do. Either add `DATABASE_URL`, or paste the SQL
 files into the Supabase dashboard SQL editor.
+
+### Supabase linter (PostGIS)
+
+`001` installs PostGIS into schema **`extensions`**, not `public`, so new projects
+avoid `extension_in_public` and keep geometry RPC off the default API surface.
+
+If you already ran an older `create extension postgis` (public schema), the
+database linter will warn about `st_estimatedextent` being callable by `anon` /
+`authenticated`. Paste **`sql/003_postgis_security_harden.sql`** into the SQL
+Editor — it revokes those executes. Moving the extension out of `public` after
+tables already use `public.geometry` is optional and destructive; revoke is enough
+for the security WARNs.
 
 **GDAL will probably fail on `pip install` on Windows** — the wheel must match a
 system libgdal that is not present. Use conda and drop the pin:

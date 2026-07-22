@@ -116,7 +116,7 @@ export default function Process() {
           <div className="max-w-3xl mb-14">
             <Reveal>
               <p className="overline mb-5">The water's journey</p>
-              <h2 className="font-display text-4xl sm:text-6xl tracking-tight text-brand-navy leading-none">
+              <h2 className="font-display text-3xl sm:text-5xl md:text-6xl tracking-tight text-brand-navy leading-none break-words">
                 Every drop follows one engineered path.
               </h2>
             </Reveal>

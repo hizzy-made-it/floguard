@@ -6,3 +6,7 @@ LeadAgent/.venv/
 LeadAgent/data/
 __pycache__/
 *.pyc
+.claude-flow/
+.claude/
+
+.vercel

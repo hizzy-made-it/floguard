@@ -158,7 +158,7 @@ export default function Home() {
       {/* ===== CINEMATIC HERO (video) ===== */}
       <section 
         data-testid="home-hero" 
-        className="relative h-[100svh] min-h-[640px] w-full overflow-hidden"
+        className="relative h-[100svh] h-[100dvh] min-h-[520px] sm:min-h-[640px] w-full max-w-[100vw] overflow-hidden"
         onPointerDown={onHeroPointerDown}
         onPointerMove={onHeroPointerMove}
         onPointerUp={onHeroPointerUp}
@@ -203,12 +203,12 @@ export default function Home() {
         <div className="pointer-events-none absolute inset-0 z-[3] bg-gradient-to-t from-[#0B0F1A] via-[#0B0F1A]/75 via-35% to-transparent" />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-24 z-[3] bg-gradient-to-b from-[#0B0F1A]/40 to-transparent" />
 
-        <div className="pointer-events-none relative z-10 h-full container-fg flex flex-col justify-end pb-16 pt-24 sm:pb-20 sm:pt-28">
+        <div className="pointer-events-none relative z-10 h-full container-fg flex flex-col justify-end pb-12 pt-24 sm:pb-20 sm:pt-28 min-w-0">
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: EASE, delay: 0.3 }}
-            className="overline mb-6"
+            className="overline mb-4 sm:mb-6"
           >
             Flood Solutions &amp; Management · Central Florida
           </motion.p>
@@ -217,7 +217,7 @@ export default function Home() {
             variants={wordContainer}
             initial="hidden"
             animate="visible"
-            className="font-display text-white text-6xl sm:text-7xl lg:text-8xl leading-[0.9] tracking-[-1.5px] max-w-4xl"
+            className="font-display text-white text-[2.5rem] sm:text-7xl lg:text-8xl leading-[0.92] tracking-[-1px] sm:tracking-[-1.5px] max-w-4xl break-words"
           >
             {headline.map((w, i) => (
               <span key={i} className="inline-block overflow-hidden mr-[0.2em] align-bottom">
@@ -233,7 +233,7 @@ export default function Home() {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.9 }}
-            className="mt-8 text-[17px] sm:text-xl text-white/70 max-w-[42ch] leading-tight"
+            className="mt-5 sm:mt-8 text-base sm:text-xl text-white/70 max-w-[42ch] leading-snug sm:leading-tight"
           >
             We engineer the precise path water must take to leave your property forever.
           </motion.p>
@@ -243,12 +243,12 @@ export default function Home() {
             initial="hidden"
             animate="visible"
             transition={{ delay: 1.05 }}
-            className="pointer-events-auto mt-10 flex flex-wrap items-center gap-4"
+            className="pointer-events-auto mt-7 sm:mt-10 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 sm:gap-4"
           >
             <Link
               to="/contact"
               data-testid="hero-cta-primary"
-              className="group inline-flex items-center gap-2 bg-brand-orange text-white px-9 py-[17px] text-sm font-bold uppercase tracking-[0.5px] rounded-sm hover:bg-brand-orangeDark active:scale-[0.985] transition-all"
+              className="group inline-flex items-center justify-center gap-2 bg-brand-orange text-white px-6 sm:px-9 py-3.5 sm:py-[17px] text-sm font-bold uppercase tracking-[0.5px] rounded-sm hover:bg-brand-orangeDark active:scale-[0.985] transition-all min-h-[48px]"
             >
               Request free assessment
               <ArrowUpRight size={18} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -256,7 +256,7 @@ export default function Home() {
             <a
               href={COMPANY.phoneHref}
               data-testid="hero-cta-phone"
-              className="inline-flex items-center gap-2 border border-white/25 text-white px-8 py-[17px] text-sm font-bold uppercase tracking-[0.5px] rounded-sm hover:bg-white/10 transition-colors"
+              className="inline-flex items-center justify-center gap-2 border border-white/25 text-white px-6 sm:px-8 py-3.5 sm:py-[17px] text-sm font-bold uppercase tracking-[0.5px] rounded-sm hover:bg-white/10 transition-colors min-h-[48px]"
             >
               <Phone size={16} /> {COMPANY.phone}
             </a>
@@ -296,7 +296,7 @@ export default function Home() {
           <div className="lg:col-span-5">
             <Reveal>
               <p className="overline mb-5">The Florida water problem</p>
-              <h2 className="font-display text-4xl sm:text-6xl tracking-tight text-brand-navy leading-none">
+              <h2 className="font-display text-3xl sm:text-5xl md:text-6xl tracking-tight text-brand-navy leading-none break-words">
                 Standing water is quietly destroying your home.
               </h2>
               <p className="mt-6 text-[17px] text-brand-slate leading-tight">

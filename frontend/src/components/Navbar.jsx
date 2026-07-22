@@ -36,10 +36,10 @@ export const Navbar = () => {
         scrolled ? "glass border-b border-white/10" : "bg-transparent"
       }`}
     >
-      <nav className="container-fg flex items-center justify-between h-20">
-        <Link to="/" data-testid="nav-logo" className="flex items-center gap-3 group">
-          <img src={IMAGES.logo} alt="FloGuard LLC" className="h-8 object-contain" />
-          <span className="font-display text-xl tracking-tight text-white leading-none">
+      <nav className="container-fg flex items-center justify-between h-16 sm:h-20 min-w-0 gap-2">
+        <Link to="/" data-testid="nav-logo" className="flex items-center gap-2 sm:gap-3 group min-w-0 shrink">
+          <img src={IMAGES.logo} alt="FloGuard LLC" className="h-7 sm:h-8 w-auto object-contain shrink-0" />
+          <span className="font-display text-lg sm:text-xl tracking-tight text-white leading-none truncate">
             Flo<span className="text-brand-orange">Guard</span>
           </span>
         </Link>

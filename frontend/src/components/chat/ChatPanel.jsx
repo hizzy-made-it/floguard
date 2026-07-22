@@ -146,7 +146,7 @@ export function ChatPanel({ onClose, open, titleId = "fg-chat-title" }) {
       aria-modal="true"
       aria-labelledby={titleId}
       data-testid="chat-panel"
-      className="flex flex-col w-[min(100vw-1.5rem,380px)] h-[min(70vh,520px)] bg-brand-surface border border-white/15 shadow-2xl rounded-sm overflow-hidden"
+      className="flex flex-col w-[min(calc(100vw-1.5rem-env(safe-area-inset-left,0px)-env(safe-area-inset-right,0px)),380px)] h-[min(70dvh,520px)] max-h-[calc(100dvh-6rem-env(safe-area-inset-bottom,0px))] bg-brand-surface border border-white/15 shadow-2xl rounded-sm overflow-hidden"
     >
       {/* header */}
       <div className="flex items-center gap-3 px-4 py-3 bg-brand-ink text-white border-b border-white/10">

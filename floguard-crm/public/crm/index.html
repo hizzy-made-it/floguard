@@ -2,24 +2,31 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>FLOGUARD SALES REV</title>
 <style>
-:root{--ink:#1a1d21;--muted:#5b636b;--accent:#F57C1F;--accent2:#1E88C7;--line:#e2e6ea;--band:#0B0F1A;--bg:#f6f8fa;}
+:root{--ink:#1a1d21;--muted:#5b636b;--accent:#F57C1F;--accent2:#1E88C7;--line:#e2e6ea;--band:#0B0F1A;--bg:#f6f8fa;--pad-x:22px;--safe-b:env(safe-area-inset-bottom,0px);--safe-t:env(safe-area-inset-top,0px);--safe-l:env(safe-area-inset-left,0px);--safe-r:env(safe-area-inset-right,0px);}
 *{box-sizing:border-box}
-body{font-family:'Segoe UI',Helvetica,Arial,sans-serif;color:var(--ink);margin:0;background:var(--bg);font-size:14px;}
-.band{background:var(--band);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
-.band .l{display:flex;align-items:center;gap:14px;}
-.band img{height:52px;border-radius:5px;display:block;}
-.band .ttl{color:#fff;line-height:1.2;}
-.band .ttl b{font-size:17px;color:#f2a24e;letter-spacing:.5px;display:block;}
-.band .ttl span{font-size:11px;color:#b9c1c9;}
-.nav{display:flex;gap:4px;flex-wrap:wrap;}
+html{width:100%;max-width:100%;overflow-x:clip;-webkit-text-size-adjust:100%;}
+body{font-family:'Segoe UI',Helvetica,Arial,sans-serif;color:var(--ink);margin:0;background:var(--bg);font-size:14px;min-height:100dvh;min-height:100vh;width:100%;max-width:100%;overflow-x:clip;}
+#appRoot{width:100%;max-width:100%;min-width:0;overflow-x:clip;}
+img,video,canvas,svg{max-width:100%;height:auto;}
+.band{background:var(--band);padding:max(10px,var(--safe-t)) max(16px,var(--safe-r)) 12px max(16px,var(--safe-l));display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;position:relative;z-index:50;width:100%;max-width:100%;}
+.band .l{display:flex;align-items:center;gap:12px;min-width:0;flex:1 1 auto;}
+.band img{height:52px;width:auto;border-radius:5px;display:block;flex-shrink:0;}
+.band .ttl{color:#fff;line-height:1.2;min-width:0;overflow:hidden;}
+.band .ttl b{font-size:17px;color:#f2a24e;letter-spacing:.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.band .ttl span{font-size:11px;color:#b9c1c9;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.band-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;min-width:0;max-width:100%;}
+.band-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0;}
+.nav-toggle{display:none;align-items:center;justify-content:center;width:42px;height:42px;padding:0;border:1px solid #3a4450;border-radius:8px;background:#232a33;color:#fff;cursor:pointer;font-size:20px;line-height:1;flex-shrink:0;}
+.nav-toggle:hover,.nav-toggle[aria-expanded="true"]{background:var(--accent);border-color:var(--accent);}
+.nav{display:flex;gap:4px;flex-wrap:wrap;min-width:0;}
 .nav button{padding:9px 15px;border:0;border-radius:8px;background:transparent;color:#c8cfd6;cursor:pointer;font-weight:700;font-size:13px;}
 .nav button.on{background:var(--accent);color:#fff;}
 .nav button:hover:not(.on){background:#232a33;}
 .rule{height:4px;background:linear-gradient(90deg,var(--accent) 0%,var(--accent) 55%,var(--accent2) 100%);}
-.wrap{max-width:1280px;margin:0 auto;padding:16px 22px 60px;}
+.wrap{width:100%;max-width:1280px;margin:0 auto;padding:16px max(16px,var(--safe-r)) calc(48px + var(--safe-b)) max(16px,var(--safe-l));min-width:0;}
 h1{font-size:19px;margin:6px 0 2px;}
 h2{font-size:15px;margin:16px 0 6px;color:var(--accent);}
 .sub{color:var(--muted);font-size:12.5px;margin:0 0 14px;}
@@ -85,7 +92,7 @@ td.name input{font-weight:600;}
 
 .drawer-bg{position:fixed;inset:0;background:rgba(15,23,30,.45);z-index:80;display:none;align-items:stretch;justify-content:flex-end;}
 .drawer-bg.open{display:flex;}
-.drawer{width:min(460px,100%);background:#fff;box-shadow:-8px 0 32px rgba(0,0,0,.18);overflow:auto;padding:18px 18px 40px;animation:slideIn .18s ease;}
+.drawer{width:min(460px,100%);max-width:100%;background:#fff;box-shadow:-8px 0 32px rgba(0,0,0,.18);overflow:auto;padding:18px max(14px,var(--safe-r)) calc(40px + var(--safe-b)) max(14px,var(--safe-l));animation:slideIn .18s ease;min-width:0;}
 @keyframes slideIn{from{transform:translateX(24px);opacity:.6}to{transform:none;opacity:1}}
 .drawer h2{margin:0 0 4px;font-size:1.25rem;}
 .drawer .meta{color:var(--muted);font-size:13px;margin-bottom:12px;}
@@ -150,7 +157,7 @@ a.maplink{color:var(--accent2);text-decoration:none;font-weight:600;}
 .docs-cats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
 .docs-cats button{font-size:12px;padding:6px 12px;border:1px solid #cdd4da;background:#fff;border-radius:20px;cursor:pointer;font-weight:600;color:var(--muted);}
 .docs-cats button.on{background:var(--accent2);color:#fff;border-color:var(--accent2);}
-.docs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+.docs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));gap:12px;}
 .doc-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px;min-height:140px;}
 .doc-card:hover{border-color:#bfe3dc;box-shadow:0 4px 14px rgba(15,23,30,.06);}
 .doc-card .cat{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;font-weight:700;color:var(--accent2);}
@@ -219,9 +226,9 @@ a.maplink{color:var(--accent2);text-decoration:none;font-weight:600;}
 .fsi-source{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:#eef2f5;color:#334;}
 .fsi-source.live{background:#eef7f5;color:#0d7d6f;border:1px solid #bfe3dc;}
 .fsi-source.demo{background:#fff6ec;color:#a2540f;border:1px solid #f0d0a8;}
-.fsi-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,1fr);gap:12px;align-items:stretch;margin-bottom:8px;}
-.fsi-mapcol,.fsi-sidecol{display:flex;flex-direction:column;gap:8px;min-height:0;}
-.fsimap{height:min(62vh,560px);min-height:320px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#e8edf1;position:relative;}
+.fsi-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:12px;align-items:stretch;margin-bottom:8px;width:100%;min-width:0;}
+.fsi-mapcol,.fsi-sidecol{display:flex;flex-direction:column;gap:8px;min-height:0;min-width:0;width:100%;}
+.fsimap{height:min(62vh,560px);min-height:280px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#e8edf1;position:relative;width:100%;max-width:100%;}
 .fsi-banner{font-size:12px;padding:8px 12px;border-radius:8px;background:#fff6ec;border:1px solid #f0d0a8;color:#8a5a2b;display:none;}
 .fsi-banner.on{display:block;}
 .fsimap-legend{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:11.5px;color:var(--muted);}
@@ -232,8 +239,8 @@ a.maplink{color:var(--accent2);text-decoration:none;font-weight:600;}
 .fsi-side-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;}
 .fsi-side-head h2{margin:0;font-size:14px;color:var(--accent);}
 .fsi-list-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
-.fsi-list-tools input[type=search]{min-width:140px;flex:1;padding:7px 9px;border:1px solid #cdd4da;border-radius:7px;}
-.fsi-list-tools select{padding:7px 9px;border:1px solid #cdd4da;border-radius:7px;font-size:12.5px;background:#fff;max-width:160px;}
+.fsi-list-tools input[type=search]{min-width:0;flex:1 1 140px;width:100%;padding:7px 9px;border:1px solid #cdd4da;border-radius:7px;}
+.fsi-list-tools select{padding:7px 9px;border:1px solid #cdd4da;border-radius:7px;font-size:12.5px;background:#fff;max-width:100%;flex:1 1 120px;}
 .fsi-bulk{display:none;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 10px;background:#f6f8fa;border:1px solid var(--line);border-radius:8px;font-size:12px;}
 .fsi-bulk.on{display:flex;}
 .fsi-bulk b{font-variant-numeric:tabular-nums;}
@@ -280,18 +287,135 @@ a.maplink{color:var(--accent2);text-decoration:none;font-weight:600;}
 .fsi-msg.ok{color:#0d7d6f;font-weight:600;}
 .fsi-msg.err{color:#b42318;font-weight:600;}
 .fsi-disclaimer{font-size:10.5px;color:var(--muted);margin:8px 0 0;line-height:1.35;}
+.fsi-suggest{margin:0 0 10px;padding:10px;background:#f6f8fa;border:1px solid var(--line);border-radius:8px;}
+.fsi-suggest h4{margin:0 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);}
+.fsi-suggest .hint{margin:6px 0 0;font-size:10.5px;}
+.suggest-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;border:1px dashed #b7d4ef;background:#eaf3fb;color:#0b63b8;margin:2px 4px 2px 0;cursor:default;line-height:1.25;}
+.suggest-chip b{font-weight:800;}
+.suggest-chip .why{font-weight:600;opacity:.85;font-size:10px;}
+.suggest-chip.str-high{border-style:solid;background:#fff6ec;border-color:var(--accent);color:#a2540f;}
+.suggest-chip.str-med{background:#eef7f5;border-color:#bfe3dc;color:#0d7d6f;border-style:solid;}
+.mgmt-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;}
+.mgmt-new{display:none;margin-top:8px;padding:10px;background:#f6f8fa;border:1px solid var(--line);border-radius:8px;}
+.mgmt-new.on{display:block;}
+.mnt-due{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;background:#fff6ec;border:1px solid #f0d0a8;color:#a2540f;white-space:nowrap;}
+.mnt-due.overdue{background:#fef3f2;border-color:#fecdca;color:#b42318;}
+.mnt-due.ok{background:#eef7f5;border-color:#bfe3dc;color:#0d7d6f;}
+.due-filter{display:none;align-items:center;gap:6px;font-size:12.5px;padding:6px 10px;background:#fff6ec;border:1px solid #f0d0a8;border-radius:8px;color:#8a5a2b;font-weight:600;}
+.due-filter.on{display:inline-flex;}
+.due-filter input{accent-color:var(--accent);}
 .fsipop{font-family:'Segoe UI',Helvetica,Arial,sans-serif;font-size:12.5px;color:var(--ink);min-width:200px;}
 .fsipop h4{margin:0 0 3px;font-size:13px;}
 .fsipop .addr{color:var(--muted);font-size:11.5px;margin:0 0 8px;}
 .fsipop .btn{margin-top:6px;}
 .maplibregl-popup-content{padding:12px 14px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);}
+
+/* ---- Responsive: phone / small tablet portrait ---- */
 @media (max-width:900px){
- .fsi-layout{grid-template-columns:1fr;}
- .fsimap{height:280px;min-height:240px;}
- .fsi-list{max-height:280px;}
+ .band{padding:max(8px,var(--safe-t)) max(12px,var(--safe-r)) 10px max(12px,var(--safe-l));gap:8px;align-items:center;}
+ .band .l{flex:1 1 auto;min-width:0;}
+ .band img{height:36px;}
+ .band .ttl b{font-size:13px;letter-spacing:0;}
+ .band .ttl span{display:none;}
+ .band-right{flex:0 0 auto;width:auto;max-width:100%;justify-content:flex-end;gap:6px;}
+ .band-meta{gap:4px;}
+ .band-meta .tokenpill{font-size:10px;padding:3px 7px;}
+ .band-meta .userpill{font-size:11px;}
+ .band-meta .userpill span{display:none;}
+ .band-meta #logoutBtn{padding:6px 8px;font-size:11px;}
+ .nav-toggle{display:inline-flex;}
+ .nav{
+  display:none;position:absolute;left:0;right:0;top:100%;
+  width:100%;flex-direction:column;gap:2px;padding:8px max(8px,var(--safe-r)) calc(8px + var(--safe-b)) max(8px,var(--safe-l));
+  background:#12161c;border-bottom:1px solid #2a3340;box-shadow:0 12px 28px rgba(0,0,0,.35);
+  max-height:min(70dvh,480px);overflow:auto;z-index:60;-webkit-overflow-scrolling:touch;
+ }
+ .nav.open{display:flex;}
+ .nav button{width:100%;text-align:left;padding:12px 14px;border-radius:8px;font-size:14px;min-height:44px;}
+ .wrap{padding:12px max(12px,var(--safe-r)) calc(40px + var(--safe-b)) max(12px,var(--safe-l));width:100%;max-width:100%;}
+ .controls,.fsi-toolbar,.docs-toolbar{padding:10px;gap:8px;width:100%;max-width:100%;}
+ .controls .field,.fsi-toolbar .field{flex:1 1 140px;min-width:0;}
+ .controls .actions{width:100%;}
+ .controls .actions .btn{flex:1 1 auto;}
+ .tabs{flex-wrap:wrap;overflow:visible;width:100%;}
+ .tabs button{padding:8px 10px;font-size:11.5px;flex:1 1 auto;min-height:40px;}
+ table{min-width:640px;}
+ .tablewrap{-webkit-overflow-scrolling:touch;width:100%;max-width:100%;}
+ .fsi-layout{grid-template-columns:1fr;width:100%;}
+ .fsimap{height:min(40dvh,300px);min-height:200px;max-height:340px;}
+ .fsi-list{max-height:min(34dvh,260px);}
+ .fsi-drawer{width:100%;max-width:100%;}
+ .fsi-drawer .meter-row{grid-template-columns:72px 1fr 36px;gap:6px;}
+ .fsi-bulk{width:100%;}
+ .fsi-bulk .btn{flex:1 1 auto;}
+ .drawer{width:100%;max-width:100%;}
+ .drawer .sec > div[style*="grid-template-columns"]{grid-template-columns:1fr !important;}
+ .mgmt-row{grid-template-columns:1fr;align-items:stretch;}
+ .admin-grid{grid-template-columns:1fr 1fr;}
+ .kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+ .chatgrid{grid-template-columns:1fr;}
+ .maps .body{grid-template-columns:1fr;}
+ .chatbox{height:min(70dvh,520px);width:100%;}
+ .docs-grid{grid-template-columns:1fr;}
+ .card,.panel,.fsi-sidecol,.fsi-mapcol{min-width:0;max-width:100%;}
+ select,input[type=text],input[type=search],input[type=password],input[type=email],input[type=number],input[type=date],input[type=datetime-local],textarea{font-size:16px;} /* stop iOS zoom */
+ #loginGate{padding:max(16px,var(--safe-t)) max(16px,var(--safe-r)) max(16px,var(--safe-b)) max(16px,var(--safe-l));align-items:flex-start;overflow-y:auto;}
+ .login-card{margin:auto 0;width:100%;max-width:420px;}
+ .foot{padding:0 8px calc(8px + var(--safe-b));}
 }
 
-@media print{.controls,.maps,.fsimap,.nav,.side,.composer,#loginGate{display:none !important;}body{background:#fff;}}
+/* Very narrow phones */
+@media (max-width:380px){
+ .band-meta .tokenpill#tokenPill,.band-meta .tokenpill#syncPill{display:none;}
+ .band .ttl b{font-size:12px;max-width:42vw;}
+ .wrap{padding-left:10px;padding-right:10px;}
+ .admin-grid,.kpi-grid{grid-template-columns:1fr;}
+}
+
+/* Phone / tablet landscape — fit viewport without excess scroll */
+@media (orientation:landscape) and (max-height:560px){
+ .band{padding:6px max(10px,var(--safe-r)) 6px max(10px,var(--safe-l));gap:8px;flex-wrap:nowrap;}
+ .band img{height:30px;}
+ .band .ttl b{font-size:12px;}
+ .band .ttl span{display:none;}
+ .band-meta .tokenpill,.band-meta .userpill{display:none;}
+ .nav-toggle{display:inline-flex;width:36px;height:36px;font-size:18px;}
+ .nav{
+  display:none;position:absolute;left:auto;right:max(6px,var(--safe-r));top:100%;
+  width:min(280px,88vw);flex-direction:column;gap:2px;padding:6px;
+  background:#12161c;border:1px solid #2a3340;border-radius:0 0 10px 10px;
+  box-shadow:0 12px 28px rgba(0,0,0,.4);max-height:min(80dvh,420px);overflow:auto;z-index:60;
+ }
+ .nav.open{display:flex;}
+ .nav button{width:100%;text-align:left;padding:10px 12px;font-size:13px;min-height:40px;}
+ .wrap{padding:8px max(10px,var(--safe-r)) calc(16px + var(--safe-b)) max(10px,var(--safe-l));max-width:none;width:100%;}
+ h1{font-size:16px;margin:2px 0;}
+ .sub{margin:0 0 8px;font-size:11.5px;}
+ .fsi-layout{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:8px;}
+ .fsimap{height:calc(100dvh - 110px);min-height:160px;max-height:none;}
+ .fsi-list{max-height:calc(100dvh - 260px);min-height:80px;}
+ .fsi-sidecol{max-height:calc(100dvh - 90px);overflow:auto;-webkit-overflow-scrolling:touch;}
+ .chatbox{height:calc(100dvh - 120px);}
+ .tablewrap{max-height:calc(100dvh - 180px);overflow:auto;}
+ select,input[type=text],input[type=search],input[type=password],input[type=email],textarea{font-size:16px;}
+}
+
+/* Narrow landscape phones: stack map */
+@media (orientation:landscape) and (max-height:560px) and (max-width:900px){
+ .fsi-layout{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}
+}
+@media (orientation:landscape) and (max-height:420px) and (max-width:900px){
+ .fsi-layout{grid-template-columns:1fr;}
+ .fsimap{height:min(48dvh,220px);min-height:140px;}
+}
+@media (orientation:landscape) and (min-width:901px) and (max-height:700px){
+ .fsimap{height:calc(100dvh - 150px);min-height:220px;}
+ .fsi-list{max-height:calc(100dvh - 300px);}
+ .band{padding:8px 18px;}
+ .band img{height:40px;}
+}
+
+@media print{.controls,.maps,.fsimap,.nav,.nav-toggle,.side,.composer,#loginGate{display:none !important;}body{background:#fff;}}
 </style>
 <link rel="stylesheet" href="vendor/maplibre-gl.css">
 <script src="vendor/maplibre-gl.js"></script>
@@ -324,23 +448,26 @@ a.maplink{color:var(--accent2);text-decoration:none;font-weight:600;}
  <img src="logo.png" alt="FloGuard logo">
  <div class="ttl"><b>FLOGUARD SALES REV</b><span>Drainage Sales Training &amp; Lead Command Center</span></div>
  </div>
- <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+ <div class="band-right">
+ <div class="band-meta">
  <div class="tokenpill" id="tokenPill" title="OpenAI token usage">Tokens: —</div>
  <div class="tokenpill" id="syncPill" title="Shared leads sync status">Sync: —</div>
- <div class="userpill">Signed in as <b id="userName">—</b></div>
+ <div class="userpill"><span>Signed in as </span><b id="userName">—</b></div>
  <button class="btn" id="logoutBtn" style="background:#232a33;color:#fff;border-color:#232a33;">Log out</button>
- <div class="nav" id="nav">
- <button data-p="leads" class="on">📋 Leads</button>
- <button data-p="fsi">🗺 Flood Map</button>
- <button data-p="docs">📚 Documents</button>
- <button data-p="drafts">✉ Outbound</button>
- <button data-p="coach">🎧 AI Coach</button>
- <button data-p="roleplay">🥊 Roleplay Gym</button>
- <button data-p="review">📝 Pitch Review</button>
- <button data-p="playbook">📖 Playbook</button>
- <button data-p="settings">⚙ Models</button>
- <button data-p="admin" id="navAdmin" class="hidden" style="display:none;">🛡 Admin</button>
  </div>
+ <button type="button" class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav">☰</button>
+ <nav class="nav" id="nav" role="navigation" aria-label="Main">
+ <button type="button" data-p="leads" class="on">📋 Leads</button>
+ <button type="button" data-p="fsi">🗺 Flood Map</button>
+ <button type="button" data-p="docs">📚 Documents</button>
+ <button type="button" data-p="drafts">✉ Outbound</button>
+ <button type="button" data-p="coach">🎧 AI Coach</button>
+ <button type="button" data-p="roleplay">🥊 Roleplay Gym</button>
+ <button type="button" data-p="review">📝 Pitch Review</button>
+ <button type="button" data-p="playbook">📖 Playbook</button>
+ <button type="button" data-p="settings">⚙ Models</button>
+ <button type="button" data-p="admin" id="navAdmin" class="hidden" style="display:none;">🛡 Admin</button>
+ </nav>
  </div>
 </div>
 <div class="rule"></div>
@@ -364,9 +491,13 @@ a.maplink{color:var(--accent2);text-decoration:none;font-weight:600;}
  <div class="field"><label>Industry</label><select id="industry" title="Filters list silently — industry is edited on the prospect card"><option value="">All industries</option></select></div>
  <div class="field"><label>City / Area</label><select id="cityFilter" title="Filters list silently — city is edited on the prospect card"><option value="">All cities</option></select></div>
  <div class="field" style="min-width:200px;flex:1"><label>Search</label><input type="search" id="search" placeholder="Name, phone, email, notes…"></div>
+ <label class="due-filter" id="dueThisMonthFilter" title="Show Maintenance leads whose next service falls in the current month">
+ <input type="checkbox" id="dueThisMonth"> Due this month
+ </label>
  <div class="spacer"></div>
- <div class="actions" style="display:flex;gap:8px;align-items:end;">
+ <div class="actions" style="display:flex;gap:8px;align-items:end;flex-wrap:wrap;">
  <button class="btn p" id="addBtn">+ Add Lead</button>
+ <button type="button" class="btn o" id="enrichBtn" title="Find phone/email for leads missing contacts (owner + site address). Free search + optional BatchData skip-trace.">Enrich contacts</button>
  <button class="btn" id="csvBtn">⭳ CSV</button>
  <button class="btn" id="jsonBtn">⭳ JSON</button>
  <button class="btn" id="jsonImportBtn">⭱ Import JSON</button>
@@ -375,6 +506,7 @@ a.maplink{color:var(--accent2);text-decoration:none;font-weight:600;}
  <button class="btn d" id="resetBtn">Reset</button>
  </div>
  </div>
+ <div class="hint" id="enrichStatus" style="margin:0 0 8px;min-height:1.2em" role="status" aria-live="polite"></div>
 
  <details class="maps">
  <summary>Google Maps → paste a business to capture name, phone &amp; website</summary>
@@ -412,13 +544,13 @@ a.maplink{color:var(--accent2);text-decoration:none;font-weight:600;}
  <div class="tablewrap">
  <table>
  <thead><tr>
- <th style="width:22%">Business</th>
- <th style="width:14%">Causes</th>
+ <th style="width:26%">Owner / business + site address</th>
+ <th style="width:12%">Causes</th>
  <th style="width:12%">Phone</th>
  <th style="width:14%">Email</th>
  <th style="width:10%">Score</th>
  <th style="width:12%">Status</th>
- <th style="width:16%"></th>
+ <th style="width:14%"></th>
  </tr></thead>
  <tbody id="tbody"></tbody>
  </table>
@@ -727,6 +859,7 @@ a.maplink{color:var(--accent2);text-decoration:none;font-weight:600;}
  <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="fsiSelectAll" class="ck"> Select all shown</label>
  <span><b id="fsiSelCount">0</b> selected</span>
  <button type="button" class="btn o" id="fsiBulkLeads">Add to Leads</button>
+ <button type="button" class="btn o" id="fsiBulkEnrich" title="Add selected parcels as leads, then bulk-enrich phone/email">Add + Enrich</button>
  <button type="button" class="btn" id="fsiBulkCsv">Export CSV</button>
  <button type="button" class="btn ghost" id="fsiBulkClear">Clear</button>
  </div>
@@ -738,6 +871,11 @@ a.maplink{color:var(--accent2);text-decoration:none;font-weight:600;}
  <div class="meters" id="fsiDrMeters"></div>
  <div class="fsi-breakdown" id="fsiDrBreakdown" style="display:none"></div>
  <div class="meta" id="fsiDrChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
+ <div class="fsi-suggest" id="fsiDrSuggest" style="display:none">
+ <h4>Suggested causes (soft · assess on-site)</h4>
+ <div id="fsiDrSuggestChips"></div>
+ <p class="hint">Soft tags from FSI / soil / zone / value — not a product quote. Assessment decides French drain vs sump vs yard.</p>
+ </div>
  <div class="fsi-acts" id="fsiDrActs">
  <button type="button" class="btn p" data-fsi-act="maps">Open in Maps</button>
  <button type="button" class="btn" data-fsi-act="copy">Copy address</button>
@@ -771,27 +909,73 @@ a.maplink{color:var(--accent2);text-decoration:none;font-weight:600;}
  <div class="cause-checks full" id="pfCauses"></div>
  <p class="hint" style="margin:8px 0 0">Each cause has its own status. Coach / queue draft / list tabs use the active cause only.</p>
  </div>
+ <div class="sec" id="pfMgmtSec" style="display:none">
+ <h3>Management company (B2B)</h3>
+ <div class="mgmt-row">
+ <div>
+ <label>Company</label>
+ <select id="pfMgmtCompany"><option value="">— None —</option></select>
+ </div>
+ <button type="button" class="btn" id="pfMgmtAddBtn" title="Add a management company">+ New</button>
+ </div>
+ <div class="mgmt-new" id="pfMgmtNew">
+ <label>Company name</label>
+ <input id="pfMgmtNewName" placeholder="e.g. Coastal Property Pros">
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+ <div><label>Phone</label><input id="pfMgmtNewPhone" placeholder="(386) …"></div>
+ <div><label>Contact</label><input id="pfMgmtNewContact" placeholder="PM name"></div>
+ </div>
+ <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+ <button type="button" class="btn p" id="pfMgmtSaveNew">Save company</button>
+ <button type="button" class="btn ghost" id="pfMgmtCancelNew">Cancel</button>
+ </div>
+ </div>
+ <p class="hint" style="margin:6px 0 0">Property managers / HOAs for portfolio outreach. Companies are saved in this browser and ride along with the lead on sync.</p>
+ </div>
+ <div class="sec" id="pfMntSec" style="display:none">
+ <h3>Maintenance schedule</h3>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+ <div><label>Last service</label><input id="pfMntLast" type="date"></div>
+ <div><label>Frequency</label>
+ <select id="pfMntFreq">
+ <option value="">—</option>
+ <option value="monthly">Monthly</option>
+ <option value="quarterly">Quarterly</option>
+ <option value="yearly">Yearly</option>
+ <option value="as_needed">As needed</option>
+ </select>
+ </div>
+ <div><label>Next due</label><input id="pfMntNext" type="date"></div>
+ <div><label>Plan / notes</label><input id="pfMntPlan" placeholder="Storm-ready plan, pump check…"></div>
+ </div>
+ <p class="hint" style="margin:6px 0 0">Use Leads → Maintenance → <b>Due this month</b> for the callback list. Changing last service + frequency auto-fills next due if empty.</p>
+ </div>
  <div class="sec">
  <h3>Location &amp; industry</h3>
- <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+ <div><label>Site address</label><input id="pfAddress" placeholder="123 Palm Ave, Port Orange, FL 32127"></div>
+ <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:6px">
  <div><label>City / Area</label><input id="pfCity" list="cityList" placeholder="e.g. Daytona Beach"></div>
+ <div><label>ZIP</label><input id="pfZip" placeholder="32127" inputmode="numeric"></div>
  <div><label>Industry</label><input id="pfIndustry" list="indList" placeholder="e.g. Home Services"></div>
  </div>
- <p class="hint" style="margin:6px 0 0">Not shown on the CRM grid — used for filters, coaching, and outreach context.</p>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+ <div><label>Parcel ID</label><input id="pfParcelId" placeholder="Volusia parcel id" readonly style="background:#f6f8fa"></div>
+ <div><label>Source</label><input id="pfSource" readonly style="background:#f6f8fa"></div>
+ </div>
+ <p class="hint" style="margin:6px 0 0">FSI map leads use <b>public property-appraiser</b> owner + site address. Phone/email are not on the tax roll — fill after skip-trace or LeadAgent enrich. DNC still applies before dialing.</p>
  </div>
  <div class="sec">
  <h3>Contact &amp; deal</h3>
  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
- <div><label>Phone</label><input id="pfPhone"></div>
- <div><label>Email</label><input id="pfEmail" type="email"></div>
+ <div><label>Phone</label><input id="pfPhone" placeholder="not on tax roll — enrich"></div>
+ <div><label>Email</label><input id="pfEmail" type="email" placeholder="not on tax roll — enrich"></div>
  <div><label>Contact</label><input id="pfContact"></div>
- <div><label>Owner</label><input id="pfOwner" placeholder="rep username"></div>
+ <div><label>Owner (rep)</label><input id="pfOwner" placeholder="rep username"></div>
  <div><label>Website</label><input id="pfWebsite"></div>
  <div><label id="pfStatusLabel">Status</label><select id="pfStatus"></select></div>
  <div><label>Package</label><input id="pfPackage" placeholder="Basic / Silver / pilot"></div>
  <div><label>Amount ($)</label><input id="pfAmount" type="number" min="0" step="1"></div>
  <div><label>Next follow-up</label><input id="pfFollow" type="datetime-local"></div>
- <div><label>Source</label><input id="pfSource" readonly></div>
  </div>
  </div>
  <div class="sec">
@@ -876,13 +1060,109 @@ function suggestListsForIndustry(industry, website){
  return out.filter(function(x,i){ return out.indexOf(x)===i && LISTS.includes(x); });
 }
 const KEY='floguard_leads_v1', CFGKEY='floguard_desk_cfg', CHATKEY='floguard_desk_chats';
+const MGMTKEY='floguard_mgmt_companies_v1';
 /* ================= OUTREACH CRM ================= */
 const ACTKEY='floguard_activities_v1';
 const PRKEY='floguard_practice_v1';
 const CLOSED_STATUSES=new Set(['Deposit collected','Contract signed']);
 const LOST_STATUSES=new Set(['Not interested','Do not contact']);
 const PIPELINE_STATUSES=new Set(['Interested','Quoted','Callback']);
+const MNT_FREQ_MONTHS={monthly:1,quarterly:3,yearly:12,as_needed:0};
 let profileLeadId=null;
+
+/* ---- Management companies (local entity for PropertyMgmt B2B) ---- */
+function loadMgmtCompanies(){
+ try{ const a=JSON.parse(localStorage.getItem(MGMTKEY)); if(Array.isArray(a)) return a; }catch(e){}
+ return [];
+}
+function saveMgmtCompanies(list){
+ localStorage.setItem(MGMTKEY, JSON.stringify(list||[]));
+}
+function nextMgmtId(){
+ const list=loadMgmtCompanies();
+ let m=0; list.forEach(function(c){ const n=Number(c.id)||0; if(n>m) m=n; });
+ return m+1;
+}
+function addMgmtCompany(rec){
+ const list=loadMgmtCompanies();
+ const row={
+  id:nextMgmtId(),
+  name:String(rec.name||'').trim(),
+  phone:String(rec.phone||'').trim(),
+  contact:String(rec.contact||'').trim(),
+  notes:String(rec.notes||'').trim(),
+  created_at:new Date().toISOString()
+ };
+ if(!row.name) return null;
+ list.push(row);
+ saveMgmtCompanies(list);
+ return row;
+}
+function fillMgmtSelect(sel, selectedId){
+ if(!sel) return;
+ const list=loadMgmtCompanies().slice().sort(function(a,b){ return String(a.name||'').localeCompare(String(b.name||'')); });
+ const cur=selectedId!=null?String(selectedId):'';
+ sel.innerHTML='<option value="">— None —</option>'+list.map(function(c){
+  return '<option value="'+esc(String(c.id))+'"'+(String(c.id)===cur?' selected':'')+'>'+esc(c.name||('Company #'+c.id))+'</option>';
+ }).join('');
+ if(cur && ![...sel.options].some(function(o){ return o.value===cur; })){
+  // orphan id from imported lead — keep as synthetic option
+  const opt=document.createElement('option');
+  opt.value=cur; opt.selected=true; opt.textContent='(saved id '+cur+')';
+  sel.appendChild(opt);
+ }
+}
+
+/* ---- Maintenance schedule helpers ---- */
+function parseYmd(s){
+ if(!s) return null;
+ const m=String(s).slice(0,10).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+ if(!m) return null;
+ const d=new Date(Number(m[1]), Number(m[2])-1, Number(m[3]));
+ return isNaN(d.getTime())?null:d;
+}
+function toYmd(d){
+ if(!d||isNaN(d.getTime())) return '';
+ const y=d.getFullYear(), mo=String(d.getMonth()+1).padStart(2,'0'), da=String(d.getDate()).padStart(2,'0');
+ return y+'-'+mo+'-'+da;
+}
+function addMonthsYmd(ymd, months){
+ const d=parseYmd(ymd); if(!d||!months) return ymd||'';
+ d.setMonth(d.getMonth()+months);
+ return toYmd(d);
+}
+function computeNextDue(last, freq){
+ const months=MNT_FREQ_MONTHS[freq];
+ if(!last||!months) return '';
+ return addMonthsYmd(last, months);
+}
+function isDueThisMonth(l){
+ const next=parseYmd(l && l.maintenance_next_due);
+ if(!next) return false;
+ const now=new Date();
+ return next.getFullYear()===now.getFullYear() && next.getMonth()===now.getMonth();
+}
+function isOverdue(l){
+ const next=parseYmd(l && l.maintenance_next_due);
+ if(!next) return false;
+ const today=new Date(); today.setHours(0,0,0,0);
+ return next < today;
+}
+function mntDueBadgeHtml(l){
+ if(!l||!l.maintenance_next_due) return '';
+ if(isOverdue(l)) return '<span class="mnt-due overdue" title="Overdue">Due '+esc(String(l.maintenance_next_due).slice(0,10))+'</span>';
+ if(isDueThisMonth(l)) return '<span class="mnt-due" title="Due this month">Due '+esc(String(l.maintenance_next_due).slice(0,10))+'</span>';
+ return '<span class="mnt-due ok" title="Scheduled">'+esc(String(l.maintenance_next_due).slice(0,10))+'</span>';
+}
+function syncDueFilterUi(){
+ const el=document.getElementById('dueThisMonthFilter');
+ if(!el) return;
+ el.classList.toggle('on', view==='Maintenance');
+ if(view!=='Maintenance'){
+  const ck=document.getElementById('dueThisMonth');
+  if(ck) ck.checked=false;
+ }
+}
 
 function leadKeyOf(l){
  return `${String(l?.name||'').trim().toLowerCase()}|${String(l?.city||'').trim().toLowerCase()}`;
@@ -1122,9 +1402,10 @@ function profileActionWebsite(){
 }
 function profileActionMaps(){
  const {l}=profileLeadAndCat(); if(!l) return;
- const q=encodeURIComponent((l.name||'')+' '+(l.city||'')+' FL');
+ const addr=(document.getElementById('pfAddress')?.value||l.address||'').trim();
+ const q=encodeURIComponent(addr || ((l.name||'')+' '+(l.city||'')+' FL'));
  launchUri('https://www.google.com/maps/search/?api=1&query='+q);
- flashActMsg('Opening Maps…', 'ok');
+ flashActMsg(addr?'Opening Maps for site address…':'Opening Maps (no site address — using name/city)…', 'ok');
 }
 function profileActionCoach(){
  const {l}=profileLeadAndCat(); if(!l) return;
@@ -1184,6 +1465,7 @@ function paintProfileForm(l){
  normalizeLead(l);
  const cat=categoryKey(activeCause(l));
  const causeStatus=getListStatus(l, cat);
+ const lists=leadLists(l);
  document.getElementById('pfName').textContent=l.name||'(unnamed)';
  const wfs=resolveWebsiteScore(l);
  const wfsMeta=wfs?(' · DNS '+wfs.total+'/'+wfs.grade):'';
@@ -1191,24 +1473,55 @@ function paintProfileForm(l){
  if((l.phone||'').trim()) contactBits.push('phone');
  if((l.email||'').trim()) contactBits.push('email');
  if((l.website||'').trim()) contactBits.push('web');
- document.getElementById('pfMeta').textContent=(l.industry||'-')+' · '+(l.city||'-')+' · '+(isHot(l)?'HOT: urgent drainage need':(l.website||''))+wfsMeta+(contactBits.length?(' · '+contactBits.join('/')):'');
- document.getElementById('pfBadges').innerHTML=leadLists(l).map(x=>'<span class="badge">'+esc(x)+(x===cat?' · active':'')+'</span>').join('')+
+ const site=(l.address||'').trim();
+ document.getElementById('pfMeta').textContent=(site?site+' · ':'')+(l.industry||'-')+' · '+(l.city||'-')+(l.zip?(' '+l.zip):'')+' · '+(isHot(l)?'HOT: urgent drainage need':(l.website||''))+wfsMeta+(contactBits.length?(' · '+contactBits.join('/')):' · no phone/email yet');
+ document.getElementById('pfBadges').innerHTML=lists.map(x=>'<span class="badge">'+esc(x)+(x===cat?' · active':'')+'</span>').join('')+
  (causeStatus?'<span class="badge">'+esc(cat)+': '+esc(causeStatus)+'</span>':'')+
- (l.owner?'<span class="badge">Owner: '+esc(l.owner)+'</span>':'')+
+ (l.owner?'<span class="badge">Rep: '+esc(l.owner)+'</span>':'')+
+ (l.parcel_id?'<span class="badge">Parcel '+esc(l.parcel_id)+'</span>':'')+
+ (l.mgmt_company_name?'<span class="badge">Mgmt: '+esc(l.mgmt_company_name)+'</span>':'')+
  (wfs?'<span class="badge">DNS '+esc(String(wfs.total))+'/'+esc(wfs.grade)+'</span>':'')+
- ((l.email||'').trim()?'<span class="badge">Email on file</span>':'')+
- ((l.phone||'').trim()?'<span class="badge">Phone on file</span>':'');
+ ((l.email||'').trim()?'<span class="badge">Email on file</span>':'<span class="badge" title="Tax roll has no email — enrich separately">No email</span>')+
+ ((l.phone||'').trim()?'<span class="badge">Phone on file</span>':'<span class="badge" title="Tax roll has no phone — enrich + DNC scrub">No phone</span>')+
+ (l.maintenance_next_due?mntDueBadgeHtml(l):'');
  renderFitnessCard(l);
  const pfCauses=document.getElementById('pfCauses');
  if(pfCauses){
  pfCauses.innerHTML=LISTS.map(function(c){
- const on=leadLists(l).includes(c);
+ const on=lists.includes(c);
  const tabOn=(view!=='All'&&view===c)?' tab-active':'';
  return '<label class="cause-chip'+(on?' on':'')+' badge-'+listBadge(c)+tabOn+'" title="'+esc(c)+'">'+
  '<input type="checkbox" data-cause="'+esc(c)+'" data-profile-cause="1"'+(on?' checked':'')+'>'+esc(c)+'</label>';
  }).join('');
  }
+ // PropertyMgmt → management company dropdown
+ const mgmtSec=document.getElementById('pfMgmtSec');
+ if(mgmtSec){
+  const showPm=lists.includes('PropertyMgmt');
+  mgmtSec.style.display=showPm?'block':'none';
+  if(showPm) fillMgmtSelect(document.getElementById('pfMgmtCompany'), l.mgmt_company_id);
+  document.getElementById('pfMgmtNew')?.classList.remove('on');
+ }
+ // Maintenance → schedule fields
+ const mntSec=document.getElementById('pfMntSec');
+ if(mntSec){
+  const showM=lists.includes('Maintenance');
+  mntSec.style.display=showM?'block':'none';
+  if(showM){
+   const last=document.getElementById('pfMntLast');
+   const freq=document.getElementById('pfMntFreq');
+   const next=document.getElementById('pfMntNext');
+   const plan=document.getElementById('pfMntPlan');
+   if(last) last.value=String(l.maintenance_last_service||'').slice(0,10);
+   if(freq) freq.value=l.maintenance_frequency||'';
+   if(next) next.value=String(l.maintenance_next_due||'').slice(0,10);
+   if(plan) plan.value=l.maintenance_plan||'';
+  }
+ }
+ if(document.getElementById('pfAddress')) document.getElementById('pfAddress').value=l.address||'';
  if(document.getElementById('pfCity')) document.getElementById('pfCity').value=l.city||'';
+ if(document.getElementById('pfZip')) document.getElementById('pfZip').value=l.zip||'';
+ if(document.getElementById('pfParcelId')) document.getElementById('pfParcelId').value=l.parcel_id||'';
  if(document.getElementById('pfIndustry')) document.getElementById('pfIndustry').value=l.industry||'';
  document.getElementById('pfPhone').value=l.phone||'';
  document.getElementById('pfEmail').value=l.email||'';
@@ -1218,7 +1531,7 @@ function paintProfileForm(l){
  document.getElementById('pfPackage').value=l.package||'';
  document.getElementById('pfAmount').value=(l.amount!=null&&l.amount!=='')?l.amount:'';
  document.getElementById('pfNotes').value=l.notes||'';
- document.getElementById('pfSource').value=l.source||'';
+ if(document.getElementById('pfSource')) document.getElementById('pfSource').value=l.source||'';
  const stLab=document.getElementById('pfStatusLabel');
  if(stLab) stLab.textContent='Status for '+cat;
  const st=document.getElementById('pfStatus');
@@ -1304,8 +1617,11 @@ function saveProfileFromForm(){
  const l=state.find(x=>x.id===profileLeadId); if(!l) return;
  const cause=activeCause(l);
  const prevStatus=getListStatus(l, cause);
+ if(document.getElementById('pfAddress')) l.address=document.getElementById('pfAddress').value.trim();
  if(document.getElementById('pfCity')) l.city=document.getElementById('pfCity').value.trim();
+ if(document.getElementById('pfZip')) l.zip=document.getElementById('pfZip').value.trim();
  if(document.getElementById('pfIndustry')) l.industry=document.getElementById('pfIndustry').value.trim();
+ // parcel_id is read-only (from FSI / tax roll)
  l.phone=document.getElementById('pfPhone').value.trim();
  l.email=document.getElementById('pfEmail').value.trim();
  l.contact=document.getElementById('pfContact').value.trim();
@@ -1322,9 +1638,7 @@ function saveProfileFromForm(){
  const fu=document.getElementById('pfFollow').value;
  l.next_follow_up_at=fu?new Date(fu).toISOString():'';
  if(!l.owner) l.owner=currentUserName()||'';
- refreshIndustryFilter();
- refreshCityFilter();
- // Sync cause checkboxes from profile panel
+ // Sync cause checkboxes from profile panel first (mgmt/mnt depend on lists)
  const pfCauses=document.getElementById('pfCauses');
  if(pfCauses){
  const checked=[];
@@ -1333,6 +1647,54 @@ function saveProfileFromForm(){
  });
  if(checked.length) setLeadLists(l, checked, {touched:true});
  }
+ // Management company
+ if(leadLists(l).includes('PropertyMgmt')){
+  const sel=document.getElementById('pfMgmtCompany');
+  const mid=sel?sel.value:'';
+  l.mgmt_company_id=mid||'';
+  if(mid){
+   const co=loadMgmtCompanies().find(function(c){ return String(c.id)===String(mid); });
+   l.mgmt_company_name=co?co.name:'';
+  } else l.mgmt_company_name='';
+ } else {
+  // keep stored values if unchecked? Clear for cleanliness when PM not worked
+ }
+ // Maintenance schedule
+ if(leadLists(l).includes('Maintenance')){
+  const lastEl=document.getElementById('pfMntLast');
+  const freqEl=document.getElementById('pfMntFreq');
+  const nextEl=document.getElementById('pfMntNext');
+  const planEl=document.getElementById('pfMntPlan');
+  l.maintenance_last_service=lastEl?lastEl.value:'';
+  l.maintenance_frequency=freqEl?freqEl.value:'';
+  l.maintenance_plan=planEl?planEl.value.trim():'';
+  let next=nextEl?nextEl.value:'';
+  if(!next && l.maintenance_last_service && l.maintenance_frequency){
+   next=computeNextDue(l.maintenance_last_service, l.maintenance_frequency);
+  }
+  l.maintenance_next_due=next||'';
+  // Auto-reminder: if next due is set and follow-up empty (or past), seed follow-up at 9am on due date
+  if(l.maintenance_next_due){
+   const due=parseYmd(l.maintenance_next_due);
+   if(due){
+    const hasFollow=!!String(l.next_follow_up_at||'').trim();
+    let followPast=false;
+    if(hasFollow){
+     const fd=new Date(l.next_follow_up_at);
+     followPast=!isNaN(fd.getTime()) && fd < new Date();
+    }
+    if(!hasFollow || followPast){
+     due.setHours(9,0,0,0);
+     const y=due.getFullYear(), mo=String(due.getMonth()+1).padStart(2,'0'), da=String(due.getDate()).padStart(2,'0');
+     l.next_follow_up_at=y+'-'+mo+'-'+da+'T09:00';
+     const fEl=document.getElementById('pfFollow');
+     if(fEl) fEl.value=l.next_follow_up_at;
+    }
+   }
+  }
+ }
+ refreshIndustryFilter();
+ refreshCityFilter();
  saveLeads();
  const nextStatus=getListStatus(l, cause);
  if(prevStatus!==nextStatus){
@@ -1759,7 +2121,7 @@ function setSyncPill(s){
  el.textContent=txt; el.className='tokenpill'+(cls?' '+cls:'');
 }
 /* Fields LeadAgent / server may enrich — always take non-empty server values. */
-const SERVER_CONTACT_FIELDS=['phone','website','email','contact','industry','notes','source','status','package','amount','owner','next_follow_up_at','website_score'];
+const SERVER_CONTACT_FIELDS=['phone','website','email','contact','industry','notes','source','status','package','amount','owner','next_follow_up_at','website_score','address','zip','parcel_id','city','mgmt_company_id','mgmt_company_name','maintenance_last_service','maintenance_frequency','maintenance_next_due','maintenance_plan','suggested_causes'];
 
 function fieldEmpty(v){
  if(v==null||v==='') return true;
@@ -1904,10 +2266,48 @@ function nextId(){ return state.reduce((m,l)=>Math.max(m,l.id||0),0)+1; }
 function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
 /* ================= NAV ================= */
+function setNavOpen(open){
+ const nav=document.getElementById('nav');
+ const btn=document.getElementById('navToggle');
+ if(nav) nav.classList.toggle('open', !!open);
+ if(btn){
+  btn.setAttribute('aria-expanded', open?'true':'false');
+  btn.setAttribute('aria-label', open?'Close menu':'Open menu');
+  btn.textContent=open?'✕':'☰';
+ }
+}
+function closeNavMenu(){ setNavOpen(false); }
+document.getElementById('navToggle')?.addEventListener('click',function(e){
+ e.stopPropagation();
+ const nav=document.getElementById('nav');
+ setNavOpen(!(nav&&nav.classList.contains('open')));
+});
 document.getElementById('nav').addEventListener('click',e=>{
  const b=e.target.closest('button'); if(!b) return;
  [...document.querySelectorAll('#nav button')].forEach(x=>x.classList.toggle('on',x===b));
  [...document.querySelectorAll('.panel')].forEach(p=>p.classList.toggle('on',p.id==='p-'+b.dataset.p));
+ closeNavMenu();
+ // Resize map after tab show (mobile layout)
+ if(b.dataset.p==='fsi' && typeof _fsiMap!=='undefined' && _fsiMap){
+  setTimeout(function(){ try{ _fsiMap.resize(); }catch(err){} }, 80);
+ }
+});
+document.addEventListener('click',function(e){
+ const nav=document.getElementById('nav');
+ const btn=document.getElementById('navToggle');
+ if(!nav||!nav.classList.contains('open')) return;
+ if(nav.contains(e.target)||(btn&&btn.contains(e.target))) return;
+ closeNavMenu();
+});
+window.addEventListener('resize',function(){
+ // Desktop width: force nav visible state clean (CSS handles display)
+ if(window.matchMedia('(min-width:901px) and (min-height:561px)').matches){
+  // keep open class off so portrait re-entry starts closed
+  closeNavMenu();
+ }
+ if(typeof _fsiMap!=='undefined' && _fsiMap){
+  try{ _fsiMap.resize(); }catch(err){}
+ }
 });
 function goTab(name){ if(name==='admin'){ try{ renderAdminCrm(); }catch(e){} } const b=document.querySelector(`#nav button[data-p="${name}"]`); if(b) b.click(); }
 
@@ -2055,12 +2455,38 @@ function renderFitnessCard(l){
  '<div class="hint" style="margin-top:6px">No gap list stored.</div>');
  el.hidden=false;
 }
+/** Pull site address out of older notes (FSI import used to bury it). */
+function extractAddressFromNotes(notes){
+ const text=String(notes||'');
+ let m=text.match(/^\s*Site address:\s*(.+)$/im);
+ if(m) return m[1].trim();
+ m=text.match(/^\s*Addr(?:ess)?:\s*(.+)$/im);
+ if(m) return m[1].trim();
+ // Street-like line with FL zip
+ m=text.match(/\b(\d{1,6}\s+[A-Za-z0-9.'\-\s]+(?:Ave|Av|St|Street|Rd|Road|Dr|Drive|Ln|Lane|Blvd|Ct|Court|Way|Cir|Pl|Place|Ter|Pkwy|Hwy)[^\n]*,\s*[^,\n]+,\s*FL\s*\d{5}(?:-\d{4})?)/i);
+ if(m) return m[1].replace(/\s+/g,' ').trim();
+ return '';
+}
+function extractParcelIdFromNotes(notes){
+ const m=String(notes||'').match(/^\s*Parcel:\s*(\S+)/im);
+ return m?m[1].trim():'';
+}
 function normalizeLead(l){
  if(l.amount==null) l.amount='';
  if(l.owner==null) l.owner='';
  if(l.package==null) l.package='';
  if(l.email==null) l.email='';
  if(l.next_follow_up_at==null) l.next_follow_up_at='';
+ if(l.address==null) l.address='';
+ if(l.zip==null) l.zip='';
+ if(l.parcel_id==null) l.parcel_id='';
+ if(l.mgmt_company_id==null) l.mgmt_company_id='';
+ if(l.mgmt_company_name==null) l.mgmt_company_name='';
+ if(l.maintenance_last_service==null) l.maintenance_last_service='';
+ if(l.maintenance_frequency==null) l.maintenance_frequency='';
+ if(l.maintenance_next_due==null) l.maintenance_next_due='';
+ if(l.maintenance_plan==null) l.maintenance_plan='';
+ if(l.suggested_causes==null) l.suggested_causes=[];
 
  // Migrate legacy list labels only — do NOT re-add multi-cause by industry
  if(!l.lists || !Array.isArray(l.lists) || !l.lists.length){
@@ -2081,6 +2507,19 @@ function normalizeLead(l){
  if(!(l.phone||'').trim() && l.notes){
  const ph=String(l.notes).match(/(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?)\d{3}[-.\s]?\d{4}/);
  if(ph) l.phone=ph[0];
+ }
+ // Backfill address / parcel_id from FSI notes (older map imports buried site address)
+ if(!(l.address||'').trim() && l.notes){
+ const a=extractAddressFromNotes(l.notes);
+ if(a) l.address=a;
+ }
+ if(!(l.parcel_id||'').trim() && l.notes){
+ const pid=extractParcelIdFromNotes(l.notes);
+ if(pid) l.parcel_id=pid;
+ }
+ if(!(l.zip||'').trim() && (l.address||'')){
+ const zm=String(l.address).match(/\bFL\s*(\d{5})(?:-\d{4})?\b/i);
+ if(zm) l.zip=zm[1];
  }
  ensureListStatus(l);
  if(!l.status) l.status=getListStatus(l, l.list);
@@ -2129,25 +2568,38 @@ function scoreCellHtml(l){
  return '<span class="wfs-pill g-'+esc(ws.grade)+'" title="'+title+'">'+esc(String(ws.total))+'/'+esc(ws.grade)+'</span>';
 }
 function render(){
+ syncDueFilterUi();
  const ind=document.getElementById('industry').value;
  const city=(document.getElementById('cityFilter')&&document.getElementById('cityFilter').value)||'';
  const q=document.getElementById('search').value.trim().toLowerCase();
+ const dueOnly=view==='Maintenance' && !!(document.getElementById('dueThisMonth')&&document.getElementById('dueThisMonth').checked);
  const tb=document.getElementById('tbody'); tb.innerHTML=''; let shown=0;
+ let dueCount=0;
  state.forEach(l=>{
  normalizeLead(l);
+ if(leadLists(l).includes('Maintenance') && (isDueThisMonth(l)||isOverdue(l))) dueCount++;
  if(!inView(l)) return;
  if(ind&&l.industry!==ind) return;
  if(city&&l.city!==city) return;
+ if(dueOnly && !(isDueThisMonth(l)||isOverdue(l))) return;
  if(q){
- const hay=(l.name+' '+l.city+' '+l.industry+' '+l.phone+' '+(l.email||'')+' '+l.notes+' '+l.website).toLowerCase();
+ const hay=(l.name+' '+(l.address||'')+' '+l.city+' '+(l.zip||'')+' '+(l.parcel_id||'')+' '+l.industry+' '+l.phone+' '+(l.email||'')+' '+l.notes+' '+l.website+' '+(l.mgmt_company_name||'')).toLowerCase();
  if(!hay.includes(q)) return;
  }
  shown++;
  const tr=document.createElement('tr'); tr.dataset.id=l.id;
  const cause=activeCause(l);
  const st=getListStatus(l, cause);
+ const mntBadge=(view==='Maintenance'||leadLists(l).includes('Maintenance'))?mntDueBadgeHtml(l):'';
+ const mgmtBit=(view==='PropertyMgmt'&&l.mgmt_company_name)?('<div style="font-size:10px;color:var(--muted);margin-top:2px">'+esc(l.mgmt_company_name)+'</div>'):'';
+ const addrBit=(l.address||'').trim()
+  ? ('<div class="lead-addr" style="font-size:11px;color:var(--muted);margin-top:2px;line-height:1.3" title="'+esc(l.address)+'">'+esc(l.address)+'</div>')
+  : '<div class="lead-addr" style="font-size:10.5px;color:#b42318;margin-top:2px">No site address</div>';
+ const contactHint=!(l.phone||'').trim()&&!(l.email||'').trim()
+  ? '<div style="font-size:10px;color:#a2540f;margin-top:2px" title="County tax roll has no phone/email">Needs phone/email enrich</div>'
+  : '';
  tr.innerHTML=`
- <td class="name row-open"><input value="${esc(l.name)}" data-f="name" placeholder="(business name)" title="${esc((l.city||'')+(l.industry?(' · '+l.industry):''))}"></td>
+ <td class="name row-open"><input value="${esc(l.name)}" data-f="name" placeholder="(owner / business)" title="${esc((l.address||'')+(l.city?(' · '+l.city):'')+(l.industry?(' · '+l.industry):''))}">${addrBit}${mgmtBit}${contactHint}${mntBadge?'<div style="margin-top:3px">'+mntBadge+'</div>':''}</td>
  <td title="Causes: ${esc(leadLists(l).join(', '))} — check/uncheck to work each product separately">${renderCauseChecks(l,{full:false})}</td>
  <td><input value="${esc(l.phone)}" data-f="phone" placeholder="(___)___-____"></td>
  <td><input value="${esc(l.email||'')}" data-f="email" placeholder="email@" title="${esc(l.email||'')}"></td>
@@ -2166,6 +2618,8 @@ function render(){
  `Showing <b>${shown}</b> of ${state.length} · `+LISTS.map(x=>`${x}: <b>${state.filter(l=>leadLists(l).includes(x)).length}</b>`).join(' · ')+
  ` · multi: <b>${state.filter(l=>leadLists(l).length>1).length}</b>`+
  (view!=='All'?' · status shown for <b>'+esc(view)+'</b>':' · status = primary cause')+
+ (view==='Maintenance'?(' · due this month: <b>'+dueCount+'</b>'):'')+
+ (dueOnly?' · <b>Due filter on</b>':'')+
  (ind?(' · industry: <b>'+esc(ind)+'</b>'):'')+
  (city?(' · city: <b>'+esc(city)+'</b>'):'');
 }
@@ -2227,6 +2681,7 @@ document.getElementById('tabs').addEventListener('click',e=>{
 document.getElementById('industry').addEventListener('change',render);
 document.getElementById('cityFilter')?.addEventListener('change',render);
 document.getElementById('search').addEventListener('input',render);
+document.getElementById('dueThisMonth')?.addEventListener('change',render);
 document.getElementById('addBtn').addEventListener('click',()=>{
  const primary=LISTS.includes(view)?view:'Website';
  const lead={id:nextId(),name:'',city:'',industry:document.getElementById('industry').value||'',list:primary,lists:[primary],list_status:{},phone:'',website:'',contact:'',status:'New',notes:'',lists_touched:true};
@@ -2278,17 +2733,218 @@ document.getElementById('mGo').addEventListener('click',()=>{
  const chips=document.getElementById('quickChips');
  SERVICE.forEach(([cat])=>{ const a=document.createElement('a'); a.href=mapsUrl(cat,'Volusia County'); a.target='_blank'; a.rel='noopener'; a.textContent=cat; chips.appendChild(a); });
 })();
+
+/* ---- Bulk contact enrich (phone/email) ---- */
+const ENRICH_BATCH=8;
+const ENRICH_MAX=40;
+function enrichStatus(msg, isHtml){
+ const el=document.getElementById('enrichStatus'); if(!el) return;
+ if(isHtml) el.innerHTML=msg; else el.textContent=msg||'';
+}
+function leadsNeedingEnrich(list){
+ return (list||[]).filter(function(l){
+  normalizeLead(l);
+  const noPhone=!String(l.phone||'').trim();
+  const noEmail=!String(l.email||'').trim();
+  const hasAddr=!!String(l.address||'').trim() || !!String(l.city||'').trim();
+  return (noPhone||noEmail) && hasAddr && String(l.name||'').trim();
+ });
+}
+function slimForEnrich(l){
+ return {
+  id:l.id, name:l.name||'', address:l.address||'', city:l.city||'', zip:l.zip||'',
+  phone:l.phone||'', email:l.email||'', website:l.website||'', industry:l.industry||'',
+  lists:leadLists(l), source:l.source||'', parcel_id:l.parcel_id||''
+ };
+}
+function applyEnrichResult(l, r){
+ if(!l||!r) return false;
+ let changed=false;
+ if(r.phone && !String(l.phone||'').trim()){ l.phone=r.phone; changed=true; }
+ if(r.email && !String(l.email||'').trim()){ l.email=r.email; changed=true; }
+ if(r.website && !String(l.website||'').trim()){ l.website=r.website; changed=true; }
+ if(changed){
+  const tag='Enriched '+(r.sources&&r.sources.length?r.sources.join(','):r.status)+' @ '+new Date().toISOString().slice(0,16);
+  if(!(l.notes||'').includes('Enriched ')) l.notes=(l.notes?l.notes+'\n':'')+tag;
+  else l.notes=String(l.notes||'')+'\n'+tag;
+  l.enriched_at=new Date().toISOString();
+  l.enrich_sources=Array.isArray(r.sources)?r.sources:[];
+ }
+ return changed;
+}
+async function enrichApi(leads, opts){
+ opts=opts||{};
+ const tok=getToken();
+ if(!tok) throw new Error('Sign in required');
+ const r=await fetch('/crm/api/enrich-contacts',{
+  method:'POST',
+  headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},
+  body:JSON.stringify({action:'enrich', leads:leads, force:!!opts.force, allowPaid:opts.allowPaid!==false})
+ });
+ const raw=await r.text(); let data=null; try{data=JSON.parse(raw);}catch(e){}
+ if(!r.ok) throw new Error((data&&data.error)||('Enrich failed '+r.status));
+ return data;
+}
+async function bulkEnrichLeads(candidates, opts){
+ opts=opts||{};
+ const list=(candidates||[]).slice(0, ENRICH_MAX);
+ if(!list.length){
+  enrichStatus('Nothing to enrich — every visible lead already has phone+email, or is missing name/address.');
+  return {found:0, partial:0, not_found:0, changed:0};
+ }
+ const btn=document.getElementById('enrichBtn');
+ if(btn) btn.disabled=true;
+ let found=0, partial=0, notFound=0, changed=0, errors=0;
+ const capsNote={v:''};
+ try{
+  for(let i=0;i<list.length;i+=ENRICH_BATCH){
+   const chunk=list.slice(i, i+ENRICH_BATCH);
+   enrichStatus('Enriching '+(i+1)+'–'+Math.min(i+chunk.length,list.length)+' of '+list.length+'… (free search'+(capsNote.v?' · '+capsNote.v:'')+')');
+   const payload=chunk.map(slimForEnrich);
+   let data;
+   try{ data=await enrichApi(payload, opts); }
+   catch(e){
+    errors+=chunk.length;
+    enrichStatus('Batch error: '+(e.message||e)+' — continuing…');
+    continue;
+   }
+   if(data.capabilities){
+    capsNote.v=data.capabilities.batchdata?'BatchData on':'free only';
+   }
+   const byId={};
+   (data.results||[]).forEach(function(r){ if(r && r.id!=null) byId[String(r.id)]=r; });
+   chunk.forEach(function(l){
+    const r=byId[String(l.id)];
+    if(!r){ notFound++; return; }
+    if(r.status==='found') found++;
+    else if(r.status==='partial') partial++;
+    else if(r.status==='complete'){ /* already had */ }
+    else if(r.status==='error'||r.status==='timeout_budget') errors++;
+    else notFound++;
+    if(applyEnrichResult(l, r)) changed++;
+   });
+  }
+  if(changed) saveLeads();
+  render();
+  const dnc=' Scrub DNC before dialing.';
+  enrichStatus('<b>'+changed+'</b> updated · found <b>'+found+'</b> · partial <b>'+partial+'</b> · no hit <b>'+notFound+'</b>'+(errors?(' · errors '+errors):'')+' · '+(capsNote.v||'free')+'.'+dnc, true);
+  return {found:found, partial:partial, not_found:notFound, changed:changed, errors:errors};
+ } finally {
+  if(btn) btn.disabled=false;
+ }
+}
+async function enrichVisibleLeads(){
+ enrichStatus('Preparing enrich…');
+ if(!getToken()){
+  enrichStatus('Sign in required to enrich contacts.');
+  return;
+ }
+ const ind=document.getElementById('industry')?.value||'';
+ const city=(document.getElementById('cityFilter')&&document.getElementById('cityFilter').value)||'';
+ const q=(document.getElementById('search')?.value||'').trim().toLowerCase();
+ const dueOnly=view==='Maintenance' && !!(document.getElementById('dueThisMonth')&&document.getElementById('dueThisMonth').checked);
+ const visible=[];
+ state.forEach(function(l){
+  normalizeLead(l);
+  if(!inView(l)) return;
+  if(ind&&l.industry!==ind) return;
+  if(city&&l.city!==city) return;
+  if(dueOnly && !(isDueThisMonth(l)||isOverdue(l))) return;
+  if(q){
+   const hay=(l.name+' '+(l.address||'')+' '+l.city+' '+(l.phone||'')+' '+(l.email||'')+' '+(l.notes||'')).toLowerCase();
+   if(!hay.includes(q)) return;
+  }
+  visible.push(l);
+ });
+ const need=leadsNeedingEnrich(visible);
+ if(!need.length){
+  const noAddr=visible.filter(function(l){ return !String(l.address||'').trim() && !String(l.city||'').trim(); }).length;
+  enrichStatus(
+   visible.length
+    ? ('Nothing to enrich in this view ('+visible.length+' shown).'+(noAddr?(' '+noAddr+' lack address/city.'):' All already have phone+email, or missing name.'))
+    : 'No leads in the current list/filter. Switch tab or clear filters, then try again.'
+  );
+  return;
+ }
+ const n=Math.min(need.length, ENRICH_MAX);
+ const msg=need.length>ENRICH_MAX
+  ? ('Enrich first '+n+' of '+need.length+' leads missing phone/email?\n\nUses free web search (+ BatchData if configured).\nScrub DNC before dialing.')
+  : ('Enrich '+n+' lead(s) missing phone and/or email?\n\nUses free web search (+ BatchData if configured).\nScrub DNC before dialing.');
+ if(!window.confirm(msg)){ enrichStatus('Enrich cancelled.'); return; }
+ enrichStatus('Starting enrich for '+n+' lead(s)…');
+ try{
+  await bulkEnrichLeads(need.slice(0, ENRICH_MAX));
+ }catch(err){
+  enrichStatus('Enrich failed: '+(err&&err.message?err.message:err));
+  console.error(err);
+ }
+}
+async function fsiBulkAddAndEnrich(){
+ const ids=Object.keys(_fsiState.selected).filter(function(id){ return _fsiState.selected[id]; });
+ if(!ids.length){ fsiSay('Select one or more parcels first.'); return; }
+ const added=[];
+ ids.forEach(function(id){
+  const p=_fsiState.filtered.find(function(x){ return String(x.parcel_id)===String(id); })
+   || _fsiState.raw.find(function(x){ return String(x.parcel_id)===String(id); });
+  if(!p) return;
+  const lead=fsiLeadFromParcel(p);
+  state.unshift(lead);
+  added.push(lead);
+ });
+ saveLeads();
+ _fsiState.selected=Object.create(null);
+ fsiRenderList();
+ if(typeof render==='function') render();
+ fsiSay('Added <b>'+added.length+'</b> leads — enriching phone/email…', true);
+ goTab('leads');
+ await bulkEnrichLeads(added.slice(0, ENRICH_MAX));
+}
+
+// Wire Enrich contacts (must stay after enrichVisibleLeads is defined)
+document.getElementById('enrichBtn')?.addEventListener('click', function(e){
+ e.preventDefault();
+ e.stopPropagation();
+ try{
+  enrichVisibleLeads();
+ }catch(err){
+  enrichStatus('Enrich failed: '+(err&&err.message?err.message:err));
+  console.error('enrichVisibleLeads', err);
+ }
+});
+
 document.getElementById('csvBtn').addEventListener('click',()=>{
- const cols=['name','city','industry','list','phone','email','website','contact','status','notes'];
- const head=['Name','City','Industry','List','Phone','Email','Website','Contact','Status','Notes','DNS'];
- const rows=state.filter(inView).map(function(l){
- const base=cols.map(c=>'"'+String(l[c]==null?'':l[c]).replace(/"/g,'""')+'"');
- const ws=resolveWebsiteScore(l);
- base.push('"'+String(ws? (ws.total+'/'+ws.grade) : '')+'"');
- return base.join(',');
+ const dueOnly=view==='Maintenance' && !!(document.getElementById('dueThisMonth')&&document.getElementById('dueThisMonth').checked);
+ const cols=['name','address','city','zip','parcel_id','industry','list','phone','email','website','contact','status','mgmt_company_name','maintenance_next_due','maintenance_frequency','maintenance_plan','next_follow_up_at','notes'];
+ const head=['Name','Address','City','ZIP','Parcel','Industry','List','Phone','Email','Website','Contact','Status','Mgmt co','Next due','Frequency','Plan','Follow-up','Notes','DNS'];
+ let list=state.filter(inView);
+ if(dueOnly){
+  list=list.filter(function(l){ return isDueThisMonth(l)||isOverdue(l); });
+ }
+ // Sort dial list: overdue first, then due this month by date, then name
+ if(view==='Maintenance'){
+  list=list.slice().sort(function(a,b){
+   const ao=isOverdue(a)?0:1, bo=isOverdue(b)?0:1;
+   if(ao!==bo) return ao-bo;
+   const ad=String(a.maintenance_next_due||''), bd=String(b.maintenance_next_due||'');
+   if(ad!==bd) return ad.localeCompare(bd);
+   return String(a.name||'').localeCompare(String(b.name||''));
+  });
+ }
+ const rows=list.map(function(l){
+  normalizeLead(l);
+  const base=cols.map(function(c){
+   let v=l[c];
+   if(c==='list') v=leadLists(l).join('|');
+   return '"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  });
+  const ws=resolveWebsiteScore(l);
+  base.push('"'+String(ws? (ws.total+'/'+ws.grade) : '')+'"');
+  return base.join(',');
  });
  const blob=new Blob([[head.join(',')].concat(rows).join('\n')],{type:'text/csv'});
- const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='floguard_leads_'+view.toLowerCase()+'.csv'; a.click();
+ const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+ const suffix=dueOnly?'_due_dials':('_'+view.toLowerCase());
+ a.download='floguard_leads'+suffix+'.csv'; a.click();
 });
 document.getElementById('jsonBtn').addEventListener('click',()=>{
  const doc={version:1,exported_at:new Date().toISOString(),leads:state};
@@ -2794,7 +3450,54 @@ document.getElementById('syncPill')&&(document.getElementById('syncPill').style.
  render();
  openProfile(l.id);
  });
- document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeProfile(); });
+ // Management company: + New / save / cancel
+ document.getElementById('pfMgmtAddBtn')?.addEventListener('click', function(){
+  document.getElementById('pfMgmtNew')?.classList.add('on');
+  document.getElementById('pfMgmtNewName')?.focus();
+ });
+ document.getElementById('pfMgmtCancelNew')?.addEventListener('click', function(){
+  document.getElementById('pfMgmtNew')?.classList.remove('on');
+ });
+ document.getElementById('pfMgmtSaveNew')?.addEventListener('click', function(){
+  const name=(document.getElementById('pfMgmtNewName')?.value||'').trim();
+  if(!name){ alert('Enter a management company name.'); return; }
+  const row=addMgmtCompany({
+   name:name,
+   phone:(document.getElementById('pfMgmtNewPhone')?.value||'').trim(),
+   contact:(document.getElementById('pfMgmtNewContact')?.value||'').trim()
+  });
+  if(!row) return;
+  fillMgmtSelect(document.getElementById('pfMgmtCompany'), row.id);
+  document.getElementById('pfMgmtNew')?.classList.remove('on');
+  ['pfMgmtNewName','pfMgmtNewPhone','pfMgmtNewContact'].forEach(function(id){
+   const el=document.getElementById(id); if(el) el.value='';
+  });
+  // Persist onto open lead immediately
+  const l=state.find(function(x){ return x.id===profileLeadId; });
+  if(l){
+   l.mgmt_company_id=row.id;
+   l.mgmt_company_name=row.name;
+   if(!leadLists(l).includes('PropertyMgmt')) toggleLeadCause(l, 'PropertyMgmt', true);
+   saveLeads(); render();
+  }
+ });
+ // Maintenance: auto-fill next due when last + freq change and next empty
+ function maybeFillNextDue(){
+  const last=document.getElementById('pfMntLast')?.value||'';
+  const freq=document.getElementById('pfMntFreq')?.value||'';
+  const nextEl=document.getElementById('pfMntNext');
+  if(!nextEl||nextEl.value) return;
+  const n=computeNextDue(last, freq);
+  if(n) nextEl.value=n;
+ }
+ document.getElementById('pfMntLast')?.addEventListener('change', maybeFillNextDue);
+ document.getElementById('pfMntFreq')?.addEventListener('change', maybeFillNextDue);
+ document.addEventListener('keydown', e=>{
+  if(e.key==='Escape'){
+   closeProfile();
+   closeNavMenu();
+  }
+ });
 })();
 
 /* Outbound drafts desk */
@@ -3115,6 +3818,68 @@ function fsiStory(p){
 }
 function fsiOneLiner(p){ return fsiStory(p).split(/[.—]/)[0]; }
 
+/**
+ * Soft product-cause suggestions from public parcel signals.
+ * Assessment decides the real product — never treat these as quotes.
+ * Returns [{cause, why, strength:'high'|'med'|'low'}] ordered by strength.
+ */
+function fsiSuggestCauses(p){
+ if(!p) return [];
+ const zone=String(p.fema_zone||'').toUpperCase();
+ const hsg=String(p.hsg||'').toUpperCase();
+ const live=Number(p.fsi_live)||0;
+ const s=Number(p.fsi_static)||0;
+ const heat=Number(p.claim_heat)||0;
+ const jv=Number(p.just_value)||0;
+ const twi=Number(p.twi_n), hand=Number(p.hand_n);
+ const mhs=Number(p.must_have_score);
+ const band=String(p.must_have_band||'').toLowerCase();
+ const use=String(p.use_desc||p.dor_use||'').toLowerCase();
+ const year=Number(p.year_built)||0;
+ const poorSoil=/D|C\/D|D\//.test(hsg)||hsg==='C';
+ const zoneX=zone==='X'||zone==='X-SHADED';
+ const femaFlood=['AE','VE','AO','AH'].indexOf(zone)>=0;
+ const commercial=jv>=900000||/commercial|condo|multi|apt|apartment|office|retail|hotel|motel|warehouse/.test(use);
+ const scored={};
+ function bump(cause, why, strength){
+  const rank={high:3,med:2,low:1};
+  const prev=scored[cause];
+  if(!prev||rank[strength]>rank[prev.strength]) scored[cause]={cause:cause,why:why,strength:strength};
+ }
+ // French drain — terrain bowls, poor soil, high FSI / must
+ if(zoneX&&poorSoil) bump('FrenchDrain','Zone '+zone+' + poor-drain soil', 'high');
+ else if(poorSoil&&(live>=55||s>=0.55||band==='must')) bump('FrenchDrain','Poor soil + elevated risk', 'high');
+ else if(isFinite(twi)&&twi>=0.7) bump('FrenchDrain','High wetness index (TWI)', 'med');
+ else if(live>=50||s>=0.5||band==='must') bump('FrenchDrain','Elevated FSI / must band', 'med');
+ else if(heat>=0.45) bump('FrenchDrain','Claim-hot neighborhood', 'low');
+ // Sump — high water / low freeboard / FEMA flood / coastal signals
+ if(isFinite(hand)&&hand<=0.25) bump('SumpPump','Low freeboard (HAND)', 'high');
+ else if(femaFlood) bump('SumpPump','FEMA '+zone+' — groundwater / flood fringe', 'med');
+ else if(isFinite(twi)&&twi>=0.8&&poorSoil) bump('SumpPump','Very wet terrain + clay', 'med');
+ else if(band==='must'&&(femaFlood||poorSoil)) bump('SumpPump','Must dial + water-table risk', 'low');
+ // Yard — surface drainage / grading on better soil or yard-scale parcels
+ if(zoneX&&!poorSoil&&(live>=40||heat>=0.35)) bump('YardDrainage','Zone X surface drainage / grading', 'med');
+ else if(/residential|single|duplex|town/.test(use)&&live>=45&&!femaFlood) bump('YardDrainage','Residential surface water risk', 'low');
+ else if(hsg==='A'||hsg==='B'){ if(live>=55||heat>=0.5) bump('YardDrainage','Better soil but wet site — catch basins / grading', 'low'); }
+ // Maintenance — older stock or already a dial priority (service plan lane)
+ if(year>0&&year<=1995) bump('Maintenance','Older stock (built '+year+') — storm-ready plan', 'med');
+ else if(band==='must'||live>=60) bump('Maintenance','High-risk site — seasonal pump/drain checks', 'low');
+ else if(heat>=0.55) bump('Maintenance','Claim-hot area — readiness visits', 'low');
+ // Property mgmt — commercial / condo / multi scale
+ if(commercial) bump('PropertyMgmt', jv>=900000?('Commercial scale · $'+Math.round(jv/1000)+'k JV'):'Multi/condo use class', 'high');
+ else if(/hoa|condo|association/.test(use)) bump('PropertyMgmt','HOA / condo use', 'med');
+
+ const order={high:0,med:1,low:2};
+ return Object.keys(scored).map(function(k){ return scored[k]; })
+  .sort(function(a,b){ return (order[a.strength]-order[b.strength])||a.cause.localeCompare(b.cause); });
+}
+function fsiSuggestChipHtml(sugs){
+ if(!sugs||!sugs.length) return '';
+ return sugs.map(function(s){
+  return '<span class="suggest-chip str-'+esc(s.strength)+'" title="'+esc(s.why)+'"><b>'+esc(LIST_SHORT[s.cause]||s.cause)+'</b> <span class="why">'+esc(s.why)+'</span></span>';
+ }).join('');
+}
+
 async function fsiFetch(payload){
  const tok=getToken();
  if(!tok) throw new Error('Session expired — log in again.');
@@ -3398,6 +4163,19 @@ function fsiRenderDrawer(){
   bd.style.display='block';
   bd.innerHTML='<h4>Terrain factors</h4><p class="hint" style="margin:0">Run enrich-dem-lite for TWI/HAND proxies, or full LiDAR for engineering-grade terrain.</p>';
  }
+ // Soft suggested causes from FSI / soil / zone / value
+ const sugs=fsiSuggestCauses(p);
+ const sugBox=document.getElementById('fsiDrSuggest');
+ const sugChips=document.getElementById('fsiDrSuggestChips');
+ if(sugBox&&sugChips){
+  if(sugs.length){
+   sugBox.style.display='block';
+   sugChips.innerHTML=fsiSuggestChipHtml(sugs);
+  }else{
+   sugBox.style.display='none';
+   sugChips.innerHTML='';
+  }
+ }
  fsiDrMsg('');
 }
 
@@ -3645,7 +4423,17 @@ function fsiInit(){
 
 function fsiLeadFromParcel(p){
  const story=fsiStory(p);
- const primary='FrenchDrain';
+ const sugs=fsiSuggestCauses(p);
+ // Soft: primary = top high/med suggestion, else FrenchDrain; multi-check only high-strength soft tags
+ const high=sugs.filter(function(s){ return s.strength==='high'; }).map(function(s){ return s.cause; });
+ const med=sugs.filter(function(s){ return s.strength==='med'; }).map(function(s){ return s.cause; });
+ let lists=high.length?high.slice():(med.length?[med[0]]:['FrenchDrain']);
+ // Cap soft multi-assign at 2 causes so list tabs stay focused; rest stay in suggested_causes
+ if(lists.length>2) lists=lists.slice(0,2);
+ if(!lists.includes('FrenchDrain')&&!lists.includes('SumpPump')&&!lists.includes('YardDrainage')&&!lists.includes('PropertyMgmt')){
+  if(!lists.includes('FrenchDrain')) lists.unshift('FrenchDrain');
+ }
+ const primary=lists[0]||'FrenchDrain';
  const cityKey=fsiParcelCity(p);
  const city=cityKey?fsiTitleCase(cityKey):(function(){
   const a=String(p.address||'');
@@ -3653,7 +4441,15 @@ function fsiLeadFromParcel(p){
  })();
  const jv=Number(p.just_value)||0;
  const industry=jv>=900000?'Commercial':'Residential';
+ const sugLine=sugs.length
+  ? ('Suggested causes (soft): '+sugs.map(function(s){ return s.cause+' ['+s.strength+'] — '+s.why; }).join('; '))
+  : 'Suggested causes (soft): none — default FrenchDrain';
+ const siteAddr=String(p.address||'').trim();
+ const zip=p.zip?String(p.zip).trim():(function(){
+  const m=siteAddr.match(/\bFL\s*(\d{5})(?:-\d{4})?\b/i); return m?m[1]:'';
+ })();
  const notes=['FSI map import',
+  'Site address: '+(siteAddr||'—'),
   'Must-Have: '+(isFinite(Number(p.must_have_score))?fsiNum(p.must_have_score):'—')+' ('+(p.must_have_band||'—')+')',
   'Live FSI: '+fsiNum(p.fsi_live),
   'Terrain S: '+fsiNum(p.fsi_static,3),
@@ -3664,16 +4460,25 @@ function fsiLeadFromParcel(p){
   'Claim heat (neighborhood): '+(isFinite(Number(p.claim_heat))?fsiNum(p.claim_heat,2):'—')+' / n~'+(p.claim_count_10y||0),
   'Parcel: '+(p.parcel_id||''),
   story,
-  'Note: claim heat is OpenFEMA tract/grid aggregate — not a personal claim and not insurance advice.'
+  sugLine,
+  'Contact: owner name + site address from Volusia property appraiser (public). Phone/email not on tax roll — enrich separately; DNC before dial.',
+  'Note: claim heat is OpenFEMA tract/grid aggregate — not a personal claim and not insurance advice. Assessment decides product.'
  ].join('\n');
  const lead={
   id:nextId(),
-  name:p.owner_name||p.address||('Parcel '+p.parcel_id),
-  city:city, industry:industry, list:primary, lists:[primary], list_status:{},
+  // Owner name from tax roll (real public record) — not a generated alias
+  name:(p.owner_name&&String(p.owner_name).trim())||siteAddr||('Parcel '+p.parcel_id),
+  address:siteAddr,
+  city:city,
+  zip:zip,
+  parcel_id:p.parcel_id?String(p.parcel_id):'',
+  industry:industry, list:primary, lists:lists, list_status:{},
+  // Phone/email intentionally empty: county GIS does not publish them
   phone:'', website:'', contact:'', email:'', status:'New', notes:notes, source:'FSI map',
-  lists_touched:true
+  lists_touched:true,
+  suggested_causes:sugs
  };
- setListStatus(lead, primary, 'New');
+ lists.forEach(function(c){ setListStatus(lead, c, 'New'); });
  return lead;
 }
 async function fsiAddLead(){
@@ -3684,24 +4489,27 @@ async function fsiAddLead(){
  state.unshift(lead);
  saveLeads();
  if(typeof render==='function') render();
- fsiDrMsg('Added to Leads · FrenchDrain · New · '+lead.industry+'. Open Leads tab to dial.','ok');
+ const addrNote=lead.address?(' · '+lead.address):' · (no address on parcel)';
+ fsiDrMsg('Added real tax-roll lead · '+leadLists(lead).join(', ')+addrNote+'. Phone/email not on appraiser data — enrich before dialing.','ok');
 }
 function fsiBulkAddLeads(){
  const ids=Object.keys(_fsiState.selected).filter(function(id){ return _fsiState.selected[id]; });
  if(!ids.length){ fsiSay('Select one or more parcels first.'); return; }
- let n=0;
+ let n=0, withAddr=0;
  ids.forEach(function(id){
   const p=_fsiState.filtered.find(function(x){ return String(x.parcel_id)===String(id); })
    || _fsiState.raw.find(function(x){ return String(x.parcel_id)===String(id); });
   if(!p) return;
-  state.unshift(fsiLeadFromParcel(p));
+  const lead=fsiLeadFromParcel(p);
+  if(lead.address) withAddr++;
+  state.unshift(lead);
   n++;
  });
  saveLeads();
  if(typeof render==='function') render();
  _fsiState.selected=Object.create(null);
  fsiRenderList();
- fsiSay('<b>'+n+'</b> leads added · FrenchDrain · New. Scrub DNC before dialing.',true);
+ fsiSay('<b>'+n+'</b> tax-roll leads added · <b>'+withAddr+'</b> with site address · phone/email need enrich · DNC before dial.',true);
 }
 function fsiBulkExportCsv(){
  const ids=Object.keys(_fsiState.selected).filter(function(id){ return _fsiState.selected[id]; });
@@ -3786,6 +4594,7 @@ document.getElementById('fsiSelectAll')?.addEventListener('change',function(){
  _fsiState.filtered.forEach(function(p){ if(on) _fsiState.selected[p.parcel_id]=true; else delete _fsiState.selected[p.parcel_id]; });
  fsiRenderList();
 });
+document.getElementById('fsiBulkEnrich')?.addEventListener('click',function(){ fsiBulkAddAndEnrich(); });
 document.getElementById('fsiBulkLeads')?.addEventListener('click',function(){ fsiBulkAddLeads(); });
 document.getElementById('fsiBulkCsv')?.addEventListener('click',function(){ fsiBulkExportCsv(); });
 document.getElementById('fsiBulkClear')?.addEventListener('click',function(){

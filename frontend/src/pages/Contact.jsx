@@ -71,7 +71,7 @@ export default function Contact() {
           <div className="lg:col-span-5 lg:pt-6">
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: EASE }}>
               <p className="overline mb-5">Free · No obligation · 24-hr response</p>
-              <h1 className="font-display text-5xl sm:text-6xl tracking-tight leading-[0.95]">
+              <h1 className="font-display text-[2.25rem] sm:text-5xl md:text-6xl tracking-tight leading-[0.95] break-words">
                 Standing water <span className="text-brand-orange">wrecking</span> your Florida yard?
               </h1>
               <p className="mt-6 text-lg text-white/70 max-w-lg">

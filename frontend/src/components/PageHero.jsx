@@ -24,7 +24,7 @@ export const PageHero = ({ overline, title, subtitle, image, primary, secondary,
       <div className="absolute inset-0 bg-gradient-to-r from-brand-ink/75 via-brand-ink/15 to-transparent" />
       <div className="absolute inset-0 bg-[radial-gradient(#ffffff_0.6px,transparent_1px)] bg-[length:3px_3px] opacity-[0.035]" />
 
-      <div className={`container-fg relative z-10 pb-16 pt-40 ${align === "center" ? "text-center mx-auto" : ""}`}>
+      <div className={`container-fg relative z-10 pb-12 sm:pb-16 pt-32 sm:pt-40 ${align === "center" ? "text-center mx-auto" : ""}`}>
         {overline && (
           <motion.p
             initial={{ opacity: 0, y: 12 }}
@@ -39,7 +39,7 @@ export const PageHero = ({ overline, title, subtitle, image, primary, secondary,
           initial={{ opacity: 0, y: 24, filter: "blur(10px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 0.9, ease: EASE, delay: 0.12 }}
-          className="font-display text-5xl sm:text-6xl lg:text-7xl tracking-[-1.2px] leading-[0.92] max-w-4xl"
+          className="font-display text-[2.35rem] sm:text-5xl md:text-6xl lg:text-7xl tracking-[-1px] sm:tracking-[-1.2px] leading-[0.95] sm:leading-[0.92] max-w-4xl break-words"
         >
           {title}
         </motion.h1>
@@ -49,7 +49,7 @@ export const PageHero = ({ overline, title, subtitle, image, primary, secondary,
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.5 }}
-            className="mt-6 text-lg text-white/70 max-w-xl leading-relaxed"
+            className="mt-5 sm:mt-6 text-base sm:text-lg text-white/70 max-w-xl leading-relaxed"
           >
             {subtitle}
           </motion.p>
@@ -60,13 +60,13 @@ export const PageHero = ({ overline, title, subtitle, image, primary, secondary,
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.65 }}
-            className="mt-9 flex flex-wrap gap-4"
+            className="mt-7 sm:mt-9 flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4"
           >
             {primary && (
               <Link
                 to={primary.to}
                 data-testid="hero-primary-cta"
-                className="inline-flex items-center bg-brand-orange text-white px-8 py-4 text-sm font-bold uppercase tracking-wider rounded-sm hover:bg-brand-orangeDark transition-colors"
+                className="inline-flex items-center justify-center bg-brand-orange text-white px-6 sm:px-8 py-3.5 sm:py-4 text-sm font-bold uppercase tracking-wider rounded-sm hover:bg-brand-orangeDark transition-colors min-h-[48px]"
               >
                 {primary.label}
               </Link>
@@ -75,7 +75,7 @@ export const PageHero = ({ overline, title, subtitle, image, primary, secondary,
               <Link
                 to={secondary.to}
                 data-testid="hero-secondary-cta"
-                className="inline-flex items-center border border-white/25 text-white px-8 py-4 text-sm font-bold uppercase tracking-wider rounded-sm hover:bg-white/10 transition-colors"
+                className="inline-flex items-center justify-center border border-white/25 text-white px-6 sm:px-8 py-3.5 sm:py-4 text-sm font-bold uppercase tracking-wider rounded-sm hover:bg-white/10 transition-colors min-h-[48px]"
               >
                 {secondary.label}
               </Link>
