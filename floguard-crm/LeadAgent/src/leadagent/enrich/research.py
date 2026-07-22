@@ -9,6 +9,7 @@ import yaml
 
 from leadagent.db import Database
 from leadagent.enrich.apify_client import ApifyClient
+from leadagent.enrich.batchdata import batchdata_skip_trace
 from leadagent.enrich.contact_finder import (
     contacts_from_apify_items,
     discover_website_via_search,
@@ -442,6 +443,45 @@ def _run_free_contact_pass(
             )[:3]
 
 
+def _run_batchdata_pass(
+    settings: Settings,
+    lead: Lead,
+    brief: ResearchBrief,
+) -> None:
+    """
+    Paid residential skip-trace: owner phone/email from property address
+    + owner name. Runs only when a key is configured, the lead has a site
+    address, and phone or email is still missing after free discovery.
+    """
+    if brief.phone and brief.emails_found:
+        return
+    result = batchdata_skip_trace(
+        lead,
+        api_key=getattr(settings, "batchdata_api_key", ""),
+        api_url=getattr(settings, "batchdata_api_url", "https://api.batchdata.com"),
+    )
+    if result is None:
+        return  # no key configured
+    brief.raw["batchdata"] = {
+        "ok": result.get("ok"),
+        "error": result.get("error", ""),
+        "phone_count": len(result.get("phones") or []),
+        "email_count": len(result.get("emails") or []),
+    }
+    if not result.get("ok"):
+        brief.risk_flags.append(f"batchdata_error:{result.get('error', 'unknown')}")
+        return
+    _apply_contacts_to_brief(
+        brief,
+        phones=list(result.get("phones") or []),
+        emails=list(result.get("emails") or []),
+    )
+    if result.get("phones") or result.get("emails"):
+        brief.hook_candidates = (
+            ["Owner contact via BatchData skip-trace"] + brief.hook_candidates
+        )[:3]
+
+
 def enrich_lead(
     settings: Settings,
     db: Database,
@@ -591,6 +631,10 @@ def enrich_lead(
             enabled=getattr(settings, "enrich_free_discovery", True),
         )
 
+    # Residential skip-trace fills remaining phone/email gaps (needs address)
+    if (lead.address or "").strip():
+        _run_batchdata_pass(settings, lead, brief)
+
     # Prefer lead email already known
     if lead.email and lead.email.strip().lower() not in brief.emails_found:
         brief.emails_found.insert(0, lead.email.strip().lower())
@@ -610,7 +654,11 @@ def enrich_lead(
         source = "merged"
     elif apify_items or (apify_ran_at and actors_run):
         source = "apify" if apify_items or actors_run else source
-    elif brief.raw.get("site_scrape") or brief.raw.get("website_search"):
+    elif (
+        brief.raw.get("site_scrape")
+        or brief.raw.get("website_search")
+        or brief.raw.get("batchdata")
+    ):
         source = "contacts"
     elif not run_apify and brief.raw.get("apify_skipped"):
         # Gap-fill only after prior Apify

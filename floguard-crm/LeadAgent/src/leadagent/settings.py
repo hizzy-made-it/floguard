@@ -26,6 +26,11 @@ class Settings(BaseSettings):
     # Free website search + site scrape for phone/email (no Apify)
     enrich_free_discovery: bool = True
 
+    # BatchData property skip-trace (residential owner phone/email).
+    # Key must have Property Skip Trace API permission enabled.
+    batchdata_api_key: str = ""
+    batchdata_api_url: str = "https://api.batchdata.com"
+
     leadagent_db: Path = Field(default=REPO_ROOT / "data" / "leadagent.db")
     leadagent_config_dir: Path = Field(default=REPO_ROOT / "config")
 
