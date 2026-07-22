@@ -5,9 +5,6 @@ import { COMPANY, IMAGES } from "../data/site";
 import { Seo, organizationLd, faqPageLd } from "../components/Seo";
 import { LANDING_FAQ } from "../data/site";
 
-// Below-fold content (framer-motion, forms, testimonials) loads after hero paints
-const HomeBelowFold = lazy(() => import("./HomeBelowFold"));
-
 const headline = ["Protected", "flow.", "Engineered", "trust."];
 
 const JOURNEY_PHASES = [
@@ -27,107 +24,169 @@ function getJourneyLabel(p) {
   return JOURNEY_PHASES[0].label;
 }
 
+/** Load below-fold only after browser is idle (or short timeout). Keeps framer off the critical path. */
+function useDeferredMount(ms = 1200) {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    const go = () => {
+      if (!cancelled) setReady(true);
+    };
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(go, { timeout: ms });
+      return () => {
+        cancelled = true;
+        window.cancelIdleCallback?.(id);
+      };
+    }
+    const t = setTimeout(go, Math.min(ms, 800));
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [ms]);
+  return ready;
+}
+
+const HomeBelowFold = lazy(() => import("./HomeBelowFold"));
+
 export default function Home() {
   // Scroll + drag driven progress for the cinematic hero video.
-  // Maps scroll/drag to time position in the water journey video (inside-pipe droplet camera follow).
+  // DOM updates via refs — avoid React re-render storms on scroll/timeupdate.
   const heroProgressRef = useRef(0);
-  const [heroProgress, setHeroProgress] = useState(0);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
 
   const videoRef = useRef(null);
-  const [videoDuration, setVideoDuration] = useState(8); // updated from metadata
+  const progressBarRef = useRef(null);
+  const labelRef = useRef(null);
+  const videoDurationRef = useRef(8);
+  const lastLabelRef = useRef(JOURNEY_PHASES[0].label);
+
+  const showBelowFold = useDeferredMount(1500);
+
+  const paintProgress = (p) => {
+    heroProgressRef.current = p;
+    if (progressBarRef.current) {
+      progressBarRef.current.style.transform = `scaleX(${p})`;
+    }
+    const label = getJourneyLabel(p);
+    if (label !== lastLabelRef.current) {
+      lastLabelRef.current = label;
+      if (labelRef.current) labelRef.current.textContent = label;
+    }
+  };
 
   useEffect(() => {
-    const range = 1.35; // scroll distance in viewport heights for full scrub control
-    let ticking = false;
     setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
+  }, []);
+
+  // Defer video source until after first paint / idle — poster is LCP; 20MB+ was crushing main thread
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) return;
+
+    const conn = navigator.connection;
+    // Still load on slow nets but later; Save-Data users keep poster only
+    if (conn?.saveData) return;
+
+    let cancelled = false;
+    const arm = () => {
+      if (!cancelled) setVideoReady(true);
+    };
+
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(arm, { timeout: 900 });
+      return () => {
+        cancelled = true;
+        window.cancelIdleCallback?.(id);
+      };
+    }
+    const t = setTimeout(arm, 400);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, []);
+
+  useEffect(() => {
+    const range = 1.35;
+    let ticking = false;
 
     const update = () => {
       const p = Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * range)));
-      heroProgressRef.current = p;
       if (!ticking) {
         ticking = true;
         requestAnimationFrame(() => {
-          setHeroProgress(p);
-          // scroll-driven seek into the video journey (replicates the previous 3D behavior)
+          paintProgress(p);
           const v = videoRef.current;
-          if (v) {
-            const dur = v.duration || videoDuration;
+          if (v && v.readyState >= 1) {
+            const dur = v.duration || videoDurationRef.current;
             const target = p * dur;
-            if (Math.abs(v.currentTime - target) > 0.06) {
-              v.currentTime = target;
+            if (Number.isFinite(target) && Math.abs(v.currentTime - target) > 0.1) {
+              try {
+                v.currentTime = target;
+              } catch {
+                /* ignore seek errors mid-load */
+              }
             }
           }
           ticking = false;
         });
       }
     };
-    update();
     window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-    };
-  }, [videoDuration]);
+    return () => window.removeEventListener("scroll", update);
+  }, []);
 
-  // Desktop mouse-drag scrub (alternative / additive to scroll)
   const dragActiveRef = useRef(false);
   const dragStartClientXRef = useRef(0);
   const dragStartPRef = useRef(0);
 
   const onHeroPointerDown = (e) => {
-    // Support mouse drag on desktop and horizontal touch drag on mobile for scrub
     dragActiveRef.current = true;
     dragStartClientXRef.current = e.clientX;
     dragStartPRef.current = heroProgressRef.current;
     e.currentTarget.setPointerCapture(e.pointerId);
-    // pause for precise manual control
-    if (videoRef.current) {
-      videoRef.current.pause();
-    }
+    if (videoRef.current) videoRef.current.pause();
   };
 
   const onHeroPointerMove = (e) => {
-    if (dragActiveRef.current) {
-      const dx = e.clientX - dragStartClientXRef.current;
-      const sensitivity = e.pointerType === "touch" ? 0.003 : 0.002;
-      let np = dragStartPRef.current + dx * sensitivity;
-      np = Math.max(0, Math.min(1, np));
-      heroProgressRef.current = np;
-      setHeroProgress(np);
-      // drive video time immediately for responsive scrub
-      const v = videoRef.current;
-      if (v) {
-        const dur = v.duration || videoDuration;
+    if (!dragActiveRef.current) return;
+    const dx = e.clientX - dragStartClientXRef.current;
+    const sensitivity = e.pointerType === "touch" ? 0.003 : 0.002;
+    let np = Math.max(0, Math.min(1, dragStartPRef.current + dx * sensitivity));
+    paintProgress(np);
+    const v = videoRef.current;
+    if (v && v.readyState >= 1) {
+      const dur = v.duration || videoDurationRef.current;
+      try {
         v.currentTime = np * dur;
+      } catch {
+        /* ignore */
       }
     }
   };
 
   const onHeroPointerUp = (e) => {
-    if (dragActiveRef.current) {
-      dragActiveRef.current = false;
-      try {
-        e.currentTarget.releasePointerCapture(e.pointerId);
-      } catch (err) {
-        /* ignore */
-      }
-      // resume beautiful cinematic loop after drag
-      if (videoRef.current) {
-        videoRef.current.play().catch(() => {});
-      }
+    if (!dragActiveRef.current) return;
+    dragActiveRef.current = false;
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      /* ignore */
     }
+    if (videoRef.current) videoRef.current.play().catch(() => {});
   };
 
-  // Kick off the autoplay cinematic loop (browsers require muted for autoplay)
-  // DO NOT replace hero.mp4 — locked marketing asset.
+  // Autoplay cinematic loop after source is attached (muted required)
   useEffect(() => {
+    if (!videoReady) return;
     const v = videoRef.current;
     if (!v) return;
     const tryPlay = () => v.play().catch(() => {});
     tryPlay();
-    const t = setTimeout(tryPlay, 400);
+    const t = setTimeout(tryPlay, 300);
     const onVis = () => {
       if (document.hidden) v.pause();
       else if (!dragActiveRef.current) tryPlay();
@@ -137,7 +196,7 @@ export default function Home() {
       clearTimeout(t);
       document.removeEventListener("visibilitychange", onVis);
     };
-  }, []);
+  }, [videoReady]);
 
   return (
     <>
@@ -151,7 +210,7 @@ export default function Home() {
           "@graph": [organizationLd, faqPageLd(LANDING_FAQ.slice(0, 5))].filter(Boolean),
         }}
       />
-      {/* ===== CINEMATIC HERO (video) — CSS motion only, no framer-motion on LCP path ===== */}
+      {/* ===== CINEMATIC HERO (video) — poster LCP first; video deferred. DO NOT drop hero.mp4. ===== */}
       <section
         data-testid="home-hero"
         className="relative h-[100svh] h-[100dvh] min-h-[520px] sm:min-h-[640px] w-full max-w-[100vw] overflow-hidden"
@@ -161,7 +220,6 @@ export default function Home() {
         onPointerLeave={onHeroPointerUp}
         onPointerCancel={onHeroPointerUp}
       >
-        {/* LCP image: explicit img + preload in index.html. Video paints on top once ready. */}
         <img
           src={IMAGES.heroPoster}
           alt=""
@@ -172,37 +230,43 @@ export default function Home() {
           className="hero-media absolute inset-0 z-[1] object-cover"
           aria-hidden="true"
         />
-        <video
-          ref={videoRef}
-          src="/hero.mp4"
-          poster={IMAGES.heroPoster}
-          className="hero-media absolute inset-0 z-[2] object-cover"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          onLoadedMetadata={(e) => {
-            const v = e.currentTarget;
-            const d = v.duration;
-            if (d && d > 0) setVideoDuration(d);
-            const p = heroProgressRef.current || 0;
-            v.currentTime = p * d;
-          }}
-          onTimeUpdate={() => {
-            const v = videoRef.current;
-            if (v && !dragActiveRef.current) {
-              const dur = v.duration || videoDuration;
+        {videoReady && (
+          <video
+            ref={videoRef}
+            src="/hero.mp4"
+            poster={IMAGES.heroPoster}
+            className="hero-media absolute inset-0 z-[2] object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            onLoadedMetadata={(e) => {
+              const v = e.currentTarget;
+              const d = v.duration;
+              if (d && d > 0) videoDurationRef.current = d;
+              const p = heroProgressRef.current || 0;
+              try {
+                v.currentTime = p * d;
+              } catch {
+                /* ignore */
+              }
+            }}
+            onTimeUpdate={() => {
+              if (dragActiveRef.current) return;
+              const v = videoRef.current;
+              if (!v) return;
+              const dur = v.duration || videoDurationRef.current;
               if (dur > 0) {
                 const p = v.currentTime / dur;
-                if (Math.abs(p - heroProgressRef.current) > 0.012) {
-                  heroProgressRef.current = p;
-                  setHeroProgress(p);
+                // Wider threshold — fewer React/label updates during free play
+                if (Math.abs(p - heroProgressRef.current) > 0.04) {
+                  paintProgress(p);
                 }
               }
-            }
-          }}
-        />
+            }}
+          />
+        )}
 
         <div className="pointer-events-none absolute inset-0 z-[3] bg-gradient-to-t from-[#0B0F1A] via-[#0B0F1A]/75 via-35% to-transparent" />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-24 z-[3] bg-gradient-to-b from-[#0B0F1A]/40 to-transparent" />
@@ -259,12 +323,15 @@ export default function Home() {
           <div className="mt-4 sm:mt-5 flex items-center gap-2 sm:gap-3 text-[9px] sm:text-[10px] uppercase tracking-[2px] text-white/35">
             <div className="flex-1 h-px bg-white/15 overflow-hidden rounded">
               <div
-                className="h-px bg-brand-orange transition-[width] duration-100"
-                style={{ width: `${heroProgress * 100}%` }}
+                ref={progressBarRef}
+                className="h-px bg-brand-orange origin-left will-change-transform"
+                style={{ transform: "scaleX(0)" }}
               />
             </div>
             FOLLOW THE WATER
-            <span className="ml-1 text-brand-orange/70 tabular-nums">{getJourneyLabel(heroProgress)}</span>
+            <span ref={labelRef} className="ml-1 text-brand-orange/70 tabular-nums">
+              {JOURNEY_PHASES[0].label}
+            </span>
             <span className="ml-auto text-white/30">{isTouchDevice ? "swipe" : "drag"}</span>
           </div>
         </div>
@@ -277,9 +344,13 @@ export default function Home() {
         </div>
       </section>
 
-      <Suspense fallback={<div className="min-h-[40vh]" aria-hidden="true" />}>
-        <HomeBelowFold />
-      </Suspense>
+      {showBelowFold ? (
+        <Suspense fallback={<div className="min-h-[40vh]" aria-hidden="true" />}>
+          <HomeBelowFold />
+        </Suspense>
+      ) : (
+        <div className="min-h-[40vh]" aria-hidden="true" />
+      )}
     </>
   );
 }

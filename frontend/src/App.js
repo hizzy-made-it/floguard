@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Layout } from "./components/Layout";
-import { Loader } from "./components/Loader";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Analytics } from "./components/Analytics";
 // Home stays eager — primary LCP route (hero video + poster)
@@ -53,13 +52,11 @@ function MarketingRoutes() {
 }
 
 function MarketingApp() {
+  // No intro loader — it delayed LCP and added main-thread work on every first visit
   return (
-    <>
-      <Loader />
-      <Layout>
-        <MarketingRoutes />
-      </Layout>
-    </>
+    <Layout>
+      <MarketingRoutes />
+    </Layout>
   );
 }
 

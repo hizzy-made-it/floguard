@@ -1,23 +1,44 @@
-import { useEffect, lazy, Suspense } from "react";
+import { useEffect, lazy, Suspense, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import { ScrollProgress } from "./ScrollProgress";
-import { Cursor } from "./Cursor";
 
-// Chat is below the fold for interaction — keep out of initial JS
+// Desktop-only polish — never on critical path
+const Cursor = lazy(() => import("./Cursor").then((m) => ({ default: m.Cursor })));
 const ChatWidget = lazy(() =>
   import("./chat/ChatWidget").then((m) => ({ default: m.ChatWidget }))
 );
 
 export const Layout = ({ children }) => {
   const { pathname } = useLocation();
+  const [enableChrome, setEnableChrome] = useState(false);
 
-  // Smooth scroll (Lenis) — dynamic import so it never lands in the critical bundle
+  // Defer cursor / chat / lenis until idle so they don't steal main-thread from LCP
   useEffect(() => {
+    let cancelled = false;
+    const arm = () => {
+      if (!cancelled) setEnableChrome(true);
+    };
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(arm, { timeout: 2500 });
+      return () => {
+        cancelled = true;
+        window.cancelIdleCallback?.(id);
+      };
+    }
+    const t = setTimeout(arm, 1200);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, []);
+
+  // Smooth scroll (Lenis) — desktop only, after idle
+  useEffect(() => {
+    if (!enableChrome) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) return;
-
     const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
     if (isTouch) return;
 
@@ -28,9 +49,9 @@ export const Layout = ({ children }) => {
     import("lenis").then(({ default: Lenis }) => {
       if (cancelled) return;
       lenis = new Lenis({
-        duration: 1.1,
+        duration: 1.05,
         smoothWheel: true,
-        lerp: 0.1,
+        lerp: 0.12,
       });
       const loop = (t) => {
         lenis.raf(t);
@@ -44,7 +65,7 @@ export const Layout = ({ children }) => {
       if (raf) cancelAnimationFrame(raf);
       if (lenis) lenis.destroy();
     };
-  }, []);
+  }, [enableChrome]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -58,16 +79,18 @@ export const Layout = ({ children }) => {
       >
         Skip to main content
       </a>
-      <Cursor />
       <ScrollProgress />
       <Navbar />
       <main id="main-content" tabIndex={-1}>
         {children}
       </main>
       <Footer />
-      <Suspense fallback={null}>
-        <ChatWidget />
-      </Suspense>
+      {enableChrome && (
+        <Suspense fallback={null}>
+          <Cursor />
+          <ChatWidget />
+        </Suspense>
+      )}
     </div>
   );
 };
