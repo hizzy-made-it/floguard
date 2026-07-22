@@ -151,10 +151,13 @@ def batchdata_skip_trace(
         if not msg:
             msg = f"HTTP {r.status_code}"
         if r.status_code == 403:
-            msg += (
-                " (token OK but no Property Skip Trace API permission — "
-                "enable Skip Trace API in BatchData dashboard)"
-            )
+            if "balance" in msg.lower():
+                msg += " (add funds in the BatchData dashboard)"
+            else:
+                msg += (
+                    " (token OK but no Property Skip Trace API permission — "
+                    "enable Skip Trace API in BatchData dashboard)"
+                )
         return {
             "ok": False,
             "provider": "batchdata",

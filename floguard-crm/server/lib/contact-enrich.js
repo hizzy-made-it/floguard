@@ -475,10 +475,12 @@ async function batchDataSkipTrace(lead) {
             data?.status?.message ||
             data?.status?.text)) ||
         `HTTP ${r.status}`;
-      // 403 with a valid-looking token usually means the key product lacks Skip Trace API access
+      // 403 covers both missing Skip Trace API access and an empty account balance
       const hint =
         r.status === 403
-          ? ' (token OK but no Property Skip Trace API permission — enable Skip Trace API in BatchData dashboard or request a different key)'
+          ? /balance/i.test(String(msg))
+            ? ' (add funds in the BatchData dashboard)'
+            : ' (token OK but no Property Skip Trace API permission — enable Skip Trace API in BatchData dashboard or request a different key)'
           : '';
       return {
         ok: false,
