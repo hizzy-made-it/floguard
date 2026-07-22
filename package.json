@@ -1,0 +1,7 @@
+﻿{
+  "name": "floguard-monorepo",
+  "private": true,
+  "scripts": {
+    "build": "node -e \"console.error('ERROR: Vercel Root Directory must be floguard-crm (not repo root). Set it in Project Settings → General → Root Directory.'); process.exit(1)\""
+  }
+}

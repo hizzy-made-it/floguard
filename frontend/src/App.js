@@ -66,7 +66,7 @@ function CrmRedirect() {
     const path = window.location.pathname.replace(/^\/crm\/?/, "") || "";
     const qs = window.location.search || "";
     const hash = window.location.hash || "";
-    const target = `https://floguard-crm.vercel.app/crm/${path}${qs}${hash}`;
+    const target = `https://crm.floguardfl.com/crm/${path}${qs}${hash}`;
     window.location.replace(target);
   }
   return (
