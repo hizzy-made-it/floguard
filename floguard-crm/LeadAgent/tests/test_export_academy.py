@@ -23,6 +23,8 @@ def test_lead_to_academy_maps_labels_and_contact():
         industry="Property Management",
         lead_type="property_mgmt",
         contact_name="Denise Alvarez",
+        address="250 N Beach St",
+        zip="32114",
         source="List_Property_Mgmt",
     )
     # B2B portfolio account that also buys seasonal service
@@ -39,6 +41,8 @@ def test_lead_to_academy_maps_labels_and_contact():
     assert row["categories"] == ["property_mgmt", "maintenance"]
     assert row["status"] == "New"
     assert row["city"] == "Daytona Beach"
+    assert row["address"] == "250 N Beach St"
+    assert row["zip"] == "32114"
     assert not RETIRED_LABELS & set(row["lists"])
 
 

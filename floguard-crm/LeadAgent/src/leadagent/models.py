@@ -86,6 +86,11 @@ class Lead(BaseModel):
     website: str = ""
     email: str = ""
     contact_name: str = ""
+    # Site / tax-roll fields (CRM + FSI map parity)
+    address: str = ""
+    zip: str = ""
+    parcel_id: str = ""
+    owner: str = ""
     status: str = "New"
     notes: str = ""
     source: str = ""

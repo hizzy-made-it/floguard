@@ -107,7 +107,7 @@ def test_import_lists_multi_category(tmp_path: Path):
     assert nguyen.lead_type == "french_drain"  # primary type kept on merge
     assert "Standing water in the backyard" in nguyen.notes
     assert "musty" in nguyen.notes
-    assert "Addr: 1420 Dunlawton Ave" in nguyen.notes
+    assert nguyen.address == "1420 Dunlawton Ave"
     assert nguyen.phone == "386-555-0142"  # richer field from the first row wins
     assert "door-knock" in nguyen.source and "quiz" in nguyen.source
 

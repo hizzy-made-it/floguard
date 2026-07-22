@@ -35,6 +35,9 @@ def test_push_sends_bulk_upsert_with_secret(tmp_path: Path):
         city="Port Orange",
         lead_type="french_drain",
         contact_name="Mai Nguyen",
+        address="1420 Dunlawton Ave",
+        zip="32127",
+        parcel_id="12345-67",
         notes="DNS 78/B (urgent) | standing water for days; water in the crawlspace",
     )
     # Homeowner spanning two service lines
@@ -59,6 +62,9 @@ def test_push_sends_bulk_upsert_with_secret(tmp_path: Path):
     assert set(row["lists"]) == {"FrenchDrain", "SumpPump"}
     assert row["contact"] == "Mai Nguyen"  # contact_name → contact
     assert row["categories"] == ["french_drain", "sump_pump"]
+    assert row["address"] == "1420 Dunlawton Ave"
+    assert row["zip"] == "32127"
+    assert row["parcel_id"] == "12345-67"
     # Drainage Need Score rides along under the front-end's field name
     assert row["website_score"]["total"] == 78
     assert row["website_score"]["band"] == "urgent"
@@ -74,7 +80,7 @@ def test_pull_merges_status_and_categories(tmp_path: Path):
     db.upsert_lead(local)
 
     server_rows = [
-        {  # existing lead: status + contact + a second service line added in the CRM
+        {  # existing lead: status + contact + address + a second service line
             "name": "Nguyen Residence",
             "city": "Port Orange",
             "list": "FrenchDrain",
@@ -82,6 +88,9 @@ def test_pull_merges_status_and_categories(tmp_path: Path):
             "status": "Contacted",
             "contact": "Mai Nguyen",
             "phone": "386-555-0142",
+            "address": "1420 Dunlawton Ave",
+            "zip": "32127",
+            "parcel_id": "FG-PARCEL-9",
         },
         {  # brand-new B2B lead with round-trip metadata
             "name": "Coastal Property Management",
@@ -112,6 +121,9 @@ def test_pull_merges_status_and_categories(tmp_path: Path):
     assert nguyen.status == "Contacted"
     assert nguyen.contact_name == "Mai Nguyen"
     assert nguyen.phone == "386-555-0142"
+    assert nguyen.address == "1420 Dunlawton Ave"
+    assert nguyen.zip == "32127"
+    assert nguyen.parcel_id == "FG-PARCEL-9"
     cats = nguyen.category_list()
     assert "french_drain" in cats  # original membership kept
     assert "sump_pump" in cats  # label-only row merged back to an internal key

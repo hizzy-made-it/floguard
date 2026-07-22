@@ -7,9 +7,9 @@ Lists (looked up in the local ``Lead Tools/`` folder):
 CSV columns (both files, header row required):
   name           Homeowner or company name. Rows whose name starts with
                  "EXAMPLE" are template rows and are skipped.
-  address        Street address — stored in notes as "Addr: …" (Lead has no
-                 dedicated address field).
+  address        Street address → Lead.address (also kept in notes for DNS context).
   city           City (merge key together with name).
+  zip            Optional ZIP → Lead.zip
   phone          Phone number.
   email          Email address.
   property_type  e.g. "Single-family home", "Rental portfolio" → Lead.industry.
@@ -39,11 +39,14 @@ from typing import Any
 from leadagent.db import Database
 from leadagent.models import Lead
 
-# Default locations: repo-relative ``Lead Tools`` plus the absolute fallback.
+# Default locations under the FloGuard monorepo (no legacy HD paths).
+# parents[2] = LeadAgent/, parents[3] = floguard-crm/
+_LEADAGENT_ROOT = Path(__file__).resolve().parents[2]
+_CRM_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_LIST_DIRS = [
-    Path(__file__).resolve().parents[3] / "Lead Tools",
-    Path(__file__).resolve().parents[2] / ".." / "Lead Tools",
-    Path(r"C:\1projects\_deploy_hdacademy\floguard-crm\Lead Tools"),
+    _CRM_ROOT / "Lead Tools",
+    _LEADAGENT_ROOT / "Lead Tools",
+    Path(r"C:\1projects\floguard\floguard-crm\Lead Tools"),
 ]
 
 LIST_FILES = {
@@ -101,6 +104,9 @@ def _upsert_multi(
     email: str = "",
     website: str = "",
     contact: str = "",
+    address: str = "",
+    zip: str = "",
+    parcel_id: str = "",
     status: str = "New",
     notes: str = "",
     source: str = "",
@@ -123,6 +129,12 @@ def _upsert_multi(
             existing.website = website
         if contact and not existing.contact_name:
             existing.contact_name = contact
+        if address and not existing.address:
+            existing.address = address
+        if zip and not existing.zip:
+            existing.zip = zip
+        if parcel_id and not existing.parcel_id:
+            existing.parcel_id = parcel_id
         if notes:
             if notes not in (existing.notes or ""):
                 existing.notes = (existing.notes + " | " + notes).strip(" |")
@@ -144,6 +156,9 @@ def _upsert_multi(
         email=email,
         website=website,
         contact_name=contact,
+        address=address,
+        zip=zip,
+        parcel_id=parcel_id,
         status=status or "New",
         notes=notes,
         source=source,
@@ -152,9 +167,8 @@ def _upsert_multi(
     return db.upsert_lead(lead)
 
 
-def _row_notes(issue_notes: str, address: str) -> str:
-    bits = [b for b in [issue_notes, f"Addr: {address}" if address else ""] if b]
-    return " · ".join(bits)
+def _row_notes(issue_notes: str) -> str:
+    return (issue_notes or "").strip()
 
 
 def import_homeowners(db: Database, path: Path) -> dict[str, int]:
@@ -168,6 +182,7 @@ def import_homeowners(db: Database, path: Path) -> dict[str, int]:
                 continue
             address = _clean(row.get("address"))
             city = _clean(row.get("city"))
+            zip_code = _clean(row.get("zip") or row.get("postal"))
             phone = _clean(row.get("phone"))
             email = _clean(row.get("email"))
             property_type = _clean(row.get("property_type"))
@@ -186,8 +201,10 @@ def import_homeowners(db: Database, path: Path) -> dict[str, int]:
                 categories=[category],
                 phone=phone,
                 email=email,
+                address=address,
+                zip=zip_code,
                 status="New",
-                notes=_row_notes(issue_notes, address),
+                notes=_row_notes(issue_notes),
                 source=source or "List_Homeowners",
             )
             if before:
@@ -208,6 +225,7 @@ def import_property_mgmt(db: Database, path: Path) -> dict[str, int]:
                 continue
             address = _clean(row.get("address"))
             city = _clean(row.get("city"))
+            zip_code = _clean(row.get("zip") or row.get("postal"))
             phone = _clean(row.get("phone"))
             email = _clean(row.get("email"))
             property_type = _clean(row.get("property_type"))
@@ -224,8 +242,10 @@ def import_property_mgmt(db: Database, path: Path) -> dict[str, int]:
                 categories=["property_mgmt"],
                 phone=phone,
                 email=email,
+                address=address,
+                zip=zip_code,
                 status="New",
-                notes=_row_notes(issue_notes, address),
+                notes=_row_notes(issue_notes),
                 source=source or "List_Property_Mgmt",
             )
             if before:

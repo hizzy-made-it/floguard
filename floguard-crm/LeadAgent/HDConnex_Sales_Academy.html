@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HD Connex Sales Academy</title>
+<style>
+:root{--ink:#1a1d21;--muted:#5b636b;--accent:#e8791a;--accent2:#16a394;--line:#e2e6ea;--band:#12161c;--bg:#f6f8fa;}
+*{box-sizing:border-box}
+body{font-family:'Segoe UI',Helvetica,Arial,sans-serif;color:var(--ink);margin:0;background:var(--bg);font-size:14px;}
+.band{background:var(--band);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.band .l{display:flex;align-items:center;gap:14px;}
+.band img{height:52px;border-radius:5px;display:block;}
+.band .ttl{color:#fff;line-height:1.2;}
+.band .ttl b{font-size:17px;color:#f2a24e;letter-spacing:.5px;display:block;}
+.band .ttl span{font-size:11px;color:#b9c1c9;}
+.nav{display:flex;gap:4px;flex-wrap:wrap;}
+.nav button{padding:9px 15px;border:0;border-radius:8px;background:transparent;color:#c8cfd6;cursor:pointer;font-weight:700;font-size:13px;}
+.nav button.on{background:var(--accent);color:#fff;}
+.nav button:hover:not(.on){background:#232a33;}
+.rule{height:4px;background:linear-gradient(90deg,var(--accent) 0%,var(--accent) 55%,var(--accent2) 100%);}
+.wrap{max-width:1280px;margin:0 auto;padding:16px 22px 60px;}
+h1{font-size:19px;margin:6px 0 2px;}
+h2{font-size:15px;margin:16px 0 6px;color:var(--accent);}
+.sub{color:var(--muted);font-size:12.5px;margin:0 0 14px;}
+.panel{display:none;}
+.panel.on{display:block;}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:end;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:12px;}
+.field{display:flex;flex-direction:column;gap:3px;}
+.field label{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:600;}
+select,input,textarea,button{font-family:inherit;font-size:13px;}
+select,input[type=text],input[type=search],input[type=password]{padding:7px 9px;border:1px solid #cdd4da;border-radius:7px;background:#fff;color:var(--ink);}
+.tabs{display:flex;border:1px solid #cdd4da;border-radius:8px;overflow:hidden;}
+.tabs button{padding:8px 16px;border:0;background:#fff;cursor:pointer;font-weight:600;color:var(--muted);border-right:1px solid #cdd4da;}
+.tabs button:last-child{border-right:0;}
+.tabs button.on{background:var(--accent);color:#fff;}
+.btn{padding:8px 13px;border:1px solid #cdd4da;background:#fff;border-radius:7px;cursor:pointer;font-weight:600;color:#333;}
+.btn:hover{background:#f0f2f4;}
+.btn.p{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+.btn.p:hover{filter:brightness(1.05);background:var(--accent2);}
+.btn.o{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn.d{color:#b23;border-color:#e3b7bd;}
+.btn:disabled{opacity:.5;cursor:default;}
+.spacer{flex:1;}
+.stats{font-size:12px;color:var(--muted);margin:2px 0 10px;}
+.stats b{color:var(--ink);}
+.maps{background:#fff;border:1px solid var(--line);border-radius:10px;margin-bottom:14px;overflow:hidden;}
+.maps summary{cursor:pointer;padding:11px 14px;font-weight:700;background:#fff6ec;color:#a2540f;list-style:none;}
+.maps summary::-webkit-details-marker{display:none;}
+.maps summary::before{content:'▸ ';color:var(--accent);}
+.maps[open] summary::before{content:'▾ ';}
+.maps .body{padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.maps h3{margin:0 0 6px;font-size:13px;color:var(--accent);}
+.maps ol{margin:0 0 8px;padding-left:18px;font-size:12.5px;color:#3a444d;}
+.maps ol li{margin:3px 0;}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.chips a,.chips button{font-size:11.5px;background:#eef7f5;border:1px solid #bfe3dc;color:#0d7d6f;padding:3px 8px;border-radius:20px;text-decoration:none;cursor:pointer;}
+.chips a:hover,.chips button:hover{background:#dcefeb;}
+.row2{display:flex;gap:8px;flex-wrap:wrap;align-items:end;margin-bottom:8px;}
+textarea{width:100%;min-height:88px;padding:8px;border:1px solid #cdd4da;border-radius:7px;resize:vertical;}
+.tablewrap{background:#fff;border:1px solid var(--line);border-radius:10px;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;min-width:1080px;}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:middle;}
+th{background:#f4f6f8;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:#39424b;position:sticky;top:0;}
+tbody tr:hover{background:#fbfcfd;}
+td input,td select{width:100%;border:1px solid transparent;background:transparent;padding:5px 6px;border-radius:5px;}
+td input:hover,td select:hover{border-color:#e2e6ea;}
+td input:focus,td select:focus{border-color:var(--accent);background:#fff;outline:none;}
+td.name input{font-weight:600;}
+.listsel{font-size:11.5px;font-weight:600;}
+.del{border:0;background:transparent;color:#c33;cursor:pointer;font-size:15px;line-height:1;padding:2px 4px;}
+.coachbtn{border:1px solid #bfe3dc;background:#eef7f5;color:#0d7d6f;border-radius:6px;cursor:pointer;font-size:11px;padding:3px 7px;font-weight:700;}
+.status-sel{font-size:11.5px;}
+.badge-web{color:#0b63b8;} .badge-spon{color:#a2540f;} .badge-both{color:#0d7d6f;}
+.foot{margin-top:18px;font-size:11px;color:var(--muted);text-align:center;}
+.hint{font-size:11.5px;color:var(--muted);}
+a.maplink{color:var(--accent2);text-decoration:none;font-weight:600;}
+/* ---- chat ---- */
+.chatgrid{display:grid;grid-template-columns:280px 1fr;gap:14px;align-items:start;}
+.side{display:flex;flex-direction:column;gap:12px;}
+.chatbox{background:#fff;border:1px solid var(--line);border-radius:10px;display:flex;flex-direction:column;height:640px;}
+.msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
+.msg{max-width:82%;padding:10px 13px;border-radius:12px;white-space:pre-wrap;line-height:1.5;font-size:13.5px;}
+.msg.u{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:4px;}
+.msg.a{align-self:flex-start;background:#f1f4f6;border:1px solid var(--line);border-bottom-left-radius:4px;}
+.msg.sys{align-self:center;background:#fff6ec;border:1px solid #f4d3ac;color:#a2540f;font-size:12px;max-width:95%;}
+.msg .meta{display:block;margin-top:6px;font-size:10.5px;color:var(--muted);}
+.msg.u .meta{color:#ffe1c2;}
+.composer{border-top:1px solid var(--line);padding:10px;display:flex;gap:8px;align-items:end;}
+.composer textarea{min-height:44px;max-height:140px;flex:1;}
+.persona{font-size:12.5px;color:#3a444d;line-height:1.5;}
+.score{display:inline-block;font-size:22px;font-weight:800;color:var(--accent2);}
+.kv{display:flex;flex-direction:column;gap:8px;}
+.pb h3{margin:14px 0 4px;font-size:13.5px;color:var(--ink);}
+.pb p{margin:4px 0;font-size:13px;color:#2e363d;line-height:1.55;}
+.pb .tag{display:inline-block;background:var(--accent2);color:#fff;font-size:10px;padding:2px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;}
+.warn{background:#fff6ec;border:1px solid #f4d3ac;border-left:4px solid var(--accent);padding:10px 14px;border-radius:6px;font-size:12.5px;margin-bottom:10px;}
+@media(max-width:900px){.chatgrid{grid-template-columns:1fr;}.maps .body{grid-template-columns:1fr;}.chatbox{height:520px;}}
+@media print{.controls,.maps,.nav,.side,.composer{display:none !important;}body{background:#fff;}}
+</style>
+</head>
+<body>
+<div class="band">
+ <div class="l">
+ <img src="data:image/jpeg;base64,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" alt="HD Connex logo">
+ <div class="ttl"><b>HD CONNEX SALES ACADEMY</b><span>Cold-Sales Training &amp; Lead Command Center · Prepared for Sean Boyer · July 7, 2026</span></div>
+ </div>
+ <div class="nav" id="nav">
+ <button data-p="leads" class="on">📋 Leads</button>
+ <button data-p="coach">🎧 AI Coach</button>
+ <button data-p="roleplay">🥊 Roleplay Gym</button>
+ <button data-p="review">📝 Pitch Review</button>
+ <button data-p="playbook">📖 Playbook</button>
+ <button data-p="settings">⚙ Models</button>
+ </div>
+</div>
+<div class="rule"></div>
+
+<div class="wrap">
+
+<!-- ============ LEADS ============ -->
+<section class="panel on" id="p-leads">
+ <h1>Lead Tracker</h1>
+ <p class="sub">Switch between <b>Website</b> and <b>Sponsor</b> leads, filter by industry, add prospects from Google Maps. Click <b>Coach</b> on any row to game-plan that call with the AI. Edits save automatically in this browser.</p>
+ <div class="controls">
+ <div class="field"><label>View</label>
+ <div class="tabs" id="tabs">
+ <button data-list="Website" class="on">Website Leads</button>
+ <button data-list="Sponsor">Sponsor Leads</button>
+ <button data-list="All">All</button>
+ </div></div>
+ <div class="field"><label>Industry</label><select id="industry"><option value="">All industries</option></select></div>
+ <div class="field" style="min-width:200px;flex:1"><label>Search</label><input type="search" id="search" placeholder="Name, city, phone, notes…"></div>
+ <div class="spacer"></div>
+ <div class="actions" style="display:flex;gap:8px;align-items:end;">
+ <button class="btn p" id="addBtn">+ Add Lead</button>
+ <button class="btn" id="csvBtn">⭳ CSV</button>
+ <button class="btn" id="printBtn">🖨 Print</button>
+ <button class="btn d" id="resetBtn">Reset</button>
+ </div>
+ </div>
+
+ <details class="maps">
+ <summary>Google Maps → paste a business to capture name, phone &amp; website</summary>
+ <div class="body">
+ <div>
+ <h3>1 · Search Google Maps</h3>
+ <ol><li>Pick a category and city, then <b>Open Maps search</b>.</li>
+ <li>Click a business. <b>No website</b> (or Facebook only) = hot website lead.</li>
+ <li>Copy its name / phone / website (or the whole info panel).</li></ol>
+ <div class="row2">
+ <div class="field"><label>Category / keyword</label><input type="text" id="mCat" placeholder="e.g. handyman" style="min-width:160px"></div>
+ <div class="field"><label>City</label><select id="mCity"></select></div>
+ <button class="btn p" id="mGo">Open Maps search ↗</button>
+ </div>
+ <div class="hint">Quick service-business searches:</div>
+ <div class="chips" id="quickChips"></div>
+ </div>
+ <div>
+ <h3>2 · Paste &amp; add the lead</h3>
+ <ol><li>Paste the copied business text (name, address, phone, website — any order).</li>
+ <li>Pick list &amp; industry, then <b>Parse &amp; Add</b>.</li></ol>
+ <textarea id="pasteBox" placeholder="Joe's Handyman Service&#10;123 Beach St, Ormond Beach, FL&#10;(386) 555-0199&#10;joeshandyman.com"></textarea>
+ <div class="row2" style="margin-top:8px">
+ <div class="field"><label>Add to list</label><select id="pList"><option>Website</option><option>Sponsor</option><option>Both</option></select></div>
+ <div class="field"><label>Industry</label><input type="text" id="pIndustry" placeholder="e.g. Home Services" style="min-width:150px"></div>
+ <button class="btn p" id="parseBtn">Parse &amp; Add ↓</button>
+ </div>
+ <div class="hint" id="parseMsg"></div>
+ </div>
+ </div>
+ </details>
+
+ <div class="stats" id="stats"></div>
+ <div class="tablewrap">
+ <table>
+ <thead><tr>
+ <th style="width:19%">Business</th><th style="width:10%">City / Area</th>
+ <th style="width:12%">Industry</th><th style="width:9%">List</th>
+ <th style="width:10%">Phone</th><th style="width:12%">Website</th>
+ <th style="width:10%">Status</th><th style="width:12%">Notes</th><th style="width:60px"></th>
+ </tr></thead>
+ <tbody id="tbody"></tbody>
+ </table>
+ </div>
+</section>
+
+<!-- ============ COACH ============ -->
+<section class="panel" id="p-coach">
+ <h1>AI Sales Coach</h1>
+ <p class="sub">Your personal cold-sales savant — ask anything, drill objections, build openers and scripts, or game-plan a specific lead. Trained on the HD Connex playbook: websites $500–$1,500, DnD subscriptions &amp; sponsorships.</p>
+ <div class="chatgrid">
+ <div class="side">
+ <div class="card kv">
+ <div class="field"><label>Model</label><select id="modelSel-coach" class="modelSel"></select></div>
+ <div class="hint" id="modelHint-coach"></div>
+ </div>
+ <div class="card">
+ <h2 style="margin-top:0">Quick drills</h2>
+ <div class="chips" style="flex-direction:column;align-items:stretch;">
+ <button class="qp" data-q="Build me a killer 8-second cold-call opener for selling a $500 website to a local service business that has no website.">8-second opener</button>
+ <button class="qp" data-q="Drill me on price objections. Throw the toughest 'it's too expensive' lines at me one at a time and grade my responses.">Drill: price objection</button>
+ <button class="qp" data-q="The prospect says they already have a Facebook page and don't need a website. Teach me the best reframe, then quiz me.">Beat "I have Facebook"</button>
+ <button class="qp" data-q="Help me pitch a Dine in Daytona sponsorship to a hotel manager. Build the value story and the close.">DnD sponsor pitch</button>
+ <button class="qp" data-q="Quiz me on the HD Connex playbook: ROI reframe, assumptive close, urgency, social proof. One question at a time.">Quiz me on the playbook</button>
+ <button class="qp" data-q="Write me a tight voicemail script and a follow-up text message for a website lead who didn't answer.">Voicemail + text script</button>
+ </div>
+ </div>
+ <button class="btn" id="clear-coach">🗑 Clear conversation</button>
+ </div>
+ <div class="chatbox">
+ <div class="msgs" id="msgs-coach"></div>
+ <div class="composer">
+ <textarea id="in-coach" placeholder="Ask your coach anything… (Enter to send, Shift+Enter for newline)"></textarea>
+ <button class="btn o" id="send-coach">Send ➤</button>
+ </div>
+ </div>
+ </div>
+</section>
+
+<!-- ============ ROLEPLAY ============ -->
+<section class="panel" id="p-roleplay">
+ <h1>Roleplay Gym</h1>
+ <p class="sub">The AI becomes a realistic prospect and stays in character — you cold-call them. When you're done, hit <b>End &amp; Get Graded</b> for a scored breakdown of what worked and what to fix.</p>
+ <div class="chatgrid">
+ <div class="side">
+ <div class="card kv">
+ <div class="field"><label>Model</label><select id="modelSel-roleplay" class="modelSel"></select></div>
+ <div class="field"><label>Scenario</label><select id="scenarioSel"></select></div>
+ <div class="field"><label>Difficulty</label>
+ <select id="difficulty"><option>Beginner</option><option selected>Intermediate</option><option>Advanced — brutal</option></select></div>
+ <button class="btn p" id="startRp">▶ Start roleplay</button>
+ <button class="btn o" id="gradeRp">🏁 End &amp; Get Graded</button>
+ </div>
+ <div class="card"><h2 style="margin-top:0">Scenario</h2><div class="persona" id="personaDesc">Pick a scenario and press Start. The prospect will "answer the phone" — your job is to open, hold attention, handle pushback, and close a concrete next step.</div></div>
+ <button class="btn" id="clear-roleplay">🗑 Clear session</button>
+ </div>
+ <div class="chatbox">
+ <div class="msgs" id="msgs-roleplay"></div>
+ <div class="composer">
+ <textarea id="in-roleplay" placeholder="You're on the call — speak to the prospect…"></textarea>
+ <button class="btn o" id="send-roleplay">Send ➤</button>
+ </div>
+ </div>
+ </div>
+</section>
+
+<!-- ============ REVIEW ============ -->
+<section class="panel" id="p-review">
+ <h1>Pitch Review</h1>
+ <p class="sub">Paste any pitch — cold-call script, voicemail, email, DnD sponsorship ask — and get a 0–100 score with coffee-chat coaching: what landed, what to fix, and which techniques you used.</p>
+ <div class="chatgrid">
+ <div class="side">
+ <div class="card kv">
+ <div class="field"><label>Model</label><select id="modelSel-review" class="modelSel"></select></div>
+ <div class="field"><label>Pitch type</label>
+ <select id="pitchType"><option>Cold call opener</option><option>Full call script</option><option>Voicemail</option><option>Follow-up email/text</option><option>DnD sponsorship pitch</option><option>Elevator pitch</option></select></div>
+ </div>
+ <div class="card"><h2 style="margin-top:0">Last score</h2><div><span class="score" id="lastScore">—</span><span class="hint"> /100</span></div></div>
+ <button class="btn" id="clear-review">🗑 Clear</button>
+ </div>
+ <div>
+ <div class="card" style="margin-bottom:12px">
+ <textarea id="pitchBox" style="min-height:130px" placeholder="Paste your pitch here…"></textarea>
+ <div style="margin-top:8px;display:flex;gap:8px;">
+ <button class="btn o" id="reviewBtn">Review my pitch ➤</button>
+ </div>
+ </div>
+ <div class="chatbox" style="height:430px"><div class="msgs" id="msgs-review"></div></div>
+ </div>
+ </div>
+</section>
+
+<!-- ============ PLAYBOOK ============ -->
+<section class="panel" id="p-playbook">
+ <h1>The Condensed Playbook</h1>
+ <p class="sub">The core cold-selling system your AI Coach teaches, drills, and grades against — adapted for HD Connex websites and Dine in Daytona.</p>
+ <div class="card pb">
+ <h3><span class="tag">1</span>The ROI Reframe</h3>
+ <p>Never defend the price — reframe the expense as an investment. A $500 website isn't a cost; it's the machine that makes an invisible business findable. One new customer usually pays for the whole site. Anchor to what invisibility is already costing them: "Right now, when someone Googles 'handyman Ormond Beach,' your competitor gets that call. What's one lost job a month costing you?"</p>
+ <h3><span class="tag">2</span>Psychological Triggers</h3>
+ <p>Sell the feeling, then the features: fear of being invisible while competitors rank, pride in seeing their name look professional, control over their own leads instead of renting an audience from Facebook, and growth. For DnD sponsors: their customers are tourists deciding where to eat and play tonight — be in that moment.</p>
+ <h3><span class="tag">3</span>The Assumptive Close</h3>
+ <p>Talk as if the deal is done: "When your site goes live…" not "If you decide…". Close on a concrete step, never on "thinking about it": for websites that step is the deposit and the signed contract, today; for sponsors it's a placement start date.</p>
+ <h3><span class="tag">4</span>Urgency That's Real</h3>
+ <p>Use true, local urgency — customers are searching right now, a competitor just launched a site, tourist season and Bike Week waves are coming, first-mover spots on the DnD wheel are limited. Never invent fake deadlines; borrowed urgency reads as pressure, real urgency reads as help.</p>
+ <h3><span class="tag">5</span>Social Proof</h3>
+ <p>Name real local wins as they accumulate: "We just built the site for a detailer in Port Orange — he booked four jobs the first week." Neighborhood proof beats national stats every time.</p>
+ <h3><span class="tag">6</span>Objection Handling</h3>
+ <p>Price → ROI reframe and the $150-a-job math. "I have Facebook" → Facebook is renting; a website is owning, and Google barely shows Facebook pages. "My nephew can build it" → speed, quality, and who fixes it at 2am. "No time" → that's the point; 15 minutes and we handle everything. "Call me later" → lock a specific time on the spot, then actually call.</p>
+ <h3><span class="tag">7</span>The Cold-Call Skeleton</h3>
+ <p>Eight-second pattern-interrupt opener that says why you, why them, why now. Permission question ("mind if I take 30 seconds?"). Two or three discovery questions before pitching. One-sentence tailored pitch. Close on the concrete next step. Deposit collected and contract signed before you hang up or leave.</p>
+ <h3><span class="tag">8</span>What You're Selling</h3>
+ <p>Websites: Basic $500 (1–3 pages), Standard $850 (custom design, Google Business), Professional $1,200 (booking, blog, analytics), Premium $1,500 (e-commerce, AI chat). Dine in Daytona: Bronze $99/mo, Silver $199/mo, Gold $299/mo restaurant subscriptions on the spin-to-win wheel (higher tier = more weight), plus banner sponsorships for any tourist-facing business. Your cut: 30% per site (min $150), 20% of subscriptions, 15% of sponsorships. Terms: 50% deposit + signed contract at close, balance at launch (2–3 week build). Payments: card via Paddle link, Venmo, or Cash App.</p>
+ </div>
+</section>
+
+<!-- ============ SETTINGS ============ -->
+<section class="panel" id="p-settings">
+ <h1>AI Models</h1>
+ <p class="sub">OpenAI is powered by the HD Connex platform key for every user — no personal API key needed. Pick how smart each tool should be.</p>
+ <div class="card kv" style="max-width:640px">
+ <div class="warn">AI is ready for everyone on this site. Usage is billed to HD Connex. Prefer <b>Auto — pick for me</b> unless you want a fixed model.</div>
+ <div class="field"><label>Default model</label><select id="modelSel-default" class="modelSel"></select></div>
+ <div class="hint"><b>Auto — pick for me</b> is the recommended skill: it routes each task to the right model — quick drills and Q&amp;A go to a fast mini model, live roleplay goes to a strong conversational model, and pitch reviews go to a deep-analysis model. Every answer shows which model handled it, so you can override any time.</div>
+ <div class="field"><label>Custom model id (optional — overrides list)</label><input type="text" id="customModel" placeholder="e.g. a newer model id"></div>
+ <button class="btn p" id="saveModels">Save model prefs</button>
+ <div class="hint" id="keyMsg"></div>
+ </div>
+</section>
+
+<div class="foot">HD Connex Sales Academy — white-label training build. Leads &amp; chats live only in your browser (localStorage); Export CSV to back up. AI uses the shared HD Connex OpenAI account (no personal keys). AI guidance is practice material — verify facts, prices, and business info before repeating them to a customer.</div>
+</div>
+
+<script>
+/* ================= DATA ================= */
+const SEED = [{"name": "Hilton Daytona Beach Oceanfront Resort", "city": "Daytona Beach", "industry": "Hotels & Resorts", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Concierge dining/activities banner to guests"}, {"name": "Renaissance Daytona Beach Oceanfront", "city": "Daytona Beach", "industry": "Hotels & Resorts", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Guest 'where to eat & play' feature"}, {"name": "Holiday Inn Resort Daytona Beach Oceanfront", "city": "Daytona Beach", "industry": "Hotels & Resorts", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Drive guest foot traffic locally"}, {"name": "Hard Rock Hotel Daytona Beach", "city": "Daytona Beach", "industry": "Hotels & Resorts", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Premium banner to out-of-town guests"}, {"name": "The Shores Resort & Spa", "city": "Daytona Beach Shores", "industry": "Hotels & Resorts", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Reach affluent guests"}, {"name": "Bahama House", "city": "Daytona Beach Shores", "industry": "Hotels & Resorts", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Guest dining guide sponsor"}, {"name": "Nautilus Inn", "city": "Daytona Beach", "industry": "Hotels & Resorts", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Small-hotel guest referral banner"}, {"name": "OceanFront Inn and Suites", "city": "Ormond Beach", "industry": "Hotels & Resorts", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "North-end guest referrals"}, {"name": "Spark by Hilton Ormond Beach Oceanfront", "city": "Ormond Beach", "industry": "Hotels & Resorts", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Ormond guest sponsor"}, {"name": "Ormond Brewing Company", "city": "Ormond Beach", "industry": "Breweries & Taprooms", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Cross-promote to craft-beer/dining crowd"}, {"name": "Ormond Garage Brewing", "city": "Ormond Beach", "industry": "Breweries & Taprooms", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Downtown Ormond banner"}, {"name": "Tomoka Brewery", "city": "Ormond Beach", "industry": "Breweries & Taprooms", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Reach beer + food crowd"}, {"name": "Beachside Brew Pub", "city": "Ormond-by-the-Sea", "industry": "Breweries & Taprooms", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "North-corridor sponsor"}, {"name": "Drunken Duck Brewing Company", "city": "Daytona Beach", "industry": "Breweries & Taprooms", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Seabreeze nightlife crowd"}, {"name": "Dunes Brewing", "city": "Daytona Beach", "industry": "Breweries & Taprooms", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Local craft sponsor"}, {"name": "Daytona Taproom", "city": "Daytona Beach", "industry": "Breweries & Taprooms", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Seabreeze entertainment-district banner"}, {"name": "Daytona International Speedway", "city": "Daytona Beach", "industry": "Attractions & Entertainment", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Event-crowd dining banner (Bike/Race Week)"}, {"name": "Daytona Lagoon Waterpark & Fun Park", "city": "Daytona Beach", "industry": "Attractions & Entertainment", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Families need dinner after the park"}, {"name": "Museum of Arts & Sciences (MOAS)", "city": "Daytona Beach", "industry": "Attractions & Entertainment", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Visitor dining referrals"}, {"name": "Ponce de Leon Inlet Lighthouse & Museum", "city": "Ponce Inlet", "industry": "Attractions & Entertainment", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Lighthouse tourists -> Ponce dining"}, {"name": "ONE DAYTONA", "city": "Daytona Beach", "industry": "Attractions & Entertainment", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Shopping+dining destination cross-promo"}, {"name": "Daytona Beach Riverfront Shops", "city": "Daytona Beach", "industry": "Attractions & Entertainment", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Downtown merchant banner"}, {"name": "Tiki Adventure Zone (go-karts/mini golf)", "city": "Port Orange", "industry": "Attractions & Entertainment", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Reach visiting families"}, {"name": "Go Kart City", "city": "Daytona Beach", "industry": "Attractions & Entertainment", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Tourist family banner"}, {"name": "Family Fun Town", "city": "Port Orange", "industry": "Attractions & Entertainment", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Birthday/tourist families"}, {"name": "Pirate's Island Adventure Golf", "city": "Daytona Beach", "industry": "Attractions & Entertainment", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Beachside tourist families"}, {"name": "Congo River Adventure Golf", "city": "Daytona Beach", "industry": "Attractions & Entertainment", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Tourist mini-golf crowd"}, {"name": "Ponce Inlet Watersports", "city": "Ponce Inlet", "industry": "Watersports & Tours", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Tour guests need meals nearby"}, {"name": "Ponce Inlet Boat Rentals", "city": "Ponce Inlet", "industry": "Watersports & Tours", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Renters -> riverfront dining"}, {"name": "Southside Jet Ski (Daytona Jet Ski)", "city": "Daytona Beach", "industry": "Watersports & Tours", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Reach thrill-seeking tourists"}, {"name": "The Manatee Scenic Boat Tours", "city": "Ponce Inlet", "industry": "Watersports & Tours", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Tour guests dining sponsor"}, {"name": "Three Brothers Boards (SUP tours)", "city": "Daytona Beach", "industry": "Watersports & Tours", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Paddleboard crowd -> dining"}, {"name": "Boogie Down Golf Carts & Bicycles", "city": "Daytona Beach", "industry": "Rentals (cart/bike/scooter)", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Beachside renters banner"}, {"name": "Daytona Fun Rentals (scooters/carts)", "city": "Daytona Beach", "industry": "Rentals (cart/bike/scooter)", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Tourist mobility sponsor"}, {"name": "Beach Carts Daytona Golf Cart Rentals", "city": "Daytona Beach", "industry": "Rentals (cart/bike/scooter)", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Beachside tourist rentals"}, {"name": "Wave Wheels Golf Carts & eBikes", "city": "Ormond Beach", "industry": "Rentals (cart/bike/scooter)", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Ormond beachside renters"}, {"name": "Paradise Powersports", "city": "Daytona Beach", "industry": "Rentals (cart/bike/scooter)", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Tourist rentals sponsor"}, {"name": "Granada Surf Shop", "city": "Ormond Beach", "industry": "Surf Shops & Beach Retail", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Beach tourists gear + fun"}, {"name": "Surfari Surf School & Shop", "city": "Ormond Beach", "industry": "Surf Shops & Beach Retail", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Reach beach visitors"}, {"name": "Citrus Surf Shop", "city": "Ormond Beach", "industry": "Surf Shops & Beach Retail", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Rentals/lessons to tourists"}, {"name": "Salty Dog Surf Shop", "city": "Daytona Beach", "industry": "Surf Shops & Beach Retail", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Beachside tourist retail"}, {"name": "Daytona Board Store", "city": "Daytona Beach Shores", "industry": "Surf Shops & Beach Retail", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Locally owned A1A surf shop"}, {"name": "Zeno's Boardwalk Sweet Shop", "city": "Daytona Beach", "industry": "Sweets & Gifts", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Boardwalk tourist impulse buys"}, {"name": "Cow Lick's Homemade Ice Cream", "city": "Daytona Beach", "industry": "Sweets & Gifts", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Beachside dessert crowd"}, {"name": "Kathy's Chocolate Shop", "city": "Daytona Beach", "industry": "Sweets & Gifts", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Tourist gift/treats sponsor"}, {"name": "Indulge Spa at The Shores Resort", "city": "Daytona Beach Shores", "industry": "Spa & Wellness", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Resort-goer pampering banner"}, {"name": "Angelic Gardens Day Spa", "city": "Ormond Beach", "industry": "Spa & Wellness", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Beachside spa to visitors"}, {"name": "Zenison Massage Therapy", "city": "Ormond Beach", "industry": "Spa & Wellness", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Wellness sponsor"}, {"name": "Massage Envy - Ormond Beach", "city": "Ormond Beach", "industry": "Spa & Wellness", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Franchise wellness banner"}, {"name": "Tropical Tattoo", "city": "Ormond Beach", "industry": "Tattoo & Beauty", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Bike Week / tourist ink crowd"}, {"name": "Generation X Tattoo", "city": "Daytona Beach", "industry": "Tattoo & Beauty", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Original Daytona shop, tourist draw"}, {"name": "Shamrock Tattoo", "city": "Ormond Beach", "industry": "Tattoo & Beauty", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Custom studio sponsor"}, {"name": "Studio 21 Tattoo", "city": "Daytona Beach", "industry": "Tattoo & Beauty", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Beachside tourist tattoos"}, {"name": "The Plastic Flamingo (beauty & tattoo)", "city": "Daytona Beach", "industry": "Tattoo & Beauty", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Beauty+ink tourist banner"}, {"name": "Jet Set North Tattoo & Body Piercing", "city": "Daytona Beach", "industry": "Tattoo & Beauty", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Tourist body-art sponsor"}, {"name": "Supernova Ink & Art Studio", "city": "Daytona Beach", "industry": "Tattoo & Beauty", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Heart-of-Daytona shop"}, {"name": "Teddy Morse's Daytona Harley-Davidson", "city": "Ormond Beach", "industry": "Powersports & Motorcycle", "list": "Sponsor", "phone": "", "website": "", "contact": "", "status": "", "notes": "Destination Daytona / Bike Week banner"}, {"name": "Oceanside Beach Bar and Grill", "city": "Ormond-by-the-Sea", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Riptides Raw Bar & Grill", "city": "Ormond-by-the-Sea", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "The Beach Bucket", "city": "Ormond-by-the-Sea (A1A)", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Hull's Seafood Market & Restaurant", "city": "Ormond Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Cast and Crew", "city": "Ormond Beach (oceanfront)", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Grind Gastropub & Kona Tiki Bar", "city": "Ormond Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Rose Villa Southern Table & Bar", "city": "Ormond Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Stonewood Grill & Tavern", "city": "Ormond Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "River Grille", "city": "Ormond Beach (riverfront)", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Riverside Johnny's", "city": "Ormond Beach (riverfront)", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Lagerheads Bar & Grill", "city": "Ormond Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Charlie Horse Restaurant & Lounge", "city": "Ormond Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Fat Paulie's Wicked Awesome Eatery", "city": "Ormond Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "63 Sovereign", "city": "Ormond Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Peach Valley Cafe", "city": "Ormond Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Ormond Beach Diner", "city": "Ormond Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Frappes North", "city": "Ormond Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Houligan's Ormond Beach", "city": "Ormond Beach", "industry": "Bars & Nightlife", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Peabody's Beach Bar", "city": "Ormond Beach", "industry": "Bars & Nightlife", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "509 Lounge", "city": "Daytona Beach (509 Seabreeze Blvd)", "industry": "Bars & Nightlife", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Coyote Ugly Saloon", "city": "Daytona Beach (512 Seabreeze Blvd)", "industry": "Bars & Nightlife", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Dirty Harry's Pub", "city": "Daytona Beach (555 Seabreeze Blvd)", "industry": "Bars & Nightlife", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Razzles Nightclub", "city": "Daytona Beach (611 Seabreeze Blvd)", "industry": "Bars & Nightlife", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Mai Tai Bar", "city": "Daytona Beach (250 N Atlantic Ave)", "industry": "Bars & Nightlife", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Ocean Deck Restaurant & Beach Club", "city": "Daytona Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "The Oyster Pub", "city": "Daytona Beach", "industry": "Bars & Nightlife", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Caribbean Jack's", "city": "Daytona Beach (riverfront)", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Cruisin' Cafe Bar & Grill", "city": "Daytona Beach (Main St)", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Full Moon Saloon", "city": "Daytona Beach (Main St)", "industry": "Bars & Nightlife", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Boot Hill Saloon", "city": "Daytona Beach (Main St)", "industry": "Bars & Nightlife", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Bank & Blues Club", "city": "Daytona Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Landshark Bar & Grill", "city": "Daytona Beach (oceanfront)", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Rossi's Pizzeria & Sports Pub", "city": "Daytona Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Tiano's Cucina Italiana", "city": "Daytona Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "The Cellar Restaurant", "city": "Daytona Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Don Vito's Italian Restaurant", "city": "Daytona Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Little Italy's Ristorante", "city": "Daytona Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Anna's Trattoria Italian Cuisine", "city": "Daytona Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Genovese's Italian Cafe", "city": "Daytona Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Giovanni's Pizzeria", "city": "Daytona Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Senorita Mexican Kitchen & Tequila Bar", "city": "Daytona Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Dick's Last Resort", "city": "Daytona Beach", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Crabby Joe's Deck & Grill (Sunglow Pier)", "city": "Daytona Beach Shores", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Down the Hatch Seafood", "city": "Ponce Inlet (riverfront)", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Racing's North Turn Beach Bar & Grille", "city": "Ponce Inlet", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Inlet Harbour Restaurant", "city": "Ponce Inlet (riverfront)", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Hidden Treasure Rum Bar & Grill", "city": "Ponce Inlet (lighthouse)", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Lighthouse Landing", "city": "Ponce Inlet", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "The Half Wall Beer House", "city": "Port Orange", "industry": "Bars & Nightlife", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Houligan's Irish Sports Pub", "city": "Port Orange", "industry": "Bars & Nightlife", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Aunt Catfish's On the River", "city": "Port Orange (riverfront)", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Tiki Docks Bar & Grill", "city": "Port Orange (Halifax River)", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Hidden Treasure Tiki Bar & Grill", "city": "Port Orange (Spruce Creek)", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Our Deck Down Under", "city": "Port Orange (riverfront)", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Boondocks Restaurant", "city": "Port Orange (riverfront)", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Pat's Riverfront Cafe", "city": "Port Orange (riverfront)", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Mama Foo Foo", "city": "Port Orange", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "McKenna's Place", "city": "Port Orange", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Last Resort Bar", "city": "Port Orange", "industry": "Bars & Nightlife", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Lola's Cantina and Burger Bar", "city": "Port Orange", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Malibu Beach Grill", "city": "Port Orange", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Farm Social", "city": "Port Orange", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Hanwoo Korean BBQ", "city": "Port Orange", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Dahlia Mexican Kitchen", "city": "Port Orange", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}, {"name": "Don Giovanni", "city": "Port Orange", "industry": "Restaurants", "list": "Website", "phone": "", "website": "", "contact": "", "status": "", "notes": ""}];
+const SERVICE = [["Lawn care / landscaping", "Home Services"], ["Handyman / home repair", "Home Services"], ["House cleaning service", "Home Services"], ["Pressure washing", "Home Services"], ["Mobile auto detailing", "Auto"], ["Pool cleaning service", "Home Services"], ["Tree service", "Home Services"], ["Painting contractor", "Home Services"], ["Pest control", "Home Services"], ["Auto repair shop", "Auto"], ["Pet grooming", "Pet Services"], ["Barber shop", "Personal & Beauty"], ["Personal trainer", "Health & Fitness"], ["Tile & flooring installer", "Home Services"], ["Fence installation", "Home Services"], ["Appliance repair", "Home Services"], ["Notary / mobile notary", "Professional Services"], ["Photographer", "Professional Services"]];
+const CITIES = ["Daytona Beach", "Ormond Beach", "Port Orange", "Holly Hill", "South Daytona", "New Smyrna Beach", "Edgewater", "DeLand", "Deltona", "Orange City", "DeBary", "Ponce Inlet"];
+const KEY='hdconnex_leads_v1', CFGKEY='hdconnex_academy_cfg', CHATKEY='hdconnex_academy_chats';
+const STATUSES=['','New','Called - no answer','Callback','Interested','Quoted','Deposit collected','Contract signed','Not interested'];
+
+/* ================= AI CONFIG ================= */
+const MODELS=[
+ {id:'auto',label:'Auto — pick for me (recommended)'},
+ {id:'gpt-4o-mini',label:'gpt-4o-mini · fast drills & Q&A'},
+ {id:'gpt-4o',label:'gpt-4o · realistic roleplay'},
+ {id:'gpt-4.1-mini',label:'gpt-4.1-mini · quick + smart'},
+ {id:'gpt-4.1',label:'gpt-4.1 · deep review & strategy'},
+ {id:'o3-mini',label:'o3-mini · reasoning (slow, thorough)'}
+];
+function pickModel(mode,text){
+ const cfg=getCfg();
+ const sel=cfg.model||'auto';
+ if(sel!=='auto') return {model:cfg.customModel||sel,auto:false};
+ if(cfg.customModel) return {model:cfg.customModel,auto:false};
+ if(mode==='review') return {model:'gpt-4.1',auto:true};
+ if(mode==='roleplay') return {model:'gpt-4o',auto:true};
+ const heavy=(text||'').length>400||/plan|strategy|script|sequence|email|write|rewrite|analy[sz]e/i.test(text||'');
+ return {model:heavy?'gpt-4.1':'gpt-4o-mini',auto:true};
+}
+function getCfg(){ try{return JSON.parse(localStorage.getItem(CFGKEY))||{};}catch(e){return {};} }
+function setCfg(p){ localStorage.setItem(CFGKEY,JSON.stringify({...getCfg(),...p})); }
+
+/* ================= SYSTEM PROMPTS (FloGuard-style harness, HD Connex domain) ================= */
+const BRAND_FACTS=`What you sell for HD Connex: professional websites — Basic $500 (1-3 pages, mobile, contact form, maps, basic SEO), Standard $850 (custom design, gallery, Google Business setup), Professional $1,200 (booking or menu module, blog, analytics, full copywriting), Premium $1,500 (e-commerce or online ordering, AI chat assistant, integrations). Territory nationwide, sweet spot is local service businesses with no website. Also Dine in Daytona (DnD), a spin-to-win restaurant discovery app for the Daytona area: Bronze $99/mo, Silver $199/mo and Gold $299/mo subscriptions for restaurants, bars and clubs (higher tier = more weight on the wheel: Silver 2x, Gold 4x), plus banner sponsorships for any tourist-facing local business (hotels, attractions, rentals, surf shops, tattoo studios). The rep's commission: 30 percent per website sale with a 150 dollar minimum, 20 percent of DnD subscription fees, 15 percent of sponsorship revenue. The rep must cold call, close, collect the deposit and get the contract signed on every website deal. Payment terms: 50 percent deposit plus signed contract at close, remaining 50 percent due at launch. Accepted payments: card via Paddle payment link, Venmo, or Cash App. Website build turnaround is 3 days from deposit to launch (same-day on request); AI agent integrations run about 4 weeks (discovery, build, soft launch, full launch). Custom platforms, AI agents, and growth systems from the hdconnex.com agency line (from $3,500 setup) are a separate product line — refer those to Heath, never quote them from the $500-$1,500 ladder.`;
+
+const CORE_METHOD=`The playbook you teach and grade against: the ROI Reframe turns expense into investment - anchor the website cost against what being invisible on Google already costs them, one new customer usually pays for the site. Psychological triggers: fear of invisibility while competitors rank, pride in a professional presence, owning your leads instead of renting an audience from Facebook, family and business growth. Assumptive closing: say "when your site goes live" never "if you decide". Real urgency only: customers searching right now, a competitor's new site, tourist season and Bike Week waves, limited first-mover placement on the DnD wheel - never fake deadlines. Social proof: name local wins, neighborhood proof beats national stats. Objection handling: price (ROI reframe plus per-job math), "I have Facebook" (renting versus owning, Google barely surfaces Facebook pages), "my nephew builds sites" (speed, quality, who fixes it at 2am), "no time" (that is the point, 15 minutes and we handle everything), "call me later" (lock an exact time on the spot). Cold-call skeleton: 8-second pattern-interrupt opener, permission question, two or three discovery questions, one-sentence tailored pitch, close on a concrete next step - deposit and signed contract for websites, placement start date for sponsors.`;
+
+const STYLE_RULES=`CRITICAL FORMATTING INSTRUCTIONS:
+- Write in plain, conversational language like you're talking to a friend
+- NO markdown formatting (no ** for bold, no # for headers, no - for bullets)
+- Use natural paragraphs and spacing instead of bullet points
+- Write numbers and lists as flowing sentences (e.g., "First... then... finally...")
+- Keep your tone warm, encouraging, and approachable
+- Use everyday language, not technical jargon unless teaching specific terms
+- Keep answers tight and useful; this is a working sales floor, not a lecture hall`;
+
+const COACH_PROMPT=`You are Coach, the elite AI sales trainer inside the HD Connex Sales Academy. You are a world-class cold-sales savant: you have mastered the skills and trades of cold selling - opening cold calls, gaining trust in seconds, gaining permission, gaining commitments, handling brutal objections, and closing - and your specialty is selling websites and digital services to small local businesses, plus local sponsorships and app subscriptions.
+
+${STYLE_RULES}
+
+Your role is to help the rep learn and practice cold-selling technique, answer questions about the playbook and strategy, run quick roleplay moments, give constructive feedback on their lines, quiz them on key concepts, build openers, scripts, voicemails and follow-ups on request, and offer encouragement and motivation. When the rep shares a specific lead (business name, industry, city, website status), build a concrete call plan for that exact business: the opener, the two discovery questions, the likely objection and counter, and the close.
+
+${CORE_METHOD}
+
+${BRAND_FACTS}
+
+Remember: be conversational, encouraging, and specific. Use realistic local examples. Push the rep to always close on a concrete next step. Never teach anything deceptive - no fake deadlines, no lying about other customers, no misrepresenting prices. Confidence built on truth is the whole art.`;
+
+const ROLEPLAY_PROMPT_BASE=`You are playing a realistic small-business prospect receiving a cold call inside the HD Connex Sales Academy roleplay gym. Stay completely in character as the prospect described below. Answer the phone naturally, be busy and mildly annoyed at first like a real owner mid-shift, raise realistic objections one at a time, and respond believably to what the rep actually says - reward genuinely good technique by warming up, punish weak technique by getting distant or trying to hang up. Speak only as the prospect, in plain spoken language, one short conversational turn at a time - no markdown, no narration, no coaching, no breaking character. If the rep earns it, let them close you on a concrete next step. Only if the rep clearly ends the roleplay do you stop being the prospect.`;
+
+const GRADE_PROMPT=`You are Coach, an elite cold-sales trainer reviewing the roleplay call that just ended. ${STYLE_RULES}
+
+Give an overall score from 0 to 100 in the form "Score: NN/100" in your first line, then talk through what they did well, what to work on, and two or three specific better lines they could have used at key moments, referencing the playbook techniques by name (ROI reframe, assumptive close, real urgency, social proof, permission opener). Write it like you're sitting down with them for coffee right after the call - warm, honest, specific. ${CORE_METHOD}`;
+
+const REVIEW_PROMPT=`You are Coach, an elite sales coach specializing in cold-selling websites and digital services for HD Connex. ${STYLE_RULES}
+
+Review the sales pitch you are given and provide an overall score from 0 to 100 in the form "Score: NN/100" in your first line, then discuss what they did well, areas for improvement, specific actionable suggestions with rewritten example lines, and identify which techniques they're using or missing (ROI reframe, psychological triggers, assumptive close, real urgency, social proof, concrete-step close). Focus on the psychology, the objection handling, and whether it closes on a deposit, signed contract, or firm next step. Write your feedback like you're sitting down with them for coffee, not like a formal report. ${CORE_METHOD} ${BRAND_FACTS}`;
+
+/* ================= SCENARIOS ================= */
+const SCENARIOS=[
+ {id:'restaurant-price',title:'The Price-Shocked Restaurant Owner',
+ desc:'Maria owns a busy family Italian restaurant in Ormond Beach with no website, only a Facebook page. She works 70-hour weeks, answers the phone mid-rush, and thinks $500 is a lot of money. Goal: survive the opener, reframe price, close a deposit or a firm sit-down.',
+ persona:'You are Maria, the owner of a family Italian restaurant in Ormond Beach, Florida. You have no website, just a Facebook page your daughter set up. You are answering the phone during prep, you are stressed, and money is tight - "$500 is a lot for something I do not understand." You do care that the restaurant across the street just got a nice website and shows up first on Google.'},
+ {id:'handyman-facebook',title:'The "I Have Facebook" Handyman',
+ desc:'Dale runs a one-man handyman business in Port Orange. Word-of-mouth keeps him busy-ish, his Facebook page is his "website," and his nephew "does computers." Goal: beat the Facebook objection and the nephew objection, close the $500 Basic.',
+ persona:'You are Dale, a one-man handyman operation in Port Orange, Florida. You think your Facebook page is plenty, your nephew "does computers" and could build you a site for free someday, and you are suspicious of salespeople. You are friendly but stubborn. Deep down you know slow months hurt and jobs from Google would help, but the rep has to earn that admission.'},
+ {id:'bar-manager',title:'The Too-Busy Bar Manager (DnD pitch)',
+ desc:'Tony manages a Seabreeze Blvd bar in Daytona. You are pitching a Dine in Daytona Silver subscription. He has "been burned by advertising before" and gives you 30 seconds. Goal: hold attention, sell the wheel, close a start date.',
+ persona:'You are Tony, the manager of a busy bar on Seabreeze Boulevard in Daytona Beach. You have been burned by paid advertising that brought nothing, you get pitched constantly, and you give cold callers about 30 seconds before cutting them off. You perk up only at concrete, measurable foot traffic and low-risk trials. You cannot approve big spends without the owner, which you use as a shield.'},
+ {id:'hotel-sponsor',title:'The Skeptical Hotel Marketing Manager (sponsor pitch)',
+ desc:'Denise runs marketing for an oceanfront hotel in Daytona Beach Shores. You are pitching a DnD banner sponsorship. She asks sharp ROI questions and compares you to Google Ads. Goal: sell guest-experience value, close a pilot placement.',
+ persona:'You are Denise, the marketing manager of an oceanfront hotel in Daytona Beach Shores. You are professional, data-driven, and polite but sharp. You compare every pitch to Google Ads and ask about impressions, audience and measurement. You genuinely do want ways to make guests happier - guests constantly ask the front desk where to eat - but the rep has to connect the dots and propose something concrete and low-risk.'},
+ {id:'gatekeeper',title:'The Gatekeeper Wall (Advanced)',
+ desc:'You call a plumbing company in DeLand and hit Brenda, the office manager who screens everything. The owner "does not take sales calls." Goal: turn the gatekeeper into an ally or earn the transfer.',
+ persona:'You are Brenda, the office manager and gatekeeper at a plumbing company in DeLand, Florida. Your job is to keep salespeople away from Rick, the owner. You have heard every trick, you are brisk and unimpressed, and you say things like "he is not interested" and "just email something." You only soften for reps who respect your time, treat you as a person who actually runs the place, and give you a concrete reason Rick would want this.'}
+];
+
+/* ================= STATE ================= */
+let state=loadLeads(); let view='Website';
+let chats=loadChats(); // {coach:[], roleplay:[], review:[]}
+let rpActive=null; // active scenario id
+
+function loadLeads(){ try{const s=JSON.parse(localStorage.getItem(KEY)); if(Array.isArray(s)&&s.length) return s;}catch(e){} return SEED.map((l,i)=>({id:i+1,...l})); }
+function saveLeads(){ localStorage.setItem(KEY,JSON.stringify(state)); }
+function loadChats(){ try{const c=JSON.parse(localStorage.getItem(CHATKEY)); if(c&&typeof c==='object') return {coach:[],roleplay:[],review:[],...c};}catch(e){} return {coach:[],roleplay:[],review:[]}; }
+function saveChats(){ localStorage.setItem(CHATKEY,JSON.stringify(chats)); }
+function nextId(){ return state.reduce((m,l)=>Math.max(m,l.id||0),0)+1; }
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* ================= NAV ================= */
+document.getElementById('nav').addEventListener('click',e=>{
+ const b=e.target.closest('button'); if(!b) return;
+ [...document.querySelectorAll('#nav button')].forEach(x=>x.classList.toggle('on',x===b));
+ [...document.querySelectorAll('.panel')].forEach(p=>p.classList.toggle('on',p.id==='p-'+b.dataset.p));
+});
+function goTab(name){ const b=document.querySelector(`#nav button[data-p="${name}"]`); if(b) b.click(); }
+
+/* ================= LEADS (tracker) ================= */
+function industries(){ const s=new Set(); state.forEach(l=>{ if(l.industry) s.add(l.industry); }); return [...s].sort(); }
+function inView(l){ return view==='All'||l.list===view||l.list==='Both'; }
+function refreshIndustryFilter(){
+ const sel=document.getElementById('industry'); const cur=sel.value;
+ sel.innerHTML='<option value="">All industries</option>'+industries().map(i=>`<option>${esc(i)}</option>`).join('');
+ if([...sel.options].some(o=>o.value===cur)) sel.value=cur;
+}
+function render(){
+ const ind=document.getElementById('industry').value;
+ const q=document.getElementById('search').value.trim().toLowerCase();
+ const tb=document.getElementById('tbody'); tb.innerHTML=''; let shown=0;
+ state.forEach(l=>{
+ if(!inView(l)) return;
+ if(ind&&l.industry!==ind) return;
+ if(q){ const hay=(l.name+' '+l.city+' '+l.phone+' '+l.notes+' '+l.website).toLowerCase(); if(!hay.includes(q)) return; }
+ shown++;
+ const tr=document.createElement('tr'); tr.dataset.id=l.id;
+ const web=l.website?`<a class="maplink" href="${/^https?:/.test(l.website)?esc(l.website):'http://'+esc(l.website)}" target="_blank" rel="noopener">↗</a>`:'';
+ tr.innerHTML=`
+ <td class="name"><input value="${esc(l.name)}" data-f="name" placeholder="(business name)"></td>
+ <td><input value="${esc(l.city)}" data-f="city"></td>
+ <td><input value="${esc(l.industry)}" data-f="industry" list="indList"></td>
+ <td><select data-f="list" class="listsel badge-${l.list==='Website'?'web':l.list==='Sponsor'?'spon':'both'}">
+ <option ${l.list==='Website'?'selected':''}>Website</option>
+ <option ${l.list==='Sponsor'?'selected':''}>Sponsor</option>
+ <option ${l.list==='Both'?'selected':''}>Both</option></select></td>
+ <td><input value="${esc(l.phone)}" data-f="phone" placeholder="(___)___-____"></td>
+ <td style="display:flex;align-items:center;gap:4px"><input value="${esc(l.website)}" data-f="website" placeholder="none? = lead!">${web}</td>
+ <td><select data-f="status" class="status-sel">${STATUSES.map(s=>`<option ${l.status===s?'selected':''}>${esc(s)}</option>`).join('')}</select></td>
+ <td><input value="${esc(l.notes)}" data-f="notes"></td>
+ <td style="white-space:nowrap"><button class="coachbtn" title="Game-plan this call with the AI Coach">Coach</button> <button class="del" title="Delete">✕</button></td>`;
+ tb.appendChild(tr);
+ });
+ let dl=document.getElementById('indList');
+ if(!dl){ dl=document.createElement('datalist'); dl.id='indList'; document.body.appendChild(dl); }
+ dl.innerHTML=industries().map(i=>`<option value="${esc(i)}">`).join('');
+ document.getElementById('stats').innerHTML=
+ `Showing <b>${shown}</b> of ${state.length} leads · Website: <b>${state.filter(l=>l.list==='Website'||l.list==='Both').length}</b> · Sponsor: <b>${state.filter(l=>l.list==='Sponsor'||l.list==='Both').length}</b>`;
+}
+document.getElementById('tbody').addEventListener('input',e=>{
+ const f=e.target.dataset.f; if(!f) return;
+ const id=+e.target.closest('tr').dataset.id; const l=state.find(x=>x.id===id); if(!l) return;
+ l[f]=e.target.value; saveLeads(); if(f==='industry') refreshIndustryFilter();
+});
+document.getElementById('tbody').addEventListener('change',e=>{ if(e.target.dataset.f==='list'){ const id=+e.target.closest('tr').dataset.id; const l=state.find(x=>x.id===id); if(l){l.list=e.target.value; saveLeads();} render(); refreshIndustryFilter(); }});
+document.getElementById('tbody').addEventListener('click',e=>{
+ const tr=e.target.closest('tr'); if(!tr) return; const id=+tr.dataset.id;
+ if(e.target.classList.contains('del')){ if(confirm('Delete this lead?')){ state=state.filter(x=>x.id!==id); saveLeads(); render(); refreshIndustryFilter(); } return; }
+ if(e.target.classList.contains('coachbtn')){
+ const l=state.find(x=>x.id===id); if(!l) return;
+ goTab('coach');
+ const box=document.getElementById('in-coach');
+ box.value=`Game-plan this cold call for me: ${l.name||'an unnamed business'} — ${l.industry||'unknown industry'} in ${l.city||'the Daytona area'}. Lead type: ${l.list}. Website on file: ${l.website||'NONE (hot website lead)'} . Phone: ${l.phone||'unknown'}. Notes: ${l.notes||'none'}. Give me the opener, two discovery questions, the objection I should expect, and the exact close.`;
+ box.focus();
+ }
+});
+document.getElementById('tabs').addEventListener('click',e=>{
+ const b=e.target.closest('button'); if(!b) return;
+ view=b.dataset.list;
+ [...document.querySelectorAll('#tabs button')].forEach(x=>x.classList.toggle('on',x===b));
+ render();
+});
+document.getElementById('industry').addEventListener('change',render);
+document.getElementById('search').addEventListener('input',render);
+document.getElementById('addBtn').addEventListener('click',()=>{
+ state.unshift({id:nextId(),name:'',city:'',industry:document.getElementById('industry').value||'',list:view==='All'?'Website':view,phone:'',website:'',contact:'',status:'New',notes:''});
+ saveLeads(); render();
+});
+function parseBlock(text){
+ const lines=text.split(/\n|\t/).map(s=>s.trim()).filter(Boolean);
+ const phoneRe=/(\(?\d{3}\)?[\s.\-]?\d{3}[\s.\-]?\d{4})/;
+ const urlRe=/\b((https?:\/\/)?(www\.)?[a-z0-9][a-z0-9\-]*\.(com|net|org|co|us|biz|menu|shop|io|info)(\/[^\s]*)?)\b/i;
+ let name='',phone='',website='',addr='';
+ for(const l of lines){
+ if(!phone){const m=l.match(phoneRe); if(m){phone=m[1]; continue;}}
+ if(!website){const m=l.match(urlRe); if(m&&!/google\.|maps\.|goo\.gl/.test(l)){website=m[1]; continue;}}
+ if(!name){name=l; continue;}
+ if(!addr&&/\d/.test(l)) addr=l;
+ }
+ let city=''; if(addr){ const p=addr.split(','); if(p.length>=2) city=p[p.length-2].trim(); }
+ return {name,phone,website,city,addr};
+}
+document.getElementById('parseBtn').addEventListener('click',()=>{
+ const txt=document.getElementById('pasteBox').value;
+ if(!txt.trim()){ pmsg('Paste a business first.'); return; }
+ const p=parseBlock(txt);
+ if(!p.name){ pmsg('Could not find a business name.'); return; }
+ const list=document.getElementById('pList').value;
+ const industry=document.getElementById('pIndustry').value||document.getElementById('industry').value||'';
+ state.unshift({id:nextId(),name:p.name,city:p.city,industry,list,phone:p.phone,website:p.website,contact:'',status:'New',notes:p.addr?('Addr: '+p.addr):''});
+ saveLeads(); refreshIndustryFilter();
+ if(list!=='Both'){ view=list; [...document.querySelectorAll('#tabs button')].forEach(x=>x.classList.toggle('on',x.dataset.list===list)); }
+ render(); document.getElementById('pasteBox').value='';
+ pmsg(`Added "${p.name}"${p.website?' (website found)':' — no website found, likely a lead!'}${p.phone?', phone '+p.phone:''}.`);
+});
+function pmsg(t){ document.getElementById('parseMsg').textContent=t; }
+function mapsUrl(cat,city){ return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent((cat||'')+' in '+(city||'')+' FL'); }
+document.getElementById('mGo').addEventListener('click',()=>{
+ const c=document.getElementById('mCat').value, city=document.getElementById('mCity').value;
+ if(!c){ alert('Type a category or keyword first.'); return; }
+ window.open(mapsUrl(c,city),'_blank');
+});
+(function initMaps(){
+ document.getElementById('mCity').innerHTML=CITIES.map(c=>`<option>${esc(c)}</option>`).join('');
+ const chips=document.getElementById('quickChips');
+ SERVICE.forEach(([cat])=>{ const a=document.createElement('a'); a.href=mapsUrl(cat,'Volusia County'); a.target='_blank'; a.rel='noopener'; a.textContent=cat; chips.appendChild(a); });
+})();
+document.getElementById('csvBtn').addEventListener('click',()=>{
+ const cols=['name','city','industry','list','phone','website','contact','status','notes'];
+ const head=['Business','City','Industry','List','Phone','Website','Contact','Status','Notes'];
+ const rows=state.filter(inView).map(l=>cols.map(c=>'"'+String(l[c]==null?'':l[c]).replace(/"/g,'""')+'"').join(','));
+ const blob=new Blob([[head.join(',')].concat(rows).join('\n')],{type:'text/csv'});
+ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='hdconnex_leads_'+view.toLowerCase()+'.csv'; a.click();
+});
+document.getElementById('printBtn').addEventListener('click',()=>window.print());
+document.getElementById('resetBtn').addEventListener('click',()=>{
+ if(confirm('Reset to the original seeded lists? This erases your added leads and edits.')){
+ localStorage.removeItem(KEY); state=loadLeads(); render(); refreshIndustryFilter();
+ }
+});
+
+/* ================= CHAT ENGINE ================= */
+function addMsg(mode,role,content,meta){
+ const wrap=document.getElementById('msgs-'+mode);
+ const d=document.createElement('div');
+ d.className='msg '+(role==='user'?'u':role==='system'?'sys':'a');
+ d.textContent=content;
+ if(meta){ const m=document.createElement('span'); m.className='meta'; m.textContent=meta; d.appendChild(m); }
+ wrap.appendChild(d); wrap.scrollTop=wrap.scrollHeight;
+ return d;
+}
+function restore(mode){
+ const wrap=document.getElementById('msgs-'+mode); wrap.innerHTML='';
+ (chats[mode]||[]).forEach(m=>addMsg(mode,m.role==='assistant'?'a':m.role,m.content,m.meta));
+ if(!(chats[mode]||[]).length){
+ const hello={coach:"Coach here. Ask me anything, hit a quick drill on the left, or open a lead from the tracker and press its Coach button — I'll build you the exact call plan.",
+ roleplay:"Pick a scenario on the left and press Start. I'll become the prospect and answer the phone. When you're done, press End & Get Graded.",
+ review:"Paste a pitch above and press Review — you'll get a score out of 100 and coffee-chat coaching on exactly what to sharpen."}[mode];
+ addMsg(mode,'system',hello);
+ }
+}
+async function callOpenAI(mode,systemPrompt,history,userText){
+ const {model,auto}=pickModel(mode,userText);
+ const messages=[{role:'system',content:systemPrompt},...history.map(m=>({role:m.role,content:m.content}))];
+ const body={model,messages};
+ if(!/^o\d/.test(model)){ body.temperature=(mode==='roleplay')?0.9:0.7; body.max_tokens=900; }
+ else body.max_completion_tokens=1400;
+ const holder=addMsg(mode,'a','…thinking');
+ try{
+ // Platform proxy — shared OpenAI key stays server-side
+ const r=await fetch('/api/academy-chat',{
+ method:'POST',
+ headers:{'Content-Type':'application/json'},
+ body:JSON.stringify(body)
+ });
+ const t=await r.text();
+ let data=null;
+ try{ data=JSON.parse(t); }catch(e){}
+ if(!r.ok){
+ let msg='AI error '+r.status;
+ if(data?.error?.message) msg+=': '+data.error.message;
+ else if(data?.error) msg+=': '+(typeof data.error==='string'?data.error:JSON.stringify(data.error));
+ else msg+=': '+(t||'').slice(0,200);
+ holder.remove(); addMsg(mode,'system',msg); throw new Error(msg);
+ }
+ const content=data?.choices?.[0]?.message?.content||'(empty response)';
+ holder.remove();
+ const meta='via '+model+(auto?' · Auto':'');
+ addMsg(mode,'a',content,meta);
+ return {content,meta};
+ }catch(err){
+ if(holder.parentNode) holder.remove();
+ if(!String(err.message||'').startsWith('AI error')) addMsg(mode,'system','Network error reaching AI: '+(err.message||err));
+ throw err;
+ }
+}
+function goTabIfHidden(name){ const p=document.getElementById('p-'+name); if(!p.classList.contains('on')) goTab(name); }
+
+async function sendChat(mode,promptText){
+ const inp=document.getElementById('in-'+mode);
+ const text=(promptText!=null?promptText:inp.value).trim();
+ if(!text) return;
+ if(promptText==null) inp.value='';
+ addMsg(mode,'user',text);
+ chats[mode]=chats[mode]||[]; chats[mode].push({role:'user',content:text}); saveChats();
+ const sys= mode==='coach' ? COACH_PROMPT
+ : mode==='roleplay' ? currentRoleplayPrompt()
+ : REVIEW_PROMPT;
+ try{
+ const {content,meta}=await callOpenAI(mode,sys,chats[mode],text);
+ chats[mode].push({role:'assistant',content,meta}); saveChats();
+ if(mode==='review'){ const m=content.match(/score[:\s]+(\d{1,3})/i); if(m) document.getElementById('lastScore').textContent=Math.min(100,+m[1]); }
+ }catch(e){ /* already surfaced */ }
+}
+['coach','roleplay'].forEach(mode=>{
+ document.getElementById('send-'+mode).addEventListener('click',()=>sendChat(mode));
+ document.getElementById('in-'+mode).addEventListener('keydown',e=>{
+ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendChat(mode); }
+ });
+ document.getElementById('clear-'+mode).addEventListener('click',()=>{
+ if(confirm('Clear this conversation?')){ chats[mode]=[]; saveChats(); if(mode==='roleplay') rpActive=null; restore(mode); }
+ });
+});
+document.getElementById('clear-review').addEventListener('click',()=>{
+ if(confirm('Clear review history?')){ chats.review=[]; saveChats(); document.getElementById('lastScore').textContent='—'; restore('review'); }
+});
+document.querySelectorAll('.qp').forEach(b=>b.addEventListener('click',()=>{ goTab('coach'); sendChat('coach',b.dataset.q); }));
+
+/* ================= ROLEPLAY ================= */
+function currentRoleplayPrompt(){
+ const sc=SCENARIOS.find(s=>s.id===rpActive)||SCENARIOS[0];
+ const diff=document.getElementById('difficulty').value;
+ const diffLine= diff.startsWith('Beginner') ? 'Difficulty is Beginner: be a little forgiving, raise soft objections, and warm up quickly to decent technique.'
+ : diff.startsWith('Advanced') ? 'Difficulty is Advanced: be brutal and realistic - interrupt, threaten to hang up, stack objections, and only a genuinely excellent rep earns the close.'
+ : 'Difficulty is Intermediate: realistic resistance, two or three solid objections, reward good technique honestly.';
+ return ROLEPLAY_PROMPT_BASE+'\n\nYOUR CHARACTER: '+sc.persona+'\n\n'+diffLine;
+}
+(function initRp(){
+ const sel=document.getElementById('scenarioSel');
+ sel.innerHTML=SCENARIOS.map(s=>`<option value="${s.id}">${esc(s.title)}</option>`).join('');
+ sel.addEventListener('change',()=>{ const sc=SCENARIOS.find(s=>s.id===sel.value); document.getElementById('personaDesc').textContent=sc.desc; });
+ document.getElementById('personaDesc').textContent=SCENARIOS[0].desc;
+})();
+document.getElementById('startRp').addEventListener('click',async ()=>{
+ rpActive=document.getElementById('scenarioSel').value;
+ chats.roleplay=[]; saveChats(); restore('roleplay');
+ const sc=SCENARIOS.find(s=>s.id===rpActive);
+ addMsg('roleplay','system','📞 Ringing… Scenario: '+sc.title+' ('+document.getElementById('difficulty').value+'). You opened the call — go.');
+ // Prospect answers the phone first
+ chats.roleplay.push({role:'user',content:'(The phone rings. Answer it in character, briefly, like a busy owner.)'}); saveChats();
+ try{ const {content,meta}=await callOpenAI('roleplay',currentRoleplayPrompt(),chats.roleplay,''); chats.roleplay.push({role:'assistant',content,meta}); saveChats(); }catch(e){}
+});
+document.getElementById('gradeRp').addEventListener('click',async ()=>{
+ if(!(chats.roleplay||[]).filter(m=>m.role==='user'&&!m.content.startsWith('(The phone rings')).length){ addMsg('roleplay','system','Nothing to grade yet — run the call first.'); return; }
+ addMsg('roleplay','system','🏁 Roleplay ended. Coach is grading the call…');
+ const transcript=chats.roleplay.map(m=>(m.role==='user'?'REP: ':'PROSPECT: ')+m.content).join('\n');
+ const history=[{role:'user',content:'Here is the transcript of my cold call roleplay. Grade it.\n\n'+transcript}];
+ try{
+ const {content,meta}=await callOpenAI('roleplay',GRADE_PROMPT,history,'grade '+transcript.slice(0,200));
+ chats.roleplay.push({role:'assistant',content,meta}); saveChats();
+ }catch(e){}
+ rpActive=null;
+});
+
+/* ================= REVIEW ================= */
+document.getElementById('reviewBtn').addEventListener('click',()=>{
+ const p=document.getElementById('pitchBox').value.trim();
+ if(!p){ alert('Paste your pitch first.'); return; }
+ const type=document.getElementById('pitchType').value;
+ sendChat('review','Type: '+type+'\n\nPitch:\n'+p);
+});
+
+/* ================= SETTINGS / MODELS ================= */
+(function initModels(){
+ // Drop any previously stored personal API keys — platform key is shared server-side
+ const prev=getCfg();
+ if(prev.apiKey){ const {apiKey,...rest}=prev; setCfg({...rest,apiKey:undefined}); try{ const c=JSON.parse(localStorage.getItem(CFGKEY)||'{}'); delete c.apiKey; localStorage.setItem(CFGKEY,JSON.stringify(c)); }catch(e){} }
+ const cfg=getCfg();
+ document.querySelectorAll('.modelSel').forEach(sel=>{
+ sel.innerHTML=MODELS.map(m=>`<option value="${m.id}" ${((cfg.model||'auto')===m.id)?'selected':''}>${esc(m.label)}</option>`).join('');
+ sel.addEventListener('change',()=>{ setCfg({model:sel.value}); document.querySelectorAll('.modelSel').forEach(o=>{o.value=sel.value;}); hint(); });
+ });
+ document.getElementById('customModel').value=cfg.customModel||'';
+ function hint(){
+ const v=getCfg().model||'auto';
+ const t= v==='auto' ? 'Auto skill on: drills → gpt-4o-mini · roleplay → gpt-4o · reviews → gpt-4.1. Each reply shows the model used.' : 'Fixed model: '+v;
+ const h=document.getElementById('modelHint-coach'); if(h) h.textContent=t;
+ }
+ hint();
+ document.getElementById('saveModels').addEventListener('click',()=>{
+ setCfg({customModel:document.getElementById('customModel').value.trim()});
+ document.getElementById('keyMsg').textContent='Model prefs saved. Open the AI Coach and say hello — no API key needed.';
+ });
+})();
+
+/* ================= INIT ================= */
+refreshIndustryFilter(); render();
+['coach','roleplay','review'].forEach(restore);
+</script>
+</body>
+</html>

@@ -20,12 +20,16 @@ CREATE TABLE IF NOT EXISTS leads (
     name TEXT NOT NULL,
     city TEXT DEFAULT '',
     industry TEXT DEFAULT '',
-    lead_type TEXT DEFAULT 'website',
+    lead_type TEXT DEFAULT 'french_drain',
     categories TEXT DEFAULT '[]',
     phone TEXT DEFAULT '',
     website TEXT DEFAULT '',
     email TEXT DEFAULT '',
     contact_name TEXT DEFAULT '',
+    address TEXT DEFAULT '',
+    zip TEXT DEFAULT '',
+    parcel_id TEXT DEFAULT '',
+    owner TEXT DEFAULT '',
     status TEXT DEFAULT 'New',
     notes TEXT DEFAULT '',
     source TEXT DEFAULT '',
@@ -114,6 +118,9 @@ class Database:
             }
             if "categories" not in cols:
                 conn.execute("ALTER TABLE leads ADD COLUMN categories TEXT DEFAULT '[]'")
+            for col in ("address", "zip", "parcel_id", "owner"):
+                if col not in cols:
+                    conn.execute(f"ALTER TABLE leads ADD COLUMN {col} TEXT DEFAULT ''")
 
     def log_activity(
         self, kind: str, lead_id: int | None = None, detail: dict[str, Any] | None = None
@@ -140,8 +147,8 @@ class Database:
             if lead.id:
                 conn.execute(
                     """UPDATE leads SET name=?, city=?, industry=?, lead_type=?, categories=?,
-                       phone=?, website=?, email=?, contact_name=?, status=?, notes=?, source=?,
-                       custom_type=?, updated_at=? WHERE id=?""",
+                       phone=?, website=?, email=?, contact_name=?, address=?, zip=?, parcel_id=?,
+                       owner=?, status=?, notes=?, source=?, custom_type=?, updated_at=? WHERE id=?""",
                     (
                         lead.name,
                         lead.city,
@@ -152,6 +159,10 @@ class Database:
                         lead.website,
                         lead.email,
                         lead.contact_name,
+                        lead.address,
+                        lead.zip,
+                        lead.parcel_id,
+                        lead.owner,
                         lead.status,
                         lead.notes,
                         lead.source,
@@ -165,8 +176,9 @@ class Database:
             cur = conn.execute(
                 """INSERT INTO leads
                    (name, city, industry, lead_type, categories, phone, website, email,
-                    contact_name, status, notes, source, custom_type, created_at, updated_at)
-                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                    contact_name, address, zip, parcel_id, owner, status, notes, source,
+                    custom_type, created_at, updated_at)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
                 (
                     lead.name,
                     lead.city,
@@ -177,6 +189,10 @@ class Database:
                     lead.website,
                     lead.email,
                     lead.contact_name,
+                    lead.address,
+                    lead.zip,
+                    lead.parcel_id,
+                    lead.owner,
                     lead.status,
                     lead.notes,
                     lead.source,

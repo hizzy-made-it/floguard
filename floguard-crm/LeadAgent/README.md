@@ -19,15 +19,20 @@ Drafts follow the elite outbound standard in `src/leadagent/draft/prompts.py`:
 ## Quick start
 
 ```powershell
-cd C:\1projects\_deploy_hdacademy\floguard-crm\LeadAgent
+cd C:\1projects\floguard\floguard-crm\LeadAgent
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -e ".[dev]"
 copy .env.example .env
-# Edit .env — set OPENAI_API_KEY when you want LLM drafts; leave empty for templates
+# Edit .env:
+#   ACADEMY_SYNC_SECRET  = same value as Vercel floguard-crm
+#   ACADEMY_SYNC_URL     = https://crm.floguardfl.com/api/academy-leads  (default)
+#   OPENAI_API_KEY       = optional (template drafts work without it)
+#   APIFY_TOKEN + APIFY_DRY_RUN=false  = optional commercial enrich
 
 leadagent init-db
-leadagent import-leads --bootstrap
+leadagent sync pull          # preferred: CRM is source of truth
+# or: leadagent import-leads --bootstrap
 leadagent leads list
 leadagent draft 1 --template
 leadagent drafts show 1
@@ -42,7 +47,7 @@ leadagent sync pull
 
 Offline fallback (browser that never synced):
 
-1. Open the FloGuard CRM (`/crm/`) in Brave/Chrome
+1. Open the FloGuard CRM (`https://crm.floguardfl.com/crm/`) in Brave/Chrome
 2. Paste/run `scripts/export_tracker_leads.js` in the console
 3. `leadagent import-leads path\to\floguard_leads_export.json`
 
@@ -64,7 +69,8 @@ The only lead categories are the ones defined in `config/playbooks.yaml`:
 ### Import the FloGuard lists (multi-category)
 
 ```powershell
-leadagent import-lists --lists-dir "C:\1projects\_deploy_hdacademy\floguard-crm\Lead Tools" --which ALL
+# Place CSVs in floguard-crm/Lead Tools/ or pass --lists-dir
+leadagent import-lists --lists-dir "C:\1projects\floguard\floguard-crm\Lead Tools" --which ALL
 ```
 
 - `List_Homeowners.csv` → residential drainage categories, refined by issue notes
@@ -97,9 +103,10 @@ to dial first; the free on-site assessment does the actual diagnosing.
 
 ## Sync with the FloGuard CRM (shared leads store)
 
-The deployed CRM (`floguardfl.com/crm/`) and LeadAgent share one server-side lead
-list (`/api/academy-leads`, stored in Supabase Storage). Set `ACADEMY_SYNC_SECRET`
-in `.env` (must match the Vercel env var of the same name), then:
+The deployed CRM (`https://crm.floguardfl.com/crm/`) and LeadAgent share one
+server-side lead list (`/api/academy-leads`, stored in Supabase Storage). Set
+`ACADEMY_SYNC_SECRET` in `.env` (must match the Vercel env var of the same name),
+then:
 
 ```powershell
 leadagent sync status   # local vs remote counts
@@ -132,20 +139,32 @@ research → draft (pending_approval) → human approve
 
 ## Contact enrichment (website · phone · email)
 
+Two paths (use either or both):
+
+| Path | Best for | How |
+|------|----------|-----|
+| **CRM** “Enrich contacts” | Residential / tax-roll / FSI (owner + site address) | Free search + optional BatchData on Vercel |
+| **LeadAgent** `research` / `enrich_all` | Commercial B2B (Maps + site crawl) + DNS scoring | Apify (commercial types only) + free scrape |
+
 When you run `leadagent research <id>`, `leadagent draft <id>`, or
 `leadagent run outbound`, enrichment tries to **find and save**:
 
 | Field | Sources |
 |-------|---------|
-| **Website** | Google Maps (Apify) → free DuckDuckGo search fallback |
+| **Website** | Google Maps (Apify, commercial) → free DuckDuckGo search |
 | **Phone** | Google Maps → site scrape (`/contact`, homepage) |
 | **Email** | Site scrape + contact-info actor → mailto/page text |
+| **DNS** | Local Drainage Need Score from notes/issue language |
+
+Residential lead types (`french_drain`, `sump_pump`, `yard_drainage`, `maintenance`)
+**do not run paid Apify actors** (see `config/enrichment.yaml`) — free discovery
+still runs. For homeowner skip-trace, use CRM Enrich or set BatchData on Vercel.
 
 Only **empty** lead fields are filled (existing values are never overwritten).
 
 ```env
 APIFY_TOKEN=apify_api_...
-APIFY_DRY_RUN=false   # live Maps + crawlers
+APIFY_DRY_RUN=false   # live Maps + crawlers (commercial only)
 ```
 
 With `APIFY_DRY_RUN=true` (or no token), free discovery still runs: website

@@ -35,8 +35,8 @@ class Settings(BaseSettings):
     daily_send_cap: int = 25
     require_send_confirmation: bool = True
 
-    # FloGuard CRM shared leads store (/api/academy-leads)
-    academy_sync_url: str = "https://floguardfl.com/api/academy-leads"
+    # FloGuard CRM shared leads store (/api/academy-leads on Vercel project floguard-crm)
+    academy_sync_url: str = "https://crm.floguardfl.com/api/academy-leads"
     academy_sync_secret: str = ""
 
     @property
