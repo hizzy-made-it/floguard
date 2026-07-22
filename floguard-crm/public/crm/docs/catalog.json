@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "generated_at": "2026-07-17T17:34:11.371Z",
+  "generated_at": "2026-07-22T17:16:20.432Z",
   "source": "Sales Docs/ + Sales Docs/training/",
   "note": "Synced for all authenticated FLOGUARD SALES REV users. Run npm run sync-docs after adding files.",
   "categories": [
@@ -23,6 +23,17 @@
       "updated_at": "2026-07-17T17:32:14.517Z"
     },
     {
+      "id": "pdf_floguard_drainage_sales_playbook_pdf",
+      "title": "Drainage Sales Playbook — PDF",
+      "category": "Playbook",
+      "description": "Print-ready branded PDF. The consultative cold-selling system: ROI reframe, triggers, assumptive close, real urgency, category discipline.",
+      "file": "pdf/FloGuard_Drainage_Sales_Playbook.pdf",
+      "href": "/crm/docs/pdf/FloGuard_Drainage_Sales_Playbook.pdf",
+      "type": "pdf",
+      "bytes": 189557,
+      "updated_at": "2026-07-22T17:15:28.426Z"
+    },
+    {
       "id": "floguard_pricing_and_offers_md",
       "title": "Pricing & Offers (SSOT)",
       "category": "Pricing",
@@ -32,6 +43,17 @@
       "type": "md",
       "bytes": 2837,
       "updated_at": "2026-07-17T17:31:59.283Z"
+    },
+    {
+      "id": "pdf_floguard_pricing_and_offers_pdf",
+      "title": "Pricing & Offers (SSOT) — PDF",
+      "category": "Pricing",
+      "description": "Print-ready branded PDF. The single source of truth for what reps may quote — the $4,500–$12,000 band, proof points, and the never-quote list.",
+      "file": "pdf/FloGuard_Pricing_and_Offers.pdf",
+      "href": "/crm/docs/pdf/FloGuard_Pricing_and_Offers.pdf",
+      "type": "pdf",
+      "bytes": 217457,
+      "updated_at": "2026-07-22T17:15:29.332Z"
     },
     {
       "id": "floguard_call_scripts_md",
@@ -45,6 +67,17 @@
       "updated_at": "2026-07-17T17:32:28.593Z"
     },
     {
+      "id": "pdf_floguard_call_scripts_pdf",
+      "title": "Call Scripts — PDF",
+      "category": "Scripts",
+      "description": "Print-ready branded PDF. First-call openers, sump/maintenance/B2B variants, voicemail, follow-up text, and the never-say list.",
+      "file": "pdf/FloGuard_Call_Scripts.pdf",
+      "href": "/crm/docs/pdf/FloGuard_Call_Scripts.pdf",
+      "type": "pdf",
+      "bytes": 179838,
+      "updated_at": "2026-07-22T17:15:30.148Z"
+    },
+    {
       "id": "floguard_objection_encyclopedia_md",
       "title": "Objection Encyclopedia",
       "category": "Scripts",
@@ -54,6 +87,17 @@
       "type": "md",
       "bytes": 3122,
       "updated_at": "2026-07-17T17:32:46.123Z"
+    },
+    {
+      "id": "pdf_floguard_objection_encyclopedia_pdf",
+      "title": "Objection Encyclopedia — PDF",
+      "category": "Scripts",
+      "description": "Print-ready branded PDF. Validate → reframe → proof → assessment close, for every objection from \"just regrade it\" to the B2B approval chain.",
+      "file": "pdf/FloGuard_Objection_Encyclopedia.pdf",
+      "href": "/crm/docs/pdf/FloGuard_Objection_Encyclopedia.pdf",
+      "type": "pdf",
+      "bytes": 191919,
+      "updated_at": "2026-07-22T17:15:30.894Z"
     },
     {
       "id": "floguard_system_explainer_md",
@@ -67,6 +111,17 @@
       "updated_at": "2026-07-17T17:32:56.877Z"
     },
     {
+      "id": "pdf_floguard_system_explainer_pdf",
+      "title": "How the System Works — PDF",
+      "category": "Product",
+      "description": "Print-ready branded PDF. Florida water physics, the five-step water path, what the system does and does NOT protect against, install story.",
+      "file": "pdf/FloGuard_System_Explainer.pdf",
+      "href": "/crm/docs/pdf/FloGuard_System_Explainer.pdf",
+      "type": "pdf",
+      "bytes": 180200,
+      "updated_at": "2026-07-22T17:15:31.646Z"
+    },
+    {
       "id": "floguard_quiz_lead_reading_guide_md",
       "title": "Quiz Lead Reading Guide",
       "category": "Leads",
@@ -78,6 +133,17 @@
       "updated_at": "2026-07-17T17:33:08.811Z"
     },
     {
+      "id": "pdf_floguard_quiz_lead_reading_guide_pdf",
+      "title": "Quiz Lead Reading Guide — PDF",
+      "category": "Leads",
+      "description": "Print-ready branded PDF. How to read floguardfl.com quiz submissions as pre-done discovery and dial with speed.",
+      "file": "pdf/FloGuard_Quiz_Lead_Reading_Guide.pdf",
+      "href": "/crm/docs/pdf/FloGuard_Quiz_Lead_Reading_Guide.pdf",
+      "type": "pdf",
+      "bytes": 181951,
+      "updated_at": "2026-07-22T17:15:32.379Z"
+    },
+    {
       "id": "drainage_need_score_md",
       "title": "Drainage Need Score (DNS)",
       "category": "Leads",
@@ -87,6 +153,17 @@
       "type": "md",
       "bytes": 2130,
       "updated_at": "2026-07-17T17:33:20.931Z"
+    },
+    {
+      "id": "pdf_drainage_need_score_pdf",
+      "title": "Drainage Need Score (DNS) — PDF",
+      "category": "Leads",
+      "description": "Print-ready branded PDF. 0–100 sales-urgency score: wire format, scoring model, grades/bands, talk-track generation.",
+      "file": "pdf/DRAINAGE-NEED-SCORE.pdf",
+      "href": "/crm/docs/pdf/DRAINAGE-NEED-SCORE.pdf",
+      "type": "pdf",
+      "bytes": 191216,
+      "updated_at": "2026-07-22T17:15:33.172Z"
     }
   ]
 }
