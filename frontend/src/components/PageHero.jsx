@@ -3,7 +3,12 @@ import { Link } from "react-router-dom";
 import { wordContainer, wordChild, fadeUp, EASE } from "../lib/animations";
 
 // Animated hero for non-3D pages. Cinematic dark base with image + Framer motion.
-export const PageHero = ({ overline, title, subtitle, image, primary, secondary, align = "left" }) => {
+export const PageHero = ({ overline, title, subtitle, image, imageAlt, primary, secondary, align = "left" }) => {
+  const alt =
+    imageAlt ||
+    (typeof title === "string" && title.trim()
+      ? title
+      : "FloGuard drainage work in Central Florida");
   return (
     <section
       data-testid="page-hero"
@@ -12,8 +17,7 @@ export const PageHero = ({ overline, title, subtitle, image, primary, secondary,
       {image && (
         <motion.img
           src={image}
-          alt=""
-          role="presentation"
+          alt={alt}
           initial={{ scale: 1.12 }}
           animate={{ scale: 1 }}
           transition={{ duration: 2, ease: EASE }}

@@ -3,26 +3,42 @@ import { useInView, useMotionValue, animate } from "framer-motion";
 import { RevealGroup } from "./Reveal";
 import { STATS } from "../data/site";
 
+function formatValue(value, decimals = 0) {
+  return Number(value).toFixed(decimals);
+}
+
 function Counter({ value, suffix = "", decimals = 0 }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
-  const mv = useMotionValue(0);
+  const mv = useMotionValue(value);
+  const fallback = formatValue(value, decimals);
 
   useEffect(() => {
+    // Prefer-reduced-motion: keep real HTML numbers (no zero flash)
+    const prefersReduced =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    if (prefersReduced) {
+      if (ref.current) ref.current.textContent = fallback;
+      return;
+    }
     if (!inView) return;
+    // Animate from 0 → value only when visible; start DOM already shows real value
+    if (ref.current) ref.current.textContent = formatValue(0, decimals);
     const controls = animate(mv, value, {
       duration: 1.8,
       ease: [0.22, 1, 0.36, 1],
       onUpdate: (v) => {
-        if (ref.current) ref.current.textContent = v.toFixed(decimals);
+        if (ref.current) ref.current.textContent = formatValue(v, decimals);
       },
     });
     return () => controls.stop();
-  }, [inView, value, decimals, mv]);
+  }, [inView, value, decimals, mv, fallback]);
 
   return (
     <span className="font-display text-4xl sm:text-5xl text-white tracking-tight tabular-nums">
-      <span ref={ref}>0</span>
+      {/* Real numbers in HTML for crawlers + first paint; JS may animate after */}
+      <span ref={ref}>{fallback}</span>
       <span className="text-brand-orange">{suffix}</span>
     </span>
   );

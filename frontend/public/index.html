@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#0B0F1A" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+    <!-- Default homepage meta — Seo.jsx overwrites canonical/description per route after hydrate -->
     <link rel="canonical" href="https://www.floguardfl.com/" />
     <!-- Favicons: Google Search uses a square icon ≥48px (multiples of 48 preferred) -->
     <link rel="icon" href="/favicon.ico" sizes="any" />
@@ -15,15 +16,15 @@
     <link rel="manifest" href="/site.webmanifest" />
     <meta
       name="description"
-      content="FloGuard LLC — engineered French drain and sump pump flood solutions for Central Florida homes. Stop standing water, protect your foundation, request a free drainage assessment."
+      content="Stop flooded yards and foundation moisture in Central Florida. FloGuard installs custom French drains and sump pumps. Free assessments in Daytona, Port Orange, Orlando."
     />
     <meta property="og:site_name" content="FloGuard, LLC" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.floguardfl.com/" />
-    <meta property="og:title" content="FloGuard LLC — Smart Drainage Systems for Florida Homes" />
+    <meta property="og:title" content="French Drain & Sump Pump Installation | Central Florida | FloGuard" />
     <meta
       property="og:description"
-      content="French drain and sump pump installation for Central Florida. Free on-site assessments in Port Orange, Daytona Beach, Sanford, Orlando."
+      content="Stop flooded yards and foundation moisture in Central Florida. FloGuard installs custom French drains and sump pumps. Free assessments in Daytona, Port Orange, Orlando."
     />
     <meta property="og:image" content="https://www.floguardfl.com/images/hero-poster.jpg" />
     <meta property="og:image:alt" content="FloGuard drainage systems for Central Florida homes" />
@@ -40,43 +41,9 @@
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <title>FloGuard LLC — Smart Drainage Systems for Florida Homes</title>
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "LocalBusiness",
-        "@id": "https://www.floguardfl.com/#organization",
-        "name": "FloGuard, LLC",
-        "legalName": "FloGuard, LLC",
-        "url": "https://www.floguardfl.com",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://www.floguardfl.com/images/logo-schema.png",
-          "width": 448,
-          "height": 448,
-          "contentUrl": "https://www.floguardfl.com/images/logo-schema.png"
-        },
-        "image": [
-          "https://www.floguardfl.com/images/logo-schema.png",
-          "https://www.floguardfl.com/images/hero-poster.jpg"
-        ],
-        "description": "Residential flood and drainage contractor specializing in French drain and sump pump systems in Central Florida.",
-        "telephone": "+13862590023",
-        "priceRange": "$$",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "5114 S Ridgewood Ave",
-          "addressLocality": "Port Orange",
-          "addressRegion": "FL",
-          "postalCode": "32127",
-          "addressCountry": "US"
-        },
-        "geo": { "@type": "GeoCoordinates", "latitude": 29.077, "longitude": -80.966 },
-        "areaServed": ["Port Orange", "Daytona Beach", "Sanford", "Orlando", "New Smyrna Beach", "Ormond Beach", "DeLand", "Deltona"],
-        "openingHours": "Mo-Fr 08:00-17:00",
-        "sameAs": []
-      }
-    </script>
+    <title>French Drain &amp; Sump Pump Installation | Central Florida | FloGuard</title>
+    <!-- Organization schema is emitted once per page from React (Seo organizationLd in @graph).
+         Do not duplicate LocalBusiness here — duplicate @id confuses parsers. -->
   </head>
   <body>
     <noscript>

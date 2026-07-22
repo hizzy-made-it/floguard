@@ -147,7 +147,7 @@ export default function Home() {
     <>
       <Seo
         title="French Drain & Sump Pump Installation | Central Florida | FloGuard"
-        description="Stop flooded yards, wet crawlspaces, and foundation damage in Central Florida. FloGuard designs and installs custom French drains and sump pumps. Free on-site assessments in Daytona, Port Orange, Orlando area."
+        description="Stop flooded yards and foundation moisture in Central Florida. FloGuard installs custom French drains and sump pumps. Free assessments in Daytona, Port Orange, Orlando."
         path="/"
         image="/images/hero-poster.jpg"
         jsonLd={{
@@ -219,11 +219,15 @@ export default function Home() {
             animate="visible"
             className="font-display text-white text-[2.5rem] sm:text-7xl lg:text-8xl leading-[0.92] tracking-[-1px] sm:tracking-[-1.5px] max-w-4xl break-words"
           >
+            {/* Real spaces in the DOM so crawlers read "Protected flow. Engineered trust." not run-together text */}
             {headline.map((w, i) => (
-              <span key={i} className="inline-block overflow-hidden mr-[0.2em] align-bottom">
-                <motion.span variants={wordChild} className={`inline-block ${i % 2 ? "text-brand-orange" : ""}`}>
-                  {w}
-                </motion.span>
+              <span key={i}>
+                {i > 0 ? " " : null}
+                <span className="inline-block overflow-hidden align-bottom">
+                  <motion.span variants={wordChild} className={`inline-block ${i % 2 ? "text-brand-orange" : ""}`}>
+                    {w}
+                  </motion.span>
+                </span>
               </span>
             ))}
           </motion.h1>

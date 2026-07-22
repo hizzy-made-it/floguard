@@ -7,6 +7,9 @@ export const POSTS = [
   {
     slug: "french-drain-cost-central-florida-2026",
     title: "How Much Does a French Drain Cost in Central Florida? (2026 Guide)",
+    seoTitle: "French Drain Cost Central Florida 2026 | FloGuard",
+    seoDescription:
+      "2026 pricing guide: French drain + sump systems in Central Florida cost $4,500–$12,000. What drives price, what’s included, and how to get an accurate free quote.",
     excerpt:
       "A clear, no-jargon breakdown of what a professional French drain + sump pump system really costs in the Daytona–Orlando corridor. Florida's high water table, flat terrain and intense storms make this one of the most effective protections available.",
     category: "Cost & Value",
@@ -53,6 +56,9 @@ export const POSTS = [
   {
     slug: "why-is-water-standing-in-my-yard",
     title: "Why Is Water Standing in My Yard? 7 Causes and How to Fix Them",
+    seoTitle: "Standing Water in Yard? 7 Causes & Fixes | FloGuard",
+    seoDescription:
+      "Why water stands in Florida yards after storms: grading, high water table, downspouts, and more — plus French drain and sump fixes that actually work.",
     excerpt:
       "Standing water after every storm isn't just annoying — it's a warning sign. Florida has a high water table (2–6 ft), flat terrain, intense rainfall and sandy soils. Here's how a French drain + sump pump system fixes the root causes.",
     category: "Drainage 101",
@@ -87,6 +93,9 @@ export const POSTS = [
   {
     slug: "french-drain-vs-sump-pump",
     title: "French Drain vs. Sump Pump: Which Does Your Florida Home Need?",
+    seoTitle: "French Drain vs Sump Pump for Florida | FloGuard",
+    seoDescription:
+      "French drain collects water; sump pump lifts it. Most Central Florida homes need both for high water tables and flat lots. Compare costs and when to use each.",
     excerpt:
       "They're not competing solutions — they're partners. Here's how to know whether you need a French drain, a sump pump, or both.",
     category: "Drainage 101",
@@ -131,6 +140,9 @@ export const POSTS = [
   {
     slug: "signs-foundation-drainage-problem",
     title: "5 Warning Signs Your Foundation Has a Drainage Problem",
+    seoTitle: "5 Foundation Drainage Warning Signs | FloGuard",
+    seoDescription:
+      "Pooling at the slab, wet crawlspaces, cracks, and sticking doors — early foundation drainage signs Florida homeowners should not ignore.",
     excerpt:
       "Water damage to a foundation is expensive and often silent. Catch these five early warning signs before they become structural repairs.",
     category: "Foundation & Home",
@@ -165,6 +177,9 @@ export const POSTS = [
   {
     slug: "prepare-yard-florida-rainy-season",
     title: "How to Prepare Your Yard for Florida's Rainy Season",
+    seoTitle: "Prepare Your Yard for Florida Rainy Season",
+    seoDescription:
+      "Pre-season checklist: gutters, sump tests, catch basins, and drainage installs before May–October storms hit Central Florida yards.",
     excerpt:
       "Florida's summer storms are relentless. A little preparation now can save your lawn, your landscaping, and your foundation later.",
     category: "Seasonal Prep",
@@ -199,6 +214,9 @@ export const POSTS = [
   {
     slug: "wet-crawl-space-interior-drainage-guide",
     title: "Wet Crawl Space? A Homeowner's Guide to Interior Drainage & Sump Pumps",
+    seoTitle: "Wet Crawl Space Drainage & Sump Guide | FloGuard",
+    seoDescription:
+      "Fix wet Florida crawlspaces with interior drains and sump pumps. Signs of moisture, how systems work, and when to call a pro.",
     excerpt:
       "A damp crawl space threatens air quality, wood framing and your foundation. Here's how interior drainage and a sump pump make it permanently dry.",
     category: "Foundation & Home",
@@ -230,6 +248,9 @@ export const POSTS = [
   {
     slug: "catch-basins-grading-swales-standing-water",
     title: "Catch Basins, Grading & Swales: Fixing Standing Water the Right Way",
+    seoTitle: "Catch Basins, Grading & Swales Guide | FloGuard",
+    seoDescription:
+      "Surface drainage tools for Florida yards: catch basins, re-grading, and swales — when they work alone and when you still need a French drain.",
     excerpt:
       "French drains aren't the only tool. Sometimes the fix for a soggy yard is smart grading, a catch basin, or a swale — often working together.",
     category: "Drainage 101",
@@ -270,6 +291,9 @@ export const POSTS = [
   {
     slug: "does-french-drain-add-home-value",
     title: "Does a French Drain Add Value to Your Home? What Buyers Look For",
+    seoTitle: "Does a French Drain Add Home Value? | FloGuard",
+    seoDescription:
+      "How French drains help Florida home value: foundation protection, inspection readiness, and buyer confidence when yards stay dry after storms.",
     excerpt:
       "Drainage isn't glamorous — but a dry, protected home sells faster and holds its value. Here's how a French drain pays off at closing.",
     category: "Cost & Value",

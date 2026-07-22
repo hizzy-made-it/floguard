@@ -1,8 +1,8 @@
 import { PageHero } from "../components/PageHero";
-import { Seo } from "../components/Seo";
+import { Seo, organizationLd, breadcrumbListLd, SITE } from "../components/Seo";
 import { Reveal, RevealGroup, RevealItem } from "../components/Reveal";
 import { FinalCTA } from "../components/FinalCTA";
-import { VALUES, IMAGES, COMPANY } from "../data/site";
+import { VALUES, IMAGES } from "../data/site";
 import { StatsBar } from "../components/StatsBar";
 import { ShieldCheck, Users, MapPin, Award } from "lucide-react";
 
@@ -11,33 +11,22 @@ const VALUE_ICONS = [ShieldCheck, Users, MapPin, Award];
 export default function About() {
   return (
     <>
-      <Seo 
-        title="About FloGuard | Local French Drain & Sump Pump Experts Central Florida" 
-        description="Family-run Central Florida drainage contractor. Learn about our engineered French drain and sump pump systems for high water table homes in Daytona, Port Orange, and Orlando areas." 
-        path="/about" 
+      <Seo
+        title="About FloGuard | Local French Drain Experts | Central Florida"
+        description="Family-run Central Florida drainage contractor. Engineered French drain and sump pump systems for high water table homes in Daytona, Port Orange, and Orlando."
+        path="/about"
         jsonLd={{
           "@context": "https://schema.org",
-          "@type": "LocalBusiness",
-          "name": "FloGuard, LLC",
-          "description": "Local family-run contractor engineering custom French drain and sump pump systems for Central Florida homes.",
-          "url": "https://www.floguardfl.com",
-          "telephone": "(386) 259-0023",
-          "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "5114 S Ridgewood Ave",
-            "addressLocality": "Port Orange",
-            "addressRegion": "FL",
-            "postalCode": "32127"
-          },
-          "areaServed": "Central Florida",
-          "hasOfferCatalog": {
-            "@type": "OfferCatalog",
-            "name": "Drainage Services",
-            "itemListElement": [
-              {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "French Drain Installation"}},
-              {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Sump Pump Systems"}}
-            ]
-          }
+          "@graph": [
+            organizationLd,
+            {
+              ...breadcrumbListLd([
+                { name: "Home", path: "/" },
+                { name: "About", path: "/about" },
+              ]),
+              "@id": `${SITE}/about#breadcrumb`,
+            },
+          ].filter(Boolean),
         }}
       />
       <PageHero
@@ -45,6 +34,7 @@ export default function About() {
         title="A local team that takes flooding personally."
         subtitle="Family-run and Florida-based, we design drainage systems the way engineers do — for the specific water your property faces."
         image="/images/case3-after.jpg"
+        imageAlt="FloGuard team and completed drainage work for Central Florida homes"
         primary={{ label: "Meet us on-site", to: "/contact" }}
       />
 

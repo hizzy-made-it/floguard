@@ -1,7 +1,6 @@
 import { Link, useParams, Navigate } from "react-router-dom";
-import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Check, ArrowUpRight, Phone } from "lucide-react";
+import { MapPin, ArrowUpRight, Phone } from "lucide-react";
 import { PageHero } from "../components/PageHero";
 import { Reveal } from "../components/Reveal";
 import { FlowPath } from "../components/FlowPath";
@@ -10,7 +9,7 @@ import { Testimonials } from "../components/Testimonials";
 import { FinalCTA } from "../components/FinalCTA";
 import { getCity, CITIES } from "../data/cities";
 import { COMPANY, SYSTEM_EXPLANATION } from "../data/site";
-import { Seo } from "../components/Seo";
+import { Seo, organizationLd, faqPageLd, breadcrumbListLd, SITE } from "../components/Seo";
 import { EASE, viewportOnce } from "../lib/animations";
 import { StatsBar } from "../components/StatsBar";
 
@@ -18,66 +17,52 @@ export default function CityPage() {
   const { slug } = useParams();
   const city = getCity(slug);
 
-  useEffect(() => {
-    if (city) {
-      document.title = `French Drains & Drainage in ${city.name}, FL — FloGuard LLC`;
-      return () => { document.title = "FloGuard LLC — Smart Drainage Systems for Florida Homes"; };
-    }
-  }, [city]);
-
   if (!city) return <Navigate to="/areas" replace />;
 
   const others = CITIES.filter((c) => c.slug !== city.slug).slice(0, 6);
+  const pageUrl = `${SITE}/areas/${city.slug}`;
+  const pageTitle = `French Drain Installation in ${city.name}, FL | FloGuard`;
+  const pageDescription = `French drain, sump pump & yard drainage in ${city.name}, ${city.county}. Stop standing water and protect foundations from Florida’s high water table. Free on-site assessments.`;
 
   return (
     <>
       <Seo
-        title={`French Drain & Sump Pump Installation in ${city.name}, FL | FloGuard`}
-        description={`Professional French drain, sump pump & yard drainage in ${city.name}, ${city.county}. Stop standing water and protect your foundation from Florida's high water table. Free assessments.`}
+        title={pageTitle}
+        description={pageDescription}
         path={`/areas/${city.slug}`}
         image={city.image}
         jsonLd={{
           "@context": "https://schema.org",
           "@graph": [
+            organizationLd,
             {
-              "@type": "LocalBusiness",
-              "@id": "https://www.floguardfl.com/#organization",
-              name: `FloGuard, LLC — Drainage in ${city.name}`,
-              description: city.intro,
-              telephone: "+13862590023",
-              url: `https://www.floguardfl.com/areas/${city.slug}`,
-              areaServed: { "@type": "City", name: city.name },
-              address: {
-                "@type": "PostalAddress",
-                streetAddress: "5114 S Ridgewood Ave",
-                addressLocality: "Port Orange",
-                addressRegion: "FL",
-                postalCode: "32127",
-                addressCountry: "US",
-              },
-              hasOfferCatalog: {
-                "@type": "OfferCatalog",
-                name: "Drainage Services",
-                itemListElement: [
-                  { "@type": "Offer", itemOffered: { "@type": "Service", name: "French Drain Installation" } },
-                  { "@type": "Offer", itemOffered: { "@type": "Service", name: "Sump Pump Systems" } },
-                  { "@type": "Offer", itemOffered: { "@type": "Service", name: "Yard Drainage & Grading" } },
-                ],
-              },
+              "@type": "WebPage",
+              "@id": `${pageUrl}#webpage`,
+              url: pageUrl,
+              name: pageTitle,
+              description: pageDescription,
+              isPartOf: { "@id": `${SITE}/#website` },
+              about: { "@id": organizationLd["@id"] },
+              breadcrumb: { "@id": `${pageUrl}#breadcrumb` },
             },
-            ...(city.faqs?.length
-              ? [
-                  {
-                    "@type": "FAQPage",
-                    mainEntity: city.faqs.map((f) => ({
-                      "@type": "Question",
-                      name: f.q,
-                      acceptedAnswer: { "@type": "Answer", text: f.a },
-                    })),
-                  },
-                ]
-              : []),
-          ],
+            {
+              ...breadcrumbListLd([
+                { name: "Home", path: "/" },
+                { name: "Areas", path: "/areas" },
+                { name: city.name, path: `/areas/${city.slug}` },
+              ]),
+              "@id": `${pageUrl}#breadcrumb`,
+            },
+            {
+              "@type": "Service",
+              name: `French Drain & Drainage in ${city.name}`,
+              description: city.intro,
+              provider: { "@id": organizationLd["@id"] },
+              areaServed: { "@type": "City", name: city.name },
+              url: pageUrl,
+            },
+            faqPageLd(city.faqs || []),
+          ].filter(Boolean),
         }}
       />
       <PageHero
@@ -85,6 +70,7 @@ export default function CityPage() {
         title={`French Drain & Drainage in ${city.name}, FL`}
         subtitle={city.intro}
         image={city.image}
+        imageAlt={`French drain and yard drainage solutions for homes in ${city.name}, Florida`}
         primary={{ label: "Request a free assessment", to: "/contact" }}
         secondary={{ label: `Call ${COMPANY.phone}`, to: "/contact" }}
       />

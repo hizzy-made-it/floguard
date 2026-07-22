@@ -3,7 +3,7 @@ import { Check, ArrowUpRight, Phone } from "lucide-react";
 import { PageHero } from "../components/PageHero";
 import { Reveal } from "../components/Reveal";
 import { FinalCTA } from "../components/FinalCTA";
-import { Seo, organizationLd, faqPageLd, SITE } from "../components/Seo";
+import { Seo, organizationLd, faqPageLd, breadcrumbListLd, SITE } from "../components/Seo";
 import { getService, SERVICES, COMPANY } from "../data/site";
 
 export default function ServiceDetail() {
@@ -12,6 +12,7 @@ export default function ServiceDetail() {
   if (!service) return <Navigate to="/services" replace />;
 
   const others = SERVICES.filter((s) => s.slug !== service.slug);
+  const pageUrl = `${SITE}/services/${service.slug}`;
 
   return (
     <>
@@ -30,7 +31,15 @@ export default function ServiceDetail() {
               description: service.answerFirst || service.blurb,
               provider: { "@id": organizationLd["@id"] },
               areaServed: organizationLd.areaServed,
-              url: `${SITE}/services/${service.slug}`,
+              url: pageUrl,
+            },
+            {
+              ...breadcrumbListLd([
+                { name: "Home", path: "/" },
+                { name: "Services", path: "/services" },
+                { name: service.title, path: `/services/${service.slug}` },
+              ]),
+              "@id": `${pageUrl}#breadcrumb`,
             },
             faqPageLd(service.faqs || []),
           ].filter(Boolean),
@@ -42,6 +51,7 @@ export default function ServiceDetail() {
         title={service.title}
         subtitle={service.answerFirst || service.blurb}
         image={service.image}
+        imageAlt={`${service.title} installation by FloGuard in Central Florida`}
         primary={{ label: "Request a free assessment", to: "/contact" }}
         secondary={{ label: `Call ${COMPANY.phone}`, to: "/contact" }}
       />

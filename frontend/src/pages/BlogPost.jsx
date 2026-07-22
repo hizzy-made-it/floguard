@@ -1,10 +1,9 @@
-import { useEffect } from "react";
 import { Link, useParams, Navigate } from "react-router-dom";
 import { motion, useScroll, useSpring } from "framer-motion";
 import { ArrowLeft, ArrowUpRight, Calendar, Clock, Phone } from "lucide-react";
 import { getPost, POSTS, formatDate } from "../data/blog";
 import { COMPANY } from "../data/site";
-import { Seo, organizationLd, faqPageLd, SITE } from "../components/Seo";
+import { Seo, organizationLd, faqPageLd, breadcrumbListLd, SITE } from "../components/Seo";
 import { EASE } from "../lib/animations";
 
 function Block({ block }) {
@@ -62,53 +61,50 @@ export default function BlogPost() {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.4 });
 
-  useEffect(() => {
-    if (post) {
-      document.title = `${post.title} — FloGuard LLC`;
-      return () => { document.title = "FloGuard LLC — Smart Drainage Systems for Florida Homes"; };
-    }
-  }, [post]);
-
   if (!post) return <Navigate to="/blog" replace />;
 
   const related = POSTS.filter((p) => p.slug !== post.slug && p.category === post.category).slice(0, 3);
   const fill = POSTS.filter((p) => p.slug !== post.slug).slice(0, 3);
   const suggestions = (related.length ? related : fill).slice(0, 3);
+  const pageUrl = `${SITE}/blog/${post.slug}`;
+  const seoTitle = post.seoTitle || `${post.title} | FloGuard`;
+  const seoDescription =
+    post.seoDescription ||
+    (post.excerpt?.length > 160 ? `${post.excerpt.slice(0, 157).trim()}…` : post.excerpt);
 
   return (
     <>
       <Seo
-        title={`${post.title} — FloGuard LLC`}
-        description={post.excerpt}
+        title={seoTitle}
+        description={seoDescription}
         path={`/blog/${post.slug}`}
         image={post.image}
         type="article"
         jsonLd={{
           "@context": "https://schema.org",
           "@graph": [
+            organizationLd,
             {
               "@type": "BlogPosting",
               headline: post.title,
-              description: post.excerpt,
+              description: seoDescription,
               image: post.image?.startsWith("http") ? post.image : `${SITE}${post.image}`,
               datePublished: post.date,
               dateModified: post.date,
               keywords: post.keyword,
               articleSection: post.category,
               author: { "@id": organizationLd["@id"] },
-              publisher: {
-                "@type": "Organization",
-                name: "FloGuard, LLC",
-                logo: {
-                  "@type": "ImageObject",
-                  url: `${SITE}/images/logo-schema.png`,
-                  width: 448,
-                  height: 448,
-                },
-              },
-              mainEntityOfPage: `${SITE}/blog/${post.slug}`,
+              publisher: { "@id": organizationLd["@id"] },
+              mainEntityOfPage: pageUrl,
             },
-            organizationLd,
+            {
+              ...breadcrumbListLd([
+                { name: "Home", path: "/" },
+                { name: "Blog", path: "/blog" },
+                { name: post.title, path: `/blog/${post.slug}` },
+              ]),
+              "@id": `${pageUrl}#breadcrumb`,
+            },
             faqPageLd(post.faqs || []),
           ].filter(Boolean),
         }}

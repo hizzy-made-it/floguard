@@ -33,7 +33,9 @@ export const GoogleReviews = () => (
                   {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={15} className="fill-brand-orange text-brand-orange" />)}
                 </div>
               </div>
-              <div className="text-xs text-brand-slate/70 mt-0.5">Google Reviews · {COMPANY.legal}</div>
+              <div className="text-xs text-brand-slate/70 mt-0.5">
+                {COMPANY.rating}★ · {COMPANY.reviewCount} Google reviews · {COMPANY.legal}
+              </div>
             </div>
           </div>
         </Reveal>

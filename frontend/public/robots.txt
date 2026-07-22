@@ -1,7 +1,15 @@
 # FloGuard — search + AI answer engines
 # Canonical host: https://www.floguardfl.com
-# Note: If Cloudflare Managed robots overrides this file, disable AI crawl blocks
-# for GPTBot/ClaudeBot/PerplexityBot/Google-Extended in the CF dashboard for AEO.
+#
+# CRITICAL (AEO/GEO): Cloudflare Managed robots often PREPENDS a block that
+# Disallows GPTBot, ClaudeBot, Google-Extended, Applebot-Extended, CCBot, etc.
+# Crawlers obey the first matching user-agent group — so CF blocks win over
+# the Allow rules below. Fix in Cloudflare dashboard:
+#   Security / Settings → AI Scrapers & Crawlers (or "Block AI bots") → Off
+#   Or disable Managed robots.txt AI disallow rules for this zone.
+# Without that change, ChatGPT / Claude / Perplexity / Google AI Overviews
+# cannot cite this site — the opposite of our AEO goal.
+# Verify live: curl -sL https://www.floguardfl.com/robots.txt | head -80
 
 # --- Search engines ---
 User-agent: *
@@ -45,6 +53,15 @@ User-agent: Bingbot
 Allow: /
 
 User-agent: Amazonbot
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: CCBot
 Allow: /
 
 # --- Sitemap ---

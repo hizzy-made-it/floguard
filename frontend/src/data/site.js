@@ -11,11 +11,19 @@ export const COMPANY = {
   emailHref: "mailto:sales@floguardfl.com",
   website: "FloGuardFL.com",
   address: "5114 S Ridgewood Ave, Port Orange, FL 32127",
+  // Nominatim geocode for 5114 S Ridgewood Ave, Port Orange, FL 32127
+  geo: { latitude: 29.1288, longitude: -80.9802 },
   hours: "Mon–Fri · 8:00 AM – 5:00 PM",
   rating: "5.0",
   reviewCount: "2",
   mapEmbed:
     "https://www.google.com/maps?q=5114+S+Ridgewood+Ave,+Port+Orange,+FL+32127&output=embed",
+  mapUrl:
+    "https://www.google.com/maps/search/?api=1&query=5114+S+Ridgewood+Ave,+Port+Orange,+FL+32127",
+  // Entity graph / sameAs — add Facebook, LinkedIn, Yelp, BBB, GBP share URLs when live
+  sameAs: [
+    "https://www.google.com/maps/search/?api=1&query=5114+S+Ridgewood+Ave,+Port+Orange,+FL+32127",
+  ],
 };
 
 export const IMAGES = {
@@ -85,9 +93,14 @@ export const SERVICES = [
     answerFirst:
       "An exterior French drain is a fabric-lined, gravel-filled trench with perforated pipe that intercepts groundwater and surface runoff before it reaches your foundation. In Central Florida’s high water table and flat lots, it is usually paired with a sump pump so water can be lifted to a safe discharge.",
     longContent: [
-      "Florida homes often sit on sandy soils over a water table only a few feet down. After summer storms, hydrostatic pressure pushes water toward slabs and crawlspaces. A correctly engineered French drain lowers that pressure zone around the perimeter.",
-      "We size trench depth, pipe diameter (typically 4\" perforated), slope, and discharge path for your lot — never a one-size kit. Filter fabric is non-negotiable in Florida sand or the system clogs within seasons.",
+      "Florida homes often sit on sandy soils over a water table only a few feet down. After summer storms, hydrostatic pressure pushes water toward slabs and crawlspaces. A correctly engineered French drain lowers that pressure zone around the perimeter so groundwater is intercepted before it soaks foundations, lanais, and low yards.",
+      "We size trench depth, pipe diameter (typically 4\" perforated), slope, and discharge path for your lot — never a one-size kit. Filter fabric is non-negotiable in Florida sand or the system clogs within seasons. Clean gravel (not leftover fill) wraps the pipe so water can enter freely while sediment stays out.",
       "Typical perimeter systems run 150–350 linear feet. Complex yards may need catch basins, downspout tie-ins, or dual trenches. Every install includes clean gravel, proper backfill, and landscape restoration so the system is invisible when finished.",
+      "Central Florida’s conditions are uniquely hard on drainage: water tables often sit 2–6 feet below grade, lots are flat so gravity alone rarely finishes the job, and summer storms can dump 2+ inches per hour. Sandy soils drain quickly but allow fines to migrate into poorly wrapped pipe. That is why FloGuard designs each exterior French drain around measured low spots, runoff paths, and a reliable discharge — usually a sump pump that lifts water to a code-compliant outlet 10–20+ feet from the foundation.",
+      "Materials matter as much as layout. We use perforated collection pipe, non-woven filter fabric rated for sand, washed stone, sealed transitions where the drain meets a sump or solid discharge line, and check valves on pump systems so water cannot siphon back. Cheap installs skip fabric, undersize pipe, or dump water next to the slab — failures that show up after one or two rainy seasons as clogged trenches and standing water again.",
+      "What the process looks like on your property: free on-site assessment and water-path mapping; custom trench and slope design; clean dig with utility awareness; pipe, gravel, and fabric install; connection to sump or approved discharge; backfill and turf or bed restoration; walkthrough so you know how to test and maintain the system. Most residential perimeter French drains install in 1–3 days depending on access, soil, and length.",
+      "Pricing for professional French drain work in the Daytona–Orlando corridor typically falls between about $3,500 for simpler runs and $12,000+ when a full perimeter system includes sump, long discharge, or battery backup. Exact numbers require walking the lot — phone quotes cannot account for water table, roots, utilities, or HOA constraints. We quote after assessment with a clear scope, not a vague per-foot guess.",
+      "Exterior French drains are the right fit when water attacks from the yard and foundation edge: chronic pooling along the slab, soft soil after storms, erosion along beds or retaining walls, or downspouts that overload a low corner. Interior drains and sumps handle crawlspace seepage; many homes need both. If you are comparing options, start with our cost guide and process pages, then book a free assessment so we can recommend the engineered combination for your soil and storms.",
     ],
     faqs: [
       { q: "How much does a French drain cost in Central Florida?", a: "Most professional French drain + sump systems for a single-family home fall between $4,500 and $12,000 depending on trench length, sump needs, and discharge run. We quote only after a free on-site assessment." },
