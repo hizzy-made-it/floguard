@@ -144,21 +144,25 @@ Two paths (use either or both):
 | Path | Best for | How |
 |------|----------|-----|
 | **CRM** “Enrich contacts” | Residential / tax-roll / FSI (owner + site address) | Free search + optional BatchData on Vercel |
-| **LeadAgent** `research` / `enrich_all` | Commercial B2B (Maps + site crawl) + DNS scoring | Apify (commercial types only) + free scrape |
+| **LeadAgent** `research` / `enrich_all` | Residential skip-trace + commercial B2B (Maps + site crawl) + DNS scoring | Apify skip-trace / actors + free scrape |
 
 When you run `leadagent research <id>`, `leadagent draft <id>`, or
 `leadagent run outbound`, enrichment tries to **find and save**:
 
 | Field | Sources |
 |-------|---------|
-| **Website** | Google Maps (Apify, commercial) → free DuckDuckGo search |
-| **Phone** | Google Maps → site scrape (`/contact`, homepage) |
-| **Email** | Site scrape + contact-info actor → mailto/page text |
+| **Website** | Google Maps (Apify, commercial) → free DuckDuckGo search (commercial only) |
+| **Phone** | Skip-trace (residential) → Google Maps → site scrape (`/contact`, homepage) |
+| **Email** | Skip-trace (residential) → site scrape + contact-info actor → mailto/page text |
 | **DNS** | Local Drainage Need Score from notes/issue language |
 
 Residential lead types (`french_drain`, `sump_pump`, `yard_drainage`, `maintenance`)
-**do not run paid Apify actors** (see `config/enrichment.yaml`) — free discovery
-still runs. For homeowner skip-trace, use CRM Enrich or set BatchData on Vercel.
+**do not run Maps/crawler actors** (see `config/enrichment.yaml`). Instead they
+run the near-free **Apify owner skip-trace** (`one-api/skip-trace`, ~$0.007 per
+FOUND owner — the free Apify plan's $5/month credit covers ~700) before free
+discovery, with **BatchData as the paid fallback** when keyed. DuckDuckGo
+website search is disabled for residential leads — owner names match
+name-collision junk sites (e.g. "LOWE JAKE" → lowes.com).
 
 Only **empty** lead fields are filled (existing values are never overwritten).
 

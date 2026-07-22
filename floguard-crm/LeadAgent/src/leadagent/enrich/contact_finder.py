@@ -136,6 +136,9 @@ def normalize_phone(phone: str) -> str:
     if digits.startswith("1") and len(digits) == 11:
         digits = digits[1:]
     if len(digits) == 10:
+        # NANP: area code and exchange cannot start with 0 or 1
+        if digits[0] in "01" or digits[3] in "01":
+            return ""
         return f"({digits[0:3]}) {digits[3:6]}-{digits[6:10]}"
     # Keep original if international / odd length but still phone-like
     if 7 <= len(digits) <= 15:

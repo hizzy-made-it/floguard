@@ -9,6 +9,7 @@ import yaml
 
 from leadagent.db import Database
 from leadagent.enrich.apify_client import ApifyClient
+from leadagent.enrich.apify_skiptrace import apify_skip_trace
 from leadagent.enrich.batchdata import batchdata_skip_trace
 from leadagent.enrich.contact_finder import (
     contacts_from_apify_items,
@@ -30,6 +31,14 @@ from leadagent.settings import Settings
 def load_enrichment_config(path: Path) -> dict[str, Any]:
     with path.open(encoding="utf-8") as f:
         return yaml.safe_load(f) or {}
+
+
+# Private homes: no business website, no Maps listing; DDG name-search produces
+# name-collision junk (e.g. "LOWE JAKE" → lowes.com). Keep in sync with the
+# empty type_plans in config/enrichment.yaml.
+RESIDENTIAL_TYPES = frozenset(
+    {"french_drain", "sump_pump", "yard_drainage", "maintenance"}
+)
 
 
 def _heuristic_brief(lead: Lead) -> ResearchBrief:
@@ -281,7 +290,8 @@ def _apply_contacts_to_brief(
             brief.website_notes = n
 
     for p in phones or []:
-        n = normalize_phone(p) or p
+        # Discovered phones must survive normalization — never resurrect junk
+        n = normalize_phone(p)
         if n:
             brief.phone = n
             break
@@ -395,10 +405,13 @@ def _run_free_contact_pass(
     cfg: dict[str, Any],
     *,
     enabled: bool = True,
+    allow_search_discovery: bool = True,
 ) -> None:
     """
     No-Apify contact discovery: optional DDG website search + direct site scrape.
     Controlled by settings.enrich_free_discovery + enrichment.yaml free_discovery.
+    allow_search_discovery=False keeps the site scrape but never DDG-searches for
+    a website — residential owner names match name-collision junk.
     """
     free_cfg = cfg.get("free_discovery") or {}
     if not enabled or free_cfg.get("enabled", True) is False:
@@ -411,7 +424,7 @@ def _run_free_contact_pass(
         website = normalize_website(lead.website)
 
     # Discover website if missing
-    if not website and free_cfg.get("search_website", True):
+    if not website and allow_search_discovery and free_cfg.get("search_website", True):
         found = discover_website_via_search(lead.name, lead.city or "")
         if found:
             _apply_contacts_to_brief(brief, websites=[found])
@@ -441,6 +454,51 @@ def _run_free_contact_pass(
                 [f"Public email found on site: {scraped['emails'][0]}"]
                 + brief.hook_candidates
             )[:3]
+
+
+def _run_skiptrace_pass(
+    client: ApifyClient,
+    lead: Lead,
+    brief: ResearchBrief,
+    cfg: dict[str, Any],
+) -> None:
+    """Near-free Apify owner skip-trace (~$0.007/found result).
+
+    Runs BEFORE free discovery for residential leads so DDG name-collision
+    junk can never satisfy the phone/email gate. BatchData stays as fallback.
+    """
+    if brief.phone and brief.emails_found:
+        return
+    st_cfg = cfg.get("skip_trace") or {}
+    if st_cfg.get("enabled", True) is False:
+        return
+    result = apify_skip_trace(
+        lead,
+        client=client,
+        actor_id=str(st_cfg.get("actor_id") or "one-api/skip-trace"),
+        max_results=int(st_cfg.get("max_results") or 1),
+        timeout_secs=int(st_cfg.get("timeout_secs") or 90),
+    )
+    if result is None:
+        return  # dry-run / no token
+    brief.raw["skiptrace"] = {
+        "ok": result.get("ok"),
+        "error": result.get("error", ""),
+        "phone_count": len(result.get("phones") or []),
+        "email_count": len(result.get("emails") or []),
+    }
+    if not result.get("ok"):
+        brief.risk_flags.append(f"skiptrace_error:{result.get('error', 'unknown')}")
+        return
+    _apply_contacts_to_brief(
+        brief,
+        phones=list(result.get("phones") or []),
+        emails=list(result.get("emails") or []),
+    )
+    if result.get("phones") or result.get("emails"):
+        brief.hook_candidates = (
+            ["Owner contact via property records"] + brief.hook_candidates
+        )[:3]
 
 
 def _run_batchdata_pass(
@@ -617,6 +675,20 @@ def enrich_lead(
         if _needs_contact_fields(lead) and not brief.emails_found:
             brief.risk_flags.append("apify_exhausted_no_email")
 
+    is_residential = (lead.lead_type or "") in RESIDENTIAL_TYPES
+
+    # Residential owner skip-trace FIRST — before free discovery, so junk
+    # search hits can't fill the phone/email gap. Gated on run_apify: reuses
+    # the existing TTL decision so repeated research calls can't re-bill the
+    # actor; --force overrides as usual.
+    if (
+        is_residential
+        and (lead.address or "").strip()
+        and run_apify
+        and not client.dry_run
+    ):
+        _run_skiptrace_pass(client, lead, brief, cfg)
+
     # Free pass fills gaps (cheap; never re-triggers Apify)
     still_missing = (
         not brief.website_present
@@ -629,6 +701,7 @@ def enrich_lead(
             brief,
             cfg,
             enabled=getattr(settings, "enrich_free_discovery", True),
+            allow_search_discovery=not is_residential,
         )
 
     # Residential skip-trace fills remaining phone/email gaps (needs address)
@@ -657,6 +730,7 @@ def enrich_lead(
     elif (
         brief.raw.get("site_scrape")
         or brief.raw.get("website_search")
+        or brief.raw.get("skiptrace")
         or brief.raw.get("batchdata")
     ):
         source = "contacts"

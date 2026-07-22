@@ -13,6 +13,16 @@ free_discovery:
   scrape_website: true   # Fetch homepage + /contact for emails & phones
   max_pages: 4
 
+# Residential owner skip-trace — Apify one-api/skip-trace.
+# ~$0.007 per FOUND result (free $5/mo Apify credit ≈ 700 owners); misses free.
+# Runs FIRST for residential lead types, before free discovery, so DDG
+# name-collision junk can't block it. BatchData (if keyed) is the fallback.
+skip_trace:
+  enabled: true
+  actor_id: "one-api/skip-trace"
+  max_results: 1       # cost guard: one billed hit per lead
+  timeout_secs: 90
+
 actors:
   google_maps:
     # Phone + website + address + rating — COMMERCIAL leads only

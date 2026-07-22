@@ -37,6 +37,17 @@ def test_normalize_phone_us():
     assert normalize_phone("(386) 555-1212") == "(386) 555-1212"
 
 
+def test_normalize_phone_rejects_invalid_nanp():
+    # Area code cannot start with 0 or 1
+    assert normalize_phone("1785551234") == ""
+    assert normalize_phone("(078) 555-1234") == ""
+    # Exchange cannot start with 0 or 1
+    assert normalize_phone("3861551234") == ""
+    assert normalize_phone("3860551234") == ""
+    # Valid numbers still pass
+    assert normalize_phone("3865551212") == "(386) 555-1212"
+
+
 def test_extract_emails_filters_noise():
     text = """
     Contact us at info@joesgrill.com or sales@joesgrill.com.
