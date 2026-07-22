@@ -40,6 +40,24 @@ FIELD_MAP = [
     ("source", "source"),
 ]
 
+
+def _address_from_notes(notes: str) -> str:
+    """Recover site address buried in older FSI notes."""
+    import re
+
+    text = notes or ""
+    m = re.search(r"(?im)^\s*Site address:\s*(.+)$", text)
+    if m:
+        v = m.group(1).strip()
+        if v and v not in ("—", "-", "–") and v.lower() not in ("n/a", "na"):
+            return v
+    m = re.search(r"(?im)^\s*Addr(?:ess)?:\s*(.+)$", text)
+    if m:
+        v = m.group(1).strip()
+        if v and v not in ("—", "-"):
+            return v
+    return ""
+
 _VALID_TYPES = {t.value for t in LeadType}
 
 
@@ -120,6 +138,10 @@ def pull_leads(settings: Settings, db: Database, client: httpx.Client | None = N
                     setattr(existing, dst, str(v))
             if not existing.city and city:
                 existing.city = city
+            if not (existing.address or "").strip():
+                recovered = _address_from_notes(existing.notes or str(row.get("notes") or ""))
+                if recovered:
+                    existing.address = recovered
             db.merge_categories(existing, cats)  # merges + upserts
             updated += 1
         else:
@@ -128,6 +150,10 @@ def pull_leads(settings: Settings, db: Database, client: httpx.Client | None = N
                 v = row.get(src)
                 if v is not None and str(v).strip() != "":
                     setattr(lead, dst, str(v))
+            if not (lead.address or "").strip():
+                recovered = _address_from_notes(lead.notes or str(row.get("notes") or ""))
+                if recovered:
+                    lead.address = recovered
             lead.set_categories(cats or [lead_type])
             db.upsert_lead(lead)
             added += 1

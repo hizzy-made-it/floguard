@@ -468,10 +468,22 @@ async function batchDataSkipTrace(lead) {
       data = null;
     }
     if (!r.ok) {
+      const msg =
+        (data &&
+          (data.message ||
+            data.error ||
+            data?.status?.message ||
+            data?.status?.text)) ||
+        `HTTP ${r.status}`;
+      // 403 with a valid-looking token usually means the key product lacks Skip Trace API access
+      const hint =
+        r.status === 403
+          ? ' (token OK but no Property Skip Trace API permission — enable Skip Trace API in BatchData dashboard or request a different key)'
+          : '';
       return {
         ok: false,
         provider: 'batchdata',
-        error: (data && (data.message || data.error)) || `HTTP ${r.status}`,
+        error: String(msg) + hint,
         status: r.status,
       };
     }
