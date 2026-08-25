@@ -23,8 +23,8 @@ export const COMPANY = {
   // Entity graph / sameAs — paste live profile URLs as citations go live (see docs/OFFSITE-PRIORITY-PLAN.md)
   // Keep in sync with Google ratingCount when reviews grow
   sameAs: [
+    "https://www.facebook.com/FloGuardLLC/",
     "https://www.google.com/maps/search/?api=1&query=5114+S+Ridgewood+Ave,+Port+Orange,+FL+32127",
-    // "https://www.facebook.com/YOUR_PAGE",
     // "https://www.yelp.com/biz/YOUR_BIZ",
     // "https://www.bbb.org/us/fl/.../YOUR_BIZ",
     // "https://g.page/YOUR_GBP",
@@ -136,17 +136,24 @@ export const SERVICES = [
     seoDescription:
       "Sump pump and interior drain installation for Florida crawlspaces and flat lots. Battery backup options for hurricanes. Free assessments across Central Florida.",
     answerFirst:
-      "A sump pump system collects water in a sealed basin and automatically pumps it away when the float switch rises. Combined with interior French drains under crawlspaces, it is one of the most effective defenses against Florida’s high groundwater — especially with battery backup for outages.",
+      "A sump pump system collects water in a sealed basin and automatically pumps it to a safe discharge when the float switch rises — typically $1,500–$4,000 installed alone, or $5,500–$8,500 as part of a complete French drain + sump system. On flat Central Florida lots with wet-season water tables around 40–60 inches down, it is usually the only way water actually leaves the property — and on lots with real fall to a legal outlet, it’s a waste of money. We’ll tell you which lot you have.",
     longContent: [
-      "Interior drains capture water under the home before it pools in the crawlspace. Water flows by gravity to the sump pit; the pump then forces it out a solid discharge line to an approved location 10–20+ feet from the foundation.",
-      "We recommend check valves, properly sized pumps, and battery backup or dual-pump setups for hurricane season when grid power fails. Smart monitoring is available so you know the system worked overnight.",
-      "This service is ideal when yards are too flat for gravity-only discharge, when crawlspaces stay damp, or when exterior access is limited.",
+      "Interior drains capture water under the home before it pools in the crawlspace. Water flows by gravity to the sump pit; the pump then forces it out a solid discharge line to an approved location 10–20+ feet from the foundation. That last part — the powered lift to a legal discharge — is what separates a sump system from every gravity-only fix, and it’s why sumps are standard equipment on Central Florida’s flat lots.",
+      "Here’s the honest version of the question most contractors won’t answer directly: does a sump pump even make sense in Florida? It depends on two measurements, not on sales pressure. First, the wet-season water table. USDA soil mapping for the sands under coastal Volusia puts the summer water table around 40–60 inches below grade — and shallower near the coast and in flatwoods pockets. When groundwater rides that high, a gravity trench has nowhere to send water, and a sump is the only outlet that works in September, when it matters. Second, fall to a legal discharge point. If your lot genuinely drops from the problem area to a swale or approved outlet, gravity can finish the job — and a sump is an unnecessary expense we won’t sell you.",
+      "The decision table we actually use: standing water plus a high wet-season table plus no usable slope → sump system. Damp crawlspace with limited exterior access → interior drain to a sump. Real fall to a legal outlet and surface-only ponding → gravity French drain or grading, no sump. If an estimator specs a sump without measuring water table behavior and discharge fall, they’re quoting a product, not designing a system.",
+      "What a complete FloGuard sump installation includes: a sealed basin sized for inflow (not a bucket-sized pit that short-cycles the pump), a submersible pump with float switch matched to head height and run length, a check valve so discharged water can’t siphon back, a solid — not perforated — discharge line to a code-compliant outlet, and clean electrical with a dedicated circuit. Undersized basins and missing check valves are the two shortcuts that kill cheap installs within a season or two.",
+      "Hurricane season is the stress test. Storms take out grid power at exactly the moment groundwater peaks — which is why we recommend battery backup or dual-pump setups for homes that flood hard. A backup pump that runs a few hours through an outage is the difference between a dry slab and a flooded crawlspace during a September tropical system. Smart monitoring is available so you know the pump cycled overnight instead of guessing.",
+      "Where the water goes is a legal question, not just a plumbing one. Discharge must reach an approved location — a swale, storm connection, or low area on your own lot well away from the foundation. Volusia County code prohibits sending harmful runoff onto adjacent property, and cities like Port Orange require a right-of-way permit for any line that touches public ROW. We design the discharge path first, then the system that feeds it — and we handle the city conversation when a project touches public right-of-way.",
+      "Maintenance reality: a sump pump is a mechanical device that sits idle for months and then has to work flawlessly for a week straight. Pour-test it monthly (a bucket of water in the basin should kick the float and clear the pit), and have it professionally checked yearly before the May–October wet season — float, check valve, discharge line, battery health, and sediment in the basin. Florida’s fine sand finds its way into everything; a basin cleaning at the right time is vastly cheaper than a burned-out pump during a storm.",
+      "This service is ideal when yards are too flat for gravity-only discharge, when crawlspaces stay damp through the wet season, when exterior trenching access is limited — and it’s the wrong buy when your lot has real fall to a legal outlet. A free on-site assessment settles which one you have; that’s why we don’t quote sump systems over the phone.",
     ],
     faqs: [
       { q: "Do I need a battery backup sump pump in Florida?", a: "Strongly recommended. Hurricanes and storms often knock out power exactly when groundwater rises. Battery backups keep the pump running when the grid is down." },
       { q: "How often should a sump pump be serviced?", a: "Test monthly by pouring water into the pit. Professional service at least once a year — ideally before rainy/hurricane season." },
       { q: "Can a sump pump stop all flooding?", a: "It dramatically reduces foundation and crawlspace moisture from groundwater and storm soak. It does not stop major storm surge or river flooding above the home’s openings." },
       { q: "Where does the water discharge?", a: "To a code-compliant location: swale, storm system, or lower area far from the foundation — never dumping against a neighbor’s slab." },
+      { q: "Do sump pumps actually make sense in Florida homes without basements?", a: "Yes — differently than up north. Here the sump sits in a basin serving yard and crawlspace drains, not a basement floor. With wet-season water tables around 40–60 inches down on many Volusia lots, active pumping is often the only way water leaves a flat property." },
+      { q: "When is a sump pump a waste of money?", a: "When your lot has genuine fall from the problem area to a legal discharge point. Gravity is free and never loses power — if grading or a gravity French drain solves it, that’s what we’ll recommend instead." },
     ],
   },
   {

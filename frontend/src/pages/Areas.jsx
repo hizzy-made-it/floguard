@@ -25,7 +25,7 @@ export default function Areas() {
             "@type": "ListItem",
             "position": i + 1,
             "name": c.name,
-            "url": `https://www.floguardfl.com/areas/${c.slug}`
+            "url": `https://floguardfl.com/areas/${c.slug}`
           }))
         }}
       />

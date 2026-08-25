@@ -1,11 +1,16 @@
-# Canonical host: apex → www (Cloudflare Pages / Netlify-style)
-https://floguardfl.com/*  https://www.floguardfl.com/:splat  301!
+# Canonical host: www → apex (zone-level redirect also enforces this)
+https://www.floguardfl.com/*  https://floguardfl.com/:splat  301!
 
 # FloGuard Sales Rev CRM lives on Vercel (separate project).
 # Marketing SPA catch-all must not swallow /crm.
-# Production host: crm.floguardfl.com (team hd-connex / floguard-crm).
 /crm    https://crm.floguardfl.com/crm/  302!
 /crm/*  https://crm.floguardfl.com/crm/:splat  302!
 
-# SPA fallback for React Router
+# Indexed URLs with no route in this app — 301 to the real content
+/pricing     /blog/french-drain-cost-central-florida-2026  301
+/pricing/*   /blog/french-drain-cost-central-florida-2026  301
+/franchise   /contact  301
+/franchise/* /contact  301
+
+# SPA fallback for React Router (static prerendered files win before this rule)
 /*    /index.html   200
