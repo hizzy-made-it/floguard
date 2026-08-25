@@ -82,8 +82,8 @@ export default function Services() {
             {
               "@type": "Organization",
               "name": "FloGuard, LLC",
-              "url": "https://www.floguardfl.com",
-              "logo": "https://www.floguardfl.com/images/logo-schema.png",
+              "url": "https://floguardfl.com",
+              "logo": "https://floguardfl.com/images/logo-schema.png",
               "address": {
                 "@type": "PostalAddress",
                 "streetAddress": "5114 S Ridgewood Ave",
@@ -97,14 +97,14 @@ export default function Services() {
             {
               "@type": "Service",
               "serviceType": "Exterior French Drains",
-              "provider": { "@id": "https://www.floguardfl.com/#organization" },
+              "provider": { "@id": "https://floguardfl.com/#organization" },
               "areaServed": ["Port Orange", "Daytona Beach", "Orlando", "Central Florida"],
               "description": "Perimeter French drain systems with perforated pipe in gravel and filter fabric to protect foundations from groundwater and runoff."
             },
             {
               "@type": "Service",
               "serviceType": "Interior Drains + Sump Pumps",
-              "provider": { "@id": "https://www.floguardfl.com/#organization" },
+              "provider": { "@id": "https://floguardfl.com/#organization" },
               "areaServed": ["Port Orange", "Daytona Beach", "Orlando", "Central Florida"],
               "description": "Interior drainage systems and automatic sump pumps for crawlspaces and flat lots with high water tables."
             }

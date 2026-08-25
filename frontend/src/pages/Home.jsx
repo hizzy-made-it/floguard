@@ -202,7 +202,7 @@ export default function Home() {
     <>
       <Seo
         title="French Drain & Sump Pump Installation | Central Florida | FloGuard"
-        description="Stop flooded yards and foundation moisture in Central Florida. FloGuard installs custom French drains and sump pumps. Free assessments in Daytona, Port Orange, Orlando."
+        description="Stop flooded yards and foundation moisture in Central Florida. Custom French drains and sump pumps. Free assessments in Daytona, Port Orange, Orlando."
         path="/"
         image={IMAGES.heroPosterJpg}
         jsonLd={{

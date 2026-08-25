@@ -3,7 +3,7 @@
 import { useLayoutEffect } from "react";
 import { COMPANY } from "../data/site";
 
-export const SITE = "https://www.floguardfl.com";
+export const SITE = "https://floguardfl.com";
 export const ORG_ID = `${SITE}/#organization`;
 
 function absUrl(pathOrUrl) {
@@ -137,14 +137,15 @@ export const Seo = ({
   );
 };
 
-/** Shared LocalBusiness / Organization — emit once per page via @graph only */
+/** Shared business entity — emit once per page via @graph only */
 export const organizationLd = {
-  "@type": "LocalBusiness",
+  "@type": "HomeAndConstructionBusiness",
   "@id": ORG_ID,
   name: "FloGuard, LLC",
   legalName: "FloGuard, LLC",
   url: SITE,
   telephone: "+13862590023",
+  email: "sales@floguardfl.com",
   logo: {
     "@type": "ImageObject",
     url: `${SITE}/images/logo-schema.png`,
@@ -170,27 +171,40 @@ export const organizationLd = {
     longitude: -80.9802,
   },
   areaServed: [
-    "Port Orange",
-    "Daytona Beach",
-    "Sanford",
-    "Orlando",
-    "New Smyrna Beach",
-    "Ormond Beach",
-    "DeLand",
-    "Deltona",
-    "Central Florida",
+    { "@type": "City", name: "Port Orange" },
+    { "@type": "City", name: "Daytona Beach" },
+    { "@type": "City", name: "Ormond Beach" },
+    { "@type": "City", name: "New Smyrna Beach" },
+    { "@type": "City", name: "DeLand" },
+    { "@type": "City", name: "Deltona" },
+    { "@type": "City", name: "Sanford" },
+    { "@type": "City", name: "Orlando" },
+    { "@type": "AdministrativeArea", name: "Volusia County" },
   ],
   priceRange: "$$",
-  openingHours: "Mo-Fr 08:00-17:00",
-  sameAs: COMPANY.sameAs || [],
-  // Only when rating is shown on-site (GoogleReviews, StatsBar, Contact)
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: COMPANY.rating,
-    reviewCount: COMPANY.reviewCount,
-    bestRating: "5",
-    worstRating: "1",
+  openingHoursSpecification: [
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      opens: "08:00",
+      closes: "17:00",
+    },
+  ],
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Drainage services",
+    itemListElement: [
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "French drain installation", serviceType: "French drain installation", url: `${SITE}/services/french-drains`, provider: { "@id": ORG_ID } } },
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "Sump pump installation", serviceType: "Sump pump installation", url: `${SITE}/services/sump-pumps`, provider: { "@id": ORG_ID } } },
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "Yard drainage and grading", serviceType: "Yard drainage and grading", url: `${SITE}/services/yard-drainage`, provider: { "@id": ORG_ID } } },
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "Sump pump maintenance and monitoring", serviceType: "Pump maintenance", url: `${SITE}/services/pump-maintenance`, provider: { "@id": ORG_ID } } },
+    ],
   },
+  sameAs: COMPANY.sameAs || [],
+  // NOTE (Google review-snippet policy, updated 2026-07-24): a business may NOT mark up
+  // aggregateRating/review for itself — pages using LocalBusiness/Organization types with
+  // self-controlled reviews are ineligible for stars and risk a structured-data manual
+  // action. Star claims stay in visible page text only. Do not re-add aggregateRating.
 };
 
 /**

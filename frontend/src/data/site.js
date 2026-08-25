@@ -23,8 +23,8 @@ export const COMPANY = {
   // Entity graph / sameAs — paste live profile URLs as citations go live (see docs/OFFSITE-PRIORITY-PLAN.md)
   // Keep in sync with Google ratingCount when reviews grow
   sameAs: [
+    "https://www.facebook.com/FloGuardLLC/",
     "https://www.google.com/maps/search/?api=1&query=5114+S+Ridgewood+Ave,+Port+Orange,+FL+32127",
-    // "https://www.facebook.com/YOUR_PAGE",
     // "https://www.yelp.com/biz/YOUR_BIZ",
     // "https://www.bbb.org/us/fl/.../YOUR_BIZ",
     // "https://g.page/YOUR_GBP",
