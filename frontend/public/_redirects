@@ -12,5 +12,21 @@ https://www.floguardfl.com/*  https://floguardfl.com/:splat  301!
 /franchise   /contact  301
 /franchise/* /contact  301
 
-# SPA fallback for React Router (static prerendered files win before this rule)
-/*    /index.html   200
+# Old-site URLs still in Google's index as 404s (GSC Coverage export 2026-09-08).
+# 301 each to its nearest live equivalent so the equity and crawl budget land on real pages.
+/how-it-works                 /process                301
+/how-it-works/*               /process                301
+/careers                      /about                  301
+/careers/*                    /about                  301
+/service-area/daytona-beach   /areas/daytona-beach    301
+/service-area/sanford         /areas/sanford          301
+/service-area/orange-city     /areas/deltona          301
+/service-area/lake-mary       /areas/sanford          301
+/service-area/ponce-inlet     /areas/port-orange      301
+/service-area/volusia-county  /areas                  301
+/service-area                 /areas                  301
+/service-area/*               /areas                  301
+
+# No SPA catch-all. Every marketing route is a prerendered static file (<route>.html);
+# /admin, /admin/login and /studio get shell copies written by scripts/prerender.mjs.
+# Anything else falls through to build/404.html with a real 404 status — no soft-404s.

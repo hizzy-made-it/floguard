@@ -19,6 +19,7 @@ const BlogPost = lazy(() => import("./pages/BlogPost"));
 const Areas = lazy(() => import("./pages/Areas"));
 const CityPage = lazy(() => import("./pages/CityPage"));
 const Contact = lazy(() => import("./pages/Contact"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 const Studio = lazy(() => import("./pages/Studio"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
@@ -45,6 +46,7 @@ function MarketingRoutes() {
           <Route path="/areas" element={<Areas />} />
           <Route path="/areas/:slug" element={<CityPage />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </ErrorBoundary>

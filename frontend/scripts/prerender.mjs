@@ -113,12 +113,53 @@ async function renderRoute(page, route) {
     // prerendered — non-JS crawlers parse noscript content, which would put a duplicate,
     // generic H1 above the page's real one. Head noscripts (font fallbacks) stay.
     document.querySelectorAll("body > noscript").forEach((n) => n.remove());
+    // Seo.jsx dedupes only the tags it manages via upsertHeadTag; React 19 metadata
+    // hoisting + the static shell still left 3x <title>, 3x og:type/twitter:card and
+    // homepage og/twitter tags next to the page's own. Keep the LAST of each (the
+    // page-specific one Seo.jsx wrote), drop the rest.
+    const keepLast = (sel) => {
+      const all = Array.from(document.head.querySelectorAll(sel));
+      all.slice(0, -1).forEach((n) => n.remove());
+    };
+    // document.title writes the FIRST <title>; React 19 hoisting appends the shell's
+    // copies after it — so for <title> keep the one that equals document.title.
+    {
+      const want = document.title;
+      const all = Array.from(document.head.querySelectorAll("title"));
+      const keep = all.find((t) => t.textContent === want) || all[0];
+      all.forEach((t) => t !== keep && t.remove());
+    }
+    // Framer-motion entrance states (opacity:0, blur, translate) were being frozen into
+    // the static HTML, so non-JS readers got an invisible H1/hero. Strip animation-only
+    // inline styles; hydration re-applies them and animates in as before.
+    document.querySelectorAll("[style]").forEach((el) => {
+      const st = el.style;
+      if (st.opacity === "0") st.removeProperty("opacity");
+      if (st.filter && /blur/.test(st.filter)) st.removeProperty("filter");
+      if (st.transform && /translate|scale/.test(st.transform)) st.removeProperty("transform");
+      if (!el.getAttribute("style")) el.removeAttribute("style");
+    });
+    keepLast('link[rel="canonical"]');
+    keepLast('meta[name="description"]');
+    keepLast('meta[name="robots"]');
+    for (const p of ["og:title","og:description","og:type","og:url","og:image","og:image:alt","og:locale","og:site_name"]) keepLast(`meta[property="${p}"]`);
+    for (const n of ["twitter:card","twitter:title","twitter:description","twitter:image"]) keepLast(`meta[name="${n}"]`);
     return "<!doctype html>\n" + document.documentElement.outerHTML;
   });
 
-  const outDir = route === "/" ? BUILD : path.join(BUILD, route.slice(1));
-  fs.mkdirSync(outDir, { recursive: true });
-  fs.writeFileSync(path.join(outDir, "index.html"), html, "utf8");
+  // Cloudflare Pages URL normalization: `<route>/index.html` makes Pages 308 the
+  // canonical, slash-less URL (`/services/french-drains`) to `/services/french-drains/`.
+  // That contradicted the sitemap, canonicals and every internal link, so Google saw
+  // "Page with redirect" on 30/31 URLs and a canonical pointing back into the redirect.
+  // Writing `<route>.html` flips it: Pages serves the bare URL with 200 and 308s the
+  // trailing-slash form to it — matching the canonical everywhere.
+  if (route === "/") {
+    fs.writeFileSync(path.join(BUILD, "index.html"), html, "utf8");
+  } else {
+    const outFile = path.join(BUILD, `${route.slice(1)}.html`);
+    fs.mkdirSync(path.dirname(outFile), { recursive: true });
+    fs.writeFileSync(outFile, html, "utf8");
+  }
 
   const title = await page.title();
   const words = await page.evaluate(() =>
@@ -182,4 +223,16 @@ if (failures.length) {
   console.error(`[prerender] ${failures.length} route(s) failed: ${failures.join(", ")}`);
   process.exit(1);
 }
-console.log(`[prerender] done — ${results.length}/${ROUTES.length} routes written`);
+// Cloudflare Pages serves build/404.html with a real 404 status for any path that has
+// no static file, once the `/* /index.html 200` catch-all is gone from _redirects.
+// The SPA still boots from it (same bundle), so /admin, /studio keep working client-side;
+// Google stops logging every typo/dead URL as a "Soft 404".
+fs.copyFileSync(path.join(BUILD, "index.html"), path.join(BUILD, "404.html"));
+// Client-only routes (auth / noindex / robots-disallowed) need the shell on disk with a
+// 200 — a `_redirects` rewrite to /index.html gets normalized by Pages into a 308 to "/".
+for (const r of ["admin", "admin/login", "studio"]) {
+  const f = path.join(BUILD, `${r}.html`);
+  fs.mkdirSync(path.dirname(f), { recursive: true });
+  fs.copyFileSync(path.join(BUILD, "index.html"), f);
+}
+console.log(`[prerender] done — ${results.length}/${ROUTES.length} routes written (+ 404.html)`);
