@@ -3,20 +3,55 @@
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
-        { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains; preload" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains; preload"
+        }
       ]
     }
   ],
   "redirects": [
-    { "source": "/", "destination": "/crm/", "permanent": false },
-    { "source": "/crm", "destination": "/crm/", "permanent": false }
+    {
+      "source": "/",
+      "destination": "/crm/",
+      "permanent": false
+    },
+    {
+      "source": "/crm",
+      "destination": "/crm/",
+      "permanent": false
+    }
   ],
   "rewrites": [
-    { "source": "/crm/", "destination": "/crm/index.html" },
-    { "source": "/crm/api/:path*", "destination": "/api/:path*" }
+    {
+      "source": "/crm/",
+      "destination": "/crm/index.html"
+    },
+    {
+      "source": "/crm/api/:path*",
+      "destination": "/api/:path*"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron-rainfall",
+      "schedule": "0 10 * * *"
+    }
   ]
 }
