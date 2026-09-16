@@ -1,10 +1,10 @@
 # Canonical host: www → apex (zone-level redirect also enforces this)
-https://www.floguardfl.com/*  https://floguardfl.com/:splat  301!
+https://www.floguardfl.com/*  https://floguardfl.com/:splat  301
 
 # FloGuard Sales Rev CRM lives on Vercel (separate project).
 # Marketing SPA catch-all must not swallow /crm.
-/crm    https://crm.floguardfl.com/crm/  302!
-/crm/*  https://crm.floguardfl.com/crm/:splat  302!
+/crm    https://crm.floguardfl.com/crm/  302
+/crm/*  https://crm.floguardfl.com/crm/:splat  302
 
 # Indexed URLs with no route in this app — 301 to the real content
 /pricing     /blog/french-drain-cost-central-florida-2026  301
