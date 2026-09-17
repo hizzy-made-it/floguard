@@ -14,7 +14,7 @@ const args = process.argv.slice(2);
 const N = Number(args[args.indexOf('--n') + 1]) || 3000;
 
 const SELECT =
-  'parcel_id,fsi_live,fsi_static,fema_zone,hsg,claim_heat,just_value,living_area,year_built,homestead,dor_use,use_desc,address,must_have_score,must_have_band,must_have_reasons';
+  'parcel_id,fsi_live,fsi_static,fema_zone,hsg,claim_heat,just_value,living_area,year_built,homestead,dor_use,use_desc,address,impervious_ratio,lot_sqft,must_have_score,must_have_band,must_have_reasons';
 
 async function page(offset, limit) {
   const r = await fetch(`${url}/rest/v1/parcel_risk?select=${SELECT}&order=parcel_id&offset=${offset}&limit=${limit}`, { headers });

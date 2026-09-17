@@ -227,13 +227,26 @@ export function mustHaveScore(row, opts = {}) {
   // Homestead helps residential; commercial is neutral (not penalized)
   const ownerOcc = hx === 'Y' || hx === 'YES' || hx === '1' || hx === 'X' ? 1 : hx ? 0.4 : 0.55;
 
+  // Lot-level stormwater term (fsi/sql/008): impervious_ratio 0.10→0, 0.50→1.
+  // Small lot (<8k sqft) with ≥20% hardscape gets +0.15. Null → neutral 0.3.
+  const impRaw = row.impervious_ratio;
+  const imp = impRaw == null || impRaw === '' ? null : Number(impRaw);
+  const lot = Number(row.lot_sqft) || 0;
+  let hardscape = 0.3;
+  if (imp != null && isFinite(imp)) {
+    hardscape = clamp01((imp - 0.1) / 0.4);
+    if (lot > 0 && lot < 8000 && imp >= 0.2) hardscape = Math.min(1, hardscape + 0.15);
+  }
+
   let raw;
   if (hasFsi) {
     raw =
-      0.32 * risk + 0.22 * heat + 0.18 * story + 0.15 * capacity + 0.08 * age + 0.05 * ownerOcc;
+      0.3 * risk + 0.2 * heat + 0.17 * story + 0.14 * capacity +
+      0.07 * hardscape + 0.07 * age + 0.05 * ownerOcc;
   } else {
     raw =
-      0.35 * heat + 0.2 * capacity + 0.18 * age + 0.12 * story + 0.1 * ownerOcc + 0.05;
+      0.33 * heat + 0.19 * capacity + 0.16 * age + 0.12 * story +
+      0.07 * hardscape + 0.08 * ownerOcc + 0.05;
     if (heat >= 0.55) raw = Math.min(1, raw + 0.1);
   }
 
@@ -260,6 +273,7 @@ export function mustHaveScore(row, opts = {}) {
   if (zone === 'X' || zone === 'X-SHADED') reasons.push('zone_x');
   if (clay >= 0.55) reasons.push(clay >= 0.9 ? 'clay_soil' : 'poor_drain_soil');
   if (gold) reasons.push('gold_segment');
+  if (imp != null && isFinite(imp) && hardscape >= 0.6) reasons.push('hardscape_pooling');
   if (age >= 0.85) reasons.push('older_building');
   if (capacity >= 0.75) reasons.push('pay_capacity');
   if (jv >= 900_000) reasons.push('commercial_scale');

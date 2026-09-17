@@ -3812,6 +3812,8 @@ function fsiStory(p){
   return 'Zone '+zone+' clay-friendly bowl — high drainage need, often ignored by FEMA maps. Strong FloGuard segment.';
  if(hsg==='D'||hsg.includes('D'))
   return 'Poor-draining soil (HSG '+hsg+'). Water sits after storms even without a FEMA flood map flag.';
+ if(reasons.indexOf('hardscape_pooling')>=0)
+  return 'Heavy hardscape for the lot ('+Math.round((Number(p.impervious_ratio)||0)*100)+'% roof/driveway cover'+(Number(p.lot_sqft)>0&&Number(p.lot_sqft)<8000?', small lot':'')+') — roof and driveway runoff has nowhere to soak in. Pooling at the edges is the pitch.';
  if(isFinite(twi)&&twi>=0.75)
   return 'High wetness index — water collects here from surrounding ground. Terrain is the story.';
  if(isFinite(hand)&&hand<=0.25)
