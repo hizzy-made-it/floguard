@@ -2,7 +2,8 @@
  * Flood Susceptibility Index — parcel reads for the CRM map panel.
  * Spec: docs/FLOOD-SUSCEPTIBILITY-INDEX.md
  *
- * POST body: { action: 'viewport'|'top', bbox?: [w,s,e,n], minFsi?, limit? }
+ * POST body: { action: 'viewport'|'top'|'storm', bbox?: [w,s,e,n], minFsi?, limit?,
+ *              minRainMm?, minBand? }   -- 'storm': parcels in cells with >= minRainMm yesterday (fsi/sql/010)
  * Auth: Authorization: Bearer <academy session token>
  *
  * Prefer public.parcel_risk via PostgREST. When the table is missing (migrations
@@ -10,7 +11,7 @@
  * usable. Real county data still requires fsi/sql/001 + ingest.
  */
 import { verifySessionToken } from '../server/lib/academy-db.js';
-import { restGet } from '../server/lib/supabase-rest.js';
+import { restGet, rest } from '../server/lib/supabase-rest.js';
 import { queryFixtures } from '../server/lib/fsi-fixtures.js';
 import { setCors, json, parseBody, rateLimit, clientIp } from '../server/lib/http.js';
 
@@ -120,6 +121,40 @@ export default async function handler(req, res) {
   if (action === 'viewport') {
     box = validateBbox(body.bbox);
     if (!box) return json(res, 400, { error: 'bbox must be [w,s,e,n] and span at most 1 degree' });
+  } else if (action === 'storm') {
+    // Post-storm dial list: cells with >= minRainMm on the last completed day,
+    // parcels at or above minBand, wettest cells first then score.
+    const minRainMm = Number.isFinite(Number(body.minRainMm)) ? Math.max(0, Number(body.minRainMm)) : 25;
+    const minBand = ['must', 'should', 'maybe'].includes(String(body.minBand || '').toLowerCase())
+      ? String(body.minBand).toLowerCase()
+      : 'should';
+    try {
+      const [cells, parcels] = await Promise.all([
+        rest('/rest/v1/rpc/storm_cells', { method: 'POST', body: JSON.stringify({ min_rain_mm: minRainMm }) }),
+        rest('/rest/v1/rpc/storm_dial_list', {
+          method: 'POST',
+          body: JSON.stringify({ min_rain_mm: minRainMm, min_band: minBand, max_rows: limit }),
+        }),
+      ]);
+      const list = Array.isArray(parcels) ? parcels : [];
+      return json(res, 200, {
+        ok: true,
+        source: 'postgres',
+        minRainMm,
+        minBand,
+        cells: Array.isArray(cells) ? cells : [],
+        count: list.length,
+        truncated: list.length >= limit,
+        parcels: list,
+      });
+    } catch (err) {
+      const status = err?.status === 404 ? 503 : 500;
+      return json(res, status, {
+        error: 'storm list failed',
+        detail: String(err?.message || err).slice(0, 300),
+        hint: status === 503 ? 'Apply fsi/sql/009 and 010.' : undefined,
+      });
+    }
   } else if (action !== 'top') {
     return json(res, 400, { error: `Unknown action: ${action}` });
   }
