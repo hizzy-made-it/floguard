@@ -9,7 +9,7 @@ the whole county fits in memory. The 1 m LiDAR product is ~100 tiles and
     python fsi/pipeline/terrain_run.py --skip-wbt # reuse rasters, redo sampling
 
 Inputs  (fsi/data/):  dem/USGS_13_*.tif, parcel_centroids.csv
-Outputs (fsi/data/):  terrain/{dem,filled,sca,slope,twi,streams,hand}.tif
+Outputs (fsi/data/):  terrain/{dem,dem_utm,twi,hand}.tif (intermediates deleted)
                       parcel_terrain.csv  parcel_id,twi,hand,twi_n,hand_n
 """
 
@@ -77,7 +77,53 @@ def mosaic_clip() -> Path:
     return dem
 
 
+# Volusia sits in UTM zone 17N. The 3DEP tiles are lat/lon (EPSG:4326): running
+# flow accumulation on a degree grid gave specific contributing areas in
+# degrees, TWI around -2 instead of ~8, and zero stream cells above the
+# threshold (HAND 100% nodata). Everything downstream needs metres.
+UTM = "EPSG:26917"
+CELL_M = 10.0
+
+
+def reproject_utm(dem_ll: Path) -> Path:
+    from rasterio.warp import Resampling, calculate_default_transform, reproject
+
+    out = OUT / "dem_utm.tif"
+    if out.exists():
+        log("dem_utm.tif exists, skipping reprojection")
+        return out
+    log(f"reproject dem.tif -> {UTM} at {CELL_M:g} m")
+    with rasterio.open(dem_ll) as src:
+        transform, width, height = calculate_default_transform(
+            src.crs, UTM, src.width, src.height, *src.bounds, resolution=(CELL_M, CELL_M)
+        )
+        meta = src.meta.copy()
+        meta.update(crs=UTM, transform=transform, width=width, height=height,
+                    nodata=-9999.0, dtype="float32", compress="lzw", tiled=True)
+        with rasterio.open(out, "w", **meta) as dst:
+            reproject(
+                source=rasterio.band(src, 1), destination=rasterio.band(dst, 1),
+                src_transform=src.transform, src_crs=src.crs, src_nodata=src.nodata,
+                dst_transform=transform, dst_crs=UTM, dst_nodata=-9999.0,
+                resampling=Resampling.bilinear,
+            )
+    log(f"dem_utm.tif {width}x{height} px")
+    return out
+
+
+def _stats(path: Path, label: str) -> None:
+    with rasterio.open(path) as d:
+        a = d.read(1)
+        ok = np.isfinite(a) & (a != d.nodata) & (a != -9999.0)
+        v = a[ok]
+        pct = np.round(np.percentile(v, [1, 25, 50, 75, 99]), 2) if v.size else None
+        log(f"  {label}: valid {100 * ok.mean():.1f}%  p1/25/50/75/99 = {pct}")
+
+
 def run_wbt(dem: Path) -> dict[str, Path]:
+    """WhiteboxTools chain. Intermediates are deleted as soon as the next stage
+    no longer needs them: the six full-county rasters total ~4 GB and the
+    machine ran out of disk on the first attempt. Peak here is ~2.5 GB."""
     import whitebox
 
     wbt = whitebox.WhiteboxTools()
@@ -85,16 +131,15 @@ def run_wbt(dem: Path) -> dict[str, Path]:
     wbt.set_working_dir(str(OUT))
     paths = {k: OUT / f"{k}.tif" for k in ("filled", "sca", "slope", "streams", "hand", "twi")}
 
-    log("breach depressions (least cost)")
-    wbt.breach_depressions_least_cost(str(dem), str(paths["filled"]), dist=100, fill=True)
+    # Least-cost breaching (terrain.py docstring) ran >15 min on the 100 Mpx
+    # county DEM with nothing written. Wang & Liu fill with flat fixing is
+    # minutes and is the standard choice for TWI on flat coastal terrain.
+    log("fill depressions (Wang & Liu, fix flats)")
+    wbt.fill_depressions_wang_and_liu(str(dem), str(paths["filled"]), fix_flats=True)
     log("D-infinity flow accumulation -> specific contributing area")
     wbt.d_inf_flow_accumulation(str(paths["filled"]), str(paths["sca"]), out_type="Specific Contributing Area")
     log("slope (degrees)")
     wbt.slope(str(paths["filled"]), str(paths["slope"]), units="degrees")
-    log("extract streams")
-    wbt.extract_streams(str(paths["sca"]), str(paths["streams"]), threshold=STREAM_THRESHOLD)
-    log("elevation above stream (HAND)")
-    wbt.elevation_above_stream(str(paths["filled"]), str(paths["streams"]), str(paths["hand"]))
 
     log("TWI = ln(sca / tan(slope))")
     with rasterio.open(paths["sca"]) as s, rasterio.open(paths["slope"]) as sl:
@@ -103,14 +148,28 @@ def run_wbt(dem: Path) -> dict[str, Path]:
         meta = s.meta.copy()
         nod = s.nodata
     tan_b = np.tan(np.maximum(np.deg2rad(slope), MIN_SLOPE_RAD))
+    del slope
     twi = np.log(np.maximum(sca, 1e-6) / tan_b).astype("float32")
     bad = ~np.isfinite(twi)
     if nod is not None:
         bad |= sca == nod
+    del sca, tan_b
     twi[bad] = -9999.0
     meta.update(dtype="float32", nodata=-9999.0, compress="lzw", tiled=True)
     with rasterio.open(paths["twi"], "w", **meta) as dst:
         dst.write(twi, 1)
+    del twi
+    paths["slope"].unlink(missing_ok=True)
+    _stats(paths["twi"], "twi")
+
+    log("extract streams")
+    wbt.extract_streams(str(paths["sca"]), str(paths["streams"]), threshold=STREAM_THRESHOLD)
+    paths["sca"].unlink(missing_ok=True)
+    log("elevation above stream (HAND)")
+    wbt.elevation_above_stream(str(paths["filled"]), str(paths["streams"]), str(paths["hand"]))
+    paths["streams"].unlink(missing_ok=True)
+    paths["filled"].unlink(missing_ok=True)
+    _stats(paths["hand"], "hand")
     return paths
 
 
@@ -125,8 +184,8 @@ def sample(paths: dict[str, Path]) -> None:
                 continue
     log(f"{len(rows)} centroids")
 
-    def read_window_mean(ds, band, lon, lat):
-        col, row = ds.index(lon, lat)
+    def read_window_mean(ds, band, x, y):
+        row, col = ds.index(x, y)
         r0, r1 = max(0, row - SAMPLE_HALF), min(ds.height, row + SAMPLE_HALF + 1)
         c0, c1 = max(0, col - SAMPLE_HALF), min(ds.width, col + SAMPLE_HALF + 1)
         if r1 <= r0 or c1 <= c0:
@@ -135,6 +194,9 @@ def sample(paths: dict[str, Path]) -> None:
         win = win[(win != -9999.0) & np.isfinite(win)]
         return float(win.mean()) if win.size else None
 
+    from pyproj import Transformer
+
+    to_utm = Transformer.from_crs("EPSG:4326", UTM, always_xy=True)
     with rasterio.open(paths["twi"]) as dt, rasterio.open(paths["hand"]) as dh:
         twi_band = dt.read(1)
         hand_band = dh.read(1)
@@ -143,10 +205,11 @@ def sample(paths: dict[str, Path]) -> None:
             hand_band = np.where(hand_band == hand_nod, -9999.0, hand_band)
         out = []
         for i, (pid, lat, lon) in enumerate(rows):
-            if not (dt.bounds.left <= lon <= dt.bounds.right and dt.bounds.bottom <= lat <= dt.bounds.top):
+            x, y = to_utm.transform(lon, lat)
+            if not (dt.bounds.left <= x <= dt.bounds.right and dt.bounds.bottom <= y <= dt.bounds.top):
                 continue
-            t = read_window_mean(dt, twi_band, lon, lat)
-            h = read_window_mean(dh, hand_band, lon, lat)
+            t = read_window_mean(dt, twi_band, x, y)
+            h = read_window_mean(dh, hand_band, x, y)
             if t is None or h is None:
                 continue
             out.append((pid, t, h))
@@ -184,7 +247,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--skip-wbt", action="store_true", help="reuse existing terrain rasters")
     args = ap.parse_args()
-    dem = mosaic_clip()
+    dem = reproject_utm(mosaic_clip())
     if args.skip_wbt:
         paths = {k: OUT / f"{k}.tif" for k in ("filled", "sca", "slope", "streams", "hand", "twi")}
     else:
