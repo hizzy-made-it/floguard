@@ -74,11 +74,12 @@ hero blending into a clean, trust-focused light body. Phone (386) 259-0023, 5.0 
 - 007 `lead_outcomes` label stream + lot features from the Volusia appraiser via pg_net (Cowork session 09-16). API: `api/lead-outcomes.js` (record/list/readiness).
 - 008 Hardscape term (`impervious_ratio`, `lot_sqft`) in the score. 13,387 parcels flagged `hardscape_pooling`. JS reference scorer updated; `fsi/tests/verify-mhs-*.mjs` prove JS == SQL (400 rows, 0 mismatches).
 - 009 Per-cell rainfall: 157 × 0.05° cells, one Open-Meteo call via pg_net, `rainfall_cell.d` per parcel. First day: d 0.014–0.638 vs county 0.274.
+- 011 Real terrain: TWI/HAND per parcel from USGS 3DEP 10 m, pipeline `fsi/pipeline/terrain_run.py`, data in `fsi/releases/terrain-2026-09-17/` (committed, public-record derived), loaded by pg_net. Requires ~4 GB free disk; C: was at 99%.
 - 010 Post-storm dial list: `storm_cells()`, `storm_dial_list()`, map API action `storm`.
 - Daily pg_cron chain (UTC): `rain_fetch_enqueue` 11:00 → `rain_fetch_process` 11:10 → `fsi_daily` 12:00 (`fsi_apply_dynamic_cells` + `must_have_rescore`).
 
 **Improvement list status**
-1 calibration on closed jobs — waiting on outcomes (0 rows). 2 LiDAR TWI/HAND — not started (`pipeline/terrain.py` scaffold). 3 per-cell rainfall — done. 4 post-storm lists — done (API; no UI button yet). 5 imagery — not started. 6 lot features — done. 7 outcome capture — table + API done, no CRM form. 8 rebanding after rainfall — done.
+1 calibration on closed jobs — waiting on outcomes (0 rows). 2 real terrain — done 2026-09-17 at 10 m (3DEP 1/3 arc-sec, `terrain_run.py`, sql/011); old DEM-lite proxies were noise (corr 0.03/0.07). 1 m LiDAR still open. 3 per-cell rainfall — done. 4 post-storm lists — done (API; no UI button yet). 5 imagery — not started. 6 lot features — done. 7 outcome capture — table + API done, no CRM form. 8 rebanding after rainfall — done.
 
 **Gotchas**
 - Supabase MCP `execute_sql` times out ~60–90 s; anything touching all 312k rows (`must_have_rescore` ~2 min, `fsi_daily` ~4 min) must run via pg_cron. `cron.unschedule` on a running one-off job **cancels it** — schedule at a fixed minute and unschedule only after `cron.job_run_details` shows success.

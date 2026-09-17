@@ -34,8 +34,9 @@ Live Supabase project `floguard` (ref `gphlrnctrtbrpspmzaxw`). Updated 2026-09-1
 | `sql/006` must-have rescore in SQL | Applied 2026-09-16. `must_have_raw()` / `must_have_rescore()`, change-only writes, `must_have_runs` log |
 | `sql/007` lead outcomes + lot features | Applied 2026-09-16. `lead_outcomes` label stream (0 rows yet); lot features loaded from the appraiser ArcGIS layer via pg_net (lot 238k, footprint 250k, impervious 190k) |
 | `sql/008` hardscape term | Applied 2026-09-17. `impervious_ratio` / `lot_sqft` in the score; reason `hardscape_pooling` (13,387 parcels) |
+| `sql/011` terrain load + static recompute | Applied 2026-09-17. `terrain_apply_csv()`, pg_net loader, `fsi_recompute_static()` |
 | `sql/009` per-cell rainfall | Applied 2026-09-17. 157 × 0.05° cells, one Open-Meteo request via pg_net, `rainfall_cell.d` per parcel with county fallback |
-| Terrain (`twi_n` / `hand_n`) | **DEM-lite proxies** from the Open-Meteo elevation grid (`scripts/enrich-dem-lite.mjs`). Real LiDAR TWI/HAND (`pipeline/terrain.py`) still a scaffold |
+| Terrain (`twi_n` / `hand_n`) | **Real, 2026-09-17**: USGS 3DEP 1/3 arc-second (10 m), `pipeline/terrain_run.py` (UTM 17N, Wang & Liu fill, D-inf SCA, HAND). 313,487 parcels. The previous DEM-lite proxies correlated 0.03 / 0.07 with these values, i.e. noise. Loaded via `sql/011` pg_net path from `fsi/releases/terrain-2026-09-17/`. 1 m LiDAR is the next step up |
 | `../api/cron-rainfall.js` | Vercel cron 10:00 UTC. County `rainfall_state` + Supabase keepalive. **Not deployed** until the Vercel project Root Directory is `floguard-crm` |
 | `../api/fsi-parcels.js` | Serving the map panel; exposes lot + hardscape columns |
 | Map panel in the CRM | Live at `crm.floguardfl.com/crm/` |
