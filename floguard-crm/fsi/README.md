@@ -24,16 +24,29 @@ the request path.
 
 ## Build state
 
+Live Supabase project `floguard` (ref `gphlrnctrtbrpspmzaxw`). Updated 2026-09-17.
+
 | Piece | State |
 |---|---|
-| `sql/001_parcel_risk.sql` | Complete, **never applied** — `parcel_risk` + `rainfall_state`, GiST + `fsi_live` indexes |
-| `sql/002_seed_fixtures.sql` | Complete, **never applied** — 21 synthetic parcels so the map is verifiable before ingest exists |
-| `pipeline/config.py` | Complete — all six weights, HSG/zone lookups, `advance_api`, `composite_fsi` |
-| `pipeline/rainfall.py` | Complete, **never run** — Open-Meteo fetch, API_t advance, bulk `fsi_live` update |
-| `pipeline/terrain.py` | **Scaffold** — WhiteboxTools sequence documented, `NotImplementedError` throughout |
-| `../api/fsi-parcels.js` | Complete — 401/400/405/503 paths exercised against the dev server; the success path is unverified because no rows exist |
-| Parcel ingest | Not started |
-| Map panel in the CRM | Complete, **unverified against data** — panel renders, but has never drawn a parcel |
+| `sql/001` `parcel_risk` + `rainfall_state` | Applied 2026-07-21. **312,281 Volusia parcels** ingested |
+| `sql/004` must-have + appraiser columns | Applied 2026-07-21 |
+| `sql/005` rainfall apply in SQL | Applied 2026-09-16. `fsi_apply_dynamic()`; county-level `rainfall_state.d` from the Vercel cron |
+| `sql/006` must-have rescore in SQL | Applied 2026-09-16. `must_have_raw()` / `must_have_rescore()`, change-only writes, `must_have_runs` log |
+| `sql/007` lead outcomes + lot features | Applied 2026-09-16. `lead_outcomes` label stream (0 rows yet); lot features loaded from the appraiser ArcGIS layer via pg_net (lot 238k, footprint 250k, impervious 190k) |
+| `sql/008` hardscape term | Applied 2026-09-17. `impervious_ratio` / `lot_sqft` in the score; reason `hardscape_pooling` (13,387 parcels) |
+| `sql/009` per-cell rainfall | Applied 2026-09-17. 157 × 0.05° cells, one Open-Meteo request via pg_net, `rainfall_cell.d` per parcel with county fallback |
+| Terrain (`twi_n` / `hand_n`) | **DEM-lite proxies** from the Open-Meteo elevation grid (`scripts/enrich-dem-lite.mjs`). Real LiDAR TWI/HAND (`pipeline/terrain.py`) still a scaffold |
+| `../api/cron-rainfall.js` | Vercel cron 10:00 UTC. County `rainfall_state` + Supabase keepalive. **Not deployed** until the Vercel project Root Directory is `floguard-crm` |
+| `../api/fsi-parcels.js` | Serving the map panel; exposes lot + hardscape columns |
+| Map panel in the CRM | Live at `crm.floguardfl.com/crm/` |
+
+Daily chain, all pg_cron (UTC): `rain_fetch_enqueue` 11:00 → `rain_fetch_process` 11:10 →
+`fsi_daily` 12:00 (`fsi_apply_dynamic_cells()` then `must_have_rescore()`).
+`select * from cron.job_run_details order by start_time desc limit 5` shows each run.
+
+Scoring lives in two places that must agree: `scripts/lib/fsi-score.mjs` (reference) and
+`sql/006` + `sql/008` (what runs). `tests/verify-mhs-sql.mjs` checks them against each other;
+`tests/verify-mhs-json.mjs` does the same from an exported JSON when PostgREST is unreachable.
 
 ## Setup
 
