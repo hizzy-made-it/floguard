@@ -10,3 +10,6 @@ __pycache__/
 .claude/
 
 .vercel
+
+# multi-GB rasters and pulled parcel geometry — never commit
+fsi/data/
