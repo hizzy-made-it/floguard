@@ -43,6 +43,9 @@ Live Supabase project `floguard` (ref `gphlrnctrtbrpspmzaxw`). Updated 2026-09-1
 Daily chain, all pg_cron (UTC): `rain_fetch_enqueue` 11:00 → `rain_fetch_process` 11:10 →
 `fsi_daily` 12:00 (`fsi_apply_dynamic_cells()` then `must_have_rescore()`).
 `select * from cron.job_run_details order by start_time desc limit 5` shows each run.
+pg_cron sessions carry a 2-minute `statement_timeout`; every job command starts with
+`set statement_timeout = ...;` because a `SET` inside a function cannot re-arm a running statement.
+Anything over ~60 s cannot run through the Supabase MCP `execute_sql` either — schedule it.
 
 Scoring lives in two places that must agree: `scripts/lib/fsi-score.mjs` (reference) and
 `sql/006` + `sql/008` (what runs). `tests/verify-mhs-sql.mjs` checks them against each other;

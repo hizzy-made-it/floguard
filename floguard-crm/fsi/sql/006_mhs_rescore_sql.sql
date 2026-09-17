@@ -280,4 +280,7 @@ grant execute on function public.fsi_apply_dynamic_from_state(text) to service_r
 grant execute on function public.fsi_daily(text) to service_role;
 
 select cron.unschedule(jobid) from cron.job where jobname = 'fsi_apply_dynamic_daily';
-select cron.schedule('fsi_apply_dynamic_daily', '0 12 * * *', $$select public.fsi_daily('12127')$$);
+-- pg_cron sessions inherit the role's 2-minute statement_timeout and a SET inside a
+-- function does not re-arm an already-running top-level statement, so the job
+-- command itself raises the timeout before calling the 4-minute chain.
+select cron.schedule('fsi_apply_dynamic_daily', '0 12 * * *', $$set statement_timeout = '1800s'; select public.fsi_daily('12127')$$);

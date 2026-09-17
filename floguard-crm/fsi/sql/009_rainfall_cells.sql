@@ -238,4 +238,4 @@ grant execute on function public.fsi_apply_dynamic_cells(text) to service_role;
 
 select cron.unschedule(jobid) from cron.job where jobname in ('rain_fetch_enqueue', 'rain_fetch_process');
 select cron.schedule('rain_fetch_enqueue', '0 11 * * *',  $$select public.rain_fetch_enqueue()$$);
-select cron.schedule('rain_fetch_process', '10 11 * * *', $$select * from public.rain_fetch_process()$$);
+select cron.schedule('rain_fetch_process', '10 11 * * *', $$set statement_timeout = '600s'; select * from public.rain_fetch_process()$$);
