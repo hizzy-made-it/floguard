@@ -4,7 +4,7 @@
 -- gold_segment (+14 points) was zone X + clay/dual soil + claim heat >= 0.35.
 -- Claim heat is coastal NFIP data (inland 0.25-0.28), so Orange City, Deltona
 -- and DeBary basins could never qualify however deep the bowl. Now:
---   gold = zone X + clay/dual soil + (claim heat >= 0.35 OR depr_n >= 0.5)
+--   gold = zone X + ((clay/dual soil + (claim heat >= 0.35 OR depr_n >= 0.5)) OR depr_n >= 1.0)
 -- New reason code 'closed_basin' (depr_n >= 0.5). must_have_raw gains p_depr_n;
 -- the old 11-arg overload is dropped so callers cannot resolve to it.
 -- Mirrored in scripts/lib/fsi-score.mjs.
@@ -117,7 +117,12 @@ begin
 
   -- sql/015: a closed basin (>= 0.5 m bowl at the lot) is a second way into gold.
   -- Claim heat is coastal NFIP data; inland basins never reach 0.35.
-  gold := zone in ('X', 'X-SHADED') and clay >= 0.55 and (heat >= 0.35 or depr >= 0.5);
+  -- Second pass (migration gold_segment_deep_basin): a deep closed basin (>= 1 m)
+  -- qualifies regardless of soil. Every flagged basin in Orange City, Deltona and
+  -- DeBary is HSG A sand; sand still floods when the basin has no outlet and the
+  -- water table rises (2022).
+  gold := zone in ('X', 'X-SHADED')
+      and ((clay >= 0.55 and (heat >= 0.35 or depr >= 0.5)) or depr >= 1.0);
   if gold then raw := least(1, raw + 0.14); end if;
   if zone in ('AE', 'VE', 'AO', 'AH') and clay < 0.5 and heat < 0.3 then raw := raw * 0.9; end if;
   if jv >= 900000 and (heat >= 0.4 or clay >= 0.55) then raw := least(1, raw + 0.06); end if;

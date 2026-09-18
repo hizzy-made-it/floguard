@@ -265,8 +265,11 @@ export function mustHaveScore(row, opts = {}) {
   // FloGuard gold: Zone X/X-shaded + clay/dual + neighborhood claim heat
   // sql/015: a closed basin (>= 0.5 m bowl at the lot) is a second way into gold.
   const deprN = clamp01(Number(row.depr_n) || 0);
+  // A deep closed basin (>= 1 m) qualifies regardless of soil: sand still floods when
+  // the basin has no outlet and the water table rises (Deltona / Orange City / DeBary 2022).
   const gold =
-    (zone === 'X' || zone === 'X-SHADED') && clay >= 0.55 && (heat >= 0.35 || deprN >= 0.5);
+    (zone === 'X' || zone === 'X-SHADED') &&
+    ((clay >= 0.55 && (heat >= 0.35 || deprN >= 0.5)) || deprN >= 1.0);
   if (gold) raw = Math.min(1, raw + 0.14);
 
   // Secondary: SFHA without soil/claim story — still dialable, slightly demoted vs gold
