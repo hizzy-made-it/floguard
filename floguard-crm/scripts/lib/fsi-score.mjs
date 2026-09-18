@@ -6,8 +6,12 @@
  * Only vacant land / pure ag / ROW / water are hard-skipped.
  */
 
-export const W_TWI = 0.4;
-export const W_HAND = 0.25;
+// Static weights (sum 1.0). 2026-09-17: W_DEPR added for closed basins (fsi/sql/013);
+// TWI and HAND gave up 0.05 each. HAND is height above *flowing* drainage and
+// misses the Deltona/DeBary lake-basin pattern; depression depth catches it.
+export const W_TWI = 0.35;
+export const W_HAND = 0.2;
+export const W_DEPR = 0.1;
 export const W_SOIL = 0.2;
 export const W_ZONE = 0.15;
 export const ALPHA = 1.0;
@@ -80,9 +84,13 @@ export function normalizeFemaZone(fldZone, zoneSubty) {
   return z || null;
 }
 
-export function staticScore(twiN, handN, hsg, zone) {
+export function staticScore(twiN, handN, hsg, zone, deprN = 0) {
   return (
-    W_TWI * twiN + W_HAND * (1.0 - handN) + W_SOIL * hsgScore(hsg) + W_ZONE * zoneScore(zone)
+    W_TWI * twiN +
+    W_HAND * (1.0 - handN) +
+    W_DEPR * clamp01(Number(deprN) || 0) +
+    W_SOIL * hsgScore(hsg) +
+    W_ZONE * zoneScore(zone)
   );
 }
 

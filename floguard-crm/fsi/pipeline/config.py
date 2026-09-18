@@ -10,8 +10,9 @@ addresses exist. Never present an FSI value to a customer as a measurement.
 from __future__ import annotations
 
 # --- Static term weights (sum to 1.0) ---
-W_TWI = 0.40
-W_HAND = 0.25
+W_TWI = 0.35
+W_HAND = 0.20
+W_DEPR = 0.10   # closed-basin depth (filled - raw DEM), 2026-09-17, see sql/013
 W_SOIL = 0.20
 W_ZONE = 0.15
 
@@ -68,8 +69,8 @@ def zone_score(zone: str | None) -> float:
     return FEMA_ZONE_SCORE.get(zone.strip().upper(), FEMA_ZONE_DEFAULT)
 
 
-def static_score(twi_n: float, hand_n: float, hsg: str | None, zone: str | None) -> float:
-    """S = w1*TWI_n + w2*(1 - HAND_n) + w3*HSG + w4*Z
+def static_score(twi_n: float, hand_n: float, hsg: str | None, zone: str | None, depr_n: float = 0.0) -> float:
+    """S = w1*TWI_n + w2*(1 - HAND_n) + w_depr*DEPR_n + w3*HSG + w4*Z
 
     twi_n  normalized 0-1 across the county.
     hand_n normalized 0-1 raw HAND. Inversion happens HERE, once, so the stored
@@ -78,6 +79,7 @@ def static_score(twi_n: float, hand_n: float, hsg: str | None, zone: str | None)
     return (
         W_TWI * twi_n
         + W_HAND * (1.0 - hand_n)
+        + W_DEPR * max(0.0, min(1.0, depr_n or 0.0))
         + W_SOIL * hsg_score(hsg)
         + W_ZONE * zone_score(zone)
     )
