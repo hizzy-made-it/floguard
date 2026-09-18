@@ -9,10 +9,12 @@
 // Static weights (sum 1.0). 2026-09-17: W_DEPR added for closed basins (fsi/sql/013);
 // TWI and HAND gave up 0.05 each. HAND is height above *flowing* drainage and
 // misses the Deltona/DeBary lake-basin pattern; depression depth catches it.
-export const W_TWI = 0.35;
+// 2026-09-17 (sql/014): DEPR raised to 0.20 (from TWI and soil) so closed basins
+// can cross a band cut; see fsi/README.md "closed-basin term".
+export const W_TWI = 0.3;
 export const W_HAND = 0.2;
-export const W_DEPR = 0.1;
-export const W_SOIL = 0.2;
+export const W_DEPR = 0.2;
+export const W_SOIL = 0.15;
 export const W_ZONE = 0.15;
 export const ALPHA = 1.0;
 
@@ -248,8 +250,10 @@ export function mustHaveScore(row, opts = {}) {
 
   let raw;
   if (hasFsi) {
+    // 2026-09-17 (sql/014): claim heat 0.20 -> 0.12, terrain risk 0.30 -> 0.38.
+    // NFIP claims are coastal insured homes; heat at 0.20 kept inland basins out of every band.
     raw =
-      0.3 * risk + 0.2 * heat + 0.17 * story + 0.14 * capacity +
+      0.38 * risk + 0.12 * heat + 0.17 * story + 0.14 * capacity +
       0.07 * hardscape + 0.07 * age + 0.05 * ownerOcc;
   } else {
     raw =

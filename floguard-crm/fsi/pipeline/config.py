@@ -10,10 +10,10 @@ addresses exist. Never present an FSI value to a customer as a measurement.
 from __future__ import annotations
 
 # --- Static term weights (sum to 1.0) ---
-W_TWI = 0.35
+W_TWI = 0.30
 W_HAND = 0.20
-W_DEPR = 0.10   # closed-basin depth (filled - raw DEM), 2026-09-17, see sql/013
-W_SOIL = 0.20
+W_DEPR = 0.20   # closed-basin depth (filled - raw DEM); 0.10 in sql/013, 0.20 since sql/014
+W_SOIL = 0.15
 W_ZONE = 0.15
 
 # --- Dynamic term weights (sum to 1.0) ---
