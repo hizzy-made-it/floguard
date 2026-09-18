@@ -36,7 +36,7 @@ async function fetchAllRows() {
   while (out.length < LIMIT) {
     const params = new URLSearchParams({
       select:
-        'parcel_id,fsi_live,fsi_static,fema_zone,hsg,claim_heat,just_value,living_area,year_built,homestead,dor_use,use_desc,address,impervious_ratio,lot_sqft',
+        'parcel_id,fsi_live,fsi_static,fema_zone,hsg,claim_heat,just_value,living_area,year_built,homestead,dor_use,use_desc,address,impervious_ratio,lot_sqft,depr_n',
       order: 'parcel_id',
       limit: String(PAGE_SIZE),
     });

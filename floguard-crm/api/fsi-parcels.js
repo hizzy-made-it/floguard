@@ -28,7 +28,7 @@ const DEFAULT_MUST_LIMIT = 200;
 const COLUMNS =
   'parcel_id,address,owner_name,lat,lon,fsi_live,fsi_static,fema_zone,hsg,twi_n,hand_n,' +
   'claim_heat,claim_count_10y,claim_last_year,must_have_score,must_have_band,must_have_reasons,' +
-  'year_built,living_area,just_value,city,zip,homestead,dor_use,use_desc,lot_sqft,impervious_ratio';
+  'year_built,living_area,just_value,city,zip,homestead,dor_use,use_desc,lot_sqft,impervious_ratio,depr_m,depr_n';
 
 function bearer(req) {
   const h = req.headers?.authorization || req.headers?.Authorization || '';

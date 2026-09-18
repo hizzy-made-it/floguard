@@ -263,8 +263,10 @@ export function mustHaveScore(row, opts = {}) {
   }
 
   // FloGuard gold: Zone X/X-shaded + clay/dual + neighborhood claim heat
+  // sql/015: a closed basin (>= 0.5 m bowl at the lot) is a second way into gold.
+  const deprN = clamp01(Number(row.depr_n) || 0);
   const gold =
-    (zone === 'X' || zone === 'X-SHADED') && clay >= 0.55 && heat >= 0.35;
+    (zone === 'X' || zone === 'X-SHADED') && clay >= 0.55 && (heat >= 0.35 || deprN >= 0.5);
   if (gold) raw = Math.min(1, raw + 0.14);
 
   // Secondary: SFHA without soil/claim story — still dialable, slightly demoted vs gold
@@ -285,6 +287,7 @@ export function mustHaveScore(row, opts = {}) {
   if (zone === 'X' || zone === 'X-SHADED') reasons.push('zone_x');
   if (clay >= 0.55) reasons.push(clay >= 0.9 ? 'clay_soil' : 'poor_drain_soil');
   if (gold) reasons.push('gold_segment');
+  if (deprN >= 0.5) reasons.push('closed_basin');
   if (imp != null && isFinite(imp) && hardscape >= 0.6) reasons.push('hardscape_pooling');
   if (age >= 0.85) reasons.push('older_building');
   if (capacity >= 0.75) reasons.push('pay_capacity');
