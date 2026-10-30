@@ -273,11 +273,16 @@ export default function Home() {
         <div className="pointer-events-none absolute inset-x-0 top-0 h-24 z-[3] bg-gradient-to-b from-[#0B0F1A]/40 to-transparent" />
 
         <div className="pointer-events-none relative z-10 h-full container-fg flex flex-col justify-end pb-12 pt-24 sm:pb-20 sm:pt-28 min-w-0">
-          <p className="overline mb-4 sm:mb-6 fg-hero-fade" style={{ animationDelay: "0.15s" }}>
-            Flood Solutions &amp; Management · Central Florida
-          </p>
+          {/* H1 carries the primary keyword; the brand line below is a display subhead (<p>). */}
+          <h1
+            className="font-display text-white text-xl sm:text-3xl lg:text-4xl leading-[1.1] tracking-[-0.3px] max-w-3xl break-words mb-4 sm:mb-6 fg-hero-fade"
+            style={{ animationDelay: "0.15s" }}
+          >
+            French Drain &amp; Yard Drainage Contractor in{" "}
+            <span className="text-brand-orange">Port Orange &amp; Volusia County</span>
+          </h1>
 
-          <h1 className="font-display text-white text-[2.5rem] sm:text-7xl lg:text-8xl leading-[0.92] tracking-[-1px] sm:tracking-[-1.5px] max-w-4xl break-words">
+          <p className="font-display text-white text-[2.5rem] sm:text-7xl lg:text-8xl leading-[0.92] tracking-[-1px] sm:tracking-[-1.5px] max-w-4xl break-words">
             {headline.map((w, i) => (
               <span key={i}>
                 {i > 0 ? " " : null}
@@ -291,7 +296,7 @@ export default function Home() {
                 </span>
               </span>
             ))}
-          </h1>
+          </p>
 
           <p
             className="mt-5 sm:mt-8 text-base sm:text-xl text-white/70 max-w-[42ch] leading-snug sm:leading-tight fg-hero-fade"

@@ -2,6 +2,7 @@ import { IMAGES } from "./site";
 
 // High-intent local landing pages for Central Florida service areas.
 // Quality gate: each city needs unique intro + deepDive + problems + faqs (not Mad-Libs).
+// `updated` = last real content edit (YYYY-MM-DD) — feeds the sitemap <lastmod>; bump it on edits.
 export const CITIES = [
   {
     slug: "daytona-beach",
@@ -20,6 +21,7 @@ export const CITIES = [
     ],
     neighborhoods: ["Daytona Beach Shores", "Ormond-by-the-Sea", "Holly Hill", "South Daytona", "Wilbur-by-the-Sea"],
     zip: "32118",
+    updated: "2026-07-22",
     faqs: [
       { q: "What drainage works best for coastal Daytona Beach homes?", a: "Most coastal lots need a French drain that intercepts groundwater plus a sump pump to lift water to a safe discharge — gravity alone rarely works on flat, high water table properties." },
       { q: "Do salt air and storms affect sump pumps?", a: "Yes. We specify durable components, recommend sealed basins, check valves, and battery backup so the system survives outages during tropical weather." },
@@ -44,6 +46,7 @@ export const CITIES = [
     ],
     neighborhoods: ["Cypress Head", "Sabal Creek", "Waters Edge", "Spruce Creek", "Town Park"],
     zip: "32127",
+    updated: "2026-07-22",
     faqs: [
       { q: "Why do Port Orange yards flood so easily?", a: "Flat lots, high water tables, and intense seasonal rain mean water sits unless you intercept and pump it to a safe discharge." },
       { q: "Are you a local Port Orange company?", a: "Yes. FloGuard is based in Port Orange and serves Volusia, Seminole, and Orange County corridors." },
@@ -68,6 +71,7 @@ export const CITIES = [
     ],
     neighborhoods: ["Historic Downtown Sanford", "Lake Forest", "Heathrow", "Markham Woods", "Wynwood"],
     zip: "32771",
+    updated: "2026-07-22",
     faqs: [
       { q: "Does living near Lake Monroe change drainage design?", a: "Yes. High groundwater and lake-influenced soils often require active pumping (sump) plus French drains — not gravity-only trenches." },
       { q: "Can you work on historic Sanford homes?", a: "Yes. We plan access carefully, protect landscaping, and can use interior crawlspace drains when exterior trenching is limited." },
@@ -92,6 +96,7 @@ export const CITIES = [
     ],
     neighborhoods: ["Winter Park", "Baldwin Park", "Lake Nona", "College Park", "Dr. Phillips"],
     zip: "32801",
+    updated: "2026-07-22",
     faqs: [
       { q: "Do you install French drains in Orlando and Winter Park?", a: "Yes. FloGuard serves the Orlando metro including Winter Park, Baldwin Park, Lake Nona, College Park, and Dr. Phillips." },
       { q: "Is drainage worth it for investment properties?", a: "Reliable drainage protects foundations and curb appeal — critical for rentals and resale. We design systems that stay invisible after backfill." },
@@ -116,6 +121,7 @@ export const CITIES = [
     ],
     neighborhoods: ["Bethune Beach", "Coronado", "Venetian Bay", "Sugar Mill", "Turnbull Bay"],
     zip: "32168",
+    updated: "2026-07-22",
     faqs: [
       { q: "Why do DIY French drains fail in New Smyrna Beach sand?", a: "Without proper filter fabric and clean gravel, fine sand clogs pipe quickly. We use fabric-wrapped systems sized for coastal soils." },
       { q: "Do you serve Coronado and Venetian Bay?", a: "Yes. FloGuard serves New Smyrna Beach neighborhoods including Coronado, Venetian Bay, Sugar Mill, and Turnbull Bay." },
@@ -140,6 +146,7 @@ export const CITIES = [
     ],
     neighborhoods: ["Ormond-by-the-Sea", "Halifax Plantation", "Breakaway Trails", "Plantation Bay", "Tomoka Estates"],
     zip: "32174",
+    updated: "2026-07-22",
     faqs: [
       { q: "Can you replace an old clogged French drain in Ormond Beach?", a: "Yes. We inspect legacy systems and redesign with proper fabric, gravel, slope, and discharge — often adding a sump where gravity failed." },
       { q: "Do you work in Halifax Plantation and Plantation Bay?", a: "Yes. FloGuard serves Ormond Beach including Halifax Plantation, Breakaway Trails, Plantation Bay, and Ormond-by-the-Sea." },
@@ -164,6 +171,7 @@ export const CITIES = [
     ],
     neighborhoods: ["Historic Downtown DeLand", "Victoria Park", "Glenwood", "Lake Winnemissett", "Cresswind"],
     zip: "32720",
+    updated: "2026-07-22",
     faqs: [
       { q: "Do larger DeLand lots need different drainage?", a: "Often yes — longer trenches, multiple collection points, or dual sumps may be required. Design is property-specific." },
       { q: "Can grading alone fix my yard?", a: "Sometimes for mild surface pooling. Chronic high water table or foundation moisture usually needs subsurface drains plus discharge." },
@@ -188,11 +196,120 @@ export const CITIES = [
     ],
     neighborhoods: ["Deltona Lakes", "Arbor Ridge", "Saxon Woods", "Timbercrest", "Courtland Estates"],
     zip: "32725",
+    updated: "2026-07-22",
     faqs: [
       { q: "Why doesn’t gravity drainage work well in Deltona?", a: "Lots are often too flat and the water table too high for water to leave by slope alone — a sump provides the lift." },
       { q: "Do you install battery backup sump pumps in Deltona?", a: "Yes. We strongly recommend battery backup for hurricane and storm outages." },
       { q: "Can you fix wet crawlspaces?", a: "Yes — interior drains to a sealed sump are a common solution for Florida crawlspaces." },
       { q: "How much does a system cost in Deltona?", a: "Most complete systems fall roughly in the $4,500–$12,000 range depending on scope. Free assessments provide exact pricing." },
+    ],
+  },
+  // ---- Added 2026-10-30. These four were already listed as service areas in the footer.
+  // No local job photos, project stories or neighborhood lists yet — copy is written as
+  // "served from Port Orange" on purpose (see docs/SEO-EXECUTION-PLAN.md §2A). Add real
+  // local jobs/photos/neighborhoods here as they happen; don't invent them.
+  {
+    slug: "edgewater",
+    name: "Edgewater",
+    county: "Volusia County",
+    image: "/images/storm.webp",
+    intro:
+      "Edgewater sits on the Indian River Lagoon just south of New Smyrna Beach — straight down US-1 from our Port Orange shop. Low, flat lots near the water leave rain few places to go, and FloGuard designs French drain and sump pump systems that give it a safe one.",
+    deepDive:
+      "We serve Edgewater from our [Port Orange](/areas/port-orange) base on Ridgewood Avenue (US-1) with the same crew, materials and design standards we use in our own city. Close to the lagoon, the ground is low and flat, so a yard can stay wet long after a summer storm has passed and gravity alone often can’t move water anywhere useful. Every Edgewater assessment starts the same way: we walk the lot, find where water collects and where it is coming from, and map a discharge path that is legal and physical — a lawful outlet, a swale or a safe spot on your own property — before we design the trench that feeds it. When that path would touch a public right-of-way, a roadside swale or a storm inlet, we confirm with the City of Edgewater first rather than guess. Where the lot has no fall, a sealed sump with a check valve lifts the water out, with a battery backup option for storm outages.",
+    problems: [
+      "Low, flat lots near the Indian River Lagoon with little natural fall",
+      "Lawns, driveways and lanais that hold water after afternoon storms",
+      "Downspouts dumping roof water into the lowest corner of the yard",
+      "Limited places to send water without affecting a neighbor or the street",
+    ],
+    neighborhoods: [],
+    servedFromHQ: true, // no local job history on the page yet — copy says so
+    zip: "32132",
+    updated: "2026-10-30",
+    faqs: [
+      { q: "Does FloGuard serve Edgewater?", a: "Yes. Edgewater is part of our regular Volusia County service area, served from our Port Orange location at 5114 S Ridgewood Ave. Assessments are free and on site." },
+      { q: "What drainage works on flat lots near the lagoon?", a: "Usually a fabric-lined French drain to intercept the water, routed to a sump pump that lifts it to a safe discharge when the lot has no natural fall. Which combination you need depends on what we find on site." },
+      { q: "Do I need a permit for drainage work in Edgewater?", a: "It depends mainly on where the water goes. In Volusia cities the common trigger is work that touches a public right-of-way, roadside swale or storm inlet, so we confirm with the City of Edgewater before designing that kind of discharge. Our [Volusia County permit guide](/blog/volusia-county-drainage-permits) explains the county-versus-city split." },
+      { q: "How much does a French drain cost in Edgewater?", a: "Most complete French drain and sump systems fall roughly in the $4,500–$12,000 range depending on scope. We give a firm number only after a free on-site assessment." },
+    ],
+  },
+  {
+    slug: "debary",
+    name: "DeBary",
+    county: "Volusia County",
+    image: "/images/yard-dry.webp",
+    intro:
+      "DeBary sits in southwest Volusia County on the St. Johns River, between Deltona and Sanford. Flat lots and wet-season downpours can leave yards soggy for days — FloGuard designs drainage that collects that water and moves it somewhere safe.",
+    deepDive:
+      "DeBary is on the same western Volusia corridor as [Deltona](/areas/deltona) and just across the river from our [Sanford](/areas/sanford) service area, and we serve it from our [Port Orange](/areas/port-orange) base. Homes near the river and the area’s lakes can see ground that stays saturated after long rainy stretches, and plenty of DeBary lots are flat enough that surface water simply sits. We don’t sell a kit: we walk the property, find where water collects and where it can legally go, check septic and utility locations, then size the trench, pipe and — when gravity can’t finish the job — a sealed sump with a check valve. Discharge is designed so water leaves your foundation without becoming a neighbor’s problem, and any work that would touch a public right-of-way or roadside swale is confirmed with the City of DeBary first. Battery backup is an option for homes that lose power in storms.",
+    problems: [
+      "Flat lots where surface water has nowhere to drain",
+      "Yards that stay soggy for days after long rainy stretches",
+      "Water pooling against the slab after heavy rain",
+      "Septic systems and utilities that limit where a trench can run",
+    ],
+    neighborhoods: [],
+    servedFromHQ: true, // no local job history on the page yet — copy says so
+    zip: "32713",
+    updated: "2026-10-30",
+    faqs: [
+      { q: "Does FloGuard serve DeBary?", a: "Yes. DeBary is part of our West Volusia service area alongside Deltona and DeLand, served from our Port Orange location. Assessments are free and on site." },
+      { q: "Can a French drain run near a septic system?", a: "It has to be planned around it. We locate the tank and drain field during the assessment and route trenches and discharge away from them — sending drain water into a drain field would flood your own system." },
+      { q: "Do I need a sump pump or will gravity work?", a: "If the lot has enough fall to a lawful outlet, gravity can work. Many flat Central Florida lots don’t, and a sump provides the lift. We decide after measuring on site, not over the phone." },
+      { q: "How much does a drainage system cost in DeBary?", a: "Most complete French drain and sump systems fall roughly in the $4,500–$12,000 range depending on scope. A free on-site assessment gives you the exact number." },
+    ],
+  },
+  {
+    slug: "lake-mary",
+    name: "Lake Mary",
+    county: "Seminole County",
+    image: "/images/diagram.webp",
+    intro:
+      "Lake Mary sits in Seminole County on the I-4 corridor between Sanford and Orlando — two of our core service areas. FloGuard installs French drains, sump pumps and yard drainage for Lake Mary homes that pond after Central Florida storms.",
+    deepDive:
+      "We serve Lake Mary as part of the same I-4 corridor run that covers [Sanford](/areas/sanford) and [Orlando](/areas/orlando), from our [Port Orange](/areas/port-orange) base. Summer storms here drop a lot of rain in a short time, and a flat backyard, a patio poured slightly toward the house or downspouts that empty onto the lawn are enough to leave standing water after every one. Many Lake Mary neighborhoods are managed by HOAs, so we plan for the visible parts of a system — catch basin grates, pop-up emitters, discharge points — to be neat, low-profile and easy to describe in an architectural review submittal, and we restore turf and beds after the install. The design itself is property-specific: we find where water collects and where it can lawfully go, then size the [French drain](/services/french-drains), any catch basins, and a sealed sump with a check valve if gravity can’t carry the water out.",
+    problems: [
+      "Backyards and side yards that pond after short, heavy summer storms",
+      "Patios and pavers that drain toward the house instead of away",
+      "Downspouts emptying onto lawns and beds next to the foundation",
+      "HOA rules on what visible drainage hardware can look like",
+    ],
+    neighborhoods: [],
+    servedFromHQ: true, // no local job history on the page yet — copy says so
+    zip: "32746",
+    updated: "2026-10-30",
+    faqs: [
+      { q: "Does FloGuard install French drains in Lake Mary?", a: "Yes. Lake Mary is part of our Seminole County service area along with Sanford, served on the I-4 corridor from our Port Orange location. Assessments are free and on site." },
+      { q: "Will my HOA need to approve a drainage system?", a: "Some HOAs require architectural review for visible items like drain grates, emitters or regrading. Check your community’s rules; we can describe the components and layout for your submittal." },
+      { q: "Can you fix water coming off my patio toward the house?", a: "Usually, yes — with a catch basin or channel drain at the low edge tied into a French drain or sump that carries the water away from the slab. The right fix depends on how the patio was graded." },
+      { q: "How much does a French drain cost in Lake Mary?", a: "Most complete French drain and sump systems fall roughly in the $4,500–$12,000 range depending on scope. We give a firm number only after a free on-site assessment." },
+    ],
+  },
+  {
+    slug: "winter-park",
+    name: "Winter Park",
+    county: "Orange County",
+    image: "/images/blog-storm-alt.webp",
+    intro:
+      "Winter Park’s chain of lakes, mature oak canopy and established homes make drainage a design problem, not a kit install. FloGuard designs French drain and sump systems that move water away from foundations while working around roots, beds and hardscape.",
+    deepDive:
+      "Winter Park is part of the [Orlando](/areas/orlando) metro we already serve, and we work there from our [Port Orange](/areas/port-orange) base with the same crew and standards. Many properties have mature trees, established landscaping, brick or paver hardscape and homes that were built before modern grading practices — so the hard part is usually getting water out without tearing up what makes the property worth protecting. We plan trench routes around major roots and utilities, use hand work where machines would do damage, and restore turf and beds when we’re done. Before designing a discharge we map where water can lawfully go; on lake-adjacent lots that conversation includes where runoff ends up, and any work touching a public right-of-way or city storm system is confirmed with the City of Winter Park first. When the lot is too flat for gravity, a sealed sump with a check valve does the lifting.",
+    problems: [
+      "Older lots graded before modern drainage practices",
+      "Mature tree roots and established beds in the way of a trench",
+      "Water sitting against foundations and in side yards after storms",
+      "Pavers and hardscape that trap water instead of shedding it",
+    ],
+    neighborhoods: [],
+    servedFromHQ: true, // no local job history on the page yet — copy says so
+    zip: "32789",
+    updated: "2026-10-30",
+    faqs: [
+      { q: "Does FloGuard serve Winter Park?", a: "Yes. Winter Park is part of our Orlando metro service area, served from our Port Orange location. Assessments are free and on site." },
+      { q: "Will a French drain damage my trees?", a: "We plan trench paths to respect major roots and utilities. Some routes use hand work or alternate layouts to protect canopy trees." },
+      { q: "Can you restore landscaping and pavers after the install?", a: "Yes. We restore turf and beds after installation so the system sits underground, and we plan around hardscape where possible." },
+      { q: "How much does a French drain cost in Winter Park?", a: "Most complete French drain and sump systems fall roughly in the $4,500–$12,000 range depending on scope. A free on-site assessment gives you the exact number." },
     ],
   },
 ];

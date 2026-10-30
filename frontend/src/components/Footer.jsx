@@ -2,6 +2,10 @@ import { Link } from "react-router-dom";
 import { Phone, MessageSquare, Mail, MapPin } from "lucide-react";
 import { COMPANY, NAV_LINKS, SERVICE_AREAS, IMAGES } from "../data/site";
 
+// Every SERVICE_AREAS name has an /areas/<slug> page (slug = lowercase, hyphenated name).
+// Derived instead of importing cities.js so the footer doesn't pull city copy into the main bundle.
+const areaPath = (name) => `/areas/${name.toLowerCase().replace(/\s+/g, "-")}`;
+
 export const Footer = () => {
   return (
     <footer data-testid="site-footer" className="relative bg-brand-ink text-white grain overflow-hidden border-t border-white/10">
@@ -42,7 +46,11 @@ export const Footer = () => {
           <div className="lg:col-span-2">
             <div className="text-xs uppercase tracking-[2px] text-white/40 mb-4">Service Area</div>
             <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm text-white/60">
-              {SERVICE_AREAS.map((a) => <div key={a}>{a}</div>)}
+              {SERVICE_AREAS.map((a) => (
+                <Link key={a} to={areaPath(a)} className="hover:text-brand-orange transition-colors">
+                  {a}
+                </Link>
+              ))}
             </div>
           </div>
 

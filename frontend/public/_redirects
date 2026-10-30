@@ -21,7 +21,7 @@ https://www.floguardfl.com/*  https://floguardfl.com/:splat  301
 /service-area/daytona-beach   /areas/daytona-beach    301
 /service-area/sanford         /areas/sanford          301
 /service-area/orange-city     /areas/deltona          301
-/service-area/lake-mary       /areas/sanford          301
+/service-area/lake-mary       /areas/lake-mary        301
 /service-area/ponce-inlet     /areas/port-orange      301
 /service-area/volusia-county  /areas                  301
 /service-area                 /areas                  301

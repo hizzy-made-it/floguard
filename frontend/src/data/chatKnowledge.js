@@ -14,6 +14,7 @@ import {
 } from "./site";
 import { CITIES } from "./cities";
 import { POSTS } from "./blog";
+import { stripInline } from "../lib/markdownText";
 
 function serviceEntry(s) {
   return {
@@ -271,12 +272,12 @@ export const CHAT_KNOWLEDGE = [
     id: `city-${city.slug}`,
     category: "area",
     title: `${city.name} drainage`,
-    answer: `${city.name} (${city.county}): ${city.intro} ${city.deepDive ? city.deepDive.slice(0, 280) + "…" : ""} Common issues: ${city.problems.join("; ")}. Neighborhoods: ${city.neighborhoods.slice(0, 4).join(", ")}. ${(city.faqs || []).slice(0, 1).map((f) => `${f.q} ${f.a}`).join(" ")} More: /areas/${city.slug}. Free assessment: /contact.`,
+    answer: `${city.name} (${city.county}): ${city.intro} ${city.deepDive ? stripInline(city.deepDive).slice(0, 280) + "…" : ""} Common issues: ${city.problems.join("; ")}.${city.neighborhoods?.length ? ` Neighborhoods: ${city.neighborhoods.slice(0, 4).join(", ")}.` : ""} ${(city.faqs || []).slice(0, 1).map((f) => `${f.q} ${stripInline(f.a)}`).join(" ")} More: /areas/${city.slug}. Free assessment: /contact.`,
     keywords: [
       city.name.toLowerCase(),
       city.slug.replace(/-/g, " "),
       city.county.toLowerCase(),
-      ...city.neighborhoods.map((n) => n.toLowerCase()),
+      ...(city.neighborhoods || []).map((n) => n.toLowerCase()),
       city.zip,
     ],
     relatedChips: ["Book free assessment", "How does the system work?"],

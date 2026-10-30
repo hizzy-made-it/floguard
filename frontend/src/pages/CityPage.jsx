@@ -12,6 +12,7 @@ import { COMPANY, SYSTEM_EXPLANATION } from "../data/site";
 import { Seo, organizationLd, faqPageLd, breadcrumbListLd, SITE } from "../components/Seo";
 import { EASE, viewportOnce } from "../lib/animations";
 import { StatsBar } from "../components/StatsBar";
+import { renderInline } from "../lib/inlineMarkdown";
 
 export default function CityPage() {
   const { slug } = useParams();
@@ -19,7 +20,7 @@ export default function CityPage() {
 
   if (!city) return <Navigate to="/areas" replace />;
 
-  const others = CITIES.filter((c) => c.slug !== city.slug).slice(0, 6);
+  const others = CITIES.filter((c) => c.slug !== city.slug);
   const pageUrl = `${SITE}/areas/${city.slug}`;
   const pageTitle = `French Drain Installation in ${city.name}, FL | FloGuard`;
   const pageDescription = `French drain, sump pump & yard drainage in ${city.name}, ${city.county}. Stop standing water and protect foundations from Florida’s high water table. Free on-site assessments.`;
@@ -87,8 +88,17 @@ export default function CityPage() {
                 Why {city.name} homes flood.
               </h2>
               <p className="mt-6 text-lg text-brand-slate leading-relaxed">
-                Every property is different — but {city.name} homeowners keep calling us about the same water problems.
-                Here's what we solve most often in {city.county}.
+                {city.servedFromHQ ? (
+                  <>
+                    Every property is different. These are the water problems we check for first on {city.name} lots —
+                    served from our Port Orange base, with the same crew and standards.
+                  </>
+                ) : (
+                  <>
+                    Every property is different — but {city.name} homeowners keep calling us about the same water problems.
+                    Here's what we solve most often in {city.county}.
+                  </>
+                )}
               </p>
               <a href={COMPANY.phoneHref} className="mt-8 inline-flex items-center gap-2 text-brand-navy font-bold link-underline">
                 <Phone size={16} className="text-brand-orange" /> {COMPANY.phone}
@@ -126,7 +136,7 @@ export default function CityPage() {
           </div>
           {city.deepDive && (
             <Reveal className="max-w-3xl mb-10">
-              <p className="text-lg text-brand-slate leading-relaxed">{city.deepDive}</p>
+              <p className="text-lg text-brand-slate leading-relaxed">{renderInline(city.deepDive)}</p>
             </Reveal>
           )}
           <div className="grid md:grid-cols-2 gap-8 text-lg text-brand-slate">
@@ -164,7 +174,7 @@ export default function CityPage() {
               {city.faqs.map((f) => (
                 <div key={f.q} className="border-b border-border pb-6">
                   <h3 className="font-display text-xl text-brand-navy">{f.q}</h3>
-                  <p className="mt-2 text-brand-slate leading-relaxed">{f.a}</p>
+                  <p className="mt-2 text-brand-slate leading-relaxed">{renderInline(f.a)}</p>
                 </div>
               ))}
             </div>
@@ -199,7 +209,8 @@ export default function CityPage() {
         </div>
       </section>
 
-      {/* Neighborhoods */}
+      {/* Neighborhoods (only when we have real ones to list) */}
+      {city.neighborhoods?.length > 0 && (
       <section className="section bg-secondary">
         <div className="container-fg">
           <Reveal className="mb-8">
@@ -217,6 +228,7 @@ export default function CityPage() {
           </div>
         </div>
       </section>
+      )}
 
       <Testimonials />
 

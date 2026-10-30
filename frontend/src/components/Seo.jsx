@@ -1,7 +1,11 @@
-// Per-page SEO via React 19 document-metadata hoisting + imperative dedupe.
-// SPA shells ship homepage meta in index.html; this component always wins after mount.
+// Per-page SEO. Every head tag (title, description, robots, googlebot, canonical, OG,
+// Twitter) is written imperatively into ONE element per selector. We deliberately do NOT
+// render <title>/<meta> JSX: React 19 metadata hoisting appends its own copies next to the
+// static index.html shell tags and the prerendered ones, which shipped every tag twice.
+// index.html keeps a homepage fallback set; this component updates those same nodes in place.
 import { useLayoutEffect } from "react";
 import { COMPANY } from "../data/site";
+import { stripInline } from "../lib/markdownText";
 
 export const SITE = "https://floguardfl.com";
 export const ORG_ID = `${SITE}/#organization`;
@@ -31,14 +35,39 @@ function upsertHeadTag(selector, create, attrs) {
   return el;
 }
 
+/** <meta name|property="key" content="..."> — exactly one per key. */
+function setMeta(attr, key, content) {
+  upsertHeadTag(
+    `meta[${attr}="${key}"]`,
+    () => {
+      const n = document.createElement("meta");
+      n.setAttribute(attr, key);
+      return n;
+    },
+    { content }
+  );
+}
+
+function setTitle(title) {
+  const titles = Array.from(document.head.querySelectorAll("title"));
+  let el = titles[titles.length - 1];
+  if (!el) {
+    el = document.createElement("title");
+    document.head.appendChild(el);
+  }
+  el.textContent = title;
+  titles.forEach((t) => t !== el && t.remove());
+}
+
 /**
- * @param {{ title: string, description: string, path?: string, image?: string, type?: string, jsonLd?: object|object[], noindex?: boolean, robots?: string }} props
+ * @param {{ title: string, description: string, path?: string, image?: string, imageAlt?: string, type?: string, jsonLd?: object|object[], noindex?: boolean, robots?: string }} props
  */
 export const Seo = ({
   title,
   description,
   path = "/",
   image,
+  imageAlt,
   type = "website",
   jsonLd,
   noindex = false,
@@ -47,6 +76,7 @@ export const Seo = ({
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   const url = `${SITE}${normalizedPath === "/" ? "/" : normalizedPath.replace(/\/$/, "")}`;
   const ogImage = absUrl(image) || `${SITE}/images/hero-poster.jpg`;
+  const ogImageAlt = imageAlt || title;
   const robotsContent =
     robots || (noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large, max-snippet:-1");
 
@@ -58,11 +88,10 @@ export const Seo = ({
         : { "@context": "https://schema.org", ...jsonLd }
     : null;
 
-  // Force self-referential canonical + unique description after every route change.
-  // Static index.html always ships homepage tags; without this, audits and some crawlers
-  // report every URL as a homepage duplicate.
+  // Self-referential canonical + unique title/description/OG/Twitter after every route change.
+  // Runs before paint, and before scripts/prerender.mjs snapshots the DOM.
   useLayoutEffect(() => {
-    document.title = title;
+    setTitle(title);
 
     upsertHeadTag('link[rel="canonical"]', () => {
       const n = document.createElement("link");
@@ -70,71 +99,35 @@ export const Seo = ({
       return n;
     }, { href: url });
 
-    upsertHeadTag('meta[name="description"]', () => {
-      const n = document.createElement("meta");
-      n.setAttribute("name", "description");
-      return n;
-    }, { content: description });
+    setMeta("name", "description", description);
+    setMeta("name", "robots", robotsContent);
+    setMeta("name", "googlebot", robotsContent);
 
-    upsertHeadTag('meta[name="robots"]', () => {
-      const n = document.createElement("meta");
-      n.setAttribute("name", "robots");
-      return n;
-    }, { content: robotsContent });
+    setMeta("property", "og:site_name", "FloGuard, LLC");
+    setMeta("property", "og:locale", "en_US");
+    setMeta("property", "og:type", type);
+    setMeta("property", "og:url", url);
+    setMeta("property", "og:title", title);
+    setMeta("property", "og:description", description);
+    setMeta("property", "og:image", ogImage);
+    setMeta("property", "og:image:alt", ogImageAlt);
 
-    upsertHeadTag('meta[property="og:url"]', () => {
-      const n = document.createElement("meta");
-      n.setAttribute("property", "og:url");
-      return n;
-    }, { content: url });
-
-    upsertHeadTag('meta[property="og:title"]', () => {
-      const n = document.createElement("meta");
-      n.setAttribute("property", "og:title");
-      return n;
-    }, { content: title });
-
-    upsertHeadTag('meta[property="og:description"]', () => {
-      const n = document.createElement("meta");
-      n.setAttribute("property", "og:description");
-      return n;
-    }, { content: description });
-
-    upsertHeadTag('meta[property="og:image"]', () => {
-      const n = document.createElement("meta");
-      n.setAttribute("property", "og:image");
-      return n;
-    }, { content: ogImage });
+    setMeta("name", "twitter:card", "summary_large_image");
+    setMeta("name", "twitter:title", title);
+    setMeta("name", "twitter:description", description);
+    setMeta("name", "twitter:image", ogImage);
 
     // Drop static LocalBusiness from index.html so only React @graph emits the entity
     document.head
       .querySelectorAll('script[type="application/ld+json"][data-static-org="true"]')
       .forEach((n) => n.remove());
-  }, [title, description, url, robotsContent, ogImage]);
+  }, [title, description, url, robotsContent, ogImage, ogImageAlt, type]);
 
-  return (
-    <>
-      <title>{title}</title>
-      <meta name="description" content={description} />
-      <meta name="robots" content={robotsContent} />
-      <meta name="googlebot" content={robotsContent} />
-      <link rel="canonical" href={url} />
-      <meta property="og:site_name" content="FloGuard, LLC" />
-      <meta property="og:locale" content="en_US" />
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
-      <meta property="og:type" content={type} />
-      <meta property="og:url" content={url} />
-      <meta property="og:image" content={ogImage} />
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={title} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={ogImage} />
-      {ld && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
-      )}
-    </>
-  );
+  // JSON-LD is not hoisted by React (renders in place in <body>), so it hydrates cleanly
+  // against the prerendered copy and never duplicates.
+  return ld ? (
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+  ) : null;
 };
 
 /** Shared business entity — emit once per page via @graph only */
@@ -179,6 +172,10 @@ export const organizationLd = {
     { "@type": "City", name: "Deltona" },
     { "@type": "City", name: "Sanford" },
     { "@type": "City", name: "Orlando" },
+    { "@type": "City", name: "Edgewater" },
+    { "@type": "City", name: "DeBary" },
+    { "@type": "City", name: "Lake Mary" },
+    { "@type": "City", name: "Winter Park" },
     { "@type": "AdministrativeArea", name: "Volusia County" },
   ],
   priceRange: "$$",
@@ -230,8 +227,8 @@ export function faqPageLd(faqs = []) {
     "@type": "FAQPage",
     mainEntity: faqs.map((f) => ({
       "@type": "Question",
-      name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.a },
+      name: stripInline(f.q),
+      acceptedAnswer: { "@type": "Answer", text: stripInline(f.a) },
     })),
   };
 }

@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#0B0F1A" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
-    <!-- Default homepage meta — Seo.jsx overwrites canonical/description per route after hydrate -->
+    <!-- Homepage FALLBACK meta (used by 404/admin shells). Seo.jsx updates each of these nodes in place
+         per route (one tag per name/property) — never add a second copy of any of them elsewhere. -->
     <link rel="canonical" href="https://floguardfl.com/" />
     <!-- Favicons: Google Search uses a square icon ≥48px (multiples of 48 preferred) -->
     <link rel="icon" href="/favicon.ico" sizes="any" />

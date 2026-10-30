@@ -1,6 +1,9 @@
 import { IMAGES } from "./site";
 
-// SEO-focused blog content for FloGuard — 8 posts, one per week over the last 8 weeks.
+// SEO-focused blog content for FloGuard.
+// `date` = first published; `updated` = last real content edit (YYYY-MM-DD). Bump `updated`
+// whenever a post's text changes — it feeds BlogPosting.dateModified and the sitemap <lastmod>.
+// Body strings support inline markdown links [label](/path) (rendered by lib/inlineMarkdown).
 export const BLOG_CATEGORIES = ["All", "Cost & Value", "Drainage 101", "Foundation & Home", "Seasonal Prep", "Local Rules"];
 
 export const POSTS = [
@@ -14,6 +17,7 @@ export const POSTS = [
       "The county code exempts single-family residences from stormwater permitting — but Volusia County only governs unincorporated areas. If you live in Daytona Beach, Port Orange or Ormond Beach, your city's rules apply. Here's the breakdown, with the actual code sections cited.",
     category: "Local Rules",
     date: "2026-08-25",
+    updated: "2026-10-30",
     readTime: 9,
     keyword: "volusia county drainage permit",
     image: "/images/diagram.webp",
@@ -39,7 +43,7 @@ export const POSTS = [
       { type: "p", text: "Translation: the county is not interested in your residential French drain — until your water becomes someone else's problem. The erosion and downstream-impact rules apply to everyone, exempt or not. That is why discharge design matters more than trench design for staying legal." },
       { type: "h2", text: "City by city: where the real rules live" },
       { type: "table", headers: ["City", "Your own yard", "The common trigger"], rows: [
-        ["Port Orange", "Generally no stormwater permit for residential lot work", "Right-of-way construction permit (city code Chapter 58) for any work in the ROW — e.g., a discharge line to the street. Engineering: (386) 506-5538"],
+        ["[Port Orange](/areas/port-orange)", "Generally no stormwater permit for residential lot work", "Right-of-way construction permit (city code Chapter 58) for any work in the ROW — e.g., a discharge line to the street. Engineering: (386) 506-5538"],
         ["Ormond Beach", "Generally no permit for lot drainage", "Driveway/culvert work has its own submittal through the city; swale changes along the road involve the city"],
         ["Daytona Beach", "Generally no permit for lot drainage", "Work touching city right-of-way, sidewalks, or the city storm system goes through the city's permit desk"],
         ["New Smyrna Beach", "Generally no permit for lot drainage", "The city runs its own stormwater program; coastal lots should confirm discharge points with the city"],
@@ -71,6 +75,7 @@ export const POSTS = [
       "Coastal Daytona Beach is not priced like an inland lot. High tidal-influenced groundwater, salt-air pump requirements, and beachside access all move the number. Here's the honest local breakdown.",
     category: "Cost & Value",
     date: "2026-08-24",
+    updated: "2026-08-25",
     readTime: 8,
     keyword: "french drain cost daytona beach",
     image: "/images/case1-after.webp",
@@ -117,6 +122,7 @@ export const POSTS = [
       "Northern guides blame roots, silt and freeze damage. In Florida the killer is our own fine sand migrating into the system. Here's the failure mechanism, the symptoms timeline, and the honest repair-or-rebuild call.",
     category: "Drainage 101",
     date: "2026-08-23",
+    updated: "2026-10-30",
     readTime: 8,
     keyword: "french drain not working",
     image: "/images/case3-before.webp",
@@ -156,7 +162,7 @@ export const POSTS = [
         "If failure is seasonal, redesign for depth and discharge — usually a shallower interception trench paired with a sump",
         "Whatever you do, keep the discharge legal: water can't be sent onto a neighbor's lot, and a failing drain often 'fixes itself' by quietly eroding next door — a problem the county code makes yours",
       ] },
-      { type: "p", text: "If your system is underperforming, we'll tell you which failure you actually have — including when a $300 cleaning is the right answer and a rebuild would be overkill. [Book a free assessment](/contact) and we'll open the trench story on site. Related: [what rebuilds cost](/blog/french-drain-cost-central-florida-2026) and [how a correctly built system goes in](/process)." },
+      { type: "p", text: "If your system is underperforming, we'll tell you which failure you actually have — including when a $300 cleaning is the right answer and a rebuild would be overkill. [Book a free assessment](/contact) and we'll open the trench story on site. Related: [what rebuilds cost](/blog/french-drain-cost-central-florida-2026), [how we build French drains for Florida sand](/services/french-drains) and [how a correctly built system goes in](/process)." },
     ],
   },
   {
@@ -169,6 +175,7 @@ export const POSTS = [
       "A clear, no-jargon breakdown of what a professional French drain + sump pump system really costs in the Daytona–Orlando corridor. Florida's high water table, flat terrain and intense storms make this one of the most effective protections available.",
     category: "Cost & Value",
     date: "2026-07-06",
+    updated: "2026-10-30",
     readTime: 12,
     keyword: "french drain cost florida",
     image: "/images/case-studies-hero.webp",
@@ -204,8 +211,8 @@ export const POSTS = [
       { type: "p", text: "The most expensive drain is the one that has to be dug up and redone. Under-sized pipe, missing filter fabric, or the wrong slope will clog and fail within a couple of Florida rainy seasons. A properly designed system is invisible after backfill and protects your foundation for decades." },
       { type: "quote", text: "The right question isn't 'what's the cheapest drain?' — it's 'what will actually keep my home dry through a Florida storm?'" },
       { type: "h2", text: "Get a Real Number — Free On-Site Assessment" },
-      { type: "p", text: "We provide free, on-site drainage assessments across Central Florida. You'll get a clear plan and an honest price — no pressure. Book yours and stop guessing about standing water. We serve Port Orange, Daytona Beach, Sanford, Orlando, and surrounding areas with the same engineered standards." },
-      { type: "p", text: "Related reading: See our full [services](/services) and learn the [exact process](/process) we follow on every job. Ready to protect your home? [Request your free assessment today](/contact)." }
+      { type: "p", text: "We provide free, on-site drainage assessments across Central Florida. You'll get a clear plan and an honest price — no pressure. Book yours and stop guessing about standing water. We serve [Port Orange](/areas/port-orange), Daytona Beach, Sanford, Orlando, and surrounding areas with the same engineered standards." },
+      { type: "p", text: "Related reading: See our full [services](/services), what goes into a [professional French drain installation](/services/french-drains), and the [exact process](/process) we follow on every job. Ready to protect your home? [Request your free assessment today](/contact)." }
     ],
   },
   {
@@ -218,6 +225,7 @@ export const POSTS = [
       "Standing water after every storm isn't just annoying — it's a warning sign. Florida has a high water table (2–6 ft), flat terrain, intense rainfall and sandy soils. Here's how a French drain + sump pump system fixes the root causes.",
     category: "Drainage 101",
     date: "2026-06-29",
+    updated: "2026-07-22",
     readTime: 6,
     keyword: "standing water in yard",
     image: "/images/case3-before.webp",
@@ -255,6 +263,7 @@ export const POSTS = [
       "They're not competing solutions — they're partners. Here's how to know whether you need a French drain, a sump pump, or both.",
     category: "Drainage 101",
     date: "2026-06-22",
+    updated: "2026-10-30",
     readTime: 10,
     keyword: "french drain vs sump pump",
     image: "/images/case4-after.webp",
@@ -286,10 +295,10 @@ export const POSTS = [
         "Foundations under hydrostatic pressure from saturated soil",
         "Heavy summer storms that overwhelm gravity-only systems"
       ] },
-      { type: "p", text: "See our [services page](/services) for details on each system and our [process](/process) for custom design." },
+      { type: "p", text: "See our [French drain installation](/services/french-drains) and [services page](/services) for details on each system and our [process](/process) for custom design." },
       { type: "quote", text: "French drain + sump pump = capture the water, then move it somewhere safe. Together they solve yard flooding, foundation pressure and crawlspace intrusion at once." },
       { type: "h2", text: "Get the Right Recommendation for Your Property" },
-      { type: "p", text: "Not sure which your home needs? That's exactly what our free site evaluation determines. We walk every property, test soil and water levels, and design the exact combination that will keep your Central Florida home dry. Contact us today for an assessment in Daytona Beach, Port Orange, Orlando, or surrounding areas." }
+      { type: "p", text: "Not sure which your home needs? That's exactly what our free site evaluation determines. We walk every property, test soil and water levels, and design the exact combination that will keep your Central Florida home dry. Contact us today for an assessment in Daytona Beach, [Port Orange](/areas/port-orange), Orlando, or surrounding areas." }
     ],
   },
   {
@@ -302,6 +311,7 @@ export const POSTS = [
       "Water damage to a foundation is expensive and often silent. Catch these five early warning signs before they become structural repairs.",
     category: "Foundation & Home",
     date: "2026-06-15",
+    updated: "2026-07-22",
     readTime: 9,
     keyword: "foundation drainage problem",
     image: "/images/case2-after.webp",
@@ -339,6 +349,7 @@ export const POSTS = [
       "Florida's summer storms are relentless. A little preparation now can save your lawn, your landscaping, and your foundation later.",
     category: "Seasonal Prep",
     date: "2026-06-08",
+    updated: "2026-07-22",
     readTime: 8,
     keyword: "florida rainy season yard prep",
     image: "/images/blog-storm-alt.webp",
@@ -376,6 +387,7 @@ export const POSTS = [
       "A damp crawl space threatens air quality, wood framing and your foundation. Here's how interior drainage and a sump pump make it permanently dry.",
     category: "Foundation & Home",
     date: "2026-06-01",
+    updated: "2026-07-22",
     readTime: 6,
     keyword: "wet crawl space waterproofing",
     image: "/images/case2-before.webp",
@@ -410,6 +422,7 @@ export const POSTS = [
       "French drains aren't the only tool. Sometimes the fix for a soggy yard is smart grading, a catch basin, or a swale — often working together.",
     category: "Drainage 101",
     date: "2026-05-25",
+    updated: "2026-07-22",
     readTime: 7,
     keyword: "catch basin yard grading",
     image: "/images/case4-before.webp",
@@ -453,6 +466,7 @@ export const POSTS = [
       "Drainage isn't glamorous — but a dry, protected home sells faster and holds its value. Here's how a French drain pays off at closing.",
     category: "Cost & Value",
     date: "2026-05-18",
+    updated: "2026-07-22",
     readTime: 5,
     keyword: "french drain home value",
     image: "/images/case3-after.webp",

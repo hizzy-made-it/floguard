@@ -113,10 +113,9 @@ async function renderRoute(page, route) {
     // prerendered — non-JS crawlers parse noscript content, which would put a duplicate,
     // generic H1 above the page's real one. Head noscripts (font fallbacks) stay.
     document.querySelectorAll("body > noscript").forEach((n) => n.remove());
-    // Seo.jsx dedupes only the tags it manages via upsertHeadTag; React 19 metadata
-    // hoisting + the static shell still left 3x <title>, 3x og:type/twitter:card and
-    // homepage og/twitter tags next to the page's own. Keep the LAST of each (the
-    // page-specific one Seo.jsx wrote), drop the rest.
+    // Belt-and-braces: Seo.jsx now writes exactly one of each head tag imperatively (no
+    // React 19 metadata hoisting), but if anything ever re-adds a copy, keep the LAST of
+    // each (the page-specific one Seo.jsx wrote) and drop the rest.
     const keepLast = (sel) => {
       const all = Array.from(document.head.querySelectorAll(sel));
       all.slice(0, -1).forEach((n) => n.remove());
@@ -142,6 +141,7 @@ async function renderRoute(page, route) {
     keepLast('link[rel="canonical"]');
     keepLast('meta[name="description"]');
     keepLast('meta[name="robots"]');
+    keepLast('meta[name="googlebot"]');
     for (const p of ["og:title","og:description","og:type","og:url","og:image","og:image:alt","og:locale","og:site_name"]) keepLast(`meta[property="${p}"]`);
     for (const n of ["twitter:card","twitter:title","twitter:description","twitter:image"]) keepLast(`meta[name="${n}"]`);
     return "<!doctype html>\n" + document.documentElement.outerHTML;
