@@ -175,7 +175,7 @@ export default function BlogPost() {
               <h3 className="font-display text-2xl sm:text-3xl tracking-tight">Standing water on your property?</h3>
               <p className="mt-3 text-white/70 max-w-lg">Book a free, on-site drainage assessment. We'll map the problem and design a system built for Florida storms.</p>
               <div className="mt-6 flex flex-wrap gap-4">
-                <Link to="/contact" className="inline-flex items-center gap-2 bg-brand-orange text-white px-6 py-3.5 text-sm font-bold uppercase tracking-wider rounded-sm hover:bg-brand-orangeDark transition-colors">
+                <Link to="/contact" className="inline-flex items-center gap-2 bg-brand-orange text-brand-ink px-6 py-3.5 text-sm font-bold uppercase tracking-wider rounded-sm hover:bg-brand-orangeDark transition-colors">
                   Request assessment <ArrowUpRight size={16} />
                 </Link>
                 <a href={COMPANY.phoneHref} className="inline-flex items-center gap-2 border border-white/25 px-6 py-3.5 text-sm font-bold uppercase tracking-wider rounded-sm hover:bg-white/10 transition-colors">
@@ -198,7 +198,7 @@ export default function BlogPost() {
                   <img src={p.image} alt={p.title} className="w-full h-full object-cover transition-all duration-700 group-hover:scale-[1.03]" loading="lazy" />
                 </div>
                 <div className="p-6 flex-1 flex flex-col">
-                  <span className="text-brand-orange font-bold uppercase tracking-[1px] text-[10px]">{p.category}</span>
+                  <span className="text-brand-orangeText font-bold uppercase tracking-[1px] text-[10px]">{p.category}</span>
                   <h3 className="font-display text-[19px] tracking-tight text-brand-navy leading-snug mt-2.5 group-hover:text-brand-orange transition-colors flex-1">{p.title}</h3>
                   <span className="mt-4 text-sm font-semibold text-brand-navy group-hover:text-brand-orange inline-flex items-center">
                     Read article <ArrowUpRight size={15} className="ml-1.5 group-hover:translate-x-0.5 transition" />

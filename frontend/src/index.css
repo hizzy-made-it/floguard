@@ -101,7 +101,13 @@
     }
   }
   .section { @apply py-16 sm:py-20 md:py-32; } /* tighter vertical rhythm on mobile */
-  .overline { @apply text-xs font-bold uppercase tracking-[0.22em] text-brand-orange; }
+  /* Eyebrow label. Deeper orange on light sections (AA 4.5:1); bright brand orange on dark surfaces, where it already passes. */
+  .overline { @apply text-xs font-bold uppercase tracking-[0.22em] text-brand-orangeText; }
+  .bg-brand-ink .overline,
+  .bg-brand-navy .overline,
+  .bg-brand-surface .overline,
+  [data-testid="page-hero"] .overline,
+  [data-testid="home-hero"] .overline { @apply text-brand-orange; }
 
   .glass {
     background: rgba(11, 15, 26, 0.72);
@@ -201,6 +207,10 @@
     transform: none !important;
   }
 }
+
+/* Scroll-reveal blocks start at inline opacity 0 (framer-motion). If keyboard focus lands
+   inside one before it has animated in, show it so the focused control is never invisible. */
+[style*="opacity"]:focus-within { opacity: 1 !important; }
 
 /* Custom cursor (desktop pointer devices only) */
 @media (hover: hover) and (pointer: fine) {

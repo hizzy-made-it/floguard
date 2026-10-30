@@ -14,7 +14,7 @@ export function ChatMessage({ role, text, showHandoff, onAssessment }) {
       <div
         className={`max-w-[90%] rounded-sm px-3.5 py-2.5 text-sm leading-relaxed ${
           isUser
-            ? "bg-brand-orange text-white"
+            ? "bg-brand-orange text-brand-ink"
             : "bg-white border border-black/10 text-brand-ink"
         }`}
       >
@@ -34,7 +34,7 @@ export function ChatMessage({ role, text, showHandoff, onAssessment }) {
                     onAssessment();
                   }
                 }}
-                className="inline-flex items-center justify-center min-h-[40px] px-3 py-2 text-xs font-bold uppercase tracking-wider bg-brand-orange text-white rounded-sm hover:brightness-110 transition"
+                className="inline-flex items-center justify-center min-h-[40px] px-3 py-2 text-xs font-bold uppercase tracking-wider bg-brand-orange text-brand-ink rounded-sm hover:brightness-110 transition"
               >
                 Start free assessment
               </a>

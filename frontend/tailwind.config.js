@@ -19,6 +19,8 @@ module.exports = {
           slate: '#334155',
           orange: '#F57C1F',
           orangeDark: '#E06A12',
+          // Deeper orange for small text on white / light-gray sections (4.6:1+, WCAG AA)
+          orangeText: '#B45308',
           lime: '#D9F844',
           orange: '#F57C1F',
         },

@@ -109,7 +109,7 @@ export const LeadForm = () => {
                       transition={{ duration: 0.5, ease: EASE }}
                     />
                   </div>
-                  <span className={`mt-2 block text-xs ${i === step ? "text-white" : "text-white/40"}`}>
+                  <span className={`mt-2 block text-xs ${i === step ? "text-white" : "text-white/50"}`}>
                     {i + 1}. {label}
                   </span>
                 </div>
@@ -273,7 +273,7 @@ export const LeadForm = () => {
                   type="button"
                   onClick={next}
                   data-testid="form-next"
-                  className="inline-flex items-center gap-2 bg-brand-orange text-white px-6 py-3 text-sm font-bold uppercase tracking-wider rounded-sm hover:bg-brand-orangeDark transition-colors"
+                  className="inline-flex items-center gap-2 bg-brand-orange text-brand-ink px-6 py-3 text-sm font-bold uppercase tracking-wider rounded-sm hover:bg-brand-orangeDark transition-colors"
                 >
                   Continue <ArrowRight size={16} />
                 </button>
@@ -283,7 +283,7 @@ export const LeadForm = () => {
                   onClick={onSubmit}
                   disabled={status === "loading"}
                   data-testid="form-submit"
-                  className="inline-flex items-center gap-2 bg-brand-orange text-white px-6 py-3 text-sm font-bold uppercase tracking-wider rounded-sm hover:bg-brand-orangeDark transition-colors disabled:opacity-60"
+                  className="inline-flex items-center gap-2 bg-brand-orange text-brand-ink px-6 py-3 text-sm font-bold uppercase tracking-wider rounded-sm hover:bg-brand-orangeDark transition-colors disabled:opacity-60"
                 >
                   {status === "loading" ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
                   {status === "loading" ? "Sending…" : "Request assessment"}

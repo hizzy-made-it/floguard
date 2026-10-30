@@ -226,7 +226,7 @@ export function ChatPanel({ onClose, open, titleId = "fg-chat-title" }) {
           type="submit"
           data-testid="chat-send"
           disabled={!input.trim()}
-          className="min-h-[44px] min-w-[44px] grid place-items-center rounded-sm bg-brand-orange text-white disabled:opacity-40 hover:brightness-110 transition"
+          className="min-h-[44px] min-w-[44px] grid place-items-center rounded-sm bg-brand-orange text-brand-ink disabled:opacity-40 hover:brightness-110 transition"
           aria-label="Send message"
         >
           <Send size={18} />

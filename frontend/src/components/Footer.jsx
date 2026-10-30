@@ -21,13 +21,13 @@ export const Footer = () => {
               <span className="font-display text-2xl sm:text-3xl tracking-tight">Flo<span className="text-brand-orange">Guard</span></span>
             </div>
             <p className="text-white/60 max-w-sm text-[15px] leading-relaxed">{COMPANY.tagline}</p>
-            <div className="mt-8 text-sm text-white/40">
+            <div className="mt-8 text-sm text-white/50">
               Flood Solutions &amp; Management · Central Florida
             </div>
           </div>
 
           <div className="lg:col-span-2">
-            <div className="text-xs uppercase tracking-[2px] text-white/40 mb-4">Explore</div>
+            <div className="text-xs uppercase tracking-[2px] text-white/50 mb-4">Explore</div>
             <ul className="space-y-2.5 text-sm">
               {NAV_LINKS.map((l) => (
                 <li key={l.to}>
@@ -40,14 +40,14 @@ export const Footer = () => {
           </div>
 
           <div className="lg:col-span-2">
-            <div className="text-xs uppercase tracking-[2px] text-white/40 mb-4">Service Area</div>
+            <div className="text-xs uppercase tracking-[2px] text-white/50 mb-4">Service Area</div>
             <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm text-white/60">
               {SERVICE_AREAS.map((a) => <div key={a}>{a}</div>)}
             </div>
           </div>
 
           <div className="lg:col-span-3">
-            <div className="text-xs uppercase tracking-[2px] text-white/40 mb-4">Contact</div>
+            <div className="text-xs uppercase tracking-[2px] text-white/50 mb-4">Contact</div>
             <div className="space-y-3 text-sm">
               <a href={COMPANY.phoneHref} className="flex items-center gap-3 text-white/80 hover:text-brand-orange transition-colors">
                 <Phone size={15} className="text-brand-orange" /> {COMPANY.phone}
@@ -65,7 +65,7 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-16 pt-6 border-t border-white/10 text-xs text-white/40 flex flex-col sm:flex-row items-center justify-between gap-y-2">
+        <div className="mt-16 pt-6 border-t border-white/10 text-xs text-white/50 flex flex-col sm:flex-row items-center justify-between gap-y-2">
           <div>© {new Date().getFullYear()} {COMPANY.legal}. All rights reserved.</div>
           <a 
             href="https://hdconnex.com" 

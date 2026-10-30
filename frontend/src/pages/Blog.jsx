@@ -48,11 +48,11 @@ export default function Blog() {
             <Link to={`/blog/${featured.slug}`} data-testid="featured-post" className="group grid lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-7 relative overflow-hidden rounded-sm ring-1 ring-black/5">
                 <img src={featured.image} alt={featured.title} className="w-full h-[300px] md:h-[440px] object-cover transition-all duration-700 group-hover:scale-[1.02]" loading="lazy" />
-                <span className="absolute top-4 left-4 text-xs font-bold uppercase tracking-[1px] text-white bg-brand-orange px-3 py-1 rounded-sm">Featured</span>
+                <span className="absolute top-4 left-4 text-xs font-bold uppercase tracking-[1px] text-brand-ink bg-brand-orange px-3 py-1 rounded-sm">Featured</span>
               </div>
               <div className="lg:col-span-5">
-                <div className="flex items-center gap-4 text-sm text-brand-slate/70 mb-4">
-                  <span className="text-brand-orange font-bold uppercase tracking-widest text-xs">{featured.category}</span>
+                <div className="flex items-center gap-4 text-sm text-brand-slate/75 mb-4">
+                  <span className="text-brand-orangeText font-bold uppercase tracking-widest text-xs">{featured.category}</span>
                   <span className="flex items-center gap-1.5"><Calendar size={14} /> {formatDate(featured.date)}</span>
                 </div>
                 <h2 className="font-display text-3xl sm:text-4xl tracking-tight text-brand-navy leading-tight group-hover:text-brand-orange transition-colors">
@@ -104,7 +104,7 @@ export default function Blog() {
                       <span className="absolute top-4 left-4 text-xs font-bold uppercase tracking-[1px] text-white bg-brand-ink/80 px-3 py-1 rounded-sm">{p.category}</span>
                     </div>
                     <div className="p-7 flex flex-col flex-1">
-                      <div className="flex items-center gap-4 text-xs text-brand-slate/60 mb-3">
+                      <div className="flex items-center gap-4 text-xs text-brand-slate/75 mb-3">
                         <span className="flex items-center gap-1"><Calendar size={13} /> {formatDate(p.date)}</span>
                         <span className="flex items-center gap-1"><Clock size={13} /> {p.readTime}</span>
                       </div>

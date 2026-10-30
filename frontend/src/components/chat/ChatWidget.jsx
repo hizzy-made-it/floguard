@@ -101,7 +101,7 @@ export function ChatWidget() {
         aria-haspopup="dialog"
         aria-label={open ? "Close FloGuard assistant" : "Open FloGuard assistant"}
         onClick={() => setOpen((v) => !v)}
-        className={`pointer-events-auto relative flex items-center justify-center w-14 h-14 min-w-[56px] min-h-[56px] rounded-full bg-brand-orange text-white shadow-lg shadow-brand-orange/30 hover:brightness-110 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 ${
+        className={`pointer-events-auto relative flex items-center justify-center w-14 h-14 min-w-[56px] min-h-[56px] rounded-full bg-brand-orange text-brand-ink shadow-lg shadow-brand-orange/30 hover:brightness-110 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 ${
           pulse ? "animate-pulse" : ""
         }`}
       >

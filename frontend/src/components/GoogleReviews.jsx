@@ -33,7 +33,7 @@ export const GoogleReviews = () => (
                   {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={15} className="fill-brand-orange text-brand-orange" />)}
                 </div>
               </div>
-              <div className="text-xs text-brand-slate/70 mt-0.5">
+              <div className="text-xs text-brand-slate/75 mt-0.5">
                 {COMPANY.rating}★ · {COMPANY.reviewCount} Google reviews · {COMPANY.legal}
               </div>
             </div>
@@ -58,7 +58,7 @@ export const GoogleReviews = () => (
                 </div>
                 <div>
                   <div className="font-medium text-brand-navy leading-tight">{t.name}</div>
-                  <div className="text-xs text-brand-slate/60">{t.location}</div>
+                  <div className="text-xs text-brand-slate/75">{t.location}</div>
                 </div>
               </div>
               <GoogleG />
@@ -67,7 +67,7 @@ export const GoogleReviews = () => (
               {Array.from({ length: t.rating }).map((_, j) => <Star key={j} size={15} className="fill-brand-orange text-brand-orange" />)}
             </div>
             <blockquote className="text-brand-slate leading-relaxed flex-1">"{t.quote}"</blockquote>
-            <figcaption className="mt-4 text-xs text-brand-slate/50">Posted on Google</figcaption>
+            <figcaption className="mt-4 text-xs text-brand-slate/75">Posted on Google</figcaption>
           </motion.figure>
         ))}
       </div>
