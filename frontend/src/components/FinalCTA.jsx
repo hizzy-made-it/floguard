@@ -23,7 +23,7 @@ export const FinalCTA = () => (
         <Link
           to="/contact"
           data-testid="cta-assessment"
-          className="group flex items-center justify-between gap-3 bg-brand-orange text-white px-5 sm:px-8 py-4 sm:py-5 rounded-sm font-bold uppercase tracking-wider text-sm hover:bg-brand-orangeDark active:scale-[0.985] transition-all min-h-[52px]"
+          className="group flex items-center justify-between gap-3 bg-brand-orange text-brand-ink px-5 sm:px-8 py-4 sm:py-5 rounded-sm font-bold uppercase tracking-wider text-sm hover:bg-brand-orangeDark active:scale-[0.985] transition-all min-h-[52px]"
         >
           Request free assessment
           <ArrowUpRight size={20} className="shrink-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />

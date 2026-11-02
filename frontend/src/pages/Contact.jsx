@@ -166,7 +166,7 @@ export default function Contact() {
                   {[...Array(t.rating)].map((_, j) => <Star key={j} size={14} className="fill-brand-orange" />)}
                 </div>
                 <p className="text-white/80 leading-relaxed">"{t.quote}"</p>
-                <div className="mt-5 text-sm"><span className="text-white font-medium">{t.name}</span><span className="text-white/40"> · {t.location}</span></div>
+                <div className="mt-5 text-sm"><span className="text-white font-medium">{t.name}</span><span className="text-white/50"> · {t.location}</span></div>
               </Reveal>
             ))}
           </div>
@@ -195,7 +195,7 @@ export default function Contact() {
       <a
         href={COMPANY.phoneHref}
         data-testid="sticky-call"
-        className="lg:hidden fixed bottom-4 inset-x-4 z-40 inline-flex items-center justify-center gap-2 bg-brand-orange text-white py-4 text-sm font-bold uppercase tracking-wider rounded-sm shadow-lg"
+        className="lg:hidden fixed bottom-4 inset-x-4 z-40 inline-flex items-center justify-center gap-2 bg-brand-orange text-brand-ink py-4 text-sm font-bold uppercase tracking-wider rounded-sm shadow-lg"
       >
         <Phone size={16} /> Call FloGuard now
       </a>

@@ -24,7 +24,7 @@ function Accordion({ service, open, onToggle, index }) {
         data-testid={`accordion-toggle-${service.id}`}
       >
         <div className="flex items-baseline gap-5">
-          <span className="font-display text-lg text-brand-orange">0{index + 1}</span>
+          <span className="font-display text-lg text-brand-orangeText">0{index + 1}</span>
           <h3 className="font-display text-2xl sm:text-3xl tracking-tight text-brand-navy group-hover:text-brand-orange transition-colors">
             {service.title}
           </h3>

@@ -92,7 +92,7 @@ export default function About() {
                 <RevealItem key={v.title} className="group bg-white border border-border rounded-sm p-8 hover:border-brand-orange/40 transition-all duration-300">
                   <div className="flex items-center justify-between">
                     <Icon className="text-brand-orange" size={32} />
-                    <div className="text-[10px] uppercase tracking-[2px] text-brand-slate/50 group-hover:text-brand-orange transition-colors">0{i+1}</div>
+                    <div className="text-[10px] uppercase tracking-[2px] text-brand-slate/75 group-hover:text-brand-orangeText transition-colors">0{i+1}</div>
                   </div>
                   <h3 className="font-display text-2xl text-brand-navy tracking-tight mt-8 leading-none">{v.title}</h3>
                   <p className="mt-4 text-brand-slate leading-relaxed text-[15px]">{v.body}</p>

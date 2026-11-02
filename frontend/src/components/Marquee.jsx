@@ -23,7 +23,7 @@ export const Marquee = () => {
         className={`flex whitespace-nowrap marquee-track group-hover:[animation-play-state:paused] ${paused ? "[animation-play-state:paused]" : ""}`}
       >
         {doubled.map((a, i) => (
-          <span key={i} className="mx-6 inline-flex items-center gap-6 text-sm uppercase tracking-[0.2em] text-white/40">
+          <span key={i} className="mx-6 inline-flex items-center gap-6 text-sm uppercase tracking-[0.2em] text-white/50">
             {a}
             <span className="w-1.5 h-1.5 rounded-full bg-brand-orange" />
           </span>

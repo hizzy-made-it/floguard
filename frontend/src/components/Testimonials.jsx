@@ -61,7 +61,7 @@ export const Testimonials = () => {
                   ))}
                 </div>
                 <span className="text-white/80 font-medium">{t.name}</span>
-                <span className="text-white/40 text-sm">· {t.location}</span>
+                <span className="text-white/50 text-sm">· {t.location}</span>
               </div>
             </motion.blockquote>
           </AnimatePresence>

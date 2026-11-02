@@ -88,7 +88,7 @@ export const Navbar = () => {
           <Link
             to="/contact"
             data-testid="nav-cta"
-            className="hidden sm:inline-flex items-center bg-brand-orange text-white px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-brand-orangeDark transition-colors"
+            className="hidden sm:inline-flex items-center bg-brand-orange text-brand-ink px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-brand-orangeDark transition-colors"
           >
             Free Assessment
           </Link>

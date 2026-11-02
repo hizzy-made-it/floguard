@@ -102,12 +102,12 @@ export const GuideDownload = () => {
                     type="submit"
                     disabled={status === "loading"}
                     data-testid="guide-submit"
-                    className="w-full inline-flex items-center justify-center gap-2 bg-brand-orange text-white px-6 py-3.5 text-sm font-bold uppercase tracking-wider rounded-sm hover:bg-brand-orangeDark transition-colors disabled:opacity-60"
+                    className="w-full inline-flex items-center justify-center gap-2 bg-brand-orange text-brand-ink px-6 py-3.5 text-sm font-bold uppercase tracking-wider rounded-sm hover:bg-brand-orangeDark transition-colors disabled:opacity-60"
                   >
                     {status === "loading" ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
                     {status === "loading" ? "Preparing…" : "Download the guide"}
                   </button>
-                  <p className="text-xs text-white/40 text-center">No spam. We'll only reach out about your drainage needs.</p>
+                  <p className="text-xs text-white/50 text-center">No spam. We'll only reach out about your drainage needs.</p>
                 </motion.form>
               )}
             </AnimatePresence>

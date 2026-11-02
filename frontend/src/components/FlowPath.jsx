@@ -27,7 +27,7 @@ export const FlowPath = ({ dark = false, activeIndex = -1 }) => (
             >
               <div className="flex items-center gap-3">
                 <Icon size={22} className={`text-brand-orange transition-transform ${isActive ? 'scale-110' : 'group-hover:scale-110'}`} />
-                <span className={`text-xs font-bold ${dark ? "text-white/40" : "text-brand-slate/50"}`}>
+                <span className={`text-xs font-bold ${dark ? "text-white/50" : "text-brand-slate/75"}`}>
                   0{i + 1}
                 </span>
               </div>

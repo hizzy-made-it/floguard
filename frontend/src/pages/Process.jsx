@@ -202,7 +202,7 @@ export default function Process() {
           <ol className="grid md:grid-cols-2 gap-x-12 gap-y-8 text-lg text-brand-slate">
             {SYSTEM_EXPLANATION.howItWorks.map((step, i) => (
               <li key={i} className="flex gap-4">
-                <span className="font-display text-brand-orange text-2xl font-bold tabular-nums w-8 shrink-0">{(i + 1).toString().padStart(2, "0")}</span>
+                <span className="font-display text-brand-orangeText text-2xl font-bold tabular-nums w-8 shrink-0">{(i + 1).toString().padStart(2, "0")}</span>
                 <span>{step}</span>
               </li>
             ))}

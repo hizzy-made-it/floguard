@@ -239,7 +239,7 @@ export const AssessmentQuiz = () => {
               >
                 <ImagePlus size={26} className="text-brand-orange" />
                 <span className="text-sm">Tap to add photos of the flooding / problem area</span>
-                <span className="text-xs text-white/35">JPG or PNG · up to 6 photos</span>
+                <span className="text-xs text-white/50">JPG or PNG · up to 6 photos</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -385,14 +385,14 @@ export const AssessmentQuiz = () => {
         )}
 
         {step.type === "single" ? (
-          <span className="text-xs text-white/30">Tap an option to continue</span>
+          <span className="text-xs text-white/50">Tap an option to continue</span>
         ) : step.type === "contact" ? (
           <button
             type="button"
             onClick={onSubmit}
             disabled={status === "loading"}
             data-testid="quiz-submit"
-            className="inline-flex items-center gap-2 bg-brand-orange text-white px-6 py-3 text-sm font-bold uppercase tracking-wider rounded-sm hover:bg-brand-orangeDark transition-colors disabled:opacity-60"
+            className="inline-flex items-center gap-2 bg-brand-orange text-brand-ink px-6 py-3 text-sm font-bold uppercase tracking-wider rounded-sm hover:bg-brand-orangeDark transition-colors disabled:opacity-60"
           >
             {status === "loading" ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
             {status === "loading" ? "Sending…" : "Get my free assessment"}
@@ -409,7 +409,7 @@ export const AssessmentQuiz = () => {
               onClick={onContinue}
               disabled={uploading}
               data-testid="quiz-continue"
-              className="inline-flex items-center gap-2 bg-brand-orange text-white px-6 py-3 text-sm font-bold uppercase tracking-wider rounded-sm hover:bg-brand-orangeDark transition-colors disabled:opacity-60"
+              className="inline-flex items-center gap-2 bg-brand-orange text-brand-ink px-6 py-3 text-sm font-bold uppercase tracking-wider rounded-sm hover:bg-brand-orangeDark transition-colors disabled:opacity-60"
             >
               {uploading ? <Loader2 size={16} className="animate-spin" /> : null}
               Continue <ArrowRight size={16} />

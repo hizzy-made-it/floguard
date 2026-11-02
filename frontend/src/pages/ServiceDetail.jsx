@@ -100,11 +100,11 @@ export default function ServiceDetail() {
             </div>
             <p className="mt-4 text-sm text-brand-slate">
               Related:{" "}
-              <Link to="/process" className="text-brand-orange hover:underline">how we install</Link>
+              <Link to="/process" className="text-brand-orangeText hover:underline">how we install</Link>
               {" · "}
-              <Link to="/blog/french-drain-cost-central-florida-2026" className="text-brand-orange hover:underline">2026 cost guide</Link>
+              <Link to="/blog/french-drain-cost-central-florida-2026" className="text-brand-orangeText hover:underline">2026 cost guide</Link>
               {" · "}
-              <Link to="/areas" className="text-brand-orange hover:underline">service areas</Link>
+              <Link to="/areas" className="text-brand-orangeText hover:underline">service areas</Link>
             </p>
           </div>
         </div>

@@ -70,7 +70,7 @@ export const PageHero = ({ overline, title, subtitle, image, imageAlt, primary, 
               <Link
                 to={primary.to}
                 data-testid="hero-primary-cta"
-                className="inline-flex items-center justify-center bg-brand-orange text-white px-6 sm:px-8 py-3.5 sm:py-4 text-sm font-bold uppercase tracking-wider rounded-sm hover:bg-brand-orangeDark transition-colors min-h-[48px]"
+                className="inline-flex items-center justify-center bg-brand-orange text-brand-ink px-6 sm:px-8 py-3.5 sm:py-4 text-sm font-bold uppercase tracking-wider rounded-sm hover:bg-brand-orangeDark transition-colors min-h-[48px]"
               >
                 {primary.label}
               </Link>

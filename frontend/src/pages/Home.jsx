@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
-import { ArrowUpRight, Phone, ArrowDown } from "lucide-react";
+import { ArrowUpRight, Phone, ArrowDown, Pause, Play } from "lucide-react";
 import { COMPANY, IMAGES } from "../data/site";
 import { Seo, organizationLd, faqPageLd } from "../components/Seo";
 import { LANDING_FAQ } from "../data/site";
@@ -56,6 +56,9 @@ export default function Home() {
   const heroProgressRef = useRef(0);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
+  // WCAG 2.2.2: visitors can stop the looping background video
+  const [videoPaused, setVideoPaused] = useState(false);
+  const userPausedRef = useRef(false);
 
   const videoRef = useRef(null);
   const progressBarRef = useRef(null);
@@ -176,7 +179,21 @@ export default function Home() {
     } catch {
       /* ignore */
     }
-    if (videoRef.current) videoRef.current.play().catch(() => {});
+    if (videoRef.current && !userPausedRef.current) videoRef.current.play().catch(() => {});
+  };
+
+  const toggleVideo = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (userPausedRef.current) {
+      userPausedRef.current = false;
+      setVideoPaused(false);
+      v.play().catch(() => {});
+    } else {
+      userPausedRef.current = true;
+      setVideoPaused(true);
+      v.pause();
+    }
   };
 
   // Autoplay cinematic loop after source is attached (muted required)
@@ -184,7 +201,9 @@ export default function Home() {
     if (!videoReady) return;
     const v = videoRef.current;
     if (!v) return;
-    const tryPlay = () => v.play().catch(() => {});
+    const tryPlay = () => {
+      if (!userPausedRef.current) v.play().catch(() => {});
+    };
     tryPlay();
     const t = setTimeout(tryPlay, 300);
     const onVis = () => {
@@ -312,7 +331,7 @@ export default function Home() {
             <Link
               to="/contact"
               data-testid="hero-cta-primary"
-              className="group inline-flex items-center justify-center gap-2 bg-brand-orange text-white px-6 sm:px-9 py-3.5 sm:py-[17px] text-sm font-bold uppercase tracking-[0.5px] rounded-sm hover:bg-brand-orangeDark active:scale-[0.985] transition-all min-h-[48px]"
+              className="group inline-flex items-center justify-center gap-2 bg-brand-orange text-brand-ink px-6 sm:px-9 py-3.5 sm:py-[17px] text-sm font-bold uppercase tracking-[0.5px] rounded-sm hover:bg-brand-orangeDark active:scale-[0.985] transition-all min-h-[48px]"
             >
               Request free assessment
               <ArrowUpRight size={18} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -326,7 +345,7 @@ export default function Home() {
             </a>
           </div>
 
-          <div className="mt-4 sm:mt-5 flex items-center gap-2 sm:gap-3 text-[9px] sm:text-[10px] uppercase tracking-[2px] text-white/35">
+          <div className="mt-4 sm:mt-5 flex items-center gap-2 sm:gap-3 text-[9px] sm:text-[10px] uppercase tracking-[2px] text-white/50">
             <div className="flex-1 h-px bg-white/15 overflow-hidden rounded">
               <div
                 ref={progressBarRef}
@@ -335,19 +354,32 @@ export default function Home() {
               />
             </div>
             FOLLOW THE WATER
-            <span ref={labelRef} className="ml-1 text-brand-orange/70 tabular-nums">
+            <span ref={labelRef} className="ml-1 text-brand-orange tabular-nums">
               {JOURNEY_PHASES[0].label}
             </span>
-            <span className="ml-auto text-white/30">{isTouchDevice ? "swipe" : "drag"}</span>
+            <span className="ml-auto text-white/50">{isTouchDevice ? "swipe" : "drag"}</span>
           </div>
         </div>
 
         <div
-          className="absolute bottom-6 right-6 sm:bottom-8 sm:right-8 md:right-14 z-10 flex items-center gap-2 text-white/40 text-[9px] sm:text-[10px] font-medium uppercase tracking-[2px] fg-hero-fade"
+          className="absolute bottom-6 right-6 sm:bottom-8 sm:right-8 md:right-14 z-10 flex items-center gap-2 text-white/50 text-[9px] sm:text-[10px] font-medium uppercase tracking-[2px] fg-hero-fade"
           style={{ animationDelay: "1.2s" }}
         >
           {isTouchDevice ? "Swipe" : "Scroll"} to explore <ArrowDown size={13} className="animate-bounce" />
         </div>
+
+        {videoReady && (
+          <button
+            type="button"
+            data-testid="hero-video-toggle"
+            onClick={toggleVideo}
+            onPointerDown={(e) => e.stopPropagation()}
+            aria-label={videoPaused ? "Play background video" : "Pause background video"}
+            className="absolute top-20 right-4 sm:top-24 sm:right-8 md:right-14 z-10 inline-flex items-center justify-center w-8 h-8 rounded-full border border-white/25 bg-brand-ink/40 text-white/80 hover:text-white hover:border-white/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
+          >
+            {videoPaused ? <Play size={13} aria-hidden="true" /> : <Pause size={13} aria-hidden="true" />}
+          </button>
+        )}
       </section>
 
       {showBelowFold ? (

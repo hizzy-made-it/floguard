@@ -71,7 +71,7 @@ function BeforeAfter({ before, after, title }) {
       </div>
 
       {/* After label fixed */}
-      <span className="absolute top-4 right-4 bg-brand-orange text-white text-[10px] font-bold uppercase tracking-[1.5px] px-3 py-1 rounded-sm shadow">After</span>
+      <span className="absolute top-4 right-4 bg-brand-orange text-brand-ink text-[10px] font-bold uppercase tracking-[1.5px] px-3 py-1 rounded-sm shadow">After</span>
 
       {/* Elegant vertical divider + premium handle */}
       <div 
@@ -176,10 +176,10 @@ export default function CaseStudies() {
                   <div className="relative h-64 overflow-hidden">
                     <img src={c.after} alt={c.title} className="w-full h-full object-cover transition-all duration-700 group-hover:scale-[1.03] group-hover:brightness-[0.92]" loading="lazy" />
                     <div className="absolute inset-0 bg-gradient-to-t from-brand-ink/75 via-brand-ink/30 to-transparent" />
-                    <span className="absolute top-4 left-4 text-xs font-bold uppercase tracking-[1px] text-white bg-brand-orange px-3 py-1 rounded-sm">{c.category}</span>
+                    <span className="absolute top-4 left-4 text-xs font-bold uppercase tracking-[1px] text-brand-ink bg-brand-orange px-3 py-1 rounded-sm">{c.category}</span>
                   </div>
                   <div className="p-7">
-                    <div className="flex items-center gap-2 text-sm text-brand-slate/70 mb-2">
+                    <div className="flex items-center gap-2 text-sm text-brand-slate/75 mb-2">
                       <MapPin size={14} className="text-brand-orange" /> {c.location}
                     </div>
                     <h3 className="font-display text-2xl tracking-tight text-brand-navy group-hover:text-brand-orange transition-colors">{c.title}</h3>
@@ -225,7 +225,7 @@ export default function CaseStudies() {
                 <BeforeAfter before={active.before} after={active.after} title={active.title} />
               </div>
               <div className="p-8">
-                <div className="flex items-center gap-2 text-sm text-brand-slate/70 mb-2">
+                <div className="flex items-center gap-2 text-sm text-brand-slate/75 mb-2">
                   <MapPin size={14} className="text-brand-orange" /> {active.location} · {active.category}
                 </div>
                 <h3 className="font-display text-3xl tracking-tight text-brand-navy">{active.title}</h3>
