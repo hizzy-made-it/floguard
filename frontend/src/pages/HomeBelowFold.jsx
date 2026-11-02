@@ -7,7 +7,6 @@ import { Marquee } from "../components/Marquee";
 import { ServicesGrid } from "../components/ServicesGrid";
 import { ProcessTimeline } from "../components/ProcessTimeline";
 import { FlowPath } from "../components/FlowPath";
-import { Testimonials } from "../components/Testimonials";
 import { GoogleReviews } from "../components/GoogleReviews";
 import { FinalCTA } from "../components/FinalCTA";
 import { LeadForm } from "../components/LeadForm";
@@ -136,7 +135,8 @@ export default function HomeBelowFold() {
         </div>
       </section>
 
-      <Testimonials />
+      {/* One reviews section on the homepage: <Testimonials /> repeated the same quotes under a
+          near-identical "5.0 stars…" H2 right above this one. City pages still use Testimonials. */}
       <GoogleReviews />
 
       <section data-testid="home-lead" className="section bg-brand-ink grain relative">

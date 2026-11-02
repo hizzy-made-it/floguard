@@ -95,6 +95,7 @@ export const SERVICES = [
   {
     id: "exterior",
     slug: "french-drains",
+    updated: "2026-07-22", // last real content edit — feeds sitemap <lastmod>
     title: "Exterior French Drains",
     blurb:
       "Perimeter trench systems that intercept surface runoff and groundwater before it reaches your foundation or pools on the lawn. Contains perforated pipe in clean gravel wrapped with filter fabric to keep sediment out.",
@@ -126,6 +127,7 @@ export const SERVICES = [
   {
     id: "interior",
     slug: "sump-pumps",
+    updated: "2026-08-25", // last real content edit — feeds sitemap <lastmod>
     title: "Interior Drains + Sump Pumps",
     blurb:
       "For crawlspaces and low, flat lots: a sub-surface drain routed to a sump basin that automatically lifts water to a safe discharge. The active defense when gravity alone isn’t enough. A waterproof basin collects water; a submersible pump with float switch pushes it far away.",
@@ -159,6 +161,7 @@ export const SERVICES = [
   {
     id: "yard",
     slug: "yard-drainage",
+    updated: "2026-07-11", // last real content edit — feeds sitemap <lastmod>
     title: "Yard Drainage & Grading",
     blurb:
       "Catch basins, channel drains and precision grading that move water off patios, lanais and low spots without eroding your landscape.",
@@ -185,6 +188,7 @@ export const SERVICES = [
   {
     id: "maintenance",
     slug: "pump-maintenance",
+    updated: "2026-07-11", // last real content edit — feeds sitemap <lastmod>
     title: "Pump Maintenance & Monitoring",
     blurb:
       "Seasonal service plans and smart monitoring that keep your system storm-ready year round — so it works the day you need it most.",

@@ -5,6 +5,7 @@ import { getPost, POSTS, formatDate } from "../data/blog";
 import { COMPANY } from "../data/site";
 import { Seo, organizationLd, faqPageLd, breadcrumbListLd, SITE } from "../components/Seo";
 import { EASE } from "../lib/animations";
+import { renderInline } from "../lib/inlineMarkdown";
 
 function Block({ block }) {
   if (block.type === "h2")
@@ -12,7 +13,7 @@ function Block({ block }) {
   if (block.type === "quote")
     return (
       <blockquote className="my-10 border-l-2 border-brand-orange pl-6 py-1">
-        <p className="font-display text-2xl text-brand-navy leading-snug">{block.text}</p>
+        <p className="font-display text-2xl text-brand-navy leading-snug">{renderInline(block.text)}</p>
       </blockquote>
     );
   if (block.type === "ul")
@@ -20,7 +21,7 @@ function Block({ block }) {
       <ul className="my-6 space-y-3">
         {block.items.map((it) => (
           <li key={it} className="flex items-start gap-3 text-lg text-brand-slate leading-relaxed">
-            <span className="mt-2.5 w-1.5 h-1.5 rounded-full bg-brand-orange shrink-0" /> {it}
+            <span className="mt-2.5 w-1.5 h-1.5 rounded-full bg-brand-orange shrink-0" /> <span>{renderInline(it)}</span>
           </li>
         ))}
       </ul>
@@ -43,7 +44,7 @@ function Block({ block }) {
               <tr key={i} className="border-b border-border last:border-0">
                 {row.map((cell, j) => (
                   <td key={j} className="px-4 py-3 text-brand-slate align-top">
-                    {cell}
+                    {renderInline(cell)}
                   </td>
                 ))}
               </tr>
@@ -52,7 +53,7 @@ function Block({ block }) {
         </table>
       </div>
     );
-  return <p className="my-5 text-lg text-brand-slate leading-relaxed">{block.text}</p>;
+  return <p className="my-5 text-lg text-brand-slate leading-relaxed">{renderInline(block.text)}</p>;
 }
 
 export default function BlogPost() {
@@ -90,7 +91,8 @@ export default function BlogPost() {
               description: seoDescription,
               image: post.image?.startsWith("http") ? post.image : `${SITE}${post.image}`,
               datePublished: post.date,
-              dateModified: post.date,
+              // Real last content edit (blog.js `updated`), not the publish date
+              dateModified: post.updated || post.date,
               keywords: post.keyword,
               articleSection: post.category,
               author: { "@id": organizationLd["@id"] },
@@ -129,7 +131,12 @@ export default function BlogPost() {
           </Link>
           <div className="flex flex-wrap items-center gap-4 text-sm text-white/60 mb-5">
             <span className="text-brand-orange font-bold uppercase tracking-widest text-xs">{post.category}</span>
-            <span className="flex items-center gap-1.5"><Calendar size={14} /> {formatDate(post.date)}</span>
+            <span className="flex items-center gap-1.5"><Calendar size={14} /> <time dateTime={post.date}>{formatDate(post.date)}</time></span>
+            {post.updated && post.updated !== post.date && (
+              <span>
+                Updated <time dateTime={post.updated}>{formatDate(post.updated)}</time>
+              </span>
+            )}
             <span className="flex items-center gap-1.5"><Clock size={14} /> {post.readTime} min read</span>
           </div>
           <motion.h1
@@ -163,7 +170,7 @@ export default function BlogPost() {
                   {post.faqs.map((f) => (
                     <div key={f.q} className="border-b border-border pb-6">
                       <h3 className="font-display text-xl text-brand-navy">{f.q}</h3>
-                      <p className="mt-2 text-brand-slate leading-relaxed">{f.a}</p>
+                      <p className="mt-2 text-brand-slate leading-relaxed">{renderInline(f.a)}</p>
                     </div>
                   ))}
                 </div>
