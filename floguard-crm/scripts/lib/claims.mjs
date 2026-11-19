@@ -617,3 +617,32 @@ export function buildParcelPatches(parcels, index, { reassignAll = false } = {})
   }
   return { patches, counts: c };
 }
+
+/**
+ * Re-apply block-group claim heat after something repainted parcel claim_heat at tract grain
+ * (scripts/join-census-tracts.mjs). Makes the tract join and the claims ingest safe in either
+ * order: block-group parcels get their block-group values back, the rest keep the tract fallback
+ * (which now also sees the freshly assigned census_tract). Review R1.
+ *
+ * @param {object} o
+ * @param {(name: string, body: object) => Promise<any>} o.rpc  PostgREST RPC caller; must throw an
+ *        Error whose message contains the HTTP status ("404") or PGRST202 when the function is missing
+ * @returns {Promise<{applied: boolean, changed: number, reason?: string}>}
+ */
+export async function reapplyBlockGroupHeat({ rpc, buckets = 8, log = () => {} } = {}) {
+  let changed = 0;
+  for (let b = 0; b < buckets; b++) {
+    try {
+      changed += Number(await rpc('nfip_apply_block_group_claims', { p_buckets: buckets, p_bucket: b })) || 0;
+    } catch (e) {
+      const msg = String(e?.message || e);
+      if (b === 0 && /\b404\b|PGRST202|42883|Could not find the function|does not exist/i.test(msg)) {
+        log('  block-group claims not installed (fsi/sql/016 not applied): tract heat stands.');
+        return { applied: false, changed: 0, reason: 'no_016' };
+      }
+      throw e;
+    }
+  }
+  log(`  block-group heat re-applied over tract heat: ${changed} rows changed`);
+  return { applied: true, changed };
+}

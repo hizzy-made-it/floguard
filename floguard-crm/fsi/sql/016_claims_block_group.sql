@@ -18,8 +18,8 @@
 --
 -- Apply order: 004 (tract table), 015 (must_have_raw), then this file. Then run
 -- `node scripts/ingest-nfip-claims.mjs` and `node scripts/score-must-have.mjs`.
--- Run scripts/join-census-tracts.mjs BEFORE the claims ingest: it repaints claim_heat from the
--- tract table for every parcel, and the ingest's apply step then overrides it where a block group exists.
+-- scripts/join-census-tracts.mjs repaints claim_heat from the tract table for every parcel and then
+-- calls nfip_apply_block_group_claims itself (review R1), so it and the claims ingest can run in either order.
 
 -- ---------------------------------------------------------------------------
 -- 1. Block-group aggregates
