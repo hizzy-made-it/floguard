@@ -281,7 +281,8 @@ export async function stubAll(context, opts) {
         Object.assign(req.headers, { 'user-agent': 'UITest/1.0', origin: url.origin, 'x-forwarded-for': '203.0.113.9' });
         await opts.estimates.handler(req, res);
         calls.push({ fn, action: body.action, body, status: res.statusCode });
-        return route.fulfill({ status: res.statusCode, contentType: 'application/json', body: JSON.stringify(res.body) });
+        const out = opts.estimates.transform ? (opts.estimates.transform(body.action, res.body, res.statusCode) || res.body) : res.body;
+        return route.fulfill({ status: res.statusCode, contentType: 'application/json', body: JSON.stringify(out) });
       }
       const [s, o] = opts.leads.handle(body); return json(o, s);
     }
