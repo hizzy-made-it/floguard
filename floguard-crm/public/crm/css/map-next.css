@@ -282,3 +282,4 @@
  .fsi-presets button{height:36px;padding:0 13px}
  .fsi-mapcol{height:calc(100dvh - var(--topbar-h) - var(--tabbar-h) - var(--safe-b) - 190px);min-height:340px}
 }
+.fsi-report-team{flex:1 1 100%;font-size:var(--fs-12);color:var(--text-2)}.fsi-report-team:empty{display:none}

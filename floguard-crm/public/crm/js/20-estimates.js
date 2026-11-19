@@ -78,10 +78,17 @@
     root.innerHTML = '<div class="est-modal" role="dialog" aria-modal="true" aria-labelledby="estTitle" tabindex="-1"><div class="est-head" id="estHead"></div><div class="est-body" id="estBody"></div><div class="est-foot" id="estFoot"></div></div>';
     document.body.appendChild(root);
     root.addEventListener('mousedown', function (e) { if (e.target === root) close(); });
-    root.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') { e.stopPropagation(); close(); return; }
-      if (e.key === 'Tab' && window.FG && FG.trapTab) FG.trapTab(root.querySelector('.est-modal'), e);
-    });
+    // Document-level so Esc works even when focus has left the editor (e.g. after Send re-renders it);
+    // a confirm opened on top of the editor (FG.modal) handles its own Esc first.
+    document.addEventListener('keydown', function (e) {
+      if (!root || root.hidden) return;
+      if (e.key === 'Escape') { if (document.querySelector('.fg-modal-bg')) return; e.stopPropagation(); close(); return; }
+      if (e.key === 'Tab' && window.FG && FG.trapTab && !document.querySelector('.fg-modal-bg')) {
+        var m = root.querySelector('.est-modal');
+        if (!m.contains(document.activeElement)) { e.preventDefault(); (FG.focusables(m)[0] || m).focus(); return; }
+        FG.trapTab(m, e);
+      }
+    }, true);
     root.addEventListener('click', onClick);
     root.addEventListener('input', onInput);
     root.addEventListener('change', onInput);
@@ -322,7 +329,18 @@
   function sendHtml() {
     var r = S.sendResult, m = r.message || {}, links = r.links || {};
     var warn = [];
+    // R2/R1: a litigator flag blocks texting exactly like DNC, whether the server says so in
+    // warnings, in message.to, or only our local copy of the lead knows.
+    var to = m.to || {};
+    var lit = (r.warnings || []).indexOf('phone_litigator') >= 0 || to.phone_litigator === true;
+    var dnc = (r.warnings || []).indexOf('phone_dnc') >= 0 || to.phone_dnc === true;
+    var local = false;
+    try { var pp = FG.phone.primary(S.lead); local = !!(FG.phone.leadBlocked(S.lead) || (pp && FG.phone.state(pp, S.lead).blocked)); } catch (e) { local = false; }
+    if (lit || dnc || local) links = Object.assign({}, links, { sms: null });
+    if (lit) warn.push('This lead’s number is flagged as a known TCPA litigator. No text link was made. Do not text or call; send the link by email or mail.');
+    else if (local && !dnc) warn.push('This lead’s number is blocked in the CRM (DNC or litigator). No text link was made.');
     (r.warnings || []).forEach(function (w) {
+      if (w === 'phone_litigator') return;
       if (w === 'phone_dnc') warn.push('This lead’s number is on the do-not-call list. No text link was made. Do not text or call.');
       else if (w === 'no_email') warn.push('No email on file for this lead; copy the message instead.');
       else if (w === 'no_phone') warn.push('No phone number on file for this lead.');
@@ -336,7 +354,7 @@
       '<div class="est-field" style="margin-top:12px"><label for="estMsg">Message (' + esc(m.subject || '') + ')</label><textarea id="estMsg" class="est-msg">' + esc(m.body || '') + '</textarea></div>' +
       '<div class="est-links" style="margin-top:12px"><button type="button" class="btn" data-est="copyMsg">Copy message</button>' +
       (links.mailto ? '<a class="btn" href="' + esc(links.mailto) + '">Open in email</a>' : '<span class="btn" aria-disabled="true">Open in email</span>') +
-      (links.sms ? '<a class="btn" href="' + esc(links.sms) + '">Open in Messages</a>' : '<span class="btn" aria-disabled="true">Open in Messages</span>') +
+      (links.sms ? '<a class="btn" href="' + esc(links.sms) + '">Open in Messages</a>' : '<span class="btn" aria-disabled="true" title="' + ((lit || dnc || local) ? 'Texting is blocked for this number' : 'No mobile number on file') + '">Open in Messages</span>') +
       '<span class="est-hint" id="estCopied" role="status"></span></div></div>';
   }
 

@@ -801,7 +801,19 @@ function fsiInit(){
  const el=document.getElementById('fsiMap');
  if(!el) return null;
  if(typeof maplibregl==='undefined'){
-  fsiSay('The map could not start. Reload the page; if it keeps happening, tell the admin.');
+  // R2: MapLibre (~1 MB) loads on first map open instead of blocking every page load.
+  if(fsiInit._state==='failed'){ fsiSay('The map could not start. Reload the page; if it keeps happening, tell the admin.'); return null; }
+  if(!fsiInit._state){
+   fsiInit._state='loading';
+   fsiSay('Loading the map…');
+   const ver=(document.querySelector('meta[name="fg-maplibre"]')||{}).content||'';
+   const css=document.createElement('link'); css.rel='stylesheet'; css.href='vendor/maplibre-gl.css'+(ver?'?v='+ver:'');
+   document.head.appendChild(css);
+   const js=document.createElement('script'); js.src='vendor/maplibre-gl.js'+(ver?'?v='+ver:''); js.async=true;
+   js.onload=function(){ fsiInit._state='ready'; fsiInit(); };
+   js.onerror=function(){ fsiInit._state='failed'; fsiSay('The map could not start (no connection?). Reload the page to try again.'); };
+   document.head.appendChild(js);
+  }
   return null;
  }
  const view=(typeof mnInitialView==='function'&&mnInitialView())||null;

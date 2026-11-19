@@ -112,7 +112,7 @@ function mnClaimsSyncBar(){
  });
  mnRenderEventChips();
  if(c.available===false){
-  mnClaimsStatus('Claims data not loaded yet. Block-group claims arrive once fsi/sql/016 is applied and the claims ingest has run. <button type="button" class="linkbtn" data-mn-use-heat>Use tract heat</button>','muted');
+  mnClaimsStatus('Claims data not loaded yet: neighbourhood claim shading appears here once the OpenFEMA import has run. Until then, <button type="button" class="linkbtn" data-mn-use-heat>use tract heat</button> for the county-wide picture.','muted');
   return;
  }
  if(c.available==null){ mnClaimsStatus('Loading neighbourhood claims… '+esc(MN_COMPLIANCE),'muted'); return; }
@@ -414,8 +414,8 @@ async function mnPolyLoad(){
   if(ctl&&P.ctl!==ctl) return;
   P.ctl=null;
   if(!data||data.available===false){
-   if(data&&data.reason==='no_rpc'){ P.disabled=true; P.note='Parcel outlines are not available yet (fsi/sql/019 not applied); the map keeps dots.'; }
-   else P.boxes.push(box); // no geometry stored here: do not ask again
+   if(data&&data.reason==='no_rpc'){ P.disabled=true; P.note='Parcel outlines are not available yet, so parcels show as dots at every zoom.'; }
+   else { P.boxes.push(box); P.noGeom=true; } // no geometry stored here: do not ask again
    mnLayersNote();
    return;
   }
@@ -440,7 +440,7 @@ async function mnPolyLoad(){
 
 function mnLayersNote(){
  const el=mnEl('fsiLayersNote'); if(!el) return;
- el.textContent='Basemap follows the app theme (OpenFreeMap; no free hillshade there). '+(MN.poly.disabled?MN.poly.note:'Parcel outlines draw from zoom 15.');
+ el.textContent='Basemap follows the app theme. '+(MN.poly.disabled?MN.poly.note:(MN.poly.noGeom&&!MN.poly.cache.size?'Lot outlines are not in the county data yet, so parcels show as dots at every zoom.':'Lot outlines draw from zoom 15.'));
 }
 
 function mnPolyClick(e){
@@ -624,14 +624,17 @@ function mnRenderWhy(p){
  * (R1 contract). Anything not acknowledged with {ok:true} (offline, 4xx/5xx, unknown action on an
  * older server) stays queued (synced:false) and is retried on the next map boot / when back online. */
 function mnReports(){ try{ return JSON.parse(localStorage.getItem(MN_REPORT_KEY)||'{}')||{}; }catch(e){ return {}; } }
-function mnReportFor(id){ if(id==null) return null; return mnReports()[String(id)]||null; }
+function mnReportFor(id){ if(id==null) return null; const r=mnReports()[String(id)]; return r&&r.v?r:null; }
 function mnSaveReport(id, v){
  const all=mnReports();
  const k=String(id);
- if(!v) delete all[k];
- else all[k]={v:v, at:new Date().toISOString(), by:(typeof currentUserName==='function'?currentUserName():'')||''};
+ const by=(typeof currentUserName==='function'?currentUserName():'')||'';
+ // Withdrawing a report the server already has needs a null report sent (R1 contract); a report that
+ // never left this device is simply dropped.
+ if(!v){ if(all[k]&&all[k].synced) all[k]={v:null, at:new Date().toISOString(), by:by, synced:false}; else delete all[k]; }
+ else all[k]={v:v, at:new Date().toISOString(), by:by};
  try{ localStorage.setItem(MN_REPORT_KEY, JSON.stringify(all)); }catch(e){}
- if(v) mnSyncReports();
+ mnSyncReports();
 }
 let _mnReportSyncing=false;
 async function mnSyncReports(){
@@ -643,7 +646,7 @@ async function mnSyncReports(){
   const all=mnReports();
   for(const k of Object.keys(all)){
    const r=all[k]; if(!r||r.synced) continue;
-   const body={action:'field_report', parcel_id:k, report:r.v==='water'?'water_confirmed':'not_a_problem'};
+   const body={action:'field_report', parcel_id:k, report:r.v==='water'?'water_confirmed':r.v==='no_problem'?'not_a_problem':null};
    const lead=(typeof state!=='undefined'&&Array.isArray(state))?state.find(function(l){ return l&&String(l.parcel_id||'')===k&&(l.uuid||l.server_id!=null); }):null;
    if(lead) body.lead_id=lead.uuid||lead.server_id;
    if(r.by) body.note='Reported by '+r.by+' on '+String(r.at).slice(0,10);
@@ -654,7 +657,8 @@ async function mnSyncReports(){
     ok=!!(j&&j.ok===true);
    }catch(e){ ok=false; }
    if(!ok) break; // keep the queue; try again later
-   const now=mnReports(); if(now[k]&&now[k].at===r.at){ now[k].synced=true; try{ localStorage.setItem(MN_REPORT_KEY, JSON.stringify(now)); }catch(e){} }
+   const now=mnReports(); if(now[k]&&now[k].at===r.at){ if(now[k].v) now[k].synced=true; else delete now[k]; try{ localStorage.setItem(MN_REPORT_KEY, JSON.stringify(now)); }catch(e){} }
+   if(MN_TEAM) MN_TEAM.delete(k);
   }
  }finally{ _mnReportSyncing=false; }
  const p=_fsiState.selectedId&&mnFindParcel(_fsiState.selectedId); if(p) mnRenderReport(p);
@@ -665,6 +669,32 @@ function mnFieldReportNote(id){
  const r=mnReportFor(id); if(!r) return '';
  return 'Field report: '+(r.v==='water'?'water confirmed on site':'not a problem on site')+' ('+String(r.at).slice(0,10)+(r.by?', '+r.by:'')+').';
 }
+/* Other reps' reports for a parcel ({action:'field_report_list'}); quiet when the server has none
+ * or the table is not there yet (503 field_reports_not_ready). Cached per parcel for the session. */
+const MN_TEAM=new Map();
+async function mnLoadTeamReports(pid){
+ const k=String(pid);
+ if(MN_TEAM.has(k)) return MN_TEAM.get(k);
+ MN_TEAM.set(k, null);
+ const tok=(typeof getToken==='function')?getToken():''; if(!tok) return null;
+ try{
+  const res=await fetch('/crm/api/lead-outcomes',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify({action:'field_report_list', parcel_id:k})});
+  if(!res.ok) return null;
+  const j=await res.json().catch(function(){ return null; });
+  const list=(j&&j.ok&&Array.isArray(j.reports))?j.reports.filter(function(r){ return r&&r.report&&!r.withdrawn_at; }):[];
+  MN_TEAM.set(k, list);
+  return list;
+ }catch(e){ return null; }
+}
+function mnTeamLine(list){
+ if(!list||!list.length) return '';
+ const me=(typeof currentUserName==='function'?currentUserName():'')||'';
+ const others=list.filter(function(r){ return !me||r.rep!==me; });
+ if(!others.length) return '';
+ const w=others.filter(function(r){ return /water/.test(r.report); }).length, n=others.length-w;
+ const last=others.map(function(r){ return String(r.updated_at||r.reported_at||''); }).sort().pop().slice(0,10);
+ return 'Team: '+[w?w+' water confirmed':'', n?n+' not a problem':''].filter(Boolean).join(', ')+(last?' (latest '+last+')':'')+'.';
+}
 function mnRenderReport(p){
  const box=mnEl('fsiDrReport'); if(!box) return;
  const r=mnReportFor(p.parcel_id);
@@ -673,6 +703,11 @@ function mnRenderReport(p){
   b.classList.toggle('on', on); b.setAttribute('aria-pressed', on?'true':'false');
  });
  const msg=mnEl('fsiDrReportMsg');
+ let team=box.querySelector('.fsi-report-team');
+ if(!team){ team=document.createElement('span'); team.className='fsi-report-team'; box.appendChild(team); }
+ const cached=MN_TEAM.get(String(p.parcel_id));
+ team.textContent=mnTeamLine(cached);
+ if(cached===undefined) mnLoadTeamReports(p.parcel_id).then(function(){ if(String(_fsiState.selectedId)===String(p.parcel_id)) team.textContent=mnTeamLine(MN_TEAM.get(String(p.parcel_id))); });
  if(msg) msg.textContent=r?((r.synced?'Sent to the team ':'Saved on this device ')+String(r.at).slice(0,10)+(r.synced?'':', sends when the server accepts it')+'. It goes into the lead notes when you add this parcel.'):'';
 }
 

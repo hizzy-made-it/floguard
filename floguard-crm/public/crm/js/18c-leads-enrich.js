@@ -38,7 +38,7 @@ function chunks(list, n){ const out=[]; for(let i=0;i<list.length;i+=n) out.push
 async function estimateAll(leads, allowPaid){
  const parts=chunks(leads, BATCH);
  const tot={leads:0, batchdata:0, trestle_phone_intel:0, trestle_reverse_phone:0, expected_lookups:0, max_lookups:0, free:0};
- let caps=null, failed=false;
+ let caps=null, failed=false, daily=null;
  let i=0;
  async function worker(){
   while(i<parts.length){
@@ -46,13 +46,15 @@ async function estimateAll(leads, allowPaid){
    const res=await api({action:'estimate', leads:part.map(slimForEnrich), allowPaid:allowPaid});
    if(!res.ok||!res.data||!res.data.totals){ failed=true; continue; }
    caps=caps||res.data.capabilities;
+   if(res.data.daily) daily=res.data.daily;
    const t=res.data.totals;
+   if(t.daily_cap!=null) tot.daily_cap=Number(t.daily_cap);
    ['leads','batchdata','trestle_phone_intel','trestle_reverse_phone','expected_lookups','max_lookups'].forEach(function(k){ tot[k]+=Number(t[k])||0; });
    (res.data.leads||[]).forEach(function(x){ if(x.free&&x.free.length) tot.free++; });
   }
  }
  await Promise.all([worker(),worker(),worker()]);
- return {totals:tot, capabilities:caps, failed:failed};
+ return {totals:tot, capabilities:caps, failed:failed, daily:daily};
 }
 
 E.open=async function(opts){
@@ -108,6 +110,13 @@ E.open=async function(opts){
   $('enCapHint').textContent=paidOn()?'One lookup is one paid provider call (max '+hard+'). 0 runs free web search only.':'Spend cap applies to paid providers; none is configured.';
  }
  capEl.addEventListener('change', function(){ capEl.dataset.touched='1'; });
+ /** Org-wide daily paid-lookup cap from the server (R1): shown beside the per-run cap. */
+ function dailyNote(d, capFromTotals){
+  const cap=d&&d.cap!=null?Number(d.cap):(capFromTotals!=null?Number(capFromTotals):null);
+  if(cap==null||!paidOn()) return d&&d.warning?'<div class="en-capnote">'+FG.icon('triangle-alert')+h(d.warning)+'</div>':'';
+  const rem=d&&d.remaining!=null?Number(d.remaining):null;
+  return '<div class="en-capnote en-daily'+(rem===0?' is-out':'')+'">'+FG.icon('calendar-clock')+'<span>Daily limit for the team: <b class="num">'+(rem!=null?rem+' of '+cap:cap)+'</b> paid lookups '+(rem!=null?'left today':'per day')+'.'+(d&&d.warning?' '+h(d.warning):'')+'</span></div>';
+ }
  function paintEst(){
   const box=$('enEst');
   const n=scopeLeads().length;
@@ -120,7 +129,7 @@ E.open=async function(opts){
    '<div><span class="fn-l">Paid lookups</span><b class="num">'+(paidOn()?t.expected_lookups:0)+'</b><small class="num">max '+(paidOn()?t.max_lookups:0)+'</small></div>'+
    '<div><span class="fn-l">BatchData</span><b class="num">'+t.batchdata+'</b></div>'+
    '<div><span class="fn-l">Trestle checks</span><b class="num">'+(t.trestle_phone_intel+t.trestle_reverse_phone)+'</b></div>'+
-   '</div>'+(capped?'<div class="en-capnote">'+FG.icon('info')+'The cap ('+cap+') is below the expected '+t.expected_lookups+' lookups. The run stops when the cap is used up.</div>':'')+
+   '</div>'+dailyNote(est.daily, t.daily_cap)+(capped?'<div class="en-capnote">'+FG.icon('info')+'The cap ('+cap+') is below the expected '+t.expected_lookups+' lookups. The run stops when the cap is used up.</div>':'')+
    (est.failed?'<div class="en-capnote">'+FG.icon('triangle-alert')+'Part of the estimate failed; numbers may be low.</div>':'');
   runBtn.disabled=running||!caps;
  }
@@ -153,7 +162,7 @@ E.open=async function(opts){
   const prog=$('enProgress'); prog.hidden=false;
   const bar=$('enBar'), ptxt=$('enPtxt');
   const parts=chunks(leads, BATCH);
-  let done=0, stopReason='';
+  let done=0, stopReason='', lastDaily=null;
   const changedLeads=[];
   for(let i=0;i<parts.length;i++){
    if(cancelled){ stopReason='Stopped by you.'; break; }
@@ -167,6 +176,7 @@ E.open=async function(opts){
     continue;
    }
    const d=res.data;
+   if(d.daily){ lastDaily=d.daily; if(d.daily.warning){ const k=String(d.daily.warning).slice(0,140); warns[k]=(warns[k]||0)+1; } }
    const used=d.budget&&Number(d.budget.used_total)||0;
    remaining-=used; sum.spent+=used;
    const byId={}; (d.results||[]).forEach(function(r){ if(r&&r.id!=null) byId[String(r.id)]=r; });
@@ -180,6 +190,7 @@ E.open=async function(opts){
    });
    done+=part.length;
    bar.style.width=Math.round(100*done/leads.length)+'%';
+   if(d.daily && Number(d.daily.granted)===0 && paidOn() && cap>0){ stopReason='The team\'s daily lookup limit is used up'+(d.daily.cap!=null?' ('+d.daily.cap+' per day)':'')+'. Try again tomorrow.'; if(i<parts.length-1){ sum.skipped=leads.length-done; } break; }
    if(d.budget && d.budget.exhausted && paidOn() && cap>0 && remaining<=0){ stopReason='Spend cap reached ('+cap+' paid lookups).'; if(i<parts.length-1){ sum.skipped=leads.length-done; } break; }
   }
   if(!sum.skipped && done<leads.length) sum.skipped=leads.length-done;
