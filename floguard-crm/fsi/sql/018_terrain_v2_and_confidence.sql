@@ -214,7 +214,7 @@ begin
              public.fsi_static_v2_of(r) as static_v2,
              case when ver = 'v2' and r.terrain_v2_at is not null then 'v2' else 'v1' end as mv
         from public.parcel_risk r
-       where abs(hashtext(r.parcel_id)) % buckets = bucket
+       where abs(hashtext(r.parcel_id)::bigint) % buckets = bucket
     ) s
    where s.parcel_id = p.parcel_id;
   get diagnostics n = row_count;
@@ -296,7 +296,7 @@ declare n integer;
 begin
   update public.parcel_risk
      set terrain_v2_at = null, fsi_static_v2 = null
-   where terrain_v2_at is not null and abs(hashtext(parcel_id)) % buckets = bucket;
+   where terrain_v2_at is not null and abs(hashtext(parcel_id)::bigint) % buckets = bucket;
   get diagnostics n = row_count;
   return n;
 end;
@@ -417,13 +417,13 @@ begin
     update public.parcel_risk
        set rain_cell = mrms_cell
      where mrms_cell is not null and rain_cell is distinct from mrms_cell
-       and abs(hashtext(parcel_id)) % buckets = bucket;
+       and abs(hashtext(parcel_id)::bigint) % buckets = bucket;
   else
     update public.parcel_risk
        set rain_cell = floor(lat / 0.05)::int || '_' || floor(lon / 0.05)::int
      where lat is not null and lon is not null
        and rain_cell is distinct from (floor(lat / 0.05)::int || '_' || floor(lon / 0.05)::int)
-       and abs(hashtext(parcel_id)) % buckets = bucket;
+       and abs(hashtext(parcel_id)::bigint) % buckets = bucket;
   end if;
   get diagnostics n = row_count;
   insert into public.fsi_settings (key, value, updated_at) values ('rain_source', src, now())

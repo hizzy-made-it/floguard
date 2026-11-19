@@ -24,6 +24,22 @@ create domain extensions.geometry as text;
 create function extensions.st_geomfromgeojson(text) returns extensions.geometry language sql immutable as $$ select $1::extensions.geometry $$;
 create function extensions.st_setsrid(extensions.geometry, integer) returns extensions.geometry language sql immutable as $$ select $1 $$;
 create function extensions.st_multi(extensions.geometry) returns extensions.geometry language sql immutable as $$ select $1 $$;
+-- 019 (fsi_parcel_geojson) stand-ins. Geometry values in tests are GeoJSON text, so st_asgeojson
+-- returns them unchanged, simplification is identity, st_makeenvelope builds a GeoJSON polygon and
+-- && compares the bounding boxes of the two GeoJSON texts (coordinates only, no SRID handling).
+create function extensions.st_simplifypreservetopology(extensions.geometry, double precision) returns extensions.geometry language sql immutable as $$ select $1 $$;
+create function extensions.st_asgeojson(extensions.geometry, integer default 9, integer default 8) returns text language sql immutable as $$ select $1::text $$;
+create function extensions.st_makeenvelope(double precision, double precision, double precision, double precision, integer default 0) returns extensions.geometry language sql immutable as $$
+  select json_build_object('type', 'Polygon', 'coordinates', json_build_array(json_build_array(
+    json_build_array($1, $2), json_build_array($3, $2), json_build_array($3, $4), json_build_array($1, $4), json_build_array($1, $2))))::text::extensions.geometry $$;
+create function extensions._sb_bbox(g text) returns double precision[] language sql immutable as $$
+  select array[min(x), min(y), max(x), max(y)]
+    from (select (m[1])::double precision as x, (m[2])::double precision as y
+            from regexp_matches(g, '\[\s*(-?[0-9.eE+-]+)\s*,\s*(-?[0-9.eE+-]+)\s*\]', 'g') as m) c $$;
+create function extensions._sb_overlaps(a text, b text) returns boolean language sql immutable as $$
+  select (extensions._sb_bbox(a))[1] <= (extensions._sb_bbox(b))[3] and (extensions._sb_bbox(b))[1] <= (extensions._sb_bbox(a))[3]
+     and (extensions._sb_bbox(a))[2] <= (extensions._sb_bbox(b))[4] and (extensions._sb_bbox(b))[2] <= (extensions._sb_bbox(a))[4] $$;
+create operator extensions.&& (leftarg = text, rightarg = text, function = extensions._sb_overlaps);
 
 create schema if not exists cron;
 create table if not exists cron.job (jobid bigserial primary key, jobname text unique, schedule text, command text);
