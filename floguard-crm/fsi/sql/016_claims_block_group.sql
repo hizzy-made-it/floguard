@@ -135,6 +135,7 @@ create index if not exists parcel_risk_block_group_idx on public.parcel_risk (bl
 create or replace function public.nfip_weighted_count(p_sfha integer, p_zone_x integer, p_other integer)
 returns double precision
 language sql immutable
+set search_path = public
 as $$
   select 1.0 * coalesce(p_sfha, 0) + 2.0 * coalesce(p_zone_x, 0) + 1.0 * coalesce(p_other, 0)
 $$;
@@ -227,7 +228,7 @@ begin
          updated_at           = now()
     from public.nfip_claim_block_group b
    where b.block_group = p.block_group
-     and abs(hashtext(p.parcel_id)) % p_buckets = p_bucket
+     and abs(hashtext(p.parcel_id)::bigint) % p_buckets = p_bucket
      and (p.claim_heat is distinct from b.heat
        or p.claim_bg_count_10y is distinct from b.claim_count_10y
        or p.claim_bg_zone_x_10y is distinct from b.claim_zone_x_10y
@@ -254,7 +255,7 @@ begin
     from public.nfip_claim_tract t
    where t.census_tract = p.census_tract
      and not exists (select 1 from public.nfip_claim_block_group b where b.block_group = p.block_group)
-     and abs(hashtext(p.parcel_id)) % p_buckets = p_bucket
+     and abs(hashtext(p.parcel_id)::bigint) % p_buckets = p_bucket
      and (p.claim_heat is distinct from t.heat
        or p.claim_bg_count_10y is not null
        or p.claim_count_10y is distinct from t.claim_count_10y);
@@ -300,3 +301,5 @@ grant execute on function public.nfip_recompute_block_group_heat() to service_ro
 grant execute on function public.nfip_claim_bg_build_geom() to service_role;
 grant execute on function public.nfip_apply_block_group_claims(integer, integer) to service_role;
 grant execute on function public.nfip_claim_event_list(integer) to service_role;
+
+notify pgrst, 'reload schema';
