@@ -111,6 +111,16 @@ test('CRM boots, navigates, edits leads, renders map (desktop + mobile, light + 
   if (screens) fs.mkdirSync(screens, { recursive: true });
   const base = `http://localhost:${server.port}/crm/`;
   try {
+    if (screens) {
+      // Login gate (no session seeded)
+      const lc = await browser.newContext({ viewport: { width: 1440, height: 900 }, ignoreHTTPSErrors: true });
+      const lp = await lc.newPage();
+      await lp.goto(base, { waitUntil: 'load' });
+      await lp.waitForSelector('#loginGate:not(.hidden)');
+      await lp.waitForTimeout(200);
+      await lp.screenshot({ path: path.join(screens, 'login-desktop-light.png') });
+      await lc.close();
+    }
     for (const vp of [{ name: 'desktop', width: 1440, height: 900 }, { name: 'mobile', width: 390, height: 844 }]) {
       for (const scheme of ['light', 'dark']) {
         const context = await browser.newContext({
@@ -159,6 +169,12 @@ test('CRM boots, navigates, edits leads, renders map (desktop + mobile, light + 
           assert.ok(on, `${tag}: panel ${p} visible after nav`);
           const cur = await page.$eval(`#nav button[data-p="${p}"]`, (b) => b.classList.contains('on'));
           assert.ok(cur, `${tag}: nav ${p} marked active`);
+          const ariaCur = await page.$eval(`#nav button[data-p="${p}"]`, (b) => b.getAttribute('aria-current'));
+          assert.equal(ariaCur, 'page', `${tag}: aria-current on ${p}`);
+          if (screens && process.env.SCREENS_ALL && p !== 'leads' && p !== 'fsi') {
+            await page.waitForTimeout(250);
+            await page.screenshot({ path: path.join(screens, `panel-${p}-${tag}.png`) });
+          }
         }
         // Real click path on desktop
         if (vp.name === 'desktop') {

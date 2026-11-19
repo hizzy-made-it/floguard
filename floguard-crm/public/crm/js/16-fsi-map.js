@@ -377,7 +377,7 @@ function fsiRenderList(){
  const list=_fsiState.filtered;
  if(stats) stats.textContent=list.length? (list.length+' shown'+(_fsiState.preset==='must'?' · Must':'')) : 'No matches';
  if(!list.length){
-  box.innerHTML='<div class="hint" style="padding:14px">'+(_fsiState.preset==='must'
+  box.innerHTML='<div class="empty-state">'+(_fsiState.preset==='must'
    ? 'No Must-band parcels in this load. Run score-must-have, or raise Max parcels / switch to Top risk.'
    : 'No parcels match filters. Clear presets or load Top countywide.')+'</div>';
   fsiSyncBulkBar();
@@ -431,10 +431,10 @@ function fsiRenderDrawer(){
  const heat=Number(p.claim_heat)||0;
  const heatPct=Math.max(0,Math.min(100,heat*100));
  document.getElementById('fsiDrMeters').innerHTML=
-  '<div class="meter-row"><label>Must-Have</label><span class="fsi-meter"><i style="width:'+mhsPct+'%;background:#c45c12"></i></span><b>'+(isFinite(mhs)?esc(fsiNum(mhs)):'—')+'</b></div>'+
+  '<div class="meter-row"><label>Must-Have</label><span class="fsi-meter"><i class="m-must" style="width:'+mhsPct+'%"></i></span><b>'+(isFinite(mhs)?esc(fsiNum(mhs)):'—')+'</b></div>'+
   '<div class="meter-row"><label>Live FSI</label><span class="fsi-meter"><i style="width:'+livePct+'%"></i></span><b>'+esc(fsiNum(live))+'</b></div>'+
-  '<div class="meter-row"><label>Terrain S</label><span class="fsi-meter"><i style="width:'+sPct+'%;background:#1E88C7"></i></span><b>'+esc(fsiNum(s,3))+'</b></div>'+
-  '<div class="meter-row"><label>Claim heat</label><span class="fsi-meter"><i style="width:'+heatPct+'%;background:#8b3a3a"></i></span><b>'+esc(fsiNum(heat,2))+'</b></div>'+
+  '<div class="meter-row"><label>Terrain S</label><span class="fsi-meter"><i class="m-terrain" style="width:'+sPct+'%"></i></span><b>'+esc(fsiNum(s,3))+'</b></div>'+
+  '<div class="meter-row"><label>Claim heat</label><span class="fsi-meter"><i class="m-heat" style="width:'+heatPct+'%"></i></span><b>'+esc(fsiNum(heat,2))+'</b></div>'+
   '<div class="meter-row"><label>Rank</label><span></span><b>'+(rank>0?('#'+rank+'/'+n):'—')+'</b></div>';
  const chips=document.getElementById('fsiDrChips');
  chips.innerHTML=
@@ -548,8 +548,8 @@ function fsiPopup(e){
   .setLngLat(e.lngLat)
   .setHTML('<div class="fsipop"><h4>'+esc(p.owner_name||'Owner unknown')+'</h4>'+
    '<p class="addr">'+esc(addr)+'</p>'+
-   '<div class="fsi-meter-wrap">Live <span class="fsi-meter" style="width:80px"><i style="width:'+Math.min(100,Number(p.fsi_live)||0)+'%"></i></span> '+esc(fsiNum(p.fsi_live))+'</div>'+
-   '<button type="button" class="btn p" id="fsiPopDetail" style="margin-top:8px">Open details</button></div>')
+   '<div class="fsi-meter-wrap">Live <span class="fsi-meter fsi-meter--pop"><i style="width:'+Math.min(100,Number(p.fsi_live)||0)+'%"></i></span> '+esc(fsiNum(p.fsi_live))+'</div>'+
+   '<button type="button" class="btn p btn--sm" id="fsiPopDetail">Open details</button></div>')
   .addTo(_fsiMap);
  setTimeout(function(){
   document.getElementById('fsiPopDetail')?.addEventListener('click',function(){

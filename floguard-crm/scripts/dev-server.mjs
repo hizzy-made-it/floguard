@@ -36,6 +36,7 @@ const MIME = {
   '.mp4': 'video/mp4',
   '.mp3': 'audio/mpeg',
   '.m4a': 'audio/mp4',
+  '.woff2': 'font/woff2',
 };
 
 const server = http.createServer(async (req, res) => {

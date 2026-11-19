@@ -6,7 +6,7 @@ function setNavOpen(open){
  if(btn){
   btn.setAttribute('aria-expanded', open?'true':'false');
   btn.setAttribute('aria-label', open?'Close menu':'Open menu');
-  btn.textContent=open?'✕':'☰';
+  btn.innerHTML='<svg class="ic" aria-hidden="true"><use href="#i-'+(open?'x':'menu')+'"/></svg>';
  }
 }
 function closeNavMenu(){ setNavOpen(false); }

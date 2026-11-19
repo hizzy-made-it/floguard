@@ -3,162 +3,250 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#0B0F1A">
 <title>FLOGUARD SALES REV</title>
-<link rel="stylesheet" href="css/app.css?v=20261119a">
+<link rel="preload" href="fonts/InterVariable-latin.woff2" as="font" type="font/woff2" crossorigin>
+<script src="js/00-theme.js?v=20261119b"></script>
+<link rel="stylesheet" href="css/tokens.css?v=20261119b">
 <link rel="stylesheet" href="vendor/maplibre-gl.css">
+<link rel="stylesheet" href="css/app.css?v=20261119b">
 <script src="vendor/maplibre-gl.js"></script>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
+<!-- Icons: Lucide (https://lucide.dev) v1.76.0, ISC License, Copyright (c) Lucide Icons and Contributors. Inline sprite; use <svg class="ic"><use href="#i-NAME"/></svg>. -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></symbol>
+<symbol id="i-map" viewBox="0 0 24 24"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15"/><path d="M9 3.236v15"/></symbol>
+<symbol id="i-send" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></symbol>
+<symbol id="i-folder-open" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></symbol>
+<symbol id="i-headphones" viewBox="0 0 24 24"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></symbol>
+<symbol id="i-messages-square" viewBox="0 0 24 24"><path d="M16 10a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 14.286V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/><path d="M20 9a2 2 0 0 1 2 2v10.286a.71.71 0 0 1-1.212.502l-2.202-2.202A2 2 0 0 0 17.172 19H10a2 2 0 0 1-2-2v-1"/></symbol>
+<symbol id="i-clipboard-check" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></symbol>
+<symbol id="i-book-open" viewBox="0 0 24 24"><path d="M12 5v16"/><path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"/></symbol>
+<symbol id="i-sliders-horizontal" viewBox="0 0 24 24"><path d="M10 5H3"/><path d="M12 19H3"/><path d="M14 3v4"/><path d="M16 17v4"/><path d="M21 12h-9"/><path d="M21 19h-5"/><path d="M21 5h-7"/><path d="M8 10v4"/><path d="M8 12H3"/></symbol>
+<symbol id="i-shield-check" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></symbol>
+<symbol id="i-ellipsis" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></symbol>
+<symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></symbol>
+<symbol id="i-printer" viewBox="0 0 24 24"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/></symbol>
+<symbol id="i-rotate-ccw" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></symbol>
+<symbol id="i-log-out" viewBox="0 0 24 24"><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></symbol>
+<symbol id="i-panel-left-close" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m16 15-3-3 3-3"/></symbol>
+<symbol id="i-panel-left-open" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m14 9 3 3-3 3"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+<symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></symbol>
+<symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+<symbol id="i-refresh-cw" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+<symbol id="i-trash-2" viewBox="0 0 24 24"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+<symbol id="i-layers-2" viewBox="0 0 24 24"><path d="M13 13.74a2 2 0 0 1-2 0L2.5 8.87a1 1 0 0 1 0-1.74L11 2.26a2 2 0 0 1 2 0l8.5 4.87a1 1 0 0 1 0 1.74z"/><path d="m20 14.285 1.5.845a1 1 0 0 1 0 1.74L13 21.74a2 2 0 0 1-2 0l-8.5-4.87a1 1 0 0 1 0-1.74l1.5-.845"/></symbol>
+<symbol id="i-crosshair" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="22" x2="18" y1="12" y2="12"/><line x1="6" x2="2" y1="12" y2="12"/><line x1="12" x2="12" y1="6" y2="2"/><line x1="12" x2="12" y1="22" y2="18"/></symbol>
+<symbol id="i-circle-gauge" viewBox="0 0 24 24"><path d="M15.6 2.7a10 10 0 1 0 5.7 5.7"/><circle cx="12" cy="12" r="2"/><path d="M13.4 10.6 19 5"/></symbol>
+</svg>
 
 <!-- ============ LOGIN GATE ============ -->
 <div id="loginGate">
+ <div class="login-shell">
+ <div class="login-brand">
+  <img src="logo.png" alt="" width="44" height="44">
+  <div><b>FloGuard</b><span>Sales Rev</span></div>
+ </div>
  <div class="login-card">
- <h1>FLOGUARD SALES REV</h1>
- <p class="sub">Sign in with your username and PIN to open the training platform.</p>
- <div class="login-tabs" id="authTabs">
+ <h1>Sign in to FloGuard Sales Rev</h1>
+ <p class="sub">Use your username and PIN to open the lead desk and training tools.</p>
+ <div class="login-tabs seg" id="authTabs" role="group" aria-label="Sign in or create an account">
  <button type="button" data-mode="login" class="on">Sign in</button>
  <button type="button" data-mode="register">Create account</button>
  </div>
- <div class="field"><label>Username</label><input type="text" id="authUser" autocomplete="username" placeholder="e.g. sean" maxlength="32"></div>
+ <div class="field"><label for="authUser">Username</label><input type="text" id="authUser" autocomplete="username" placeholder="e.g. sean" maxlength="32"></div>
  <div class="field">
- <label>PIN</label>
+ <label for="authPin">PIN</label>
  <input type="password" id="authPin" inputmode="numeric" pattern="[0-9]*" autocomplete="current-password" placeholder="4+ digits" maxlength="12">
- <div class="pin-hint">Numbers only · minimum 4 digits · saved securely to the FLOGUARD SALES REV database</div>
+ <div class="pin-hint">Numbers only, at least 4 digits. Stored hashed in the FloGuard Sales Rev database.</div>
  </div>
- <div class="login-msg" id="authMsg"></div>
- <button class="btn p" id="authSubmit" style="width:100%">Sign in</button>
+ <div class="login-msg" id="authMsg" role="alert"></div>
+ <button class="btn p btn--block btn--lg" id="authSubmit">Sign in</button>
+ </div>
  </div>
 </div>
 
-<div id="appRoot" class="hidden">
-<div class="band">
- <div class="l">
- <img src="logo.png" alt="FloGuard logo">
- <div class="ttl"><b>FLOGUARD SALES REV</b><span>Drainage Sales Training &amp; Lead Command Center</span></div>
+<div id="appRoot" class="hidden app">
+
+<!-- ============ SIDEBAR ============ -->
+<aside class="sidebar" id="sidebar" aria-label="Primary">
+ <div class="sb-brand">
+  <img src="logo.png" alt="FloGuard logo" width="32" height="32">
+  <div class="sb-name"><b>FloGuard</b><span>Sales Rev</span></div>
+  <button type="button" class="sb-close btn btn--icon btn--ghost" id="sbClose" aria-label="Close menu"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
  </div>
- <div class="band-right">
- <div class="band-meta">
- <div class="tokenpill" id="tokenPill" title="OpenAI token usage">Tokens: —</div>
- <div class="tokenpill" id="syncPill" title="Shared leads sync status">Sync: —</div>
- <div class="userpill"><span>Signed in as </span><b id="userName">—</b></div>
- <button class="btn" id="logoutBtn" style="background:#232a33;color:#fff;border-color:#232a33;">Log out</button>
- </div>
- <button type="button" class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav">☰</button>
  <nav class="nav" id="nav" role="navigation" aria-label="Main">
- <button type="button" data-p="leads" class="on">📋 Leads</button>
- <button type="button" data-p="fsi">🗺 Flood Map</button>
- <button type="button" data-p="docs">📚 Documents</button>
- <button type="button" data-p="drafts">✉ Outbound</button>
- <button type="button" data-p="coach">🎧 AI Coach</button>
- <button type="button" data-p="roleplay">🥊 Roleplay Gym</button>
- <button type="button" data-p="review">📝 Pitch Review</button>
- <button type="button" data-p="playbook">📖 Playbook</button>
- <button type="button" data-p="settings">⚙ Models</button>
- <button type="button" data-p="admin" id="navAdmin" class="hidden" style="display:none;">🛡 Admin</button>
+  <div class="nav-group" role="group" aria-labelledby="ng-work">
+   <div class="nav-label" id="ng-work">Work</div>
+   <button type="button" data-p="leads" class="on" aria-current="page"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span>Leads</span></button>
+  </div>
+  <div class="nav-group" role="group" aria-labelledby="ng-map">
+   <div class="nav-label" id="ng-map">Map</div>
+   <button type="button" data-p="fsi"><svg class="ic" aria-hidden="true"><use href="#i-map"/></svg><span>Flood map</span></button>
+  </div>
+  <div class="nav-group" role="group" aria-labelledby="ng-out">
+   <div class="nav-label" id="ng-out">Outreach</div>
+   <button type="button" data-p="drafts"><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg><span>Outbound</span></button>
+   <button type="button" data-p="docs"><svg class="ic" aria-hidden="true"><use href="#i-folder-open"/></svg><span>Documents</span></button>
+  </div>
+  <div class="nav-group" role="group" aria-labelledby="ng-train">
+   <div class="nav-label" id="ng-train">Train</div>
+   <button type="button" data-p="coach"><svg class="ic" aria-hidden="true"><use href="#i-headphones"/></svg><span>AI coach</span></button>
+   <button type="button" data-p="roleplay"><svg class="ic" aria-hidden="true"><use href="#i-messages-square"/></svg><span>Roleplay gym</span></button>
+   <button type="button" data-p="review"><svg class="ic" aria-hidden="true"><use href="#i-clipboard-check"/></svg><span>Pitch review</span></button>
+   <button type="button" data-p="playbook"><svg class="ic" aria-hidden="true"><use href="#i-book-open"/></svg><span>Playbook</span></button>
+  </div>
+  <div class="nav-group" role="group" aria-labelledby="ng-admin">
+   <div class="nav-label" id="ng-admin">Admin</div>
+   <button type="button" data-p="settings"><svg class="ic" aria-hidden="true"><use href="#i-sliders-horizontal"/></svg><span>Models</span></button>
+   <button type="button" data-p="admin" id="navAdmin" class="hidden" style="display:none;"><svg class="ic" aria-hidden="true"><use href="#i-shield-check"/></svg><span>Admin</span></button>
+  </div>
  </nav>
+ <div class="sb-foot">
+  <button type="button" class="sb-collapse" id="sbCollapse" aria-label="Collapse sidebar" aria-pressed="false" title="Collapse sidebar"><svg class="ic" aria-hidden="true"><use href="#i-panel-left-close"/></svg><span>Collapse</span></button>
  </div>
-</div>
-<div class="rule"></div>
+</aside>
+<div class="scrim" id="navScrim" aria-hidden="true"></div>
 
-<div class="wrap">
+<div class="main-col">
+<!-- ============ TOP BAR ============ -->
+<header class="topbar band" role="banner">
+ <button type="button" class="nav-toggle btn btn--icon btn--ghost" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav"><svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg></button>
+ <div class="tb-title"><span class="tb-section" id="tbSection">Work</span><span class="tb-sep" aria-hidden="true">/</span><b id="tbTitle">Leads</b></div>
+ <div class="band-meta">
+  <div class="tokenpill" id="tokenPill" title="OpenAI token usage">Tokens: —</div>
+  <div class="tokenpill" id="syncPill" title="Shared leads sync status" role="status">Sync: —</div>
+  <div class="userpill"><span>Signed in as </span><b id="userName">—</b></div>
+  <button type="button" class="btn btn--icon btn--ghost" id="themeToggle" aria-label="Switch to dark theme" title="Switch theme"><svg class="ic" aria-hidden="true"><use href="#i-moon"/></svg></button>
+  <button class="btn btn--ghost btn--sm" id="logoutBtn" title="Log out"><svg class="ic" aria-hidden="true"><use href="#i-log-out"/></svg><span class="lbl">Log out</span></button>
+ </div>
+</header>
+
+<main class="wrap" id="main" tabindex="-1">
 
 <!-- ============ LEADS ============ -->
-<section class="panel on" id="p-leads">
- <h1>Lead Tracker</h1>
- <p class="sub">Outreach command center: check/uncheck <b>Causes</b> (French Drains · Sump Pumps · Yard Drainage · Maintenance · Property Mgmt) so each service line is worked separately. Status is per cause. Open a profile for call/email/text, log activity, and track deals. Agent data lands here via sync.</p>
- <div class="controls">
- <div class="field"><label>View</label>
- <div class="tabs" id="tabs">
- <button data-list="FrenchDrain" class="on">French Drains</button>
- <button data-list="SumpPump">Sump Pumps</button>
- <button data-list="YardDrainage">Yard Drainage</button>
- <button data-list="Maintenance">Maintenance</button>
- <button data-list="PropertyMgmt">Property Mgmt</button>
- <button data-list="All">All</button>
- </div></div>
- <div class="field"><label>Industry</label><select id="industry" title="Filters list silently — industry is edited on the prospect card"><option value="">All industries</option></select></div>
- <div class="field"><label>City / Area</label><select id="cityFilter" title="Filters list silently — city is edited on the prospect card"><option value="">All cities</option></select></div>
- <div class="field" style="min-width:200px;flex:1"><label>Search</label><input type="search" id="search" placeholder="Name, phone, email, notes…"></div>
- <label class="due-filter" id="dueThisMonthFilter" title="Show Maintenance leads whose next service falls in the current month">
- <input type="checkbox" id="dueThisMonth"> Due this month
- </label>
- <div class="spacer"></div>
- <div class="actions" style="display:flex;gap:8px;align-items:end;flex-wrap:wrap;">
- <button class="btn p" id="addBtn">+ Add Lead</button>
- <button type="button" class="btn o" id="enrichBtn" title="Find phone/email for leads missing contacts (owner + site address). Free search + optional BatchData skip-trace.">Enrich contacts</button>
- <button class="btn" id="csvBtn">⭳ CSV</button>
- <button class="btn" id="jsonBtn">⭳ JSON</button>
- <button class="btn" id="jsonImportBtn">⭱ Import JSON</button>
- <input type="file" id="jsonFile" accept=".json,application/json" style="display:none">
- <button class="btn" id="printBtn">🖨 Print</button>
- <button class="btn d" id="resetBtn">Reset</button>
- </div>
- </div>
- <div class="hint" id="enrichStatus" style="margin:0 0 8px;min-height:1.2em" role="status" aria-live="polite"></div>
+<section class="panel on" id="p-leads" aria-labelledby="h-leads">
+ <header class="page-head">
+  <div class="page-title">
+   <h1 id="h-leads">Leads</h1>
+   <p class="sub">Work each service line on its own: check the <b>causes</b> on a lead (French drains, sump pumps, yard drainage, maintenance, property management) and set status per cause. Open a lead to call, text, email, log activity and track the deal. Agent data lands here through sync.</p>
+  </div>
+  <div class="page-actions">
+   <button type="button" class="btn" id="enrichBtn" title="Find phone/email for leads missing contacts (owner + site address). Free search + optional BatchData skip-trace."><svg class="ic" aria-hidden="true"><use href="#i-sparkles"/></svg>Enrich contacts</button>
+   <button type="button" class="btn p" id="addBtn"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg>Add lead</button>
+   <details class="menu" id="leadsMore">
+    <summary class="btn btn--icon" aria-label="More lead actions" title="More actions"><svg class="ic" aria-hidden="true"><use href="#i-ellipsis"/></svg></summary>
+    <div class="menu-pop" role="menu" aria-label="More lead actions">
+     <button type="button" class="menu-item" role="menuitem" id="csvBtn"><svg class="ic" aria-hidden="true"><use href="#i-download"/></svg>Export CSV</button>
+     <button type="button" class="menu-item" role="menuitem" id="jsonBtn"><svg class="ic" aria-hidden="true"><use href="#i-download"/></svg>Export JSON</button>
+     <button type="button" class="menu-item" role="menuitem" id="jsonImportBtn"><svg class="ic" aria-hidden="true"><use href="#i-upload"/></svg>Import JSON…</button>
+     <button type="button" class="menu-item" role="menuitem" id="printBtn"><svg class="ic" aria-hidden="true"><use href="#i-printer"/></svg>Print list</button>
+     <div class="menu-sep" role="separator"></div>
+     <button type="button" class="menu-item danger" role="menuitem" id="resetBtn"><svg class="ic" aria-hidden="true"><use href="#i-rotate-ccw"/></svg>Reset local leads…</button>
+    </div>
+   </details>
+   <input type="file" id="jsonFile" accept=".json,application/json" hidden>
+  </div>
+ </header>
 
- <details class="maps">
- <summary>Google Maps → paste a business to capture name, phone &amp; website</summary>
+ <div class="toolbar">
+  <div class="tabs seg" id="tabs" role="group" aria-label="Cause view">
+   <button data-list="FrenchDrain" class="on">French drains</button>
+   <button data-list="SumpPump">Sump pumps</button>
+   <button data-list="YardDrainage">Yard drainage</button>
+   <button data-list="Maintenance">Maintenance</button>
+   <button data-list="PropertyMgmt">Property mgmt</button>
+   <button data-list="All">All</button>
+  </div>
+  <div class="toolbar-row">
+   <label class="search-field"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg><span class="sr-only">Search leads</span><input type="search" id="search" placeholder="Search name, phone, email, notes…"></label>
+   <label class="select-field"><span class="sr-only">Industry</span><select id="industry" title="Filters list silently — industry is edited on the prospect card"><option value="">All industries</option></select></label>
+   <label class="select-field"><span class="sr-only">City or area</span><select id="cityFilter" title="Filters list silently — city is edited on the prospect card"><option value="">All cities</option></select></label>
+   <label class="due-filter" id="dueThisMonthFilter" title="Show Maintenance leads whose next service falls in the current month">
+    <input type="checkbox" id="dueThisMonth"> Due this month
+   </label>
+  </div>
+ </div>
+ <div class="status-line" id="enrichStatus" role="status" aria-live="polite"></div>
+
+ <details class="maps disclosure">
+ <summary><svg class="ic chev" aria-hidden="true"><use href="#i-chevron-down"/></svg>Capture a business from Google Maps</summary>
  <div class="body">
  <div>
- <h3>1 · Search Google Maps</h3>
+ <h3>Search Google Maps</h3>
  <ol><li>Pick a category and city, then <b>Open Maps search</b>.</li>
  <li>Click a business. <b>No website</b> (or Facebook only) = hot website lead.</li>
  <li>Copy its name / phone / website (or the whole info panel).</li></ol>
  <div class="row2">
- <div class="field"><label>Category / keyword</label><input type="text" id="mCat" placeholder="e.g. handyman" style="min-width:160px"></div>
- <div class="field"><label>City</label><select id="mCity"></select></div>
- <button class="btn p" id="mGo">Open Maps search ↗</button>
+ <div class="field"><label for="mCat">Category or keyword</label><input type="text" id="mCat" placeholder="e.g. handyman"></div>
+ <div class="field"><label for="mCity">City</label><select id="mCity"></select></div>
+ <button class="btn p" id="mGo">Open Maps search</button>
  </div>
  <div class="hint">Quick service-business searches:</div>
  <div class="chips" id="quickChips"></div>
  </div>
  <div>
- <h3>2 · Paste &amp; add the lead</h3>
+ <h3>Paste and add the lead</h3>
  <ol><li>Paste the copied business text (name, address, phone, website — any order).</li>
- <li>Pick list &amp; industry, then <b>Parse &amp; Add</b>.</li></ol>
- <textarea id="pasteBox" placeholder="Jane Smith&#10;123 Palm Ave, Port Orange, FL&#10;(386) 555-0199&#10;Backyard floods every storm"></textarea>
- <div class="row2" style="margin-top:8px">
- <div class="field"><label>Add to list</label><select id="pList"><option>FrenchDrain</option><option>SumpPump</option><option>YardDrainage</option><option>Maintenance</option><option>PropertyMgmt</option></select></div>
- <div class="field"><label>Industry</label><input type="text" id="pIndustry" placeholder="e.g. Home Services" style="min-width:150px"></div>
- <button class="btn p" id="parseBtn">Parse &amp; Add ↓</button>
+ <li>Pick list &amp; industry, then <b>Parse &amp; add</b>.</li></ol>
+ <textarea id="pasteBox" aria-label="Pasted business text" placeholder="Jane Smith&#10;123 Palm Ave, Port Orange, FL&#10;(386) 555-0199&#10;Backyard floods every storm"></textarea>
+ <div class="row2 mt-2">
+ <div class="field"><label for="pList">Add to list</label><select id="pList"><option>FrenchDrain</option><option>SumpPump</option><option>YardDrainage</option><option>Maintenance</option><option>PropertyMgmt</option></select></div>
+ <div class="field"><label for="pIndustry">Industry</label><input type="text" id="pIndustry" placeholder="e.g. Home Services"></div>
+ <button class="btn p" id="parseBtn">Parse &amp; add</button>
  </div>
- <div class="hint" id="parseMsg"></div>
+ <div class="hint" id="parseMsg" role="status"></div>
  </div>
  </div>
  </details>
 
- <div class="stats" id="stats"></div>
- <p class="hint" style="margin:0 0 8px">Industry and city filter the list but stay off the grid — open a prospect for full details, notes, and drainage need score.</p>
- <div class="tablewrap">
+ <div class="table-head">
+  <div class="stats" id="stats"></div>
+  <p class="hint">Industry and city filter the list but stay off the grid. Open a lead for details, notes and drainage need score.</p>
+ </div>
+ <div class="tablewrap leads-table">
  <table>
+ <colgroup><col class="c-name"><col class="c-causes"><col class="c-phone"><col class="c-email"><col class="c-score"><col class="c-status"><col class="c-acts"></colgroup>
  <thead><tr>
- <th style="width:26%">Owner / business + site address</th>
- <th style="width:12%">Causes</th>
- <th style="width:12%">Phone</th>
- <th style="width:14%">Email</th>
- <th style="width:10%">Score</th>
- <th style="width:12%">Status</th>
- <th style="width:14%"></th>
+ <th scope="col">Owner / business</th>
+ <th scope="col">Causes</th>
+ <th scope="col">Phone</th>
+ <th scope="col">Email</th>
+ <th scope="col">Score</th>
+ <th scope="col">Status</th>
+ <th scope="col"><span class="sr-only">Actions</span></th>
  </tr></thead>
- <tbody id="tbody"></tbody>
+ <tbody id="tbody"><tr class="loading-row"><td colspan="7"><span class="skel"></span><span class="skel short"></span><span class="sr-only">Loading leads…</span></td></tr></tbody>
  </table>
  </div>
 </section>
 
 <!-- ============ COACH ============ -->
-<section class="panel" id="p-coach">
- <h1>AI Sales Coach</h1>
- <p class="sub">Trained on FloGuard Sales Docs for <b>French Drains</b> (engineered systems), <b>Sump Pumps</b> (crawlspace + battery backup), <b>Yard Drainage</b> (lanai, patio &amp; grading), <b>Maintenance</b> (storm-readiness plans), and <b>Property Mgmt</b> (B2B portfolio programs). Ask anything, drill objections, or game-plan a lead — prices only from the playbook SSOT.</p>
+<section class="panel" id="p-coach" aria-labelledby="h-coach">
+ <header class="page-head"><div class="page-title">
+ <h1 id="h-coach">AI coach</h1>
+ <p class="sub">Trained on FloGuard Sales Docs for <b>French drains</b> (engineered systems), <b>sump pumps</b> (crawlspace + battery backup), <b>yard drainage</b> (lanai, patio &amp; grading), <b>maintenance</b> (storm-readiness plans) and <b>property management</b> (B2B portfolio programs). Ask anything, drill objections, or game-plan a lead. Prices come only from the playbook.</p>
+ </div></header>
  <div class="chatgrid">
  <div class="side">
  <div class="card kv">
- <div class="field"><label>Model</label><select id="modelSel-coach" class="modelSel"></select></div>
+ <div class="field"><label for="modelSel-coach">Model</label><select id="modelSel-coach" class="modelSel"></select></div>
  <div class="hint" id="modelHint-coach"></div>
- <div class="hint" id="coachKnowledgeHint" style="margin-top:6px">Loading Sales Docs knowledge…</div>
+ <div class="hint" id="coachKnowledgeHint">Loading Sales Docs knowledge…</div>
  </div>
  <div class="card">
- <h2 style="margin-top:0">Quick drills</h2>
- <div class="chips" style="flex-direction:column;align-items:stretch;">
+ <h2>Quick drills</h2>
+ <div class="drill-list">
  <button class="qp" data-q="CATEGORY: FrenchDrain. Give me the first-call 8-second opener referencing the last storm in the prospect's neighborhood, a permission question, two discovery questions, and the free-assessment close.">FD: first-call opener</button>
  <button class="qp" data-q="CATEGORY: FrenchDrain. Teach the Drainage Need Score talk track for a homeowner scoring DNS 78/B (urgent) — standing water three days, moisture at the slab. Opener, three risk lines, and the assessment close. What should I NOT say?">FD: DNS 78 urgent pitch</button>
  <button class="qp" data-q="CATEGORY: SumpPump. Pitch battery backup to a Daytona homeowner whose crawlspace smells musty and who lost power in the last storm. Opener, two discovery questions, honest scope (no storm-surge promises), close on the assessment.">Sump: battery backup close</button>
@@ -169,75 +257,81 @@
  <button class="qp" data-q="Write me a tight voicemail and follow-up text for a homeowner lead who didn't answer — reference the recent storms, the free assessment, and 24-hour response. No fake urgency.">Voicemail + text</button>
  </div>
  </div>
- <button class="btn" id="clear-coach">🗑 Clear conversation</button>
+ <button class="btn btn--ghost" id="clear-coach"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg>Clear conversation</button>
  </div>
  <div class="chatbox">
- <div class="msgs" id="msgs-coach"></div>
+ <div class="msgs" id="msgs-coach" role="log" aria-live="polite" aria-label="Coach conversation"></div>
  <div class="composer">
- <textarea id="in-coach" placeholder="Ask your coach anything… (Enter to send, Shift+Enter for newline)"></textarea>
- <button class="btn o" id="send-coach">Send ➤</button>
+ <textarea id="in-coach" aria-label="Message to coach" placeholder="Ask your coach anything… (Enter to send, Shift+Enter for newline)"></textarea>
+ <button class="btn p" id="send-coach"><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg>Send</button>
  </div>
  </div>
  </div>
 </section>
 
 <!-- ============ ROLEPLAY ============ -->
-<section class="panel" id="p-roleplay">
- <h1>Roleplay Gym</h1>
- <p class="sub">The AI becomes a realistic prospect and stays in character — you cold-call them. When you're done, hit <b>End &amp; Get Graded</b> for a scored breakdown of what worked and what to fix.</p>
+<section class="panel" id="p-roleplay" aria-labelledby="h-roleplay">
+ <header class="page-head"><div class="page-title">
+ <h1 id="h-roleplay">Roleplay gym</h1>
+ <p class="sub">The AI plays a realistic prospect and stays in character while you cold-call them. When you're done, choose <b>End &amp; get graded</b> for a scored breakdown of what worked and what to fix.</p>
+ </div></header>
  <div class="chatgrid">
  <div class="side">
  <div class="card kv">
- <div class="field"><label>Model</label><select id="modelSel-roleplay" class="modelSel"></select></div>
- <div class="field"><label>Scenario</label><select id="scenarioSel"></select></div>
- <div class="field"><label>Difficulty</label>
+ <div class="field"><label for="modelSel-roleplay">Model</label><select id="modelSel-roleplay" class="modelSel"></select></div>
+ <div class="field"><label for="scenarioSel">Scenario</label><select id="scenarioSel"></select></div>
+ <div class="field"><label for="difficulty">Difficulty</label>
  <select id="difficulty"><option>Beginner</option><option selected>Intermediate</option><option>Advanced — brutal</option></select></div>
- <button class="btn p" id="startRp">▶ Start roleplay</button>
- <button class="btn o" id="gradeRp">🏁 End &amp; Get Graded</button>
+ <button class="btn p" id="startRp">Start roleplay</button>
+ <button class="btn o" id="gradeRp">End &amp; get graded</button>
  </div>
- <div class="card"><h2 style="margin-top:0">Scenario</h2><div class="persona" id="personaDesc">Pick a scenario and press Start. The prospect will "answer the phone" — your job is to open, hold attention, handle pushback, and close a concrete next step.</div></div>
- <button class="btn" id="clear-roleplay">🗑 Clear session</button>
+ <div class="card"><h2>Scenario</h2><div class="persona" id="personaDesc">Pick a scenario and press Start. The prospect will "answer the phone" — your job is to open, hold attention, handle pushback, and close a concrete next step.</div></div>
+ <button class="btn btn--ghost" id="clear-roleplay"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg>Clear session</button>
  </div>
  <div class="chatbox">
- <div class="msgs" id="msgs-roleplay"></div>
+ <div class="msgs" id="msgs-roleplay" role="log" aria-live="polite" aria-label="Roleplay conversation"></div>
  <div class="composer">
- <textarea id="in-roleplay" placeholder="You're on the call — speak to the prospect…"></textarea>
- <button class="btn o" id="send-roleplay">Send ➤</button>
+ <textarea id="in-roleplay" aria-label="What you say to the prospect" placeholder="You're on the call — speak to the prospect…"></textarea>
+ <button class="btn p" id="send-roleplay"><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg>Send</button>
  </div>
  </div>
  </div>
 </section>
 
 <!-- ============ REVIEW ============ -->
-<section class="panel" id="p-review">
- <h1>Pitch Review</h1>
- <p class="sub">Paste any pitch — cold-call script, voicemail, email, door approach — and get a 0–100 score with coffee-chat coaching: what landed, what to fix, and which techniques you used.</p>
+<section class="panel" id="p-review" aria-labelledby="h-review">
+ <header class="page-head"><div class="page-title">
+ <h1 id="h-review">Pitch review</h1>
+ <p class="sub">Paste any pitch — cold-call script, voicemail, email, door approach — and get a 0–100 score with coaching: what landed, what to fix, and which techniques you used.</p>
+ </div></header>
  <div class="chatgrid">
  <div class="side">
  <div class="card kv">
- <div class="field"><label>Model</label><select id="modelSel-review" class="modelSel"></select></div>
- <div class="field"><label>Pitch type</label>
+ <div class="field"><label for="modelSel-review">Model</label><select id="modelSel-review" class="modelSel"></select></div>
+ <div class="field"><label for="pitchType">Pitch type</label>
  <select id="pitchType"><option>Cold call opener</option><option>Full call script</option><option>Voicemail</option><option>Follow-up email/text</option><option>Door approach</option><option>Property manager pitch</option><option>Elevator pitch</option></select></div>
  </div>
- <div class="card"><h2 style="margin-top:0">Last score</h2><div><span class="score" id="lastScore">—</span><span class="hint"> /100</span></div></div>
- <button class="btn" id="clear-review">🗑 Clear</button>
+ <div class="card"><h2>Last score</h2><div><span class="score" id="lastScore">—</span><span class="hint"> /100</span></div></div>
+ <button class="btn btn--ghost" id="clear-review"><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg>Clear</button>
  </div>
- <div>
- <div class="card" style="margin-bottom:12px">
- <textarea id="pitchBox" style="min-height:130px" placeholder="Paste your pitch here…"></textarea>
- <div style="margin-top:8px;display:flex;gap:8px;">
- <button class="btn o" id="reviewBtn">Review my pitch ➤</button>
+ <div class="stack">
+ <div class="card">
+ <textarea id="pitchBox" class="tall" aria-label="Your pitch" placeholder="Paste your pitch here…"></textarea>
+ <div class="btn-row mt-2">
+ <button class="btn p" id="reviewBtn">Review my pitch</button>
  </div>
  </div>
- <div class="chatbox" style="height:430px"><div class="msgs" id="msgs-review"></div></div>
+ <div class="chatbox chatbox--short"><div class="msgs" id="msgs-review" role="log" aria-live="polite" aria-label="Pitch review results"></div></div>
  </div>
  </div>
 </section>
 
 <!-- ============ PLAYBOOK ============ -->
-<section class="panel" id="p-playbook">
- <h1>The Condensed Playbook</h1>
- <p class="sub">The core consultative cold-selling system your AI Coach teaches, drills, and grades against — adapted for FloGuard drainage systems across Central Florida.</p>
+<section class="panel" id="p-playbook" aria-labelledby="h-playbook">
+ <header class="page-head"><div class="page-title">
+ <h1 id="h-playbook">The condensed playbook</h1>
+ <p class="sub">The consultative cold-selling system your AI coach teaches, drills and grades against — adapted for FloGuard drainage systems across Central Florida.</p>
+ </div></header>
  <div class="card pb">
  <h3><span class="tag">1</span>The ROI Reframe</h3>
  <p>Never defend the price — reframe the expense as protection. A drainage system isn't a cost; it's what stands between Florida's water table and the biggest asset they own. Anchor to what water is already costing them: foundation repair runs $10,000+, mold remediation, re-sodding the yard every spring, a failed inspection when they sell. "Every storm that water sits against your slab, the repair bill grows. What did the last one cost you?"</p>
@@ -255,67 +349,74 @@
  <p>Eight-second pattern-interrupt opener referencing their neighborhood or the last storm. Permission question ("mind if I take 30 seconds?"). Two or three discovery questions — where does water sit, how long does it stand, what has it touched. One-sentence tailored pitch. Close on a concrete free assessment slot before you hang up.</p>
  <h3><span class="tag">8</span>What You're Selling</h3>
  <p>Exterior French Drains: fabric-lined gravel trench + 4" perforated pipe, complete French drain + sump systems typically $4,500–$12,000 — quoted only after the free on-site assessment, never firm by phone. Interior Drains + Sump Pumps: sealed basin, float switch, check valve, battery backup for hurricane season. Yard Drainage &amp; Grading: catch basins, channel drains, swales, downspout tie-ins — the lower-ticket entry offer. Pump Maintenance &amp; Monitoring: seasonal storm-readiness plans, including systems FloGuard didn't install. Deposit, financing, and commission terms: [CONFIRM WITH OWNER] before quoting.</p>
-<h3><span class="tag">9</span>Property Mgmt leads</h3>
+ <h3><span class="tag">9</span>Property Mgmt leads</h3>
  <p>PropertyMgmt is the B2B lane: property managers, HOAs, and landlords with portfolios of rentals. The pitch is fewer tenant complaints, one vendor, scheduled seasonal service, and clean invoicing. The close is always a free pilot assessment of their worst property plus a written scope they can hand the owner. Expect an approval chain and sell to it — never around it.</p>
  </div>
 </section>
 
 <!-- ============ ADMIN ============ -->
-<section class="panel" id="p-admin">
- <h1>Admin · Users &amp; Analytics</h1>
- <p class="sub">Platform-wide usage, locks, lead activity, and AI activity by rep. Approving more tokens requires your admin PIN.</p>
+<section class="panel" id="p-admin" aria-labelledby="h-admin">
+ <header class="page-head">
+  <div class="page-title">
+   <h1 id="h-admin">Users &amp; analytics</h1>
+   <p class="sub">Platform-wide usage, locks, lead activity and AI activity by rep. Approving more tokens requires your admin PIN.</p>
+  </div>
+  <div class="page-actions">
+   <span class="hint" id="adminMsg" role="status"></span>
+   <button class="btn" id="adminRefresh"><svg class="ic" aria-hidden="true"><use href="#i-refresh-cw"/></svg>Refresh</button>
+  </div>
+ </header>
  <div class="admin-grid" id="adminSummary">
  <div class="admin-card"><div class="n" id="admUsers">—</div><div class="l">Users</div></div>
  <div class="admin-card"><div class="n" id="admTokens">—</div><div class="l">Tokens used</div></div>
  <div class="admin-card"><div class="n" id="admLocked">—</div><div class="l">Locked</div></div>
  <div class="admin-card"><div class="n" id="admCalls">—</div><div class="l">AI calls (24h)</div></div>
  </div>
- <div class="controls" style="margin-bottom:10px">
- <button class="btn p" id="adminRefresh">↻ Refresh</button>
- <span class="hint" id="adminMsg"></span>
- </div>
  <div class="tablewrap">
  <table>
  <thead><tr>
- <th>User</th><th>Role</th><th>Tokens</th><th style="width:120px">Usage</th><th>Locked</th><th>Leads</th><th>Last seen</th><th></th>
+ <th>User</th><th>Role</th><th>Tokens</th><th class="w-120">Usage</th><th>Locked</th><th>Leads</th><th>Last seen</th><th><span class="sr-only">Actions</span></th>
  </tr></thead>
  <tbody id="adminTbody"></tbody>
  </table>
  </div>
- 
- <h2 style="margin:18px 0 8px;font-size:1rem">Revenue &amp; close rate</h2>
+
+ <h2 class="section-title">Revenue &amp; close rate</h2>
  <div class="kpi-grid" id="adminKpis">
  <div class="kpi-card"><div class="n" id="kpiRevenue">$0</div><div class="l">Closed revenue</div></div>
  <div class="kpi-card"><div class="n" id="kpiClosePct">-</div><div class="l">Close rate (won/(won+lost))</div></div>
  <div class="kpi-card"><div class="n" id="kpiPipeline">$0</div><div class="l">Pipeline (Quoted+Interested)</div></div>
  <div class="kpi-card"><div class="n" id="kpiTouched">0</div><div class="l">Leads touched (not New)</div></div>
  </div>
- <div class="tablewrap" style="margin-bottom:16px">
+ <div class="tablewrap mb-4">
  <table>
  <thead><tr><th>Rep</th><th>Closed $</th><th>Won</th><th>Lost</th><th>Close %</th><th>Pipeline $</th></tr></thead>
  <tbody id="adminRevTbody"></tbody>
  </table>
  </div>
- <h2 style="margin:18px 0 8px;font-size:1rem">Practice summaries</h2>
- <div class="tablewrap" style="margin-bottom:16px">
+ <h2 class="section-title">Practice summaries</h2>
+ <div class="tablewrap mb-4">
  <table>
  <thead><tr><th>Rep</th><th>Sessions</th><th>Avg score</th><th>Roleplay</th><th>Reviews</th><th>Last practice</th></tr></thead>
  <tbody id="adminPracticeTbody"></tbody>
  </table>
  </div>
 <div class="detail-panel" id="adminDetail" style="display:none">
- <h2 style="margin:0 0 8px" id="adminDetailTitle">User detail</h2>
+ <h2 id="adminDetailTitle">User detail</h2>
  <div id="adminDetailBody" class="hint"></div>
  </div>
 </section>
 
 <!-- ============ DOCUMENTS (all signed-in users) ============ -->
-<section class="panel" id="p-docs">
- <h1>Sales library</h1>
- <p class="sub">PDFs, study guides, and <b>training videos</b> for every signed-in user. Open, download, or watch in place. Content syncs from <code>Sales Docs/</code> (and <code>Sales Docs/training/</code> for MP4s) on deploy.</p>
- <div class="docs-toolbar">
- <div class="field"><label>Search</label><input type="search" id="docsSearch" placeholder="Title, category, description…" style="min-width:220px"></div>
- <div class="field"><label>Type</label>
+<section class="panel" id="p-docs" aria-labelledby="h-docs">
+ <header class="page-head"><div class="page-title">
+ <h1 id="h-docs">Sales library</h1>
+ <p class="sub">PDFs, study guides and <b>training videos</b> for every signed-in user. Open, download or watch in place. Content syncs from <code>Sales Docs/</code> (and <code>Sales Docs/training/</code> for MP4s) on deploy.</p>
+ </div></header>
+ <div class="toolbar docs-toolbar">
+ <div class="toolbar-row">
+ <label class="search-field"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg><span class="sr-only">Search documents</span><input type="search" id="docsSearch" placeholder="Search title, category, description…"></label>
+ <label class="select-field"><span class="sr-only">Type</span>
  <select id="docsType">
  <option value="">All types</option>
  <option value="pdf">PDF</option>
@@ -323,22 +424,26 @@
  <option value="md">Markdown</option>
  <option value="html">HTML</option>
  </select>
- </div>
- <button type="button" class="btn p" id="docsRefresh">Refresh list</button>
+ </label>
  <span class="spacer"></span>
  <span class="stats" id="docsStats">Loading…</span>
+ <button type="button" class="btn" id="docsRefresh"><svg class="ic" aria-hidden="true"><use href="#i-refresh-cw"/></svg>Refresh</button>
+ </div>
  </div>
  <div class="docs-cats" id="docsCats" aria-label="Filter by category"></div>
  <div class="docs-grid" id="docsGrid"></div>
- <p class="hint" id="docsEmpty" style="display:none;margin-top:12px">No documents match. Clear search or pick another category/type. Drop training <code>.mp4</code> files into <code>Sales Docs/training/</code> and run <code>npm run academy:sync-docs</code>.</p>
+ <p class="empty-state" id="docsEmpty" style="display:none">No documents match. Clear the search or pick another category or type. Drop training <code>.mp4</code> files into <code>Sales Docs/training/</code> and run <code>npm run academy:sync-docs</code>.</p>
 </section>
 
 <!-- ============ OUTBOUND DRAFTS ============ -->
-<section class="panel" id="p-drafts">
- <h1>Outbound Desk</h1>
- <p class="sub">Human-approved email drafts only — <b>never auto-send</b>. Approve here, then send from Outlook / LeadAgent. Queue a draft from a lead profile (<b>Queue draft</b>) or paste below.</p>
- <div class="controls">
- <div class="field"><label>Filter</label>
+<section class="panel" id="p-drafts" aria-labelledby="h-drafts">
+ <header class="page-head"><div class="page-title">
+ <h1 id="h-drafts">Outbound desk</h1>
+ <p class="sub">Human-approved email drafts only — <b>never auto-send</b>. Approve here, then send from Outlook or LeadAgent. Queue a draft from a lead profile (<b>Queue draft</b>) or write one below.</p>
+ </div></header>
+ <div class="toolbar">
+ <div class="toolbar-row">
+ <label class="select-field"><span class="sr-only">Filter drafts</span>
  <select id="draftFilter">
  <option value="">All</option>
  <option value="pending_approval" selected>Pending approval</option>
@@ -346,20 +451,23 @@
  <option value="sent">Sent</option>
  <option value="rejected">Rejected</option>
  </select>
- </div>
- <button type="button" class="btn p" id="draftRefresh">Refresh</button>
+ </label>
  <span class="spacer"></span>
  <span class="stats" id="draftStats"></span>
+ <button type="button" class="btn" id="draftRefresh"><svg class="ic" aria-hidden="true"><use href="#i-refresh-cw"/></svg>Refresh</button>
  </div>
- <div class="card" style="margin-bottom:12px">
- <h2 style="margin-top:0">New draft</h2>
- <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
- <div class="field"><label>Lead name / key</label><input type="text" id="draftLeadKey" placeholder="Business name or name|city"></div>
- <div class="field"><label>Subject</label><input type="text" id="draftSubject" placeholder="Email subject"></div>
  </div>
- <div class="field" style="margin-top:8px"><label>Body</label><textarea id="draftBody" style="min-height:100px" placeholder="Primary email body…"></textarea></div>
- <button type="button" class="btn o" id="draftCreate" style="margin-top:8px">Queue for approval</button>
- <div class="hint" id="draftCreateMsg" style="margin-top:6px"></div>
+ <div class="card mb-3">
+ <h2>New draft</h2>
+ <div class="grid-2">
+ <div class="field"><label for="draftLeadKey">Lead name or key</label><input type="text" id="draftLeadKey" placeholder="Business name or name|city"></div>
+ <div class="field"><label for="draftSubject">Subject</label><input type="text" id="draftSubject" placeholder="Email subject"></div>
+ </div>
+ <div class="field mt-2"><label for="draftBody">Body</label><textarea id="draftBody" class="tall" placeholder="Primary email body…"></textarea></div>
+ <div class="btn-row mt-2">
+ <button type="button" class="btn p" id="draftCreate">Queue for approval</button>
+ <span class="hint" id="draftCreateMsg" role="status"></span>
+ </div>
  </div>
  <div class="tablewrap">
  <table>
@@ -367,10 +475,10 @@
  <tbody id="draftTbody"></tbody>
  </table>
  </div>
- <div class="card" id="draftDetail" style="display:none;margin-top:12px">
- <h2 id="draftDetailTitle" style="margin-top:0">Draft</h2>
- <pre id="draftDetailBody" style="white-space:pre-wrap;font-family:inherit;font-size:13px;background:#f6f8fa;padding:12px;border-radius:8px;border:1px solid var(--line)"></pre>
- <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+ <div class="card mt-3" id="draftDetail" style="display:none">
+ <h2 id="draftDetailTitle">Draft</h2>
+ <pre id="draftDetailBody" class="draft-body"></pre>
+ <div class="btn-row mt-3">
  <button type="button" class="btn p" id="draftApprove">Approve</button>
  <button type="button" class="btn" id="draftReject">Reject</button>
  <button type="button" class="btn o" id="draftMarkSent">Mark sent</button>
@@ -381,26 +489,34 @@
 </section>
 
 <!-- ============ SETTINGS ============ -->
-<section class="panel" id="p-settings">
- <h1>AI Models</h1>
- <p class="sub">OpenAI is powered by the FLOGUARD SALES REV platform key for every user — no personal API key needed. Pick how smart each tool should be. Soft cap: <b>50,000 tokens</b> per user, then AI pauses until an admin approves more.</p>
- <div class="card kv" style="max-width:640px">
+<section class="panel" id="p-settings" aria-labelledby="h-settings">
+ <header class="page-head"><div class="page-title">
+ <h1 id="h-settings">AI models</h1>
+ <p class="sub">OpenAI runs on the FloGuard Sales Rev platform key for every user — no personal API key needed. Pick how smart each tool should be. Soft cap: <b>50,000 tokens</b> per user, then AI pauses until an admin approves more.</p>
+ </div></header>
+ <div class="card kv narrow">
  <div class="warn">AI is ready for everyone on this site. Usage is billed to FLOGUARD SALES REV. Prefer <b>Auto — pick for me</b> unless you want a fixed model.</div>
- <div class="field"><label>Default model</label><select id="modelSel-default" class="modelSel"></select></div>
+ <div class="field"><label for="modelSel-default">Default model</label><select id="modelSel-default" class="modelSel"></select></div>
  <div class="hint"><b>Auto — pick for me</b> is the recommended skill: it routes each task to the right model — quick drills and Q&amp;A go to a fast mini model, live roleplay goes to a strong conversational model, and pitch reviews go to a deep-analysis model. Every answer shows which model handled it, so you can override any time.</div>
- <div class="field"><label>Custom model id (optional — overrides list)</label><input type="text" id="customModel" placeholder="e.g. a newer model id"></div>
- <button class="btn p" id="saveModels">Save model prefs</button>
- <div class="hint" id="keyMsg"></div>
+ <div class="field"><label for="customModel">Custom model id (optional — overrides list)</label><input type="text" id="customModel" placeholder="e.g. a newer model id"></div>
+ <div class="btn-row"><button class="btn p" id="saveModels">Save model prefs</button></div>
+ <div class="hint" id="keyMsg" role="status"></div>
  </div>
 </section>
 
 <!-- ============ FSI FLOOD MAP COMMAND CENTER ============ -->
-<section class="panel" id="p-fsi">
- <h1>Flood Susceptibility Map</h1>
- <p class="sub">Volusia dial list + territory map. <b>Terrain is the gate, rainfall is the trigger</b> — Zone X clay bowls often outrank FEMA AE ridges. Color = terrain band; size/list rank = live FSI.</p>
+<section class="panel panel--map" id="p-fsi" aria-labelledby="h-fsi">
+ <header class="page-head page-head--compact">
+  <div class="page-title">
+   <h1 id="h-fsi">Flood susceptibility map</h1>
+   <p class="sub">Volusia dial list and territory map. <b>Terrain is the gate, rainfall is the trigger</b> — Zone X clay bowls often outrank FEMA AE ridges. Colour = terrain band; size and list rank = live FSI.</p>
+  </div>
+  <div class="page-actions">
+   <span class="fsi-source" id="fsiSource" title="Data source">—</span>
+  </div>
+ </header>
 
  <div class="fsi-toolbar">
- <div class="field" style="min-width:100%"><label>Presets</label>
  <div class="fsi-presets" id="fsiPresets" role="group" aria-label="Filter presets">
  <button type="button" data-preset="must" class="on">Must dial</button>
  <button type="button" data-preset="top">Top risk</button>
@@ -410,18 +526,18 @@
  <button type="button" data-preset="fema">FEMA mapped</button>
  <button type="button" data-preset="clear">Clear filters</button>
  </div>
- </div>
- <div class="field"><label>Min live score</label><input type="text" id="fsiMinScore" value="0" inputmode="decimal" style="width:92px"></div>
- <div class="field"><label>Max parcels</label><input type="text" id="fsiLimit" value="200" inputmode="numeric" style="width:92px" title="Must dial defaults to top 200"></div>
- <button type="button" class="btn p" id="fsiSearchArea">Search this area</button>
- <button type="button" class="btn o" id="fsiTop">Top countywide</button>
- <div class="field"><label>Overlays</label>
- <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;text-transform:none;letter-spacing:0;color:var(--ink);font-weight:400"><input type="checkbox" id="fsiNfhl"> FEMA flood zones</label>
- <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;text-transform:none;letter-spacing:0;color:var(--ink);font-weight:400;margin-top:4px" title="Neighborhood NFIP claim density — not personal claims"><input type="checkbox" id="fsiClaimHeat"> Claim heat</label>
+ <div class="fsi-controls">
+ <div class="field field--inline"><label for="fsiMinScore">Min live score</label><input type="text" id="fsiMinScore" value="0" inputmode="decimal" class="num-input"></div>
+ <div class="field field--inline"><label for="fsiLimit">Max parcels</label><input type="text" id="fsiLimit" value="200" inputmode="numeric" class="num-input" title="Must dial defaults to top 200"></div>
+ <div class="toggles" role="group" aria-label="Map overlays">
+ <label class="toggle"><input type="checkbox" id="fsiNfhl"><span>FEMA flood zones</span></label>
+ <label class="toggle" title="Neighborhood NFIP claim density — not personal claims"><input type="checkbox" id="fsiClaimHeat"><span>Claim heat</span></label>
  </div>
  <span class="spacer"></span>
- <span class="fsi-source" id="fsiSource" title="Data source">—</span>
  <span class="stats" id="fsiStats">Open this tab to load the map…</span>
+ <button type="button" class="btn" id="fsiTop">Top countywide</button>
+ <button type="button" class="btn p" id="fsiSearchArea">Search this area</button>
+ </div>
  </div>
 
  <div class="fsi-banner" id="fsiBanner" role="status"></div>
@@ -437,19 +553,20 @@
  <span class="stats" id="fsiListStats"></span>
  </div>
  <div class="fsi-list-tools">
- <input type="search" id="fsiSearchText" placeholder="Search address, owner, id…" autocomplete="off">
+ <label class="search-field"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg><span class="sr-only">Search parcels</span><input type="search" id="fsiSearchText" placeholder="Search address, owner, id…" autocomplete="off"></label>
  <select id="fsiCityFilter" aria-label="Filter by city" title="Territory city">
  <option value="">All cities</option>
  </select>
  </div>
  <div class="fsi-city-chips" id="fsiCityChips" aria-label="Quick city filters"></div>
  <div class="fsi-bulk" id="fsiBulk" role="toolbar" aria-label="Bulk actions">
- <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="fsiSelectAll" class="ck"> Select all shown</label>
- <span><b id="fsiSelCount">0</b> selected</span>
- <button type="button" class="btn o" id="fsiBulkLeads">Add to Leads</button>
- <button type="button" class="btn o" id="fsiBulkEnrich" title="Add selected parcels as leads, then bulk-enrich phone/email">Add + Enrich</button>
- <button type="button" class="btn" id="fsiBulkCsv">Export CSV</button>
- <button type="button" class="btn ghost" id="fsiBulkClear">Clear</button>
+ <label class="fsi-selall"><input type="checkbox" id="fsiSelectAll" class="ck"> Select all</label>
+ <span class="fsi-selcount"><b id="fsiSelCount">0</b> selected</span>
+ <span class="spacer"></span>
+ <button type="button" class="btn btn--sm o" id="fsiBulkLeads">Add to leads</button>
+ <button type="button" class="btn btn--sm o" id="fsiBulkEnrich" title="Add selected parcels as leads, then bulk-enrich phone/email">Add + enrich</button>
+ <button type="button" class="btn btn--sm" id="fsiBulkCsv">Export CSV</button>
+ <button type="button" class="btn btn--sm btn--icon ghost" id="fsiBulkClear" aria-label="Clear selection" title="Clear selection"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
  </div>
  <div class="fsi-list" id="fsiList" role="listbox" aria-label="Ranked parcels"></div>
  <div class="fsi-drawer" id="fsiDrawer" aria-live="polite">
@@ -458,73 +575,73 @@
  <p class="headline" id="fsiDrHeadline"></p>
  <div class="meters" id="fsiDrMeters"></div>
  <div class="fsi-breakdown" id="fsiDrBreakdown" style="display:none"></div>
- <div class="meta" id="fsiDrChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
+ <div class="meta fsi-dr-chips" id="fsiDrChips"></div>
  <div class="fsi-suggest" id="fsiDrSuggest" style="display:none">
  <h4>Suggested causes (soft · assess on-site)</h4>
  <div id="fsiDrSuggestChips"></div>
  <p class="hint">Soft tags from FSI / soil / zone / value — not a product quote. Assessment decides French drain vs sump vs yard.</p>
  </div>
  <div class="fsi-acts" id="fsiDrActs">
- <button type="button" class="btn p" data-fsi-act="maps">Open in Maps</button>
+ <button type="button" class="btn o" data-fsi-act="lead">Add to leads</button>
+ <button type="button" class="btn" data-fsi-act="maps">Open in Maps</button>
  <button type="button" class="btn" data-fsi-act="copy">Copy address</button>
- <button type="button" class="btn o" data-fsi-act="lead">Add to Leads</button>
  <button type="button" class="btn" data-fsi-act="draft">Queue draft</button>
  </div>
- <div class="fsi-msg" id="fsiDrMsg"></div>
+ <div class="fsi-msg" id="fsiDrMsg" role="status"></div>
  <p class="fsi-disclaimer">Not an inspection, insurance quote, or guarantee. Free on-site assessment does the diagnosing. Parcel records are public; DNC / CAN-SPAM still govern outreach.</p>
  </div>
  </div>
  </div>
- <p class="hint">FSI ranks a call list from public terrain, soil, flood-zone, and neighborhood claim-heat data. Residential + commercial + condos stay dialable. Weights are literature defaults. Claim heat is never a personal claim. Scrub DNC before dialing.</p>
+ <p class="hint compliance">FSI ranks a call list from public terrain, soil, flood-zone, and neighborhood claim-heat data. Residential + commercial + condos stay dialable. Weights are literature defaults. Claim heat is never a personal claim. Scrub DNC before dialing.</p>
 </section>
 
 
 <!-- PROFILE DRAWER -->
 <div class="drawer-bg" id="profileDrawer" aria-hidden="true">
- <div class="drawer" role="dialog" aria-labelledby="pfName">
- <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
- <div>
+ <div class="drawer" role="dialog" aria-modal="true" aria-labelledby="pfName">
+ <div class="drawer-head">
+ <div class="drawer-title">
  <h2 id="pfName">Business</h2>
  <div class="meta" id="pfMeta"></div>
  </div>
- <button type="button" class="btn ghost" id="pfClose" title="Close">X</button>
+ <button type="button" class="btn btn--icon ghost" id="pfClose" title="Close" aria-label="Close lead"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
  </div>
  <div class="badges" id="pfBadges"></div>
  <div class="wfs-card" id="pfFitness" hidden></div>
  <div class="actbar" id="pfActBar"></div>
  <div class="sec">
- <h3>Causes (check which products to work)</h3>
+ <h3>Causes</h3>
  <div class="cause-checks full" id="pfCauses"></div>
- <p class="hint" style="margin:8px 0 0">Each cause has its own status. Coach / queue draft / list tabs use the active cause only.</p>
+ <p class="hint mt-2">Each cause has its own status. Coach, queue draft and the list tabs use the active cause only.</p>
  </div>
  <div class="sec" id="pfMgmtSec" style="display:none">
  <h3>Management company (B2B)</h3>
  <div class="mgmt-row">
  <div>
- <label>Company</label>
+ <label for="pfMgmtCompany">Company</label>
  <select id="pfMgmtCompany"><option value="">— None —</option></select>
  </div>
- <button type="button" class="btn" id="pfMgmtAddBtn" title="Add a management company">+ New</button>
+ <button type="button" class="btn" id="pfMgmtAddBtn" title="Add a management company"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg>New</button>
  </div>
  <div class="mgmt-new" id="pfMgmtNew">
- <label>Company name</label>
+ <label for="pfMgmtNewName">Company name</label>
  <input id="pfMgmtNewName" placeholder="e.g. Coastal Property Pros">
- <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
- <div><label>Phone</label><input id="pfMgmtNewPhone" placeholder="(386) …"></div>
- <div><label>Contact</label><input id="pfMgmtNewContact" placeholder="PM name"></div>
+ <div class="grid-2 mt-2">
+ <div><label for="pfMgmtNewPhone">Phone</label><input id="pfMgmtNewPhone" placeholder="(386) …"></div>
+ <div><label for="pfMgmtNewContact">Contact</label><input id="pfMgmtNewContact" placeholder="PM name"></div>
  </div>
- <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+ <div class="btn-row mt-2">
  <button type="button" class="btn p" id="pfMgmtSaveNew">Save company</button>
  <button type="button" class="btn ghost" id="pfMgmtCancelNew">Cancel</button>
  </div>
  </div>
- <p class="hint" style="margin:6px 0 0">Property managers / HOAs for portfolio outreach. Companies are saved in this browser and ride along with the lead on sync.</p>
+ <p class="hint mt-2">Property managers / HOAs for portfolio outreach. Companies are saved in this browser and ride along with the lead on sync.</p>
  </div>
  <div class="sec" id="pfMntSec" style="display:none">
  <h3>Maintenance schedule</h3>
- <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
- <div><label>Last service</label><input id="pfMntLast" type="date"></div>
- <div><label>Frequency</label>
+ <div class="grid-2">
+ <div><label for="pfMntLast">Last service</label><input id="pfMntLast" type="date"></div>
+ <div><label for="pfMntFreq">Frequency</label>
  <select id="pfMntFreq">
  <option value="">—</option>
  <option value="monthly">Monthly</option>
@@ -533,56 +650,57 @@
  <option value="as_needed">As needed</option>
  </select>
  </div>
- <div><label>Next due</label><input id="pfMntNext" type="date"></div>
- <div><label>Plan / notes</label><input id="pfMntPlan" placeholder="Storm-ready plan, pump check…"></div>
+ <div><label for="pfMntNext">Next due</label><input id="pfMntNext" type="date"></div>
+ <div><label for="pfMntPlan">Plan / notes</label><input id="pfMntPlan" placeholder="Storm-ready plan, pump check…"></div>
  </div>
- <p class="hint" style="margin:6px 0 0">Use Leads → Maintenance → <b>Due this month</b> for the callback list. Changing last service + frequency auto-fills next due if empty.</p>
+ <p class="hint mt-2">Use Leads → Maintenance → <b>Due this month</b> for the callback list. Changing last service + frequency auto-fills next due if empty.</p>
  </div>
  <div class="sec">
  <h3>Location &amp; industry</h3>
- <div><label>Site address</label><input id="pfAddress" placeholder="123 Palm Ave, Port Orange, FL 32127"></div>
- <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:6px">
- <div><label>City / Area</label><input id="pfCity" list="cityList" placeholder="e.g. Daytona Beach"></div>
- <div><label>ZIP</label><input id="pfZip" placeholder="32127" inputmode="numeric"></div>
- <div><label>Industry</label><input id="pfIndustry" list="indList" placeholder="e.g. Home Services"></div>
+ <div><label for="pfAddress">Site address</label><input id="pfAddress" placeholder="123 Palm Ave, Port Orange, FL 32127"></div>
+ <div class="grid-3 mt-2">
+ <div><label for="pfCity">City / area</label><input id="pfCity" list="cityList" placeholder="e.g. Daytona Beach"></div>
+ <div><label for="pfZip">ZIP</label><input id="pfZip" placeholder="32127" inputmode="numeric"></div>
+ <div><label for="pfIndustry">Industry</label><input id="pfIndustry" list="indList" placeholder="e.g. Home Services"></div>
  </div>
- <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
- <div><label>Parcel ID</label><input id="pfParcelId" placeholder="Volusia parcel id" readonly style="background:#f6f8fa"></div>
- <div><label>Source</label><input id="pfSource" readonly style="background:#f6f8fa"></div>
+ <div class="grid-2 mt-2">
+ <div><label for="pfParcelId">Parcel ID</label><input id="pfParcelId" placeholder="Volusia parcel id" readonly></div>
+ <div><label for="pfSource">Source</label><input id="pfSource" readonly></div>
  </div>
- <p class="hint" style="margin:6px 0 0">FSI map leads use <b>public property-appraiser</b> owner + site address. Phone/email are not on the tax roll — fill after skip-trace or LeadAgent enrich. DNC still applies before dialing.</p>
+ <p class="hint mt-2">FSI map leads use <b>public property-appraiser</b> owner + site address. Phone/email are not on the tax roll — fill after skip-trace or LeadAgent enrich. DNC still applies before dialing.</p>
  </div>
  <div class="sec">
  <h3>Contact &amp; deal</h3>
- <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
- <div><label>Phone</label><input id="pfPhone" placeholder="not on tax roll — enrich"></div>
- <div><label>Email</label><input id="pfEmail" type="email" placeholder="not on tax roll — enrich"></div>
- <div><label>Contact</label><input id="pfContact"></div>
- <div><label>Owner (rep)</label><input id="pfOwner" placeholder="rep username"></div>
- <div><label>Website</label><input id="pfWebsite"></div>
- <div><label id="pfStatusLabel">Status</label><select id="pfStatus"></select></div>
- <div><label>Package</label><input id="pfPackage" placeholder="Basic / Silver / pilot"></div>
- <div><label>Amount ($)</label><input id="pfAmount" type="number" min="0" step="1"></div>
- <div><label>Next follow-up</label><input id="pfFollow" type="datetime-local"></div>
+ <div class="grid-2">
+ <div><label for="pfPhone">Phone</label><input id="pfPhone" placeholder="not on tax roll — enrich"></div>
+ <div><label for="pfEmail">Email</label><input id="pfEmail" type="email" placeholder="not on tax roll — enrich"></div>
+ <div><label for="pfContact">Contact</label><input id="pfContact"></div>
+ <div><label for="pfOwner">Owner (rep)</label><input id="pfOwner" placeholder="rep username"></div>
+ <div><label for="pfWebsite">Website</label><input id="pfWebsite"></div>
+ <div><label id="pfStatusLabel" for="pfStatus">Status</label><select id="pfStatus"></select></div>
+ <div><label for="pfPackage">Package</label><input id="pfPackage" placeholder="Basic / Silver / pilot"></div>
+ <div><label for="pfAmount">Amount ($)</label><input id="pfAmount" type="number" min="0" step="1" class="num"></div>
+ <div><label for="pfFollow">Next follow-up</label><input id="pfFollow" type="datetime-local"></div>
  </div>
  </div>
  <div class="sec">
  <h3>Notes &amp; context</h3>
- <p class="hint" style="margin:0 0 6px">Call notes, DNS lines, and research live here (not on the list grid).</p>
- <textarea id="pfNotes" placeholder="Notes, fitness gaps, next steps…"></textarea>
- <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+ <p class="hint">Call notes, DNS lines and research live here (not on the list grid).</p>
+ <textarea id="pfNotes" aria-label="Notes" placeholder="Notes, fitness gaps, next steps…"></textarea>
+ <div class="btn-row mt-3">
  <button type="button" class="btn p" id="pfSave">Save profile</button>
  <button type="button" class="btn" id="pfRemoveList">Uncheck active cause</button>
+ <span class="spacer"></span>
  <button type="button" class="btn danger" id="pfDelete">Delete forever</button>
  </div>
  </div>
  <div class="sec">
  <h3>Log activity</h3>
- <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
- <div><label>Type</label>
+ <div class="grid-2">
+ <div><label for="pfLogType">Type</label>
  <select id="pfLogType"><option value="call">Call</option><option value="email">Email</option><option value="sms">Text</option><option value="note">Note</option><option value="status">Status</option></select>
  </div>
- <div><label>Outcome</label>
+ <div><label for="pfLogOutcome">Outcome</label>
  <select id="pfLogOutcome">
  <option value="">-</option>
  <option>no_answer</option><option>left_vm</option><option>callback</option>
@@ -591,9 +709,9 @@
  </select>
  </div>
  </div>
- <label>Detail</label>
+ <label for="pfLogDetail">Detail</label>
  <textarea id="pfLogDetail" placeholder="What happened?"></textarea>
- <button type="button" class="btn o" id="pfLogSave" style="margin-top:8px">Log activity</button>
+ <div class="btn-row mt-2"><button type="button" class="btn o" id="pfLogSave">Log activity</button></div>
  </div>
  <div class="sec">
  <h3>Category playbook</h3>
@@ -606,38 +724,49 @@
  </div>
 </div>
 
-<div class="foot">FLOGUARD SALES REV — white-label training build. Leads save in this browser and sync for admin analytics when online. AI uses the shared FLOGUARD SALES REV OpenAI account (no personal keys). Soft cap 50k tokens/user pending admin approval. AI guidance is practice material — verify facts, prices, and business info before repeating them to a customer.</div>
-</div>
+<footer class="foot">FLOGUARD SALES REV — white-label training build. Leads save in this browser and sync for admin analytics when online. AI uses the shared FLOGUARD SALES REV OpenAI account (no personal keys). Soft cap 50k tokens/user pending admin approval. AI guidance is practice material — verify facts, prices, and business info before repeating them to a customer.</footer>
+</main>
+</div><!-- /main-col -->
+
+<!-- Mobile bottom tab bar (shortcuts into #nav; see js/17-shell.js) -->
+<nav class="tabbar" id="tabbar" aria-label="Quick">
+ <button type="button" data-go="leads"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg><span>Leads</span></button>
+ <button type="button" data-go="fsi"><svg class="ic" aria-hidden="true"><use href="#i-map"/></svg><span>Map</span></button>
+ <button type="button" data-go="drafts"><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg><span>Outbound</span></button>
+ <button type="button" data-go="coach"><svg class="ic" aria-hidden="true"><use href="#i-headphones"/></svg><span>Coach</span></button>
+ <button type="button" data-go="more" aria-controls="nav"><svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg><span>More</span></button>
+</nav>
 
 <!-- Token lock overlay -->
-<div id="usageLock">
+<div id="usageLock" role="dialog" aria-modal="true" aria-labelledby="lockTitle">
  <div class="lock-card">
- <h2>AI usage limit reached</h2>
+ <h2 id="lockTitle">AI usage limit reached</h2>
  <p class="sub" id="lockMsg">This account has used its token budget. An admin must approve more usage before AI Coach, Roleplay, and Pitch Review continue.</p>
  <div class="row2">
  <button class="btn p" id="requestUnlockBtn">Request admin approval</button>
  <button class="btn" id="lockDismissBtn">Dismiss</button>
  </div>
- <div class="hint" id="lockStatus" style="margin-top:10px"></div>
+ <div class="hint mt-2" id="lockStatus" role="status"></div>
  </div>
 </div>
 
-<script src="js/01-data.js?v=20261119a"></script>
-<script src="js/02-crm-core.js?v=20261119a"></script>
-<script src="js/03-ai-prompts.js?v=20261119a"></script>
-<script src="js/04-state.js?v=20261119a"></script>
-<script src="js/05-nav.js?v=20261119a"></script>
-<script src="js/06-leads.js?v=20261119a"></script>
-<script src="js/07-chat.js?v=20261119a"></script>
-<script src="js/08-roleplay.js?v=20261119a"></script>
-<script src="js/09-review.js?v=20261119a"></script>
-<script src="js/10-settings.js?v=20261119a"></script>
-<script src="js/11-auth.js?v=20261119a"></script>
-<script src="js/12-admin.js?v=20261119a"></script>
-<script src="js/13-boot.js?v=20261119a"></script>
-<script src="js/14-drafts.js?v=20261119a"></script>
-<script src="js/15-docs.js?v=20261119a"></script>
-<script src="js/16-fsi-map.js?v=20261119a"></script>
+<script src="js/01-data.js?v=20261119b"></script>
+<script src="js/02-crm-core.js?v=20261119b"></script>
+<script src="js/03-ai-prompts.js?v=20261119b"></script>
+<script src="js/04-state.js?v=20261119b"></script>
+<script src="js/05-nav.js?v=20261119b"></script>
+<script src="js/06-leads.js?v=20261119b"></script>
+<script src="js/07-chat.js?v=20261119b"></script>
+<script src="js/08-roleplay.js?v=20261119b"></script>
+<script src="js/09-review.js?v=20261119b"></script>
+<script src="js/10-settings.js?v=20261119b"></script>
+<script src="js/11-auth.js?v=20261119b"></script>
+<script src="js/12-admin.js?v=20261119b"></script>
+<script src="js/13-boot.js?v=20261119b"></script>
+<script src="js/14-drafts.js?v=20261119b"></script>
+<script src="js/15-docs.js?v=20261119b"></script>
+<script src="js/16-fsi-map.js?v=20261119b"></script>
+<script src="js/17-shell.js?v=20261119b"></script>
 </div><!-- /appRoot -->
 </body>
 </html>

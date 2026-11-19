@@ -261,6 +261,16 @@ function scoreCellHtml(l){
  const title=esc('DNS '+ws.total+'/'+ws.grade+(ws.band?(' · '+ws.band):'')+(gaps?(' · '+gaps):''));
  return '<span class="wfs-pill g-'+esc(ws.grade)+'" title="'+title+'">'+esc(String(ws.total))+'/'+esc(ws.grade)+'</span>';
 }
+/** Visual tone for a status pill (presentation only). */
+function statusTone(st){
+ if(CLOSED_STATUSES.has(st)) return 'won';
+ if(LOST_STATUSES.has(st)) return 'lost';
+ if(st==='Quoted') return 'quoted';
+ if(PIPELINE_STATUSES.has(st)) return 'active';
+ if(!st||st==='New') return 'new';
+ if(st==='Archived') return 'muted';
+ return 'touched';
+}
 function render(){
  syncDueFilterUi();
  const ind=document.getElementById('industry').value;
@@ -285,23 +295,28 @@ function render(){
  const cause=activeCause(l);
  const st=getListStatus(l, cause);
  const mntBadge=(view==='Maintenance'||leadLists(l).includes('Maintenance'))?mntDueBadgeHtml(l):'';
- const mgmtBit=(view==='PropertyMgmt'&&l.mgmt_company_name)?('<div style="font-size:10px;color:var(--muted);margin-top:2px">'+esc(l.mgmt_company_name)+'</div>'):'';
+ const mgmtBit=(view==='PropertyMgmt'&&l.mgmt_company_name)?('<div class="lead-sub">'+esc(l.mgmt_company_name)+'</div>'):'';
  const addrBit=(l.address||'').trim()
-  ? ('<div class="lead-addr" style="font-size:11px;color:var(--muted);margin-top:2px;line-height:1.3" title="'+esc(l.address)+'">'+esc(l.address)+'</div>')
-  : '<div class="lead-addr" style="font-size:10.5px;color:#b42318;margin-top:2px">No site address</div>';
+  ? ('<div class="lead-addr" title="'+esc(l.address)+'">'+esc(l.address)+'</div>')
+  : '<div class="lead-addr missing">No site address</div>';
  const contactHint=!(l.phone||'').trim()&&!(l.email||'').trim()
-  ? '<div style="font-size:10px;color:#a2540f;margin-top:2px" title="County tax roll has no phone/email">Needs phone/email enrich</div>'
+  ? '<div class="lead-flag" title="County tax roll has no phone/email">Needs phone/email</div>'
   : '';
  tr.innerHTML=`
- <td class="name row-open"><input value="${esc(l.name)}" data-f="name" placeholder="(owner / business)" title="${esc((l.address||'')+(l.city?(' · '+l.city):'')+(l.industry?(' · '+l.industry):''))}">${addrBit}${mgmtBit}${contactHint}${mntBadge?'<div style="margin-top:3px">'+mntBadge+'</div>':''}</td>
- <td title="Causes: ${esc(leadLists(l).join(', '))} — check/uncheck to work each product separately">${renderCauseChecks(l,{full:false})}</td>
- <td><input value="${esc(l.phone)}" data-f="phone" placeholder="(___)___-____"></td>
- <td><input value="${esc(l.email||'')}" data-f="email" placeholder="email@" title="${esc(l.email||'')}"></td>
- <td class="row-open" style="cursor:pointer" title="Open prospect for score details">${scoreCellHtml(l)}</td>
- <td><select data-f="status" data-cause-status="1" class="status-sel" title="Status for ${esc(cause)}">${STATUSES.map(s=>`<option ${st===s?'selected':''}>${esc(s)}</option>`).join('')}</select><div style="font-size:10px;color:var(--muted);font-weight:600;margin-top:2px">${esc(cause)}</div></td>
- <td style="white-space:nowrap"><button type="button" class="coachbtn openbtn" title="Open profile">Open</button> <button type="button" class="coachbtn" title="Game-plan this call with the AI Coach">Coach</button> <button type="button" class="del" title="Delete forever">✕</button></td>`;
+ <td class="name row-open"><input value="${esc(l.name)}" data-f="name" aria-label="Owner or business name" placeholder="(owner / business)" title="${esc((l.address||'')+(l.city?(' · '+l.city):'')+(l.industry?(' · '+l.industry):''))}">${addrBit}${mgmtBit}${contactHint}${mntBadge?'<div class="lead-due">'+mntBadge+'</div>':''}</td>
+ <td class="cell-causes" title="Causes: ${esc(leadLists(l).join(', '))} — check/uncheck to work each product separately">${renderCauseChecks(l,{full:false})}</td>
+ <td class="cell-phone"><input value="${esc(l.phone)}" data-f="phone" aria-label="Phone" placeholder="Add phone"></td>
+ <td class="cell-email"><input value="${esc(l.email||'')}" data-f="email" aria-label="Email" placeholder="Add email" title="${esc(l.email||'')}"></td>
+ <td class="row-open cell-score" title="Open prospect for score details">${scoreCellHtml(l)}</td>
+ <td class="cell-status" data-st="${esc(statusTone(st))}"><select data-f="status" data-cause-status="1" class="status-sel" aria-label="Status for ${esc(cause)}" title="Status for ${esc(cause)}">${STATUSES.map(s=>`<option ${st===s?'selected':''}>${esc(s)}</option>`).join('')}</select><div class="lead-cause">${esc(cause)}</div></td>
+ <td class="cell-acts"><button type="button" class="coachbtn openbtn" title="Open profile">Open</button> <button type="button" class="coachbtn" title="Game-plan this call with the AI Coach">Coach</button> <button type="button" class="del" title="Delete forever" aria-label="Delete lead forever">✕</button></td>`;
  tb.appendChild(tr);
  });
+ if(!shown){
+  const tr=document.createElement('tr'); tr.className='empty-row';
+  tr.innerHTML='<td colspan="7"><div class="empty-state"><b>'+(state.length?'No leads match these filters':'No leads yet')+'</b><span>'+(state.length?'Clear the search, pick another cause tab, or reset the industry and city filters.':'Add a lead, paste one from Google Maps, or send parcels over from the flood map.')+'</span></div></td>';
+  tb.appendChild(tr);
+ }
  let dl=document.getElementById('indList');
  if(!dl){ dl=document.createElement('datalist'); dl.id='indList'; document.body.appendChild(dl); }
  dl.innerHTML=industries().map(i=>`<option value="${esc(i)}">`).join('');
