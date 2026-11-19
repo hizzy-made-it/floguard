@@ -170,6 +170,11 @@ test('flood map next: claims, events, popup, search, polygons, score breakdown, 
         // --- claims layer on by default, with storm chips
         await page.waitForFunction(() => MN.claims.available === true && MN.claims.rows.size > 0, null, { timeout: 15000 });
         await page.waitForFunction(() => document.querySelectorAll('#fsiClaimsEvents .ev-chip').length >= 4, null, { timeout: 10000 });
+        // R2: on phones the claims controls fold into the Filters panel so the map gets the screen
+        if (vp.name === 'mobile') {
+          assert.equal(await page.isVisible('#fsiClaimsBar'), false, `${tag}: claims bar folded on phones`);
+          await page.click('#fsiFiltersBtn');
+        }
         assert.equal(await page.isVisible('#fsiClaimsBar'), true, `${tag}: claims bar visible`);
         const legend = await page.textContent('#fsiLegend');
         assert.match(legend, /Claims/, `${tag}: legend lists the claims layer`);

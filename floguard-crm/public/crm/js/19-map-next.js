@@ -204,7 +204,7 @@ async function mnClaimsLoad(force){
 function mnClaimsPaint(){
  const c=MN.claims, map=mnMap();
  const rows=[...c.rows.values()];
- c.model=c.available&&rows.length?FSI_PURE.claimsModel(rows,{zone:c.zone, win:c.win, event:!!c.event}):null;
+ c.model=c.available&&rows.length?FSI_PURE.claimsModel(rows,{zone:c.zone, win:c.win, event:!!c.event, dark:(typeof fsiEffectiveTheme==='function'&&fsiEffectiveTheme()==='dark')}):null;
  if(map){
   const polys=[], pts=[];
   if(c.model) c.model.items.forEach(function(it){
@@ -470,6 +470,7 @@ function mnInitialView(){
 let _mnWired=false;
 function mnOnStyleLoad(first){
  mnAddClaimsLayers();
+ if(!first&&MN.claims.rows.size) mnClaimsPaint(); // theme switch: repaint with that theme's ramp
  mnAddPolyLayers();
  mnApplyOpacity('parcels');
  if(_mnWired) return;
@@ -509,7 +510,7 @@ function mnOnMoveEnd(){
  }, 300);
 }
 
-function mnLayersChanged(){ fsiRenderLegend(); mnWriteHash(); }
+function mnLayersChanged(){ fsiRenderLegend(); mnWriteHash(); if(window.mnFiltersCount) window.mnFiltersCount(); }
 
 function mnAfterRefresh(){
  MN.bander=fsiBander(_fsiState.raw);
@@ -619,7 +620,9 @@ function mnRenderWhy(p){
  bd.innerHTML=h;
 }
 
-/* field reports (local: lead_outcomes needs a won/lost/no_show outcome, see docs/handoff/F2.md) */
+/* field reports: kept on this device and sent to /crm/api/lead-outcomes as action 'field_report'
+ * (R1 contract). Anything not acknowledged with {ok:true} (offline, 4xx/5xx, unknown action on an
+ * older server) stays queued (synced:false) and is retried on the next map boot / when back online. */
 function mnReports(){ try{ return JSON.parse(localStorage.getItem(MN_REPORT_KEY)||'{}')||{}; }catch(e){ return {}; } }
 function mnReportFor(id){ if(id==null) return null; return mnReports()[String(id)]||null; }
 function mnSaveReport(id, v){
@@ -628,7 +631,36 @@ function mnSaveReport(id, v){
  if(!v) delete all[k];
  else all[k]={v:v, at:new Date().toISOString(), by:(typeof currentUserName==='function'?currentUserName():'')||''};
  try{ localStorage.setItem(MN_REPORT_KEY, JSON.stringify(all)); }catch(e){}
+ if(v) mnSyncReports();
 }
+let _mnReportSyncing=false;
+async function mnSyncReports(){
+ if(_mnReportSyncing) return;
+ const tok=(typeof getToken==='function')?getToken():''; if(!tok) return;
+ if(typeof navigator!=='undefined'&&navigator.onLine===false) return;
+ _mnReportSyncing=true;
+ try{
+  const all=mnReports();
+  for(const k of Object.keys(all)){
+   const r=all[k]; if(!r||r.synced) continue;
+   const body={action:'field_report', parcel_id:k, report:r.v==='water'?'water_confirmed':'not_a_problem'};
+   const lead=(typeof state!=='undefined'&&Array.isArray(state))?state.find(function(l){ return l&&String(l.parcel_id||'')===k&&(l.uuid||l.server_id!=null); }):null;
+   if(lead) body.lead_id=lead.uuid||lead.server_id;
+   if(r.by) body.note='Reported by '+r.by+' on '+String(r.at).slice(0,10);
+   let ok=false;
+   try{
+    const res=await fetch('/crm/api/lead-outcomes',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify(body)});
+    const j=res.ok?await res.json().catch(function(){ return null; }):null;
+    ok=!!(j&&j.ok===true);
+   }catch(e){ ok=false; }
+   if(!ok) break; // keep the queue; try again later
+   const now=mnReports(); if(now[k]&&now[k].at===r.at){ now[k].synced=true; try{ localStorage.setItem(MN_REPORT_KEY, JSON.stringify(now)); }catch(e){} }
+  }
+ }finally{ _mnReportSyncing=false; }
+ const p=_fsiState.selectedId&&mnFindParcel(_fsiState.selectedId); if(p) mnRenderReport(p);
+}
+window.addEventListener('online', function(){ mnSyncReports(); });
+setTimeout(function(){ mnSyncReports(); }, 4000);
 function mnFieldReportNote(id){
  const r=mnReportFor(id); if(!r) return '';
  return 'Field report: '+(r.v==='water'?'water confirmed on site':'not a problem on site')+' ('+String(r.at).slice(0,10)+(r.by?', '+r.by:'')+').';
@@ -641,7 +673,7 @@ function mnRenderReport(p){
   b.classList.toggle('on', on); b.setAttribute('aria-pressed', on?'true':'false');
  });
  const msg=mnEl('fsiDrReportMsg');
- if(msg) msg.textContent=r?('Saved on this device '+String(r.at).slice(0,10)+'. It goes into the lead notes when you add this parcel.'):'';
+ if(msg) msg.textContent=r?((r.synced?'Sent to the team ':'Saved on this device ')+String(r.at).slice(0,10)+(r.synced?'':', sends when the server accepts it')+'. It goes into the lead notes when you add this parcel.'):'';
 }
 
 /* ----------------------------------------------------------------------------------------
@@ -995,4 +1027,48 @@ function mnSyncOpInputs(){
 
  // Hash on list-side filter changes (16 handles the filtering itself)
  ['fsiMinScore','fsiLimit','fsiCityFilter'].forEach(function(id){ mnEl(id)?.addEventListener('change',function(){ mnWriteHash(); }); });
+})();
+
+/* ----------------------------------------------------------------------------------------
+ * R2: Filters popover (score, size, overlays) + Esc closes the desktop side sheet.
+ * ---------------------------------------------------------------------------------------- */
+(function mnFiltersBoot(){
+ const bar=document.getElementById('fsiToolbar'), btn=document.getElementById('fsiFiltersBtn'), pop=document.getElementById('fsiControls');
+ if(!bar||!btn||!pop) return;
+ function count(){
+  let n=0;
+  const v=function(id){ const el=document.getElementById(id); return el?el:null; };
+  if(Number(v('fsiMinScore')?.value||0)>0) n++;
+  if(String(v('fsiLimit')?.value||'200')!=='200') n++;
+  if(v('fsiNfhl')?.checked) n++;
+  if(v('fsiClaims')&&!v('fsiClaims').checked) n++;
+  if(v('fsiClaimHeat')?.checked) n++;
+  const c=document.getElementById('fsiFiltersCount');
+  if(c){ c.hidden=!n; c.textContent=n?String(n):''; }
+  btn.setAttribute('aria-label', 'Filters'+(n?' ('+n+' active)':''));
+ }
+ function open(on){
+  bar.classList.toggle('filters-open', on);
+  btn.setAttribute('aria-expanded', on?'true':'false');
+  if(on){ const f=pop.querySelector('input'); if(f&&!window.matchMedia('(max-width: 820px)').matches) f.focus({preventScroll:true}); }
+ }
+ btn.addEventListener('click', function(){ open(!bar.classList.contains('filters-open')); });
+ pop.addEventListener('input', count); pop.addEventListener('change', count);
+ document.addEventListener('mousedown', function(e){
+  if(!bar.classList.contains('filters-open')) return;
+  if(window.matchMedia('(max-width: 820px)').matches) return; // inline panel on phones
+  if(!e.target.closest('.fsi-filter-wrap')) open(false);
+ });
+ document.addEventListener('keydown', function(e){
+  if(e.key!=='Escape') return;
+  if(bar.classList.contains('filters-open')){ open(false); btn.focus(); return; }
+  // desktop side sheet: Esc closes the parcel detail and returns to the list
+  if(!mnIsSheet() && _fsiState.selectedId && document.documentElement.getAttribute('data-panel')==='fsi'
+     && !e.target.closest('#fsiMapSearch') && !document.querySelector('.fg-modal-bg,.est-bg:not([hidden]),#profileDrawer.open')){
+   const id=_fsiState.selectedId; fsiSelect(null);
+   const row=document.querySelector('#fsiList .fsi-row[data-id="'+CSS.escape(String(id))+'"]'); if(row){ row.setAttribute('tabindex','-1'); row.focus({preventScroll:true}); }
+  }
+ });
+ count();
+ window.mnFiltersCount=count;
 })();

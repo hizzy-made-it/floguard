@@ -402,9 +402,9 @@ function fsiRenderList(){
   box.innerHTML='<div class="empty-state">'+(_fsiState.bg
    ? 'No loaded parcels in this block group. Press <b>Search this area</b> to load the parcels on screen, or remove the block-group filter.'
    : _fsiState.preset==='storm'
-   ? (_fsiState.storm&&_fsiState.storm.error?esc(_fsiState.storm.error):'No parcels where it rained hard yesterday. Dry day, or the rainfall cron has not run.')
+   ? (_fsiState.storm&&_fsiState.storm.error?esc(_fsiState.storm.error):'No parcels where it rained hard yesterday. Either it was a dry day or yesterday\'s rainfall has not been loaded yet.')
    : _fsiState.preset==='must'
-   ? 'No Must-band parcels in this load. Run score-must-have, or raise Max parcels / switch to Top risk.'
+   ? 'No Must-dial parcels in this load. Raise Max parcels under Filters, or switch to Top risk.'
    : 'No parcels match filters. Clear presets or load Top countywide.')+'</div>';
   fsiSyncBulkBar();
   return;
@@ -519,7 +519,7 @@ function fsiRenderBreakdownLegacy(p){
   }).join('');
  }else{
   bd.style.display='block';
-  bd.innerHTML='<h4>Terrain factors</h4><p class="hint" style="margin:0">Run enrich-dem-lite for TWI/HAND proxies, or full LiDAR for engineering-grade terrain.</p>';
+  bd.innerHTML='<h4>Terrain factors</h4><p class="hint" style="margin:0">Terrain detail has not been computed for this parcel yet.</p>';
  }
 }
 
@@ -554,8 +554,8 @@ function fsiRefreshView(fit){
   if(_fsiState.source==='fixtures'||hasFix){
    ban.classList.add('on');
    ban.textContent=_fsiState.source==='fixtures'
-    ? 'Showing demo FIXTURE parcels (bundled or seed). Replace with county ingest for production dial lists.'
-    : 'Some FIXTURE-* rows are in this set. Real appraiser parcels will use non-FIXTURE ids.';
+    ? 'Demo data: these are sample parcels, not real owners. Real county parcels appear once the county import has run.'
+    : 'Demo data: some parcels in this set are samples, not real owners.';
   }else ban.classList.remove('on');
  }
  const ls=document.getElementById('fsiListStats');
@@ -614,7 +614,7 @@ async function fsiLoad(action){
  if(action==='viewport'){
   const b=_fsiMap.getBounds();
   if(b.getEast()-b.getWest()>1 || b.getNorth()-b.getSouth()>1){
-   fsiSay('Zoom in — this view is wider than 1° and the server will refuse it.');
+   fsiSay('Zoom in a little: this view is too wide to search.');
    return;
   }
   payload.bbox=[b.getWest(),b.getSouth(),b.getEast(),b.getNorth()];
@@ -644,9 +644,9 @@ async function fsiLoad(action){
     : ('No rain cell had ≥ '+st.minMm+' mm yesterday — nothing to storm-dial today.'), true);
   }else if(!_fsiState.raw.length){
    fsiSay(preset==='must'
-    ? 'No Must-band parcels yet. Run npm run score-must-have (keeps commercial + condos).'
+    ? 'No Must-dial parcels yet. Scores have not been computed for this county; try Top risk.'
     : (action==='top'
-     ? 'No parcels scored yet. Run enrich-static-lite + score-must-have, or wait for ingest.'
+     ? 'No parcels scored yet. Scores appear once the county data has been processed.'
      : 'No parcels in this view above the score filter.'));
   }else{
    const mustNote=preset==='must'?' · Must dial top '+_fsiState.raw.length+(data.truncated?' (raise Max parcels for more)':''):'';
@@ -655,10 +655,10 @@ async function fsiLoad(action){
  }catch(err){
   if(err&&err.name==='AbortError') return;
   if(action==='storm'){
-   _fsiState.raw=[]; _fsiState.storm={error:'Storm list unavailable: '+(err.message||String(err))+'. It needs the rainfall cells (fsi/sql/009 + 010) and the daily rain cron.'};
+   _fsiState.raw=[]; _fsiState.storm={error:'Storm list is not available yet: yesterday\'s rainfall has not been loaded. Use Must dial for now.'};
    fsiRefreshView(false);
    fsiSay(_fsiState.storm.error);
-  }else fsiSay(err.message||String(err));
+  }else fsiSay('Could not load parcels'+(err&&err.message&&!/fetch|network/i.test(err.message)?' ('+String(err.message).slice(0,80)+')':'')+'. Check your connection and try again.');
  }
  if(ctl&&_fsiLoadCtl===ctl) _fsiLoadCtl=null;
  _fsiMoved=false; fsiSyncSearchBtn();
@@ -801,7 +801,7 @@ function fsiInit(){
  const el=document.getElementById('fsiMap');
  if(!el) return null;
  if(typeof maplibregl==='undefined'){
-  fsiSay('Map library did not load. Check public/crm/vendor/maplibre-gl.js.');
+  fsiSay('The map could not start. Reload the page; if it keeps happening, tell the admin.');
   return null;
  }
  const view=(typeof mnInitialView==='function'&&mnInitialView())||null;
@@ -822,13 +822,22 @@ function fsiInit(){
  });
  _fsiMap.on('error',function(ev){
   const msg=String((ev&&ev.error&&ev.error.message)||'');
-  if(/style/i.test(msg)) fsiSay('Basemap failed to load: '+msg);
+  if(!/style/i.test(msg)) return;
+  // R2: no basemap (weak signal in the truck, tile host down) must not mean no parcels. Fall back
+  // to a plain background style once, so our layers, the ranked list and the detail still work.
+  if(!_fsiStyleLoads&&!_fsiState.blankStyle){
+   _fsiState.blankStyle=true;
+   const dark=fsiEffectiveTheme()==='dark';
+   _fsiStyleUrl='blank';
+   _fsiMap.setStyle({version:8,glyphs:'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',sources:{},layers:[{id:'bg',type:'background',paint:{'background-color':dark?'#121826':'#EEF1F5'}}]},{diff:false});
+  }
+  fsiSay('Street map could not load (check your connection). Parcels still show.');
  });
  return _fsiMap;
 }
 /** Swap the basemap when the app theme changes; style.load rebuilds our layers from state. */
 function fsiSyncBasemap(){
- if(!_fsiMap) return;
+ if(!_fsiMap||_fsiState.blankStyle) return;
  const want=fsiStyleUrl();
  if(want===_fsiStyleUrl) return;
  _fsiStyleUrl=want;
@@ -895,19 +904,35 @@ function fsiLeadFromParcel(p){
   lists_touched:true,
   suggested_causes:sugs
  };
+ // R2: carry the map's numbers as fields too (not only in the notes), so the leads table can rank
+ // by flood score and the server row keeps the claims/terrain context. Neighbourhood aggregates only.
+ const keep=['fsi_live','fsi_static','must_have_score','must_have_band','fema_zone','hsg','claim_heat','claim_count_10y',
+  'block_group','claim_bg_count_10y','claim_bg_zone_x_10y','claim_bg_rate','claim_bg_last_year','claim_bg_top_event',
+  'fsi_confidence','model_version','nbr_rel_m','street_rel_m','wt_depth_m','drain_class','lat','lon'];
+ keep.forEach(function(k){ if(p[k]!=null&&p[k]!=='') lead[k]=p[k]; });
+ const rep=(typeof mnReportFor==='function')?mnReportFor(p.parcel_id):null;
+ if(rep) lead.field_report={v:rep.v, at:rep.at, by:rep.by||''};
  lists.forEach(function(c){ setListStatus(lead, c, 'New'); });
  return lead;
+}
+/** Existing lead for a parcel (R2: adding the same parcel twice made duplicate leads). */
+function fsiLeadForParcel(pid){
+ if(!pid) return null;
+ const k=String(pid);
+ return state.find(function(l){ return l&&String(l.parcel_id||'')===k; })||null;
 }
 async function fsiAddLead(){
  const p=_fsiState.filtered.find(function(x){ return x.parcel_id===_fsiState.selectedId; })
   || _fsiState.raw.find(function(x){ return x.parcel_id===_fsiState.selectedId; });
  if(!p){ fsiDrMsg('Select a parcel first.','err'); return; }
+ const had=fsiLeadForParcel(p.parcel_id);
+ if(had){ fsiDrMsg('Already in leads as '+(had.name||'this parcel')+'.','ok'); return; }
  const lead=fsiLeadFromParcel(p);
  state.unshift(lead);
  saveLeads();
  if(typeof render==='function') render();
  const addrNote=lead.address?(' · '+lead.address):' · (no address on parcel)';
- fsiDrMsg('Added real tax-roll lead · '+leadLists(lead).join(', ')+addrNote+'. Phone/email not on appraiser data — enrich before dialing.','ok');
+ fsiDrMsg('Added to leads'+addrNote+'. The county record has no phone or email: enrich, then scrub DNC before dialing.','ok');
 }
 function fsiBulkAddLeads(){
  const ids=Object.keys(_fsiState.selected).filter(function(id){ return _fsiState.selected[id]; });
@@ -916,7 +941,7 @@ function fsiBulkAddLeads(){
  ids.forEach(function(id){
   const p=_fsiState.filtered.find(function(x){ return String(x.parcel_id)===String(id); })
    || _fsiState.raw.find(function(x){ return String(x.parcel_id)===String(id); });
-  if(!p) return;
+  if(!p||fsiLeadForParcel(p.parcel_id)) return;
   const lead=fsiLeadFromParcel(p);
   if(lead.address) withAddr++;
   state.unshift(lead);
@@ -926,7 +951,7 @@ function fsiBulkAddLeads(){
  if(typeof render==='function') render();
  _fsiState.selected=Object.create(null);
  fsiRenderList();
- fsiSay('<b>'+n+'</b> tax-roll leads added · <b>'+withAddr+'</b> with site address · phone/email need enrich · DNC before dial.',true);
+ fsiSay('<b>'+n+'</b> leads added'+(ids.length>n?' ('+(ids.length-n)+' already in leads)':'')+' · <b>'+withAddr+'</b> with a site address · enrich for phones, then scrub DNC before dialing.',true);
 }
 function fsiBulkExportCsv(){
  const ids=Object.keys(_fsiState.selected).filter(function(id){ return _fsiState.selected[id]; });
@@ -1083,3 +1108,10 @@ document.getElementById('nav')?.addEventListener('click',function(e){
  else if(_fsiMap){ _fsiMap.resize(); }
 });
 
+/** R2: the Leads storm banner ("Open storm list") lands on the Storm list preset (contract in F1.md). */
+window.fsiShowStorm=function(){
+ const b=document.querySelector('#fsiPresets button[data-preset="storm"]');
+ if(!b) return;
+ if(_fsiState.preset==='storm'&&_fsiMap){ fsiLoad('storm'); return; }
+ b.click();
+};
