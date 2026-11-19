@@ -27,7 +27,6 @@
 
 /* ---------- storm banner ---------- */
 .storm-banner{display:flex;align-items:center;gap:12px;margin:0 0 var(--s-4);padding:10px 12px 10px 14px;border:1px solid var(--info-line);background:var(--info-soft);border-radius:var(--r-lg);color:var(--text);font-size:var(--fs-13)}
-.storm-banner[hidden]{display:none}
 .storm-banner .sb-ic{display:inline-flex;width:30px;height:30px;align-items:center;justify-content:center;border-radius:var(--r-md);background:var(--surface);color:var(--info);flex:none;box-shadow:var(--sh-1)}
 .storm-banner .sb-ic .ic{width:18px;height:18px}
 .storm-banner .sb-txt{flex:1;min-width:0;line-height:1.45}
@@ -98,7 +97,6 @@ button.fn-tile:focus-visible{outline:none;box-shadow:var(--focus-ring)}
 .fchip.fc-stage{padding:0 2px 0 0}
 .fchip.fc-stage select{height:26px!important;border:0;background-color:transparent;font-size:var(--fs-12);font-weight:560;color:inherit;padding:0 26px 0 10px;box-shadow:none!important}
 .fchip.fc-clear{border-style:dashed}
-.fchip[hidden]{display:none}
 .fc-sort{margin-left:auto}
 .fc-sort select{height:28px;font-size:var(--fs-12);border-radius:var(--r-md)}
 
@@ -108,7 +106,6 @@ button.fn-tile:focus-visible{outline:none;box-shadow:var(--focus-ring)}
 .view-toggle button .ic{width:15px;height:15px}
 .view-toggle button.on::after{display:none}
 .bulk-bar{position:sticky;top:calc(var(--topbar-h) + 6px);z-index:20;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 var(--s-2);padding:8px 10px 8px 14px;background:var(--surface);border:1px solid var(--action-soft-line);border-radius:var(--r-lg);box-shadow:var(--sh-3);animation:popIn var(--t-fast) var(--ease)}
-.bulk-bar[hidden]{display:none}
 .bulk-bar>b{font-size:var(--fs-13);margin-right:4px}
 .bulk-bar select,.bulk-bar input{height:28px;font-size:var(--fs-12)}
 .bulk-owner{display:inline-flex;gap:4px}
@@ -150,7 +147,6 @@ button.fn-tile:focus-visible{outline:none;box-shadow:var(--focus-ring)}
 /* ---------- board ---------- */
 #p-leads.is-board .table-head .stats{flex:1}
 .board{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(252px,1fr);gap:var(--s-3);overflow-x:auto;padding:2px 2px var(--s-3);scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;align-items:start}
-.board[hidden]{display:none}
 .bd-col{display:flex;flex-direction:column;min-width:0;background:var(--surface-sunken);border:1px solid var(--line);border-radius:var(--r-lg);scroll-snap-align:start;max-height:calc(100dvh - var(--topbar-h) - 120px);transition:border-color var(--t-fast) var(--ease),background var(--t-fast) var(--ease)}
 .bd-col.drop-on{border-color:var(--action);background:var(--action-soft);box-shadow:0 0 0 3px var(--action-soft)}
 .bd-head{display:flex;align-items:center;gap:6px;padding:10px 10px 8px 12px;position:sticky;top:0}
@@ -182,7 +178,6 @@ button.fn-tile:focus-visible{outline:none;box-shadow:var(--focus-ring)}
 
 /* ---------- drawer additions ---------- */
 .drawer .ext-actions{display:flex;flex-wrap:wrap;gap:6px;padding:4px 20px 0}
-.drawer .ext-actions[hidden]{display:none}
 .drawer .actbar .btn.is-blocked{border-style:dashed;color:var(--text-3);background:var(--surface-sunken);opacity:1}
 .drawer .actbar .btn.is-blocked:hover{color:var(--danger);border-color:var(--danger-line);background:var(--danger-soft)}
 .act-blocked{display:flex;align-items:flex-start;gap:8px;width:100%;padding:8px 10px;border-radius:var(--r-md);background:var(--danger-soft);border:1px solid var(--danger-line);font-size:var(--fs-12);color:var(--text);line-height:1.45}
@@ -266,7 +261,7 @@ button.fn-tile:focus-visible{outline:none;box-shadow:var(--focus-ring)}
    breaks the sticky sidebar when the page is scrolled (affects the lead drawer too). */
 .drawer-open body,.fg-modal-open body{overflow:visible}
 html.drawer-open,html.fg-modal-open{overflow:hidden}
-.fg-modal-bg{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(11,15,26,.48);animation:fadeIn var(--t) var(--ease)}
+.fg-modal-bg{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--scrim);animation:fadeIn var(--t) var(--ease)}
 .fg-modal-bg.out{opacity:0;transition:opacity 120ms var(--ease)}
 .fg-modal{display:flex;flex-direction:column;width:min(560px,100%);max-height:min(88dvh,820px);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-xl);box-shadow:var(--sh-4);animation:modalIn var(--t-slow) var(--ease)}
 .fg-modal--sm{width:min(420px,100%)}
@@ -438,4 +433,47 @@ kbd{display:inline-flex;align-items:center;justify-content:center;min-width:22px
 }
 @media print{
  .storm-banner,.funnel-strip,.today-strip,.filter-chips,.bulk-bar,.board,.view-toggle,.cell-sel,.th-sel,.ph-btns{display:none!important}
+}
+
+/* ---------- R2: denser Leads header so the list starts above the fold ---------- */
+#p-leads .page-head .sub{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;max-width:96ch}
+.funnel-strip{margin-bottom:var(--s-2)}
+.fn-tile{padding:8px 12px 9px;gap:2px}
+.fn-n{font-size:var(--fs-18)}
+.today-strip{margin-bottom:var(--s-3)}
+.td-item{padding-top:6px;padding-bottom:6px}
+.maps--after{margin-top:var(--s-4)}
+@media (max-width:1180px) and (min-width:1001px){
+ .funnel-strip{grid-template-columns:minmax(0,1.5fr) repeat(4,minmax(0,1fr))}
+ .funnel-strip .fn-pipe{grid-column:auto}
+ .fn-s{display:none}
+}
+@media (max-width:1000px) and (min-width:821px){
+ .funnel-strip{display:flex;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity}
+ .funnel-strip::-webkit-scrollbar{display:none}
+ .fn-tile{flex:0 0 auto;min-width:160px}
+ .funnel-strip .fn-pipe{min-width:300px}
+}
+@media (max-width:820px){
+ #p-leads .page-head .sub{display:none}
+ .fn-legend{flex-wrap:nowrap;overflow:hidden}
+}
+
+/* ---------- R2: drawer action row (Call · Text · Email · extensions · More) ---------- */
+.drawer .act-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:12px 20px 6px}
+.drawer .act-row .actbar,.drawer .act-row .ext-actions{display:contents}
+.drawer .act-row .btn{height:34px;padding:0 12px;font-size:var(--fs-13)}
+.drawer .act-row .ext-actions .btn{order:1}
+.drawer .act-row .act-more{order:2;margin-left:auto}
+.drawer .act-row .act-more summary{list-style:none}
+.drawer .act-row .act-more summary::-webkit-details-marker{display:none}
+.drawer .act-row .act-more .menu-pop{right:0;min-width:220px}
+.drawer .act-row .act-msg,.drawer .act-row .act-blocked{order:3;flex:1 1 100%}
+.drawer .act-row .btn.is-off,.menu-item.is-off{color:var(--text-3)}
+.badge.badge--on{background:var(--action-soft);border-color:var(--action-soft-line);color:var(--action-text)}
+@media (max-width:820px){
+ .drawer .act-row{padding:10px 16px 6px}
+ .drawer .act-row .btn{height:44px;flex:1 1 calc(25% - 6px);justify-content:center}
+ .drawer .act-row .act-more{margin-left:0;flex:1 1 calc(25% - 6px)}
+ .drawer .act-row .act-more summary{width:100%}
 }

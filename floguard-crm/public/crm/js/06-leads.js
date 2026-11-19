@@ -130,7 +130,7 @@ function renderFitnessCard(l){
  const ws=resolveWebsiteScore(l);
  if(!ws){
  el.hidden=true;
- el.innerHTML='<div class="wfs-empty">No Drainage Need Score yet. Run <code>leadagent score</code>, then sync/import — or log <code>DNS 72/B (urgent) | standing water 2+ days; crawlspace damp</code> in notes.</div>';
+ el.innerHTML='<div class="wfs-empty">No Drainage Need Score yet.'+(leadFloodScore(l)!=null?' Flood score from the map: <b>'+esc(String(Math.round(leadFloodScore(l))))+'</b> (a call-list rank, not an inspection).':'')+' After talking to the owner, note it in the lead notes as <i>DNS 72/B</i> with what they described (for example, standing water 2+ days).</div>';
  el.hidden=false;
  return;
  }
@@ -252,14 +252,22 @@ function refreshCityFilter(){
  sel.innerHTML='<option value="">All cities</option>'+cities().map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
  if([...sel.options].some(o=>o.value===cur)) sel.value=cur;
 }
+/** Flood score carried from the map (must-have score, else live FSI), or null. R2. */
+function leadFloodScore(l){
+ const m=Number(l&&l.must_have_score), f=Number(l&&l.fsi_live);
+ if(l&&l.must_have_score!=null&&isFinite(m)) return m;
+ if(l&&l.fsi_live!=null&&isFinite(f)) return f;
+ return null;
+}
 function scoreCellHtml(l){
  const ws=resolveWebsiteScore(l);
- const hasWeb=!!websiteHref(l.website||'');
- if(!hasWeb && !ws){
- return '<span class="wfs-pill hot" title="Urgent drainage need — active flooding signals in notes/score">HOT</span>';
- }
  if(!ws){
- return '<span class="wfs-pill none" title="No drainage score yet — run leadagent score or log DNS in notes">—</span>';
+ const fs=leadFloodScore(l);
+ if(fs!=null){
+  const tone=fs>=70?'hot':fs>=45?'g-C':'g-E';
+  return '<span class="wfs-pill '+tone+'" title="Flood score from the map (terrain, soil, zone, rain). A call-list rank, not an inspection.">'+esc(String(Math.round(fs)))+'</span>';
+ }
+ return '<span class="wfs-pill none" title="No score yet. Leads added from the flood map carry their flood score; others get a Drainage Need Score after an assessment.">—</span>';
  }
  const gaps=(ws.gaps||[]).slice(0,3).join('; ');
  const title=esc('DNS '+ws.total+'/'+ws.grade+(ws.band?(' · '+ws.band):'')+(gaps?(' · '+gaps):''));
@@ -692,6 +700,8 @@ async function fsiBulkAddAndEnrich(){
   const p=_fsiState.filtered.find(function(x){ return String(x.parcel_id)===String(id); })
    || _fsiState.raw.find(function(x){ return String(x.parcel_id)===String(id); });
   if(!p) return;
+  const had=(typeof fsiLeadForParcel==='function')?fsiLeadForParcel(p.parcel_id):null;
+  if(had){ added.push(had); return; } // already a lead: enrich it rather than duplicate it (R2)
   const lead=fsiLeadFromParcel(p);
   state.unshift(lead);
   added.push(lead);

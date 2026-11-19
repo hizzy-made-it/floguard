@@ -67,7 +67,7 @@ $('chipStage')&&$('chipStage').addEventListener('change', function(e){ V.chips.s
 
 /* ---------------- sorting ---------------- */
 const STAGE_ORDER={new:0,contacted:1,assessment_booked:2,estimate_sent:3,won:4,nurture:5,lost:6};
-function scoreVal(l){ const ws=resolveWebsiteScore(l); if(ws) return Number(ws.total)||0; return (!websiteHref(l.website||''))?101:-1; }
+function scoreVal(l){ const ws=resolveWebsiteScore(l); if(ws) return Number(ws.total)||0; const f=(typeof leadFloodScore==='function')?leadFloodScore(l):null; return f!=null?f:-1; }
 function phoneRank(l){ const p=FG.phone.best(l); if(p){ const s=FG.phone.state(p,l); return s.scrub==='scrubbed'?0:1; } return FG.phone.list(l).length?2:3; }
 function dueVal(l){ const t=FG.tasks.of(l); return t?String(t.due_at):'9999'; }
 V.sortLeads=function(list){

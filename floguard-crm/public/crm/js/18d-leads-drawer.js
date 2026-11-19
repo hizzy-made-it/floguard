@@ -150,7 +150,7 @@ function paintActBar(l){
    b.setAttribute('aria-disabled','true');
    b.classList.add('is-blocked');
    b.title=s.reason+' Send mail or a door hanger instead.';
-   if(!b.querySelector('.ic')) b.insertAdjacentHTML('afterbegin', FG.icon('ban'));
+   const u=b.querySelector('.ic use'); if(u) u.setAttribute('href','#i-ban'); else if(!b.querySelector('.ic')) b.insertAdjacentHTML('afterbegin', FG.icon('ban'));
   }
  });
  if(p && FG.phone.state(p,l).blocked && !bar.querySelector('.act-blocked')){
