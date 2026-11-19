@@ -1,0 +1,18 @@
+{
+  "_note": "ASSUMED shape — recorded from BatchData docs memory, NOT from a live response. See mapBatchDataResponse().",
+  "status": { "code": 200, "text": "OK" },
+  "results": {
+    "persons": [
+      {
+        "name": { "first": "John", "last": "Smith", "full": "John Smith" },
+        "phoneNumbers": [
+          { "number": "3865550101", "type": "Mobile", "carrier": "AT&T", "tested": true, "reachable": true, "dnc": false, "tcpa": false, "score": 90 },
+          { "number": "3865550102", "type": "Land Line", "reachable": true, "dnc": true, "tcpa": false, "score": 60 },
+          { "number": "3865550103", "type": "VoIP", "reachable": true, "dnc": false, "tcpa": true, "score": 40 },
+          { "number": "3865550104", "type": "Mobile", "reachable": false }
+        ],
+        "emails": [{ "email": "john.smith@gmail.com", "tested": true }]
+      }
+    ]
+  }
+}
