@@ -19,10 +19,13 @@
 -- Written to the table by api/academy-leads.js via the service role (PostgREST).
 -- Every table below: RLS on, no anon/authenticated access, service_role only.
 
-create extension if not exists pgcrypto;  -- harmless; gen_random_uuid() is core in PG13+
+-- No pgcrypto needed: gen_random_uuid() is core since PG13 (the earlier `create extension pgcrypto` was removed;
+-- it could create the extension in schema public and trip linter 0014, or fail for a role without CREATE on the database).
 
+-- Same body as the helper in 007; re-declared so 017 stands alone. `set search_path` clears linter 0011.
 create or replace function public.touch_updated_at()
 returns trigger language plpgsql
+set search_path = public
 as $$ begin new.updated_at := now(); return new; end $$;
 
 -- ---------------------------------------------------------------------------
@@ -82,8 +85,9 @@ alter table public.leads add column if not exists created_at        timestamptz 
 -- re-running this file can never overwrite a stage a rep moved by hand.
 do $$
 begin
-  if not exists (select 1 from information_schema.columns
-                 where table_schema = 'public' and table_name = 'leads' and column_name = 'stage') then
+  -- pg_attribute, not information_schema.columns: the latter hides columns the current role cannot see.
+  if not exists (select 1 from pg_attribute
+                 where attrelid = 'public.leads'::regclass and attname = 'stage' and not attisdropped) then
     alter table public.leads add column stage text not null default 'new';
     -- Legacy per-cause status -> stage (spec mapping). The API also derives stage across
     -- list_status; this backfill uses the primary status only.
@@ -115,6 +119,7 @@ update public.leads set parcel_id = null where parcel_id is not null and btrim(p
 -- numeric for the existing front end. Explicit legacy_ids are never touched.
 create or replace function public.leads_assign_legacy_id()
 returns trigger language plpgsql
+set search_path = public
 as $$
 begin
   if new.legacy_id is null or btrim(new.legacy_id) = '' then
@@ -133,7 +138,7 @@ drop trigger if exists leads_touch_updated_at_trg on public.leads;
 create trigger leads_touch_updated_at_trg before update on public.leads
   for each row execute function public.touch_updated_at();
 
--- Indexes. parcel_id uniqueness (live rows only, blanks excluded): created ONLY if no
+-- Indexes. parcel_id uniqueness (live rows only, NULL and blank excluded): created ONLY if no
 -- duplicates exist right now. If duplicates exist the migration does NOT fail: it makes
 -- a plain index, raises a NOTICE listing the count, and the API still dedupes at app
 -- level (api matches by parcel_id before inserting). Resolve the duplicates, then
@@ -146,11 +151,12 @@ begin
   end if;
   select count(*) into dup from (
     select parcel_id from public.leads
-     where parcel_id is not null and deleted_at is null
+     where parcel_id is not null and btrim(parcel_id) <> '' and deleted_at is null
      group by parcel_id having count(*) > 1) d;
   if dup = 0 then
     create unique index leads_parcel_id_uidx on public.leads (parcel_id)
-      where parcel_id is not null and deleted_at is null;
+      where parcel_id is not null and btrim(parcel_id) <> '' and deleted_at is null;
+    drop index if exists public.leads_parcel_id_idx;  -- the stop-gap index from an earlier run (duplicates since resolved)
   else
     raise notice 'leads: % duplicate parcel_id value(s) among live rows; leads_parcel_id_uidx NOT created. Using non-unique index leads_parcel_id_idx; the API dedupes at app level. Fix duplicates and re-run 017.', dup;
     create index if not exists leads_parcel_id_idx on public.leads (parcel_id) where parcel_id is not null;
@@ -262,6 +268,7 @@ create trigger lead_estimates_touch_updated_at_trg before update on public.lead_
 alter table public.lead_estimates enable row level security;
 revoke all on table public.lead_estimates from anon, authenticated;
 grant select, insert, update, delete on table public.lead_estimates to service_role;
+revoke all on sequence public.lead_estimate_number_seq from anon, authenticated;  -- Supabase default privileges grant these
 grant usage, select on sequence public.lead_estimate_number_seq to service_role;
 
 create table if not exists public.lead_jobs (
@@ -313,8 +320,11 @@ end $$;
 -- ---------------------------------------------------------------------------
 -- F. Views for the dashboard (read via service role; no anon/authenticated access)
 -- ---------------------------------------------------------------------------
+-- security_invoker (PG15+, Supabase runs 15/17): the views run with the caller's privileges, so
+-- they can never be a back door around the table grants/RLS (linter 0010). service_role has
+-- BYPASSRLS plus table grants, so PostgREST access through service_role is unchanged.
 -- Funnel: live leads per stage. Stages with zero leads are absent; the API fills zeros.
-create or replace view public.lead_funnel as
+create or replace view public.lead_funnel with (security_invoker = true) as
   select stage,
          count(*)::int                                   as leads,
          coalesce(sum(amount), 0)::numeric               as amount
@@ -324,7 +334,7 @@ create or replace view public.lead_funnel as
 
 -- Open tasks due today or overdue, "today" being the America/New_York calendar day
 -- (the business is in Daytona Beach). bucket = 'overdue' | 'today'.
-create or replace view public.lead_tasks_due as
+create or replace view public.lead_tasks_due with (security_invoker = true) as
   select t.id, t.lead_id, t.type, t.due_at, t.note, t.created_by, t.is_next_action,
          case when t.due_at < (date_trunc('day', now() at time zone 'America/New_York') at time zone 'America/New_York')
               then 'overdue' else 'today' end            as bucket,
