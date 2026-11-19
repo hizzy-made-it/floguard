@@ -254,3 +254,81 @@ export function watchErrors(page) {
   return errors;
 }
 export { todayAt };
+
+/**
+ * One stub for the whole integrated app (R2 walkthrough + XSS test):
+ * leads (FakeLeadsServer), enrich, the full fsi-parcels contract from the demo fixtures shaped by the
+ * real API helpers (claims, events, polygons, search, storm), lead-outcomes (incl. field_report),
+ * drafts, admin, chat, and estimates through the real handler when opts.estimates is given
+ * ({ handler, makeReqRes }).
+ * opts: { leads, enrich, calls, drafts, admin, searchExtra(parcels), parcelMap(p), outcomes(body) -> [status, json], chat }
+ */
+export async function stubAll(context, opts) {
+  const fx = await import(pathToFileURL(path.join(root, 'server/lib/fsi-fixtures.js')).href);
+  const api = await import(pathToFileURL(path.join(root, 'api/fsi-parcels.js')).href);
+  const calls = opts.calls || [];
+  const pm = opts.parcelMap || ((p) => p);
+  await context.route(/\/crm\/api\//, async (route) => {
+    const url = new URL(route.request().url());
+    const fn = url.pathname.split('/').pop();
+    let body = {};
+    try { body = JSON.parse(route.request().postData() || '{}'); } catch (e) { /* ignore */ }
+    const json = (o, status = 200) => route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(o) });
+    if (fn === 'academy-auth') return json({ ok: true, user: opts.user || USER });
+    if (fn === 'academy-leads') {
+      if (opts.estimates && /^(estimate_|job_|invoice_|jobs_)/.test(body.action || '')) {
+        const { req, res } = opts.estimates.makeReqRes({ body, secret: 'test-secret' });
+        Object.assign(req.headers, { 'user-agent': 'UITest/1.0', origin: url.origin, 'x-forwarded-for': '203.0.113.9' });
+        await opts.estimates.handler(req, res);
+        calls.push({ fn, action: body.action, body, status: res.statusCode });
+        return route.fulfill({ status: res.statusCode, contentType: 'application/json', body: JSON.stringify(res.body) });
+      }
+      const [s, o] = opts.leads.handle(body); return json(o, s);
+    }
+    if (fn === 'leads' && opts.publicLeads) {
+      const { req, res } = opts.estimates.makeReqRes({ body });
+      Object.assign(req.headers, { 'user-agent': 'UITest/1.0', origin: url.origin, 'x-forwarded-for': '203.0.113.10' });
+      await opts.publicLeads(req, res);
+      return route.fulfill({ status: res.statusCode, contentType: 'application/json', body: JSON.stringify(res.body) });
+    }
+    if (fn === 'enrich-contacts' && opts.enrich) { const [s, o] = opts.enrich(body); return json(o, s); }
+    if (fn === 'lead-outcomes') {
+      calls.push({ fn, action: body.action, body });
+      if (opts.outcomes) { const [s, o] = opts.outcomes(body); return json(o, s); }
+      return json({ ok: true, outcome: { lead_key: body.lead_key, outcome: body.outcome } });
+    }
+    if (fn === 'academy-drafts') return json({ ok: true, backend: 'postgres', drafts: opts.drafts || [] });
+    if (fn === 'academy-admin') return json(opts.admin ? opts.admin(body) : { ok: true, users: [opts.user || USER], activity: [], practice: [], leads: [], summary: {} });
+    if (fn === 'academy-chat') return json({ ok: true, choices: [{ message: { role: 'assistant', content: opts.chat || 'Lead with the standing-water question, then book the assessment.' } }] });
+    if (fn !== 'fsi-parcels') { calls.push({ fn, body }); return json({ ok: true }); }
+    const action = body.action || 'viewport';
+    calls.push({ fn, action, body });
+    const box = Array.isArray(body.bbox) ? { w: body.bbox[0], s: body.bbox[1], e: body.bbox[2], n: body.bbox[3] } : null;
+    if (action === 'claims_layer') {
+      const f = fx.claimsLayerFixtures({ box, event: body.event || '', eventYear: body.eventYear ?? null, limit: body.limit || 400 });
+      const rows = api.shapeClaimsLayerRows(f.bgRows, { eventRows: f.eventRows, includeGeom: !!body.includeGeom }).map((r) => ({ ...r, demo: true }));
+      return json({ ok: true, source: 'fixtures', available: true, demo: true, count: rows.length, truncated: false, rows, note: 'DEMO' });
+    }
+    if (action === 'claims_events') {
+      const events = api.shapeClaimsEvents(fx.claimsEventsFixtures({ minClaims: body.minClaims ?? 25 }));
+      return json({ ok: true, source: 'fixtures', available: true, demo: true, count: events.length, events });
+    }
+    if (action === 'parcel_geom') {
+      const features = api.shapeParcelGeom(fx.parcelGeomFixtures(box, body.limit || 600));
+      return json({ ok: true, source: 'fixtures', available: true, demo: true, type: 'FeatureCollection', count: features.length, truncated: false, features });
+    }
+    if (action === 'search') {
+      let parcels = fx.searchFixtures(api.sanitizeSearch(body.q)).map(pm);
+      if (opts.searchExtra) parcels = opts.searchExtra(parcels, body.q);
+      return json({ ok: true, source: 'fixtures', count: parcels.length, parcels });
+    }
+    if (action === 'storm') {
+      if (opts.storm === null) return json({ error: 'storm list failed' }, 503);
+      const s = fx.stormFixtures({ minRainMm: body.minRainMm, minBand: body.minBand, limit: body.limit });
+      return json({ ok: true, source: 'fixtures', demo: true, minRainMm: body.minRainMm || 25, minBand: body.minBand || 'must', cells: s.cells, count: s.parcels.length, parcels: s.parcels.map(pm) });
+    }
+    let parcels = fx.queryFixtures({ action, limit: body.limit || 200, minFsi: body.minFsi || 0, mustBand: body.mustBand, sort: body.sort, box }).map(pm);
+    if (opts.manyParcels) parcels = opts.manyParcels(parcels, body);
+    return json({ ok: true, source: 'fixtures', count: parcels.length, truncated: false, parcels });
+  });
+}
