@@ -9,10 +9,10 @@
 <link rel="preload" href="fonts/InterVariable-latin.woff2" as="font" type="font/woff2" crossorigin>
 <script src="js/00-theme.js?v=55fb673d7a"></script>
 <link rel="stylesheet" href="css/tokens.css?v=3df9c790a9">
-<link rel="stylesheet" href="css/app.css?v=dc9db98233">
-<link rel="stylesheet" href="css/leads-next.css?v=06b744d85f">
-<link rel="stylesheet" href="css/map-next.css?v=2152c7b5d9">
-<link rel="stylesheet" href="css/estimates.css?v=3088262338">
+<link rel="stylesheet" href="css/app.css?v=c6f7656f6f">
+<link rel="stylesheet" href="css/leads-next.css?v=e8f118a86f">
+<link rel="stylesheet" href="css/map-next.css?v=7b090498c5">
+<link rel="stylesheet" href="css/estimates.css?v=e5959930ec">
 <!-- MapLibre (vendor/maplibre-gl.js + .css) is loaded by js/16-fsi-map.js on first map open. -->
 <meta name="fg-maplibre" content="45a9b07a91">
 </head>
@@ -564,13 +564,10 @@
 <!-- ============ FSI FLOOD MAP COMMAND CENTER ============ -->
 <!-- Owned by js/16-fsi-map.js + js/19-map-next.js (+ css/map-next.css). Icons not in the sprite are inline. -->
 <section class="panel panel--map" id="p-fsi" aria-labelledby="h-fsi">
- <header class="page-head page-head--compact">
+ <header class="page-head page-head--compact fsi-head">
   <div class="page-title">
    <h1 id="h-fsi">Flood susceptibility map</h1>
    <p class="sub">Volusia dial list and territory map. <b>Terrain is the gate, rainfall is the trigger</b> — Zone X clay bowls often outrank FEMA AE ridges. Colour = terrain band; size and list rank = live FSI.</p>
-  </div>
-  <div class="page-actions">
-   <span class="fsi-source" id="fsiSource" title="Data source">—</span>
   </div>
  </header>
 
@@ -586,6 +583,7 @@
  <button type="button" data-preset="fema">FEMA mapped</button>
  <button type="button" data-preset="clear">Clear filters</button>
  </div>
+ <span class="fsi-source" id="fsiSource" title="Where these parcels come from">Loading</span>
  <span class="stats fsi-stats" id="fsiStats" role="status">Open this tab to load the map…</span>
  <div class="fsi-filter-wrap">
  <button type="button" class="btn btn--sm" id="fsiFiltersBtn" aria-expanded="false" aria-controls="fsiControls"><svg class="ic" aria-hidden="true"><use href="#i-sliders-horizontal"/></svg>Filters<span class="fsi-fcount num" id="fsiFiltersCount" hidden></span></button>
@@ -885,7 +883,7 @@
 <script src="js/03-ai-prompts.js?v=d3a8932dc7"></script>
 <script src="js/04-state.js?v=318fd80c4d"></script>
 <script src="js/05-nav.js?v=9260a5b3a3"></script>
-<script src="js/06-leads.js?v=f8ddf3e411"></script>
+<script src="js/06-leads.js?v=e5f370418b"></script>
 <script src="js/07-chat.js?v=611000fd68"></script>
 <script src="js/08-roleplay.js?v=fe2cb3c5b5"></script>
 <script src="js/09-review.js?v=a321b45871"></script>
@@ -895,15 +893,15 @@
 <script src="js/13-boot.js?v=e7d4fb22af"></script>
 <script src="js/14-drafts.js?v=968506369e"></script>
 <script src="js/15-docs.js?v=3ea3e567de"></script>
-<script src="js/16-fsi-map.js?v=e9090d0c06"></script>
+<script src="js/16-fsi-map.js?v=aa47798cf8"></script>
 <script src="js/17-shell.js?v=93b657117f"></script>
 <script src="js/18-leads-next.js?v=6a2d986028"></script>
 <script src="js/18b-leads-views.js?v=b871c12738"></script>
 <script src="js/18c-leads-enrich.js?v=75f9d0a367"></script>
 <script src="js/18d-leads-drawer.js?v=7ba1b4aec9"></script>
 <script src="js/19a-map-pure.js?v=0a1a48dd19"></script>
-<script src="js/19-map-next.js?v=15ed255fcd"></script>
-<script src="js/20-estimates.js?v=fe2c107a0e"></script>
+<script src="js/19-map-next.js?v=49de80c12f"></script>
+<script src="js/20-estimates.js?v=70a896d85c"></script>
 </div><!-- /appRoot -->
 </body>
 </html>

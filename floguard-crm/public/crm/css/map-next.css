@@ -283,3 +283,16 @@
  .fsi-mapcol{height:calc(100dvh - var(--topbar-h) - var(--tabbar-h) - var(--safe-b) - 190px);min-height:340px}
 }
 .fsi-report-team{flex:1 1 100%;font-size:var(--fs-12);color:var(--text-2)}.fsi-report-team:empty{display:none}
+/* R2: the top bar already names the page; the map keeps its heading for screen readers only. */
+#p-fsi .fsi-head{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;margin:0;padding:0;border:0}
+.fsi-toolbar-row .fsi-source{flex:none}
+.fsi-banner{padding:6px 12px;margin-bottom:var(--s-2)}
+@media (max-width:820px){
+ .fsi-toolbar-row .fsi-source{display:none}
+ .fsi-banner{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
+/* Small laptops: the claims row folds into Filters too, so the map keeps the height. */
+@media (max-width:1100px) and (min-width:821px){
+ .fsi-claims-bar{display:none}
+ .fsi-toolbar.filters-open .fsi-claims-bar{display:flex}
+}

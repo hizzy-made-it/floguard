@@ -18,6 +18,7 @@ import { setup } from '../estimates/helpers/setup.js';
 import { makeReqRes } from '../leads/helpers/fake-supabase.js';
 
 const label = process.argv[2] || 'before';
+const PROXY = process.env.NO_TILES ? '' : (process.env.HTTPS_PROXY || process.env.https_proxy || '');
 const only = process.argv[3] || '';
 const out = path.join(root, 'docs/handoff/R2-screens', label);
 fs.mkdirSync(out, { recursive: true });
@@ -71,7 +72,7 @@ async function shot(page, name, { full = false } = {}) {
 
 async function newCtx(browser, vp, scheme, { mode = 'server', session = true } = {}) {
   const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, colorScheme: scheme, isMobile: !!vp.mobile, hasTouch: !!vp.mobile, deviceScaleFactor: 1, ignoreHTTPSErrors: true });
-  await context.route((u) => !/^(localhost|127\.0\.0\.1)$/.test(new URL(u).hostname), (r) => r.abort());
+  if (!PROXY) await context.route((u) => !/^(localhost|127\.0\.0\.1)$/.test(new URL(u).hostname), (r) => r.abort());
   const calls = [];
   const leads = new FakeLeadsServer(allLeads(), { mode });
   leads.rows[0].activity.push({ id: 'seed1', lead_id: uuidOf(1), at: new Date(Date.now() - 2 * 86400000).toISOString(), actor: 'sean', type: 'call', direction: 'outbound', outcome: 'talked', body: 'Walked the side yard on the phone; wants an assessment.', meta: {} });
@@ -264,7 +265,7 @@ async function perf(browser, server) {
 }
 
 const server = await startServer();
-const browser = await chromium.launch({ executablePath: chromePath() });
+const browser = await chromium.launch({ executablePath: chromePath(), args: PROXY ? [`--proxy-server=${PROXY}`] : [] });
 try {
   if (!only || only === 'perf') await perf(browser, server);
   for (const vp of VPS) {

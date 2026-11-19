@@ -482,3 +482,18 @@ kbd{display:inline-flex;align-items:center;justify-content:center;min-width:22px
 .leads-table tr.more-row .more-n{flex:1;font-size:var(--fs-12);color:var(--text-2)}
 @media (max-width:820px){ .leads-table tr.more-row{display:block} }
 .en-daily.is-out{color:var(--danger)}
+
+/* ---------- R2: tighter lead rows ---------- */
+.leads-table col.c-causes{width:200px}
+.leads-table col.c-phone{width:224px}
+.leads-table col.c-acts{width:136px}
+.leads-table td.cell-causes .cause-checks{gap:3px}
+.leads-table td.cell-causes .cause-chip{height:20px;padding:0 6px;font-size:10.5px}
+.leads-table td.cell-causes .cause-chip:not(.on){border-style:dashed;opacity:.75}
+.leads-table td.cell-phone .ph-line{flex-wrap:nowrap}
+.leads-table td.cell-phone .ph-btns{flex:none}
+.leads-table td.cell-acts{white-space:nowrap}
+.leads-table .wfs-pill.none{background:transparent;border-color:transparent;min-width:0}
+.tabs .tab-n{margin-left:6px;font-size:11px;font-weight:600;color:var(--text-3)}
+.tabs button.on .tab-n{color:var(--action-text)}
+@media (max-width:820px){ .leads-table td.cell-phone .ph-line{flex-wrap:wrap} }

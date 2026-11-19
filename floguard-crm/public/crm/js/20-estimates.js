@@ -29,8 +29,10 @@
   function token() { try { return typeof getToken === 'function' ? getToken() : ''; } catch (e) { return ''; } }
   function leadRef(lead) { return lead.uuid || lead.id; }
   function leadAddress(l) {
-    var tail = [l.city, l.zip].filter(Boolean).join(' ');
-    return [String(l.address || '').trim(), tail].filter(Boolean).join(', ');
+    var a = String(l.address || '').trim(), low = a.toLowerCase();
+    // R2: imported addresses already carry city and ZIP ("…, Port Orange, FL 32127"); do not repeat them
+    var tail = [l.city && low.indexOf(String(l.city).toLowerCase()) < 0 ? l.city : '', l.zip && low.indexOf(String(l.zip)) < 0 ? l.zip : ''].filter(Boolean).join(' ');
+    return [a, tail].filter(Boolean).join(', ');
   }
   function toLocalInput(iso) {
     if (!iso) return '';

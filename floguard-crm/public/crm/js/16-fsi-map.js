@@ -65,6 +65,7 @@ function fsiCanonicalCityKey(raw){
 function fsiSay(msg,isHtml){
  const el=document.getElementById('fsiStats'); if(!el) return;
  if(isHtml) el.innerHTML=msg; else el.textContent=msg;
+ el.title=el.textContent; // the toolbar truncates it to one line
 }
 function fsiDrMsg(msg,cls){
  const el=document.getElementById('fsiDrMsg'); if(!el) return;
@@ -225,8 +226,8 @@ async function fsiFetch(payload, signal){
 function fsiSetSourceBadge(src){
  const el=document.getElementById('fsiSource'); if(!el) return;
  if(src==='postgres'){ el.textContent='Live data'; el.className='fsi-source live'; }
- else if(src==='fixtures'){ el.textContent='Demo fixtures'; el.className='fsi-source demo'; }
- else { el.textContent='—'; el.className='fsi-source'; }
+ else if(src==='fixtures'){ el.textContent='Demo data'; el.className='fsi-source demo'; }
+ else { el.textContent='Loading'; el.className='fsi-source'; }
 }
 function fsiSyncSearchBtn(){
  const b=document.getElementById('fsiSearchArea'); if(!b) return;
@@ -284,7 +285,7 @@ function fsiRebuildCityUi(){
  if(cur&&_fsiState.city!==cur) _fsiState.city=cur;
  const sel=document.getElementById('fsiCityFilter');
  if(sel){
-  sel.innerHTML='<option value="">All Cities</option>'+sorted.slice(0,80).map(function(c){
+  sel.innerHTML='<option value="">All cities</option>'+sorted.slice(0,80).map(function(c){
    const label=fsiTitleCase(c);
    return '<option value="'+esc(c)+'"'+(c===cur?' selected':'')+'>'+esc(label)+' ('+cities[c]+')</option>';
   }).join('');

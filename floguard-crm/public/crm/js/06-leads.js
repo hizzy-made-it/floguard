@@ -346,6 +346,15 @@ document.addEventListener('click', function(e){
  const el=document.getElementById(id); if(el){ el.addEventListener('input', resetLeadsPage, true); el.addEventListener('change', resetLeadsPage, true); }
 });
 ['tabs','filterChips'].forEach(function(id){ const el=document.getElementById(id); if(el) el.addEventListener('click', resetLeadsPage, true); });
+function paintCauseTabCounts(){
+ const tabs=document.getElementById('tabs'); if(!tabs) return;
+ tabs.querySelectorAll('button[data-list]').forEach(function(b){
+  const c=b.getAttribute('data-list');
+  const n=c==='All'?state.length:state.filter(function(l){ return leadLists(l).includes(c); }).length;
+  let sp=b.querySelector('.tab-n'); if(!sp){ sp=document.createElement('span'); sp.className='tab-n num'; b.appendChild(sp); }
+  sp.textContent=String(n);
+ });
+}
 function render(){
  syncDueFilterUi();
  const fg=window.FG&&FG.ready;
@@ -384,7 +393,7 @@ function render(){
  <td class="cell-phone"><input value="${esc(l.phone)}" data-f="phone" aria-label="Phone" placeholder="Add phone">${phoneCellExtras(l)}</td>
  <td class="cell-email"><input value="${esc(l.email||'')}" data-f="email" aria-label="Email" placeholder="Add email" title="${esc(l.email||'')}"></td>
  <td class="row-open cell-score" title="Open prospect for score details">${scoreCellHtml(l)}</td>
- <td class="cell-status" data-st="${esc(statusTone(st))}"><select data-f="status" data-cause-status="1" class="status-sel" aria-label="Status for ${esc(cause)}" title="Status for ${esc(cause)}">${STATUSES.map(s=>`<option ${st===s?'selected':''}>${esc(s)}</option>`).join('')}</select><div class="lead-cause">${fg?FG.stageChip(stage,' title="Pipeline stage"'):''}<span>${esc(cause)}</span></div></td>
+ <td class="cell-status" data-st="${esc(statusTone(st))}"><select data-f="status" data-cause-status="1" class="status-sel" aria-label="Status for ${esc(causeLabel(cause))}" title="Status for ${esc(causeLabel(cause))}">${STATUSES.map(s=>`<option ${st===s?'selected':''}>${esc(s)}</option>`).join('')}</select><div class="lead-cause">${fg?FG.stageChip(stage,' title="Pipeline stage"'):''}<span>${esc(causeLabel(cause))}</span></div></td>
  <td class="cell-acts"><button type="button" class="coachbtn openbtn" title="Open profile">Open</button> <button type="button" class="coachbtn" title="Game-plan this call with the AI Coach">Coach</button> <button type="button" class="del" title="Delete lead" aria-label="Delete lead">✕</button></td>`;
  frag.appendChild(tr);
  });
@@ -406,10 +415,10 @@ function render(){
  let cdl=document.getElementById('cityList');
  if(!cdl){ cdl=document.createElement('datalist'); cdl.id='cityList'; document.body.appendChild(cdl); }
  cdl.innerHTML=cities().map(c=>`<option value="${esc(c)}">`).join('');
+ paintCauseTabCounts();
  document.getElementById('stats').innerHTML=
- `Showing <b>${shown}</b> of ${state.length} · `+LISTS.map(x=>`${x}: <b>${state.filter(l=>leadLists(l).includes(x)).length}</b>`).join(' · ')+
- ` · multi: <b>${state.filter(l=>leadLists(l).length>1).length}</b>`+
- (view!=='All'?' · status shown for <b>'+esc(view)+'</b>':' · status = primary cause')+
+ `Showing <b class="num">${shown}</b> of <span class="num">${state.length}</span> leads`+
+ (view!=='All'?' · status shown for <b>'+esc(causeLabel(view))+'</b>':' · status shown for each lead\'s primary cause')+
  (view==='Maintenance'?(' · due this month: <b>'+dueCount+'</b>'):'')+
  (dueOnly?' · <b>Due filter on</b>':'')+
  (ind?(' · industry: <b>'+esc(ind)+'</b>'):'')+

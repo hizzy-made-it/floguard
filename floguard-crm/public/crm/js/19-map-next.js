@@ -1092,7 +1092,7 @@ function mnSyncOpInputs(){
  document.addEventListener('mousedown', function(e){
   if(!bar.classList.contains('filters-open')) return;
   if(window.matchMedia('(max-width: 820px)').matches) return; // inline panel on phones
-  if(!e.target.closest('.fsi-filter-wrap')) open(false);
+  if(!e.target.closest('.fsi-filter-wrap, .fsi-claims-bar')) open(false);
  });
  document.addEventListener('keydown', function(e){
   if(e.key!=='Escape') return;
