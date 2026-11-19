@@ -281,6 +281,15 @@ export function mergePhones(base, inc) {
   return out;
 }
 
+/**
+ * phones[] with `number` recorded as do-not-call (added when missing). Used when a DNC-flagged
+ * primary number is replaced, so the flag is not lost with the scalar phone_dnc.
+ */
+export function carryDncPhone(phones, number) {
+  if (!phoneDigits(number)) return Array.isArray(phones) ? phones : [];
+  return mergePhones(phones, [{ number, dnc: true, source: 'manual', line_type: 'unknown', note: 'kept: was the DNC primary number' }]);
+}
+
 function cleanNextAction(v) {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return null;
   const type = TASK_TYPES.includes(String(v.type)) ? String(v.type) : 'other';
@@ -352,10 +361,15 @@ export function mergeLead(base, inc, opts = {}) {
   }
 
   // phones + DNC
-  const phones = mergePhones(base?.phones, inc?.phones);
-  if (phones.length) merged.phones = phones;
   const baseDigits = phoneDigits(base?.phone);
   const mergedDigits = phoneDigits(merged.phone);
+  // A DNC-flagged primary number that is being replaced keeps its flag in phones[] so that a later
+  // switch back to it restores phone_dnc (review R1: otherwise the flag was lost with the number).
+  const phones = mergePhones(
+    base?.phone_dnc === true && baseDigits && mergedDigits !== baseDigits ? carryDncPhone(base.phones, base.phone) : base?.phones,
+    inc?.phones,
+  );
+  if (phones.length) merged.phones = phones;
   const entryDnc = mergedDigits ? phones.find((p) => phoneDigits(p.number) === mergedDigits)?.dnc : undefined;
   let dnc = base?.phone_dnc ?? null;
   const incDnc = inc?.phone_dnc;

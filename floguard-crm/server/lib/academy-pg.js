@@ -4,7 +4,7 @@
  */
 import { restDelete, restGet, restInsert, restPatch } from './supabase-rest.js';
 import {
-  ACTIVITY_TYPES, STAGES, TASK_TYPES, cleanNextAction, deriveStage, isUuid, leadToRow, mergeLead,
+  ACTIVITY_TYPES, STAGES, TASK_TYPES, carryDncPhone, cleanNextAction, deriveStage, isUuid, leadToRow, mergeLead,
   mergePhones, normStage, phoneDigits, planUpsert, rowToLead,
 } from './leads-core.js';
 
@@ -453,6 +453,7 @@ export async function pgPatchLead(ref, patch, { expectedUpdatedAt = null, actor 
   } else if (wasDnc && !('phone_dnc' in patch)) {
     // phone replaced by hand: the flag belonged to the old number
     if ('phone' in patch && phoneDigits(next.phone) !== phoneDigits(base.phone)) {
+      next.phones = carryDncPhone(next.phones, base.phone); // keep the old number's DNC record
       const entry = (next.phones || []).find((p) => phoneDigits(p.number) === phoneDigits(next.phone));
       next.phone_dnc = entry && typeof entry.dnc === 'boolean' ? entry.dnc : null;
     } else next.phone_dnc = true;
