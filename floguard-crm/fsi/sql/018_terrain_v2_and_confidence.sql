@@ -433,7 +433,19 @@ end;
 $$;
 
 -- sql/009 fetched every rainfall_cell from Open-Meteo; MRMS cells must not be sent there.
-create or replace function public.rain_fetch_enqueue()
+-- Review R1: production has a later migration (rain_fetch_retry_and_freshness, 2026-09-25) that is
+-- NOT in this repo and may have changed rain_fetch_enqueue. Replace it only when the live body is
+-- still the repo's 009 version (or already this one); otherwise leave production alone with a NOTICE.
+-- The only change here is skipping MRMS cells, which matters only after rain_source_use('mrms').
+do $do$
+declare cur text; v009 constant text := 'declare ids text[]; lats text; lons text; url text; rid bigint; begin select array_agg(cell_id order by cell_id), string_agg(round(lat::numeric, 3)::text, '','' order by cell_id), string_agg(round(lon::numeric, 3)::text, '','' order by cell_id) into ids, lats, lons from public.rainfall_cell; if ids is null then raise exception ''rainfall_cell is empty — run rain_cells_seed() first''; end if; url := ''https://api.open-meteo.com/v1/forecast?latitude='' || lats || ''&longitude='' || lons || ''&daily=precipitation_sum&past_days=14&forecast_days=1&timezone=America%2FNew_York''; rid := net.http_get(url, timeout_milliseconds := 60000); insert into public.rain_fetch_queue (req_id, cell_ids) values (rid, ids); return rid; end;';
+               v018 constant text := 'declare ids text[]; lats text; lons text; url text; rid bigint; begin select array_agg(cell_id order by cell_id), string_agg(round(lat::numeric, 3)::text, '','' order by cell_id), string_agg(round(lon::numeric, 3)::text, '','' order by cell_id) into ids, lats, lons from public.rainfall_cell where source = ''open_meteo''; if ids is null then raise exception ''rainfall_cell has no open_meteo cells — run rain_cells_seed() first''; end if; url := ''https://api.open-meteo.com/v1/forecast?latitude='' || lats || ''&longitude='' || lons || ''&daily=precipitation_sum&past_days=14&forecast_days=1&timezone=America%2FNew_York''; rid := net.http_get(url, timeout_milliseconds := 60000); insert into public.rain_fetch_queue (req_id, cell_ids) values (rid, ids); return rid; end;';
+begin
+  select regexp_replace(p.prosrc, '\s+', ' ', 'g') into cur
+    from pg_proc p where p.oid = to_regprocedure('public.rain_fetch_enqueue()');
+  cur := btrim(cur);
+  if cur is null or cur = v009 or cur = v018 then
+    execute $fn$create or replace function public.rain_fetch_enqueue()
 returns bigint
 language plpgsql security definer
 set search_path = public, extensions
@@ -456,7 +468,12 @@ begin
   insert into public.rain_fetch_queue (req_id, cell_ids) values (rid, ids);
   return rid;
 end;
-$$;
+$$$fn$;
+  else
+    raise notice '018: public.rain_fetch_enqueue() differs from fsi/sql/009 (production migration not in the repo); NOT replaced. Before enabling MRMS, make it skip rainfall_cell rows with source = ''mrms''.';
+  end if;
+end
+$do$;
 
 -- ---------------------------------------------------------------------------
 -- G. Outcome snapshots also freeze the v2 inputs (calibration needs them)

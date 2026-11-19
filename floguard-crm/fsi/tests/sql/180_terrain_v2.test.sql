@@ -55,3 +55,15 @@ select t.ok(not has_function_privilege('anon', 'public.fsi_set_model_version(tex
 -- restore setting/rows touched (keeps the idempotency comparison of later runs meaningful)
 update public.fsi_settings set value = 'open_meteo' where key = 'rain_source';
 delete from public.parcel_risk where parcel_id like 'T-TV2-%';
+
+-- 5. Production carries a migration that is not in the repo (rain_fetch_retry_and_freshness) and may
+--    have changed rain_fetch_enqueue(). Re-applying 018 must not overwrite a body it does not know.
+create temp table _rfe as select pg_get_functiondef('public.rain_fetch_enqueue()'::regprocedure) as def;
+create or replace function public.rain_fetch_enqueue() returns bigint language plpgsql security definer
+  set search_path = public, extensions as $$ begin return -42; /* production-only change */ end $$;
+\i :migdir/018_terrain_v2_and_confidence.sql.:dbname.rewritten.sql
+select t.ok((select prosrc ~ 'production-only change' from pg_proc where oid = 'public.rain_fetch_enqueue()'::regprocedure),
+            '018 leaves an unknown (production) rain_fetch_enqueue body alone');
+do $$ begin execute (select def from _rfe); end $$;
+select t.ok((select prosrc ~ 'open_meteo' from pg_proc where oid = 'public.rain_fetch_enqueue()'::regprocedure),
+            '018 version restored for the rest of the run');
