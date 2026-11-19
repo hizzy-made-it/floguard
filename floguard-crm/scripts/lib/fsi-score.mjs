@@ -336,3 +336,114 @@ function clamp01(x) {
   if (!isFinite(x)) return 0;
   return Math.max(0, Math.min(1, x));
 }
+
+/* ------------------------------------------------------------------------------------------------
+ * Terrain v2 static score (review R1; spec docs/handoff/D.md). Mirror of fsi/pipeline/config_v2.py
+ * static_score_v2() and SQL fsi_static_v2_expr() (fsi/sql/018). tests/map/fsi-v2-mirror.test.mjs
+ * compares it with numbers produced by the Python code (tests/map/fixtures/fsi-v2-python.json).
+ * v1 above is untouched and stays the live model until fsi_model_version = 'v2'.
+ *
+ *   S2 = 0.20*TWI2 + 0.15*(1-HAND2) + 0.15*DEPR2 + 0.15*BOWL + 0.10*SOIL2 + 0.10*WT + 0.15*Z
+ *
+ * Note on Z: SQL zone_score() and Python zone_score() look the label up exactly
+ * (FEMA_ZONE_SCORE[upper(trim)], else 0.6). The v1 JS zoneScore() above also maps raw NFHL labels
+ * ("AREA OF MINIMAL FLOOD HAZARD" -> 0.45, "0.2 PCT" -> 0.6). To stay identical to what the
+ * database stores, v2 uses the exact lookup (zoneScoreExact). Stored fema_zone values are already
+ * normalised by normalizeFemaZone(), so both agree on real rows.
+ * ---------------------------------------------------------------------------------------------- */
+export const W2 = { twi: 0.2, hand: 0.15, depr: 0.15, bowl: 0.15, soil: 0.1, wt: 0.1, zone: 0.15 };
+export const DRAIN_CLASS_SCORE = {
+  'VERY POORLY DRAINED': 1.0,
+  'POORLY DRAINED': 0.85,
+  'SOMEWHAT POORLY DRAINED': 0.65,
+  'MODERATELY WELL DRAINED': 0.4,
+  'WELL DRAINED': 0.2,
+  'SOMEWHAT EXCESSIVELY DRAINED': 0.1,
+  'EXCESSIVELY DRAINED': 0.05,
+};
+export const V2_DEFAULTS = { twi: 0.55, hand: 0.45, depr: 0, bowl: 0.2, soil: HSG_DEFAULT, wt: 0.5 };
+export const BOWL_FULL_M = 0.6;
+export const BOWL_W_NBR = 0.6;
+export const WT_FULL_M = 2.0;
+
+const fin = (v) => v != null && v !== '' && Number.isFinite(Number(v));
+const c01 = (x) => Math.max(0, Math.min(1, x));
+
+export function drainClassScore(dc) {
+  if (dc == null || String(dc).trim() === '') return null;
+  return DRAIN_CLASS_SCORE[String(dc).trim().toUpperCase()] ?? null;
+}
+
+export function ksatScore(k) {
+  if (!fin(k)) return null;
+  const v = Number(k);
+  if (v <= 0) return 1;
+  return c01((2 - Math.log10(v)) / 2);
+}
+
+export function soilScoreV2(hsgEff, dc, ksat) {
+  const parts = [];
+  const h = hsgEff == null ? '' : String(hsgEff).trim().toUpperCase();
+  if (h in HSG_SCORE) parts.push(HSG_SCORE[h]);
+  const d = drainClassScore(dc);
+  if (d != null) parts.push(d);
+  const k = ksatScore(ksat);
+  if (k != null) parts.push(k);
+  return parts.length ? parts.reduce((a, b) => a + b, 0) / parts.length : V2_DEFAULTS.soil;
+}
+
+export function bowlScore(nbrRel, streetRel) {
+  const n = fin(nbrRel);
+  const s = fin(streetRel);
+  let rel;
+  if (n && s) rel = BOWL_W_NBR * Number(nbrRel) + (1 - BOWL_W_NBR) * Number(streetRel);
+  else if (n) rel = Number(nbrRel);
+  else if (s) rel = Number(streetRel);
+  else return V2_DEFAULTS.bowl;
+  return c01(-rel / BOWL_FULL_M);
+}
+
+export function wtScore(wt) {
+  return fin(wt) ? c01(1 - Number(wt) / WT_FULL_M) : V2_DEFAULTS.wt;
+}
+
+export function zoneScoreExact(zone) {
+  if (zone == null || String(zone).trim() === '') return FEMA_ZONE_DEFAULT;
+  return FEMA_ZONE_SCORE[String(zone).trim().toUpperCase()] ?? FEMA_ZONE_DEFAULT;
+}
+
+// toFixed rounds the exact binary value (as Python round() does); Math.round(x*1e4) can flip ties.
+const round4 = (x) => Number(x.toFixed(4));
+
+/** v2 static score from the 018 parcel_risk columns. Rounded to 4 dp like SQL/Python. */
+export function staticScoreV2({
+  twi_v2_n: twi = null, hand_v2_n: hand = null, depr_v2_n: depr = null, nbr_rel_m: nbr = null,
+  street_rel_m: street = null, hsg_eff: hsgEff = null, drain_class: dc = null, ksat_um_s: ksat = null,
+  wt_depth_m: wt = null, fema_zone: zone = null,
+} = {}) {
+  const v = (x, d) => (fin(x) ? Number(x) : d);
+  return round4(
+    W2.twi * c01(v(twi, V2_DEFAULTS.twi)) +
+      W2.hand * (1 - c01(v(hand, V2_DEFAULTS.hand))) +
+      W2.depr * c01(v(depr, V2_DEFAULTS.depr)) +
+      W2.bowl * bowlScore(nbr, street) +
+      W2.soil * soilScoreV2(hsgEff, dc, ksat) +
+      W2.wt * wtScore(wt) +
+      W2.zone * zoneScoreExact(zone),
+  );
+}
+
+/**
+ * The static score a parcel row is actually scored with: the stored v2 score when the row says
+ * model_version 'v2' (fsi_static_dispatch in SQL 018), else v1 from its terms.
+ */
+export function staticScoreForRow(row = {}) {
+  if (row.model_version === 'v2' && fin(row.fsi_static_v2)) return Number(row.fsi_static_v2);
+  return staticScore(
+    fin(row.twi_n) ? Number(row.twi_n) : LITE_TWI_N,
+    fin(row.hand_n) ? Number(row.hand_n) : LITE_HAND_N,
+    row.hsg,
+    row.fema_zone,
+    fin(row.depr_n) ? Number(row.depr_n) : 0,
+  );
+}
