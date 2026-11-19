@@ -442,7 +442,10 @@ export async function getLeadsPipeline() {
   const mode = dataBackend();
   if (mode === 'storage') return null;
   const ready = await pg.pgLeadsReady();
-  if (ready) return pg;
+  if (ready) {
+    await seedPipelineFromBlobOnce();
+    return pg;
+  }
   if (mode === 'postgres') {
     throw new BackendError(
       503,
@@ -452,6 +455,38 @@ export async function getLeadsPipeline() {
   }
   if (mode === 'dual') console.warn('[academy-db] dual: leads pipeline not ready (017 not applied); writing blob only');
   return null;
+}
+
+let _seedChecked = false;
+export function _resetSeedCheck() {
+  _seedChecked = false;
+}
+
+/**
+ * Safety net for the cut-over: the first time this instance uses the Postgres pipeline, if
+ * public.leads is empty (live or soft-deleted) while the Storage blob still holds leads, copy
+ * the blob in. Without this, flipping the backend (or `auto` after 017 is applied) would show
+ * an empty lead list until someone ran scripts/migrate-leads-to-pg.mjs. Idempotent: identity
+ * merge means two instances seeding at once converge on the same rows. Never deletes.
+ */
+async function seedPipelineFromBlobOnce() {
+  if (_seedChecked) return;
+  _seedChecked = true;
+  try {
+    const page = await pg.pgListLeadRows({ limit: 1, includeDeleted: true });
+    const rows = Array.isArray(page) ? page : page?.rows || page?.leads || [];
+    if (rows.length) return;
+    const blob = await storageLoadLeads();
+    const leads = Array.isArray(blob?.leads) ? blob.leads : [];
+    if (!leads.length) return;
+    const res = await pg.pgUpsertLeads(leads, { actor: 'system:seed-from-blob' });
+    console.warn(`[academy-db] seeded Postgres leads from the Storage blob: ${leads.length} in blob`, {
+      inserted: res?.inserted, updated: res?.updated,
+    });
+  } catch (e) {
+    _seedChecked = false; // try again on the next request
+    console.warn('[academy-db] seeding Postgres leads from the blob failed:', e?.message);
+  }
 }
 
 /** dual mode: keep the blob in step with Postgres (full live set). Best effort. */

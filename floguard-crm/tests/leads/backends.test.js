@@ -37,7 +37,8 @@ test('auto mode: blob until 017 is applied, then Postgres', async () => {
   mode('auto', true);
   r = await call({ action: 'push', leads: [{ name: 'Auto Two', city: 'X' }] });
   assert.equal(r.status, 200);
-  assert.equal(fake.tables.leads.length, 1);
+  // The blob lead is seeded into the empty table on first use, then the new one is added.
+  assert.deepEqual(fake.tables.leads.map((l) => l.name).sort(), ['Auto One', 'Auto Two']);
   assert.equal(blob().length, 1, 'auto does not keep writing the blob');
   assert.equal((await call({ action: 'funnel' })).status, 200);
 });
