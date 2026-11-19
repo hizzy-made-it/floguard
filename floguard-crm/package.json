@@ -15,6 +15,7 @@
     "join-tracts": "node scripts/join-census-tracts.mjs",
     "refresh-rainfall": "node scripts/refresh-rainfall.mjs",
     "ingest-claims": "node scripts/ingest-nfip-claims.mjs",
-    "score-must-have": "node scripts/score-must-have.mjs"
+    "score-must-have": "node scripts/score-must-have.mjs",
+    "test": "node --test \"tests/**/*.test.js\""
   }
 }

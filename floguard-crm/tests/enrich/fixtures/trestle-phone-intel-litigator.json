@@ -1,0 +1,12 @@
+{
+  "id": "Phone.3a1b8c1e-0000-4000-8000-000000000002",
+  "phone_number": "+13865550142",
+  "is_valid": true,
+  "activity_score": 90,
+  "line_type": "Mobile",
+  "carrier": "T-Mobile",
+  "is_prepaid": true,
+  "add_ons": { "litigator_checks": { "phone": { "is_litigator_risk": true } } },
+  "error": null,
+  "warnings": []
+}

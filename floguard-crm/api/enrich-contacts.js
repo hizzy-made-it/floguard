@@ -1,22 +1,51 @@
 /**
  * Bulk contact enrichment for CRM leads (phone / email / website).
  *
- * POST { action: 'enrich'|'capabilities', leads?: [...], force?: bool, allowPaid?: bool }
+ * POST { action: 'enrich'|'capabilities'|'estimate', leads?: [...], force?: bool,
+ *        allowPaid?: bool, maxPaidLookups?: number }
  * Auth: Authorization: Bearer <academy session>
  *
  * Returns per-lead results; client merges into local leads and re-pushes store.
  * Max 12 leads per request (Vercel time budget). Client should batch.
+ *
+ * Spend guard: maxPaidLookups (default 50, hard cap 500) bounds paid provider HTTP calls
+ * (BatchData + Trestle) in THIS request. The function is stateless, so a client running many
+ * batches subtracts `budget.used_total` from its run total and sends the remainder next time.
+ * 'estimate' makes no provider calls; it returns per-lead provider and lookup counts.
  */
 import { verifySessionToken } from '../server/lib/academy-db.js';
 import {
   enrichOneLead,
   enrichCapabilities,
+  estimateLead,
+  createBudget,
+  clampMaxPaidLookups,
 } from '../server/lib/contact-enrich.js';
 import { setCors, json, parseBody, rateLimit, clientIp } from '../server/lib/http.js';
 
 export const config = { maxDuration: 60 };
 
 const MAX_BATCH = 12;
+const SOFT_BUDGET_MS = 50_000; // leave ~10s of the 60s maxDuration for the response
+const PHONE_SOURCES = new Set(['batchdata', 'trestle', 'web', 'search', 'manual', 'google_voice']);
+
+function slimPhones(raw) {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .slice(0, 10)
+    .filter((p) => p && typeof p === 'object' && String(p.number || '').trim())
+    .map((p) => ({
+      number: String(p.number).trim(),
+      line_type: String(p.line_type || 'unknown'),
+      dnc: p.dnc === true ? true : p.dnc === false ? false : null,
+      litigator: p.litigator === true ? true : p.litigator === false ? false : null,
+      source: PHONE_SOURCES.has(p.source) ? p.source : 'manual',
+      confidence: Number.isFinite(Number(p.confidence)) ? Number(p.confidence) : 0.5,
+      found_at: String(p.found_at || ''),
+      ...(typeof p.name_match === 'string' ? { name_match: p.name_match } : {}),
+      ...(Array.isArray(p.checks) ? { checks: p.checks.map(String).slice(0, 6) } : {}),
+    }));
+}
 
 function bearer(req) {
   const h = req.headers?.authorization || req.headers?.Authorization || '';
@@ -41,6 +70,12 @@ function slimLead(raw) {
     lists: Array.isArray(raw.lists) ? raw.lists.map(String) : [],
     source: String(raw.source || '').trim(),
     parcel_id: String(raw.parcel_id || '').trim(),
+    // existing contact metadata so verification does not re-pay for known numbers
+    phones: slimPhones(raw.phones),
+    phone_source: String(raw.phone_source || '').trim(),
+    phone_line_type: String(raw.phone_line_type || '').trim(),
+    phone_confidence: raw.phone_confidence,
+    phone_dnc: raw.phone_dnc === true ? true : raw.phone_dnc === false ? false : null,
   };
 }
 
@@ -74,7 +109,7 @@ export default async function handler(req, res) {
       max_batch: MAX_BATCH,
     });
   }
-  if (action !== 'enrich') {
+  if (action !== 'enrich' && action !== 'estimate') {
     return json(res, 400, { error: `Unknown action: ${action}` });
   }
 
@@ -92,14 +127,38 @@ export default async function handler(req, res) {
   const leads = rawList.map(slimLead).filter(Boolean);
   const force = !!body.force;
   const allowPaid = body.allowPaid !== false;
+  const maxPaidLookups = clampMaxPaidLookups(body.maxPaidLookups);
+
+  if (action === 'estimate') {
+    const per = leads.map((l) => estimateLead(l, { force, allowPaid }));
+    const sum = (k) => per.reduce((n, e) => n + (e[k] || 0), 0);
+    return json(res, 200, {
+      ok: true,
+      capabilities: enrichCapabilities(),
+      max_paid_lookups: maxPaidLookups,
+      leads: per,
+      totals: {
+        leads: per.length,
+        batchdata: sum('batchdata'),
+        trestle_phone_intel: sum('trestle_phone_intel'),
+        trestle_reverse_phone: sum('trestle_reverse_phone'),
+        expected_lookups: sum('expected_lookups'),
+        max_lookups: sum('max_lookups'),
+        capped_at: maxPaidLookups,
+      },
+    });
+  }
+
   const started = Date.now();
+  const deadline = started + SOFT_BUDGET_MS;
+  const budget = createBudget(maxPaidLookups);
   const results = [];
 
   // Sequential: polite to free search endpoints; avoids burst blocks
   for (const lead of leads) {
     try {
       // Soft time budget — leave ~8s for response
-      if (Date.now() - started > 50_000) {
+      if (Date.now() > deadline) {
         results.push({
           id: lead.id,
           status: 'timeout_budget',
@@ -111,7 +170,7 @@ export default async function handler(req, res) {
         });
         continue;
       }
-      const r = await enrichOneLead(lead, { force, allowPaid });
+      const r = await enrichOneLead(lead, { force, allowPaid, budget, deadline });
       results.push(r);
     } catch (e) {
       results.push({
@@ -132,15 +191,24 @@ export default async function handler(req, res) {
     partial: results.filter((r) => r.status === 'partial').length,
     not_found: results.filter((r) => r.status === 'not_found').length,
     complete: results.filter((r) => r.status === 'complete').length,
+    blocked: results.filter((r) => r.status === 'blocked').length,
     errors: results.filter((r) => r.status === 'error' || r.status === 'timeout_budget')
       .length,
     ms: Date.now() - started,
+  };
+  const budgetOut = {
+    max: budget.max,
+    remaining: budget.remaining,
+    used_total: budget.max - budget.remaining,
+    used: budget.used,
+    exhausted: budget.exhausted,
   };
 
   return json(res, 200, {
     ok: true,
     capabilities: enrichCapabilities(),
     summary,
+    budget: budgetOut,
     results,
     dnc_reminder:
       'Scrub phone against DNC and honor CAN-SPAM before outreach. Enrichment is not consent.',

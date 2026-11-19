@@ -1,0 +1,12 @@
+{
+  "id": "Phone.3a1b8c1e-0000-4000-8000-000000000003",
+  "phone_number": "+13865550142",
+  "is_valid": true,
+  "activity_score": 12,
+  "line_type": "Landline",
+  "carrier": "Frontier",
+  "is_prepaid": false,
+  "add_ons": null,
+  "error": null,
+  "warnings": []
+}
