@@ -39,6 +39,20 @@ TMP="$PGROOT/work"
 export PATH="$PGBIN:$PATH"
 
 as_pg() { if [ "$(id -u)" = 0 ]; then runuser -u "$PGUSER_OS" -- "$@"; else "$@"; fi; }
+
+# PostGIS schema layout under test. Production has PostGIS in `public`; 001 installs it in
+# `extensions`. Without POSTGIS_SCHEMA set, the whole run happens twice (review R1), once per layout.
+if [ -z "${POSTGIS_SCHEMA:-}" ]; then
+  rc=0
+  for gs in extensions public; do
+    echo "################ POSTGIS_SCHEMA=$gs ################"
+    POSTGIS_SCHEMA=$gs KEEP_SERVER=1 bash "${BASH_SOURCE[0]}" || rc=1
+  done
+  [ "${KEEP_SERVER:-0}" = 1 ] || as_pg pg_ctl -D "$PGDATA" stop -m fast >/dev/null 2>&1
+  echo; if [ $rc = 0 ]; then echo "ALL OK (PostGIS in extensions and in public)"; else echo "FAILURES (see above)"; fi
+  exit $rc
+fi
+case "$POSTGIS_SCHEMA" in extensions|public) ;; *) echo "POSTGIS_SCHEMA must be extensions or public"; exit 2;; esac
 psqlx() { psql -X -q -h "$PGROOT" -p "$PGPORT" -U "${APPLY_USER:-postgres}" -v ON_ERROR_STOP=1 "$@"; }
 
 FAILED=0
@@ -60,7 +74,7 @@ trap stop_server EXIT
 # ---------------------------------------------------------------- helpers
 rewrite() { # $1 source file -> stdout (rewritten copy)
   sed -E \
-    -e 's/(extensions\.)?geometry\([A-Za-z]+, *[0-9]+\)/extensions.geometry/g' \
+    -e "s/(extensions\\.)?geometry\\([A-Za-z]+, *[0-9]+\\)/$POSTGIS_SCHEMA.geometry/g" \
     -e 's/^( *)create extension postgis with schema extensions;/\1null;/' \
     -e 's/using gist \(([a-z_]+)\)/(\1)/g' \
     -e '/^create extension if not exists (postgis|pg_cron)/d' \
@@ -95,6 +109,21 @@ echo "== s_base: stand-ins + fsi/sql 001..015 + supabase/migrations"
 psqlx -d postgres -c "drop database if exists s_base with (force)" -c "create database s_base" || exit 2
 psqlx -d s_base -c "alter database s_base set search_path = \"\$user\", public, extensions"
 psqlx -d s_base -f "$HERE/00_bootstrap_supabase.sql" >/dev/null || { echo "bootstrap failed"; exit 2; }
+if [ "$POSTGIS_SCHEMA" = public ]; then # production layout: move the PostGIS stand-ins to public
+  psqlx -d s_base -f - >/dev/null <<'SQL' || { echo "moving PostGIS stand-ins to public failed"; exit 2; }
+alter domain extensions.geometry set schema public;
+alter function extensions.st_geomfromgeojson(text) set schema public;
+alter function extensions.st_setsrid(geometry, integer) set schema public;
+alter function extensions.st_multi(geometry) set schema public;
+alter function extensions.st_simplifypreservetopology(geometry, double precision) set schema public;
+alter function extensions.st_asgeojson(geometry, integer, integer) set schema public;
+alter function extensions.st_makeenvelope(double precision, double precision, double precision, double precision, integer) set schema public;
+alter function extensions._sb_bbox(text) set schema public;
+alter function extensions._sb_overlaps(text, text) set schema public;
+alter operator extensions.&& (text, text) set schema public;
+SQL
+fi
+echo "   (PostGIS stand-ins in schema $POSTGIS_SCHEMA)"
 for f in "$SQL"/[0-9]*.sql; do
   n=$(num "$f"); [ "$n" -le 15 ] || continue
   apply_file s_base "$f" || echo "   (baseline file $(basename "$f") failed; later results may be affected)"

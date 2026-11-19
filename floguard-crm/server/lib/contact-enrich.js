@@ -609,7 +609,14 @@ export function mapBatchDataResponse(data, lead = {}) {
     const num = normalizePhone(String(isObj ? firstDefined(raw, BD_PHONE_NUMBER_KEYS) ?? '' : raw ?? ''));
     if (!num) return;
     const dnc = triBool(isObj ? firstDefined(raw, BD_DNC_KEYS) : undefined) ?? triBool(firstDefined(person, BD_DNC_KEYS));
-    const lit = triBool(isObj ? firstDefined(raw, BD_LIT_KEYS) : undefined) ?? triBool(firstDefined(person, BD_LIT_KEYS));
+    // Litigator/TCPA: phone-level `tcpa` (V3) first, then the person-level flags (`litigator`, and
+    // `dnc.tcpa`, which BatchData nests under a `dnc` object). Confirmed against help.batchdata.io
+    // (V3 SkipTrace API + "Understanding your property skip trace results"), 2026-11-19.
+    const personDnc = person && typeof person.dnc === 'object' && person.dnc ? person.dnc : null;
+    const lit =
+      triBool(isObj ? firstDefined(raw, BD_LIT_KEYS) : undefined) ??
+      triBool(firstDefined(person, BD_LIT_KEYS)) ??
+      triBool(personDnc ? personDnc.tcpa : undefined);
     const reachable = triBool(isObj ? raw.reachable : undefined);
     let conf = BASE_CONFIDENCE.batchdata;
     if (reachable === false) conf -= 0.3;

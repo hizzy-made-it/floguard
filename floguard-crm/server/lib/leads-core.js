@@ -281,6 +281,44 @@ export function mergePhones(base, inc) {
   return out;
 }
 
+/**
+ * phones[] with `number` recorded as do-not-call (added when missing). Used when a DNC-flagged
+ * primary number is replaced, so the flag is not lost with the scalar phone_dnc.
+ */
+export function carryDncPhone(phones, number) {
+  if (!phoneDigits(number)) return Array.isArray(phones) ? phones : [];
+  return mergePhones(phones, [{ number, dnc: true, source: 'manual', line_type: 'unknown', note: 'kept: was the DNC primary number' }]);
+}
+
+/**
+ * Re-apply an update computed as prev -> next on top of `fresh`, a newer copy of the same lead
+ * (someone wrote between our read and our conditional write). Only the keys the update changed
+ * are taken from `next`; every other key keeps the concurrent writer's value. phones[] are merged
+ * per number and a DNC flag stays sticky unless the update itself moved the primary number.
+ */
+export function rebaseLeadUpdate(prev, next, fresh) {
+  const out = { ...fresh };
+  const keys = new Set([...Object.keys(prev || {}), ...Object.keys(next || {})]);
+  for (const k of keys) {
+    if (SYSTEM_KEYS.has(k) || k === 'phones' || k === 'phone_dnc') continue;
+    if (JSON.stringify(prev?.[k] ?? null) === JSON.stringify(next?.[k] ?? null)) continue;
+    out[k] = next?.[k];
+  }
+  let phones = mergePhones(fresh?.phones, next?.phones);
+  const freshD = phoneDigits(fresh?.phone);
+  const outD = phoneDigits(out.phone);
+  let dnc = fresh?.phone_dnc ?? null;
+  if (next?.phone_dnc === true) dnc = true;
+  else if (dnc === true && freshD && outD !== freshD) {
+    phones = carryDncPhone(phones, fresh.phone);
+    dnc = typeof next?.phone_dnc === 'boolean' ? next.phone_dnc : null;
+  } else if (dnc !== true && (prev?.phone_dnc ?? null) !== (next?.phone_dnc ?? null)) dnc = next?.phone_dnc ?? null;
+  if (outD && phones.find((p) => phoneDigits(p.number) === outD)?.dnc === true) dnc = true;
+  if (phones.length || Array.isArray(fresh?.phones)) out.phones = phones;
+  out.phone_dnc = dnc;
+  return out;
+}
+
 function cleanNextAction(v) {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return null;
   const type = TASK_TYPES.includes(String(v.type)) ? String(v.type) : 'other';
@@ -352,10 +390,15 @@ export function mergeLead(base, inc, opts = {}) {
   }
 
   // phones + DNC
-  const phones = mergePhones(base?.phones, inc?.phones);
-  if (phones.length) merged.phones = phones;
   const baseDigits = phoneDigits(base?.phone);
   const mergedDigits = phoneDigits(merged.phone);
+  // A DNC-flagged primary number that is being replaced keeps its flag in phones[] so that a later
+  // switch back to it restores phone_dnc (review R1: otherwise the flag was lost with the number).
+  const phones = mergePhones(
+    base?.phone_dnc === true && baseDigits && mergedDigits !== baseDigits ? carryDncPhone(base.phones, base.phone) : base?.phones,
+    inc?.phones,
+  );
+  if (phones.length) merged.phones = phones;
   const entryDnc = mergedDigits ? phones.find((p) => phoneDigits(p.number) === mergedDigits)?.dnc : undefined;
   let dnc = base?.phone_dnc ?? null;
   const incDnc = inc?.phone_dnc;

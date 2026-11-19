@@ -4,7 +4,7 @@
  */
 import { restDelete, restGet, restInsert, restPatch } from './supabase-rest.js';
 import {
-  ACTIVITY_TYPES, STAGES, TASK_TYPES, cleanNextAction, deriveStage, isUuid, leadToRow, mergeLead,
+  ACTIVITY_TYPES, STAGES, TASK_TYPES, carryDncPhone, cleanNextAction, deriveStage, isUuid, leadToRow, mergeLead, rebaseLeadUpdate,
   mergePhones, normStage, phoneDigits, planUpsert, rowToLead,
 } from './leads-core.js';
 
@@ -36,21 +36,34 @@ export function pipelineFromStatus(status) {
   return STATUS_TO_PIPELINE[s] || STATUS_TO_PIPELINE[s.toLowerCase()] || 'new';
 }
 
+let missingOrgErr = null;
+let missingOrgAt = 0;
+
 export async function getDefaultOrg() {
   const now = Date.now();
   if (cachedOrg && now - cachedOrgAt < 60_000) return cachedOrg;
-  const rows = await restGet(
-    'organizations',
-    `select=*&slug=eq.${encodeURIComponent(DEFAULT_SLUG)}&limit=1`,
-  );
-  if (!Array.isArray(rows) || !rows.length) {
-    throw new Error(
-      `Default org slug "${DEFAULT_SLUG}" not found. Apply supabase/migrations/20260712_sales_rev_orgs.sql`,
+  // Production has no organizations table (single tenant): remember the miss for 60 s instead of
+  // paying an extra failing round trip on every leads call (review R1).
+  if (missingOrgErr && now - missingOrgAt < 60_000) throw missingOrgErr;
+  try {
+    const rows = await restGet(
+      'organizations',
+      `select=*&slug=eq.${encodeURIComponent(DEFAULT_SLUG)}&limit=1`,
     );
+    if (!Array.isArray(rows) || !rows.length) {
+      throw new Error(
+        `Default org slug "${DEFAULT_SLUG}" not found. Apply supabase/migrations/20260712_sales_rev_orgs.sql`,
+      );
+    }
+    cachedOrg = rows[0];
+    cachedOrgAt = now;
+    missingOrgErr = null;
+    return cachedOrg;
+  } catch (e) {
+    missingOrgErr = e;
+    missingOrgAt = now;
+    throw e;
   }
-  cachedOrg = rows[0];
-  cachedOrgAt = now;
-  return cachedOrg;
 }
 
 export async function resolveOrgId() {
@@ -163,6 +176,8 @@ async function orgIdOrNull() {
   }
 }
 
+const ISO_TS_RE = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(:\d{2}(\.\d{1,9})?)?(Z|[+-]\d{2}(:?\d{2})?)?$/;
+
 function orgClause(orgId) {
   return orgId ? `&org_id=eq.${ENC(orgId)}` : '';
 }
@@ -180,10 +195,14 @@ export async function pgListLeadRows({ since = null, cursor = null, limit = PAGE
     const i = String(cursor).lastIndexOf('|');
     const ts = i > 0 ? String(cursor).slice(0, i) : '';
     const id = i > 0 ? String(cursor).slice(i + 1) : '';
-    if (!ts || !id || Number.isNaN(Date.parse(ts))) throw new LeadsError(400, 'bad_cursor', 'cursor is not valid');
+    // Both parts end up inside a PostgREST or=(...) group, where a decoded ',' or ')' is syntax:
+    // accept only an ISO-ish timestamp and a uuid (review R1).
+    if (!ts || !id || !ISO_TS_RE.test(ts) || Number.isNaN(Date.parse(ts)) || !isUuid(id)) {
+      throw new LeadsError(400, 'bad_cursor', 'cursor is not valid');
+    }
     q += `&or=(updated_at.gt.${ENC(ts)},and(updated_at.eq.${ENC(ts)},id.gt.${ENC(id)}))`;
   } else if (since) {
-    if (Number.isNaN(Date.parse(since))) throw new LeadsError(400, 'bad_since', 'since must be an ISO timestamp');
+    if (!ISO_TS_RE.test(String(since)) || Number.isNaN(Date.parse(since))) throw new LeadsError(400, 'bad_since', 'since must be an ISO timestamp');
     q += `&updated_at=gt.${ENC(since)}`;
   }
   const rows = (await restGet('leads', q)) || [];
@@ -329,9 +348,28 @@ export async function pgUpsertLeads(incoming, opts = {}) {
   const activity = [];
   const naSync = [];
   for (const u of plan.updates) {
-    const out = await restPatch('leads', `id=eq.${ENC(u.prev.uuid)}`, leadToRow(u.next, { orgId }));
-    const row = Array.isArray(out) ? out[0] : out;
+    // Conditional write on the updated_at we read: a patch/task/stage change that lands while this
+    // (possibly multi-second) push runs must not be overwritten with our stale copy. On a miss,
+    // re-read and re-apply only what this push changed (rebaseLeadUpdate), at most 3 times.
+    let guardAt = u.prev.updated_at || null;
+    let nextLead = u.next;
+    let row = null;
+    for (let attempt = 0; attempt < 3 && !row; attempt += 1) {
+      const guard = guardAt ? `&updated_at=eq.${ENC(guardAt)}` : '';
+      const out = await restPatch('leads', `id=eq.${ENC(u.prev.uuid)}${guard}`, leadToRow(nextLead, { orgId }));
+      row = (Array.isArray(out) ? out[0] : out) || null;
+      if (row || !guard) break;
+      const fresh = (await restGet('leads', `select=*&id=eq.${ENC(u.prev.uuid)}&limit=1`))?.[0];
+      if (!fresh) break;
+      const freshLead = rowToLead(fresh);
+      nextLead = rebaseLeadUpdate(u.prev, u.next, freshLead);
+      guardAt = fresh.updated_at || null;
+    }
     if (row) written.push(row);
+    else {
+      result.conflicts.push({ name: String(u.next?.name || ''), reason: 'concurrent_edit: the lead kept changing during this push; re-sync and retry' });
+      continue;
+    }
     if (u.stageChange) {
       activity.push({
         lead_id: u.prev.uuid,
@@ -453,6 +491,7 @@ export async function pgPatchLead(ref, patch, { expectedUpdatedAt = null, actor 
   } else if (wasDnc && !('phone_dnc' in patch)) {
     // phone replaced by hand: the flag belonged to the old number
     if ('phone' in patch && phoneDigits(next.phone) !== phoneDigits(base.phone)) {
+      next.phones = carryDncPhone(next.phones, base.phone); // keep the old number's DNC record
       const entry = (next.phones || []).find((p) => phoneDigits(p.number) === phoneDigits(next.phone));
       next.phone_dnc = entry && typeof entry.dnc === 'boolean' ? entry.dnc : null;
     } else next.phone_dnc = true;

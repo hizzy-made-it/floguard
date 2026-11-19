@@ -44,3 +44,30 @@ test('bare-string phones (unknown plan shape) still map, with unknown metadata',
   assert.equal(phones[0].number, '(386) 555-0199');
   assert.equal(phones[0].dnc, null);
 });
+
+// Review R1: shapes confirmed in BatchData's help center (help.batchdata.io articles 12859857
+// "BatchData V3 SkipTrace API" and 12856069 "Understanding your property skip trace results",
+// read 2026-11-19): results.persons[].phoneNumbers[] {number, carrier, type, tested, reachable,
+// score, dnc, tcpa(V3)}, persons[].emails[] {email, tested|verified}, person-level `litigator`
+// and `dnc.tcpa` (an object, not a boolean).
+test('person-level dnc.tcpa (object) is read as the TCPA/litigator flag when the phone has none', () => {
+  const data = {
+    status: { code: 200, text: 'OK' },
+    results: { persons: [{
+      name: { first: 'John', last: 'Smith' },
+      dnc: { tcpa: true },
+      phoneNumbers: [{ number: '3865550111', type: 'Mobile', reachable: true, dnc: false, score: 90 }],
+      emails: [{ email: 'john.smith@gmail.com', tested: true }],
+    }] },
+  };
+  const { phones, emails } = mapBatchDataResponse(data, lead);
+  assert.equal(phones[0].litigator, true);
+  assert.equal(phones[0].dnc, false, 'phone-level dnc still wins for DNC');
+  assert.deepEqual(emails, ['john.smith@gmail.com']);
+});
+test('person-level dnc object never masquerades as a DNC boolean', () => {
+  const data = { results: { persons: [{ dnc: { tcpa: false }, phoneNumbers: [{ number: '3865550112', type: 'Land Line' }] }] } };
+  const { phones } = mapBatchDataResponse(data, lead);
+  assert.equal(phones[0].dnc, null);
+  assert.equal(phones[0].litigator, false);
+});

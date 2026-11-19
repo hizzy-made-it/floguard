@@ -5,7 +5,7 @@
 -- The API caps the box at 0.06 degrees each way and the row count at 1500; this function caps
 -- again so a direct service-role call cannot pull the county either.
 --
--- Depends on: public.parcel_risk.geom (001, extensions.geometry(MultiPolygon, 4326)) and its GiST
+-- Depends on: public.parcel_risk.geom (001; PostGIS in schema public or extensions) and its GiST
 -- index parcel_risk_geom_idx. If geom is null for every parcel in the box the function returns no
 -- rows and the API answers available:false / reason 'no_geom' (the map keeps dots).
 --
@@ -19,21 +19,29 @@ create or replace function public.fsi_parcel_geojson(
   n   double precision,
   lim integer default 600)
 returns table(parcel_id text, fsi_static real, fsi_live real, geom_geojson jsonb)
-language sql stable security definer
+-- plpgsql + unqualified st_* / && resolved through search_path at call time, so this works with
+-- PostGIS in schema public (production) or extensions (001). Review R1. Not security definer:
+-- only service_role calls it, and it bypasses RLS anyway.
+language plpgsql stable
 set search_path = public, extensions
 as $$
+#variable_conflict use_column
+begin
+  if w is null or s is null or e is null or n is null
+     or not (e > w and n > s) or (e - w) > 0.06 or (n - s) > 0.06 then
+    return;
+  end if;
+  return query
   select p.parcel_id,
          p.fsi_static,
          p.fsi_live,
-         extensions.st_asgeojson(
-           extensions.st_simplifypreservetopology(p.geom, 0.000005), 6)::jsonb as geom_geojson
+         st_asgeojson(st_simplifypreservetopology(p.geom, 0.000005), 6)::jsonb
     from public.parcel_risk p
    where p.geom is not null
-     and e > w and n > s
-     and (e - w) <= 0.06 and (n - s) <= 0.06
-     and p.geom operator(extensions.&&) extensions.st_makeenvelope(w, s, e, n, 4326)
+     and p.geom && st_makeenvelope(w, s, e, n, 4326)
    order by p.fsi_live desc nulls last
-   limit least(greatest(coalesce(lim, 600), 1), 1500)
+   limit least(greatest(coalesce(lim, 600), 1), 1500);
+end;
 $$;
 
 revoke all on function public.fsi_parcel_geojson(double precision, double precision, double precision, double precision, integer)

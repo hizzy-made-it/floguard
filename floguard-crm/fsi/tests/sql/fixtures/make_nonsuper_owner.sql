@@ -8,7 +8,11 @@ alter schema extensions owner to sb_owner;
 alter schema cron owner to sb_owner;
 alter schema net owner to sb_owner;
 alter schema t owner to sb_owner;
-alter domain extensions.geometry owner to sb_owner;
+do $$ begin  -- PostGIS stand-in domain lives in extensions or public (run-local.sh POSTGIS_SCHEMA)
+  execute format('alter domain %s owner to sb_owner',
+    (select t.oid::regtype from pg_type t join pg_namespace n on n.oid = t.typnamespace
+      where t.typname = 'geometry' and n.nspname in ('public', 'extensions') limit 1));
+end $$;
 do $$
 declare r record;
 begin

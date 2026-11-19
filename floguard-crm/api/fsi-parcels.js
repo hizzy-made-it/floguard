@@ -237,6 +237,24 @@ const EVENT_COLS = 'block_group,event_key,event_name,event_year,claim_count,paid
 const CLAIMS_LAYER_DEFAULT_LIMIT = 400;
 const CLAIMS_LAYER_MAX_LIMIT = 1000; // Supabase PostgREST default max-rows
 
+/**
+ * Vercel caps a function response at 4.5 MB (FUNCTION_PAYLOAD_TOO_LARGE). Block-group polygons
+ * (claims_layer includeGeom, up to 1000 rows) can approach that on a county-wide view. Keep the rows,
+ * drop `geom` from the lowest-heat rows until the payload fits; the map draws those as circles.
+ */
+export const RESPONSE_GEOM_BUDGET_BYTES = 3_500_000;
+export function trimGeomToBudget(rows, budget = RESPONSE_GEOM_BUDGET_BYTES) {
+  let size = Buffer.byteLength(JSON.stringify(rows));
+  let trimmed = 0;
+  for (let i = rows.length - 1; i >= 0 && size > budget; i--) {
+    if (rows[i].geom == null) continue;
+    size -= Buffer.byteLength(JSON.stringify(rows[i].geom)) - 4; // "null"
+    rows[i] = { ...rows[i], geom: null };
+    trimmed++;
+  }
+  return { rows, trimmed, bytes: size };
+}
+
 const numOrNull = (v) => (v == null || v === '' || !Number.isFinite(Number(v)) ? null : Number(v));
 const intOr0 = (v) => (Number.isFinite(Number(v)) ? Math.trunc(Number(v)) : 0);
 
@@ -370,7 +388,8 @@ async function claimsLayer(body, res) {
       evQuery ? restGet('nfip_claim_event', evQuery) : Promise.resolve(null),
     ]);
     const bgRows = Array.isArray(bg) ? bg : [];
-    const rows = shapeClaimsLayerRows(bgRows, { eventRows: Array.isArray(ev) ? ev : null, includeGeom });
+    const shaped = shapeClaimsLayerRows(bgRows, { eventRows: Array.isArray(ev) ? ev : null, includeGeom });
+    const { rows, trimmed } = includeGeom ? trimGeomToBudget(shaped) : { rows: shaped, trimmed: 0 };
     return json(res, 200, {
       ok: true,
       source: 'postgres',
@@ -378,6 +397,7 @@ async function claimsLayer(body, res) {
       event: eventKey ? { key: eventKey, year: Number.isFinite(eventYear) ? eventYear : null } : null,
       count: rows.length,
       truncated: bgRows.length >= limit,
+      ...(trimmed ? { geom_trimmed: trimmed } : {}),
       rows,
       note: 'Claim figures are neighbourhood (census block group) aggregates from OpenFEMA, never a property-level claim.',
     });

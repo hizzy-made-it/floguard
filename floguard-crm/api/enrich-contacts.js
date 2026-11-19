@@ -12,6 +12,11 @@
  * (BatchData + Trestle) in THIS request. The function is stateless, so a client running many
  * batches subtracts `budget.used_total` from its run total and sends the remainder next time.
  * 'estimate' makes no provider calls; it returns per-lead provider and lookup counts.
+ *
+ * Daily cap (server side, review R1): every 'enrich' reserves its paid lookups from a per-day
+ * budget (env ENRICH_DAILY_PAID_CAP, default 200; fsi/sql/022 for a deployment-wide counter,
+ * per-instance memory otherwise) BEFORE any provider call, so neither a client-sent
+ * maxPaidLookups nor replayed requests can exceed it. Response `daily` reports it.
  */
 import { verifySessionToken } from '../server/lib/academy-db.js';
 import {
@@ -22,6 +27,7 @@ import {
   clampMaxPaidLookups,
 } from '../server/lib/contact-enrich.js';
 import { setCors, json, parseBody, rateLimit, clientIp } from '../server/lib/http.js';
+import { dailyPaidCap, releaseDailySpend, reserveDailySpend } from '../server/lib/enrich-spend.js';
 
 export const config = { maxDuration: 60 };
 
@@ -145,13 +151,18 @@ export default async function handler(req, res) {
         expected_lookups: sum('expected_lookups'),
         max_lookups: sum('max_lookups'),
         capped_at: maxPaidLookups,
+        daily_cap: dailyPaidCap(),
       },
     });
   }
 
   const started = Date.now();
   const deadline = started + SOFT_BUDGET_MS;
-  const budget = createBudget(maxPaidLookups);
+  // Reserve paid lookups from today's server-side budget before any provider is called.
+  const caps = enrichCapabilities();
+  const wantsPaid = allowPaid && maxPaidLookups > 0 && Boolean(caps.batchdata || caps.trestle);
+  const reservation = wantsPaid ? await reserveDailySpend(maxPaidLookups) : null;
+  const budget = createBudget(reservation ? reservation.granted : wantsPaid ? 0 : maxPaidLookups);
   const results = [];
 
   // Sequential: polite to free search endpoints; avoids burst blocks
@@ -203,12 +214,26 @@ export default async function handler(req, res) {
     used: budget.used,
     exhausted: budget.exhausted,
   };
+  const released = reservation ? await releaseDailySpend(reservation, budgetOut.used_total) : null;
+  const daily = reservation
+    ? {
+        cap: reservation.cap,
+        requested: maxPaidLookups,
+        granted: reservation.granted,
+        remaining: released ? released.remaining : reservation.remaining,
+        day: reservation.day,
+        store: reservation.store,
+        limited: reservation.granted < maxPaidLookups,
+        ...(reservation.warning ? { warning: reservation.warning } : {}),
+      }
+    : { cap: dailyPaidCap(), requested: wantsPaid ? maxPaidLookups : 0, granted: 0, store: null, limited: false };
 
   return json(res, 200, {
     ok: true,
     capabilities: enrichCapabilities(),
     summary,
     budget: budgetOut,
+    daily,
     results,
     dnc_reminder:
       'Scrub phone against DNC and honor CAN-SPAM before outreach. Enrichment is not consent.',

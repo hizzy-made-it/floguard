@@ -604,15 +604,17 @@ export function buildMessage({ lead, estimate, url }) {
   const email = String(lead?.email || '').trim();
   const phone = digitsOnly(lead?.phone);
   const dnc = lead?.phone_dnc === true;
+  // A TCPA-litigator primary number is as undialable as a DNC one (spec: dial blocked on either).
+  const litigator = Array.isArray(lead?.phones) && lead.phones.some((p) => digitsOnly(p?.number) === phone && phone && p?.litigator === true);
   return {
     subject,
     body: bodyEmail,
     sms,
     links: {
       mailto: email ? `mailto:${email}?subject=${ENC(subject)}&body=${ENC(bodyEmail)}` : null,
-      sms: phone && !dnc ? `sms:${phone}?&body=${ENC(sms)}` : null,
+      sms: phone && !dnc && !litigator ? `sms:${phone}?&body=${ENC(sms)}` : null,
     },
-    to: { email: email || null, phone: phone ? (lead.phone || null) : null, phone_dnc: dnc },
+    to: { email: email || null, phone: phone ? (lead.phone || null) : null, phone_dnc: dnc, phone_litigator: litigator },
   };
 }
 
@@ -657,7 +659,8 @@ async function sendEstimate(body, { actor }) {
   if (estimate.out_of_band) warnings.push('out_of_band');
   if (message.to.phone_dnc) warnings.push('phone_dnc');
   if (!message.links.mailto) warnings.push('no_email');
-  if (!message.links.sms && !message.to.phone_dnc) warnings.push('no_phone');
+  if (message.to.phone_litigator) warnings.push('phone_litigator');
+  if (!message.links.sms && !message.to.phone_dnc && !message.to.phone_litigator) warnings.push('no_phone');
   return { estimate, public_url: estimate.public_url, message, links: message.links, warnings, stage: moved };
 }
 

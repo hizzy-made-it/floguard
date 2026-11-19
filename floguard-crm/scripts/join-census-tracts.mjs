@@ -2,10 +2,15 @@
  * Assign census_tract to parcels via Census Bureau reverse geocode on a grid,
  * then re-paint claim_heat from nfip_claim_tract (cleaner than 0.1° OpenFEMA cells).
  *
+ * Order-safe with scripts/ingest-nfip-claims.mjs (review R1): the tract paint below overwrites
+ * claim_heat on EVERY parcel, so it then calls nfip_apply_block_group_claims (fsi/sql/016) to put
+ * block-group heat back wherever a parcel has a block group. Without 016 the tract heat stands.
+ *
  * Usage:
  *   node scripts/join-census-tracts.mjs
  */
 import { supabaseConfig, restHeaders } from './lib/load-env.mjs';
+import { reapplyBlockGroupHeat } from './lib/claims.mjs';
 
 const { url: SUPABASE_URL, key } = supabaseConfig();
 const headers = restHeaders(key, 'resolution=merge-duplicates,return=minimal');
@@ -170,6 +175,15 @@ async function main() {
   const tractGrid = await buildTractGrid();
   const claimMap = await loadClaimTracts();
   await paintParcels(tractGrid, claimMap);
+  console.log('Re-applying block-group claim heat (fsi/sql/016) over the tract paint…');
+  await reapplyBlockGroupHeat({
+    rpc: async (name, body) => {
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, { method: 'POST', headers: readHeaders, body: JSON.stringify(body) });
+      if (!r.ok) throw new Error(`rpc ${name} ${r.status}: ${(await r.text()).slice(0, 200)}`);
+      return r.json();
+    },
+    log: (m) => console.log(m),
+  });
   console.log('Done. Next: node scripts/score-must-have.mjs');
 }
 
