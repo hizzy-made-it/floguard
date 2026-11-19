@@ -702,4 +702,5 @@ td{font-variant-numeric:tabular-nums}
  .td-lead{min-height:32px}
  .fsi-maptools{gap:8px;top:112px}
  .fsi-layers-pop{top:112px;right:62px}
+ .fsi-mapsearch{width:calc(100% - 80px)}
 }
