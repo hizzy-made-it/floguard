@@ -103,11 +103,11 @@ test('estimate editor and proposal page: build, send, view, accept, job, invoice
       await page.goto(base, { waitUntil: 'load' });
       await page.waitForFunction(() => typeof openProfile === 'function' && document.getElementById('appRoot') && !document.getElementById('appRoot').classList.contains('hidden'), null, { timeout: 15000 }).catch(() => {});
       await page.evaluate((id) => openProfile(id), Number(lead.legacy_id));
-      await page.waitForSelector('#pfActBar [data-fg-estimate]', { timeout: 8000 });
+      await page.waitForSelector('#pfActBar [data-fg-estimate], #pfExtActions [data-ext-action="estimate"]', { timeout: 8000 });
       await shot(page, `drawer-entry-${vp.name}.png`);
 
       // --- editor -------------------------------------------------------------
-      await page.click('#pfActBar [data-fg-estimate]');
+      await page.click('#pfActBar [data-fg-estimate], #pfExtActions [data-ext-action="estimate"]');
       await page.waitForSelector('.est-modal #estAddSel');
       assert.ok(await page.locator('.est-warn', { hasText: 'Draft terms' }).count(), 'draft-terms warning is visible in the editor');
       await page.selectOption('#estAddSel', 'french_drain_sump_system');
@@ -245,7 +245,7 @@ test('estimate editor and proposal page: build, send, view, accept, job, invoice
     await page.goto(base, { waitUntil: 'load' });
     await page.waitForFunction(() => typeof openProfile === 'function');
     await page.evaluate((id) => openProfile(id), Number(lead.legacy_id));
-    await page.click('#pfActBar [data-fg-estimate]');
+    await page.click('#pfActBar [data-fg-estimate], #pfExtActions [data-ext-action="estimate"]');
     await page.waitForSelector('.est-dboff');
     assert.match(await page.locator('.est-dboff').innerText(), /Estimates need the database switched on/);
     await shot(page, 'editor-db-off.png');
