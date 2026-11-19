@@ -686,13 +686,17 @@ function removeLeadFromCurrentList(){
  const l=state.find(x=>x.id===profileLeadId); if(!l) return;
  normalizeLead(l);
  const active=activeCause(l);
- if(!active||active==='All'){ if(window.FG&&FG.ready) FG.toast('Pick a cause tab (not All) to uncheck that cause.', {kind:'err'}); else alert('Pick a list tab (not All) to uncheck that cause.'); return; }
+ if(!active||active==='All'){ fgNotify('Pick a cause tab (not All) to uncheck that cause.', 'err'); return; }
+ const finish=function(){
+  appendActivity({lead_id:l.id,lead_key:leadKeyOf(l),type:'list_change',detail:{text:'Unchecked cause '+active,lists:leadLists(l)}});
+  saveLeads();
+  closeProfile();
+  render(); refreshIndustryFilter(); refreshCityFilter();
+ };
  const ok=toggleLeadCause(l, active, false);
+ if(ok&&typeof ok.then==='function'){ ok.then(function(y){ if(y) finish(); }); return; }
  if(!ok) return;
- appendActivity({lead_id:l.id,lead_key:leadKeyOf(l),type:'list_change',detail:{text:'Unchecked cause '+active,lists:leadLists(l)}});
- saveLeads();
- closeProfile();
- render(); refreshIndustryFilter(); refreshCityFilter();
+ finish();
 }
 async function deleteLeadForever(){
  const l=state.find(x=>x.id===profileLeadId); if(!l) return;

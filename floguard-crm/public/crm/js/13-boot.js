@@ -36,12 +36,17 @@ document.getElementById('syncPill')&&(document.getElementById('syncPill').style.
  if(!e.target.matches || !e.target.matches('input[data-profile-cause]')) return;
  const l=state.find(x=>x.id===profileLeadId); if(!l) return;
  const cause=e.target.getAttribute('data-cause');
- const ok=toggleLeadCause(l, cause, e.target.checked);
+ const want=e.target.checked;
+ const finish=function(){
+  appendActivity({lead_id:l.id,lead_key:leadKeyOf(l),type:'list_change',detail:{text:(want?'Checked':'Unchecked')+' '+cause,lists:leadLists(l)}});
+  saveLeads();
+  render();
+  openProfile(l.id);
+ };
+ const ok=toggleLeadCause(l, cause, want);
+ if(ok&&typeof ok.then==='function'){ e.target.checked=!want; ok.then(function(y){ if(y) finish(); }); return; }
  if(!ok){ e.target.checked=!e.target.checked; return; }
- appendActivity({lead_id:l.id,lead_key:leadKeyOf(l),type:'list_change',detail:{text:(e.target.checked?'Checked':'Unchecked')+' '+cause,lists:leadLists(l)}});
- saveLeads();
- render();
- openProfile(l.id);
+ finish();
  });
  // Management company: + New / save / cancel
  document.getElementById('pfMgmtAddBtn')?.addEventListener('click', function(){
@@ -53,7 +58,7 @@ document.getElementById('syncPill')&&(document.getElementById('syncPill').style.
  });
  document.getElementById('pfMgmtSaveNew')?.addEventListener('click', function(){
   const name=(document.getElementById('pfMgmtNewName')?.value||'').trim();
-  if(!name){ alert('Enter a management company name.'); return; }
+  if(!name){ fgNotify('Enter a management company name.', 'err'); return; }
   const row=addMgmtCompany({
    name:name,
    phone:(document.getElementById('pfMgmtNewPhone')?.value||'').trim(),

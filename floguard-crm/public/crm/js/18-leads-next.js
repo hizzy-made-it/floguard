@@ -175,6 +175,29 @@ FG.confirm=function(o){
  });
 };
 
+/** Promise<string|null>. Replaces window.prompt (R2). o: {title, label, type:'text'|'password', confirmLabel, hint} */
+FG.prompt=function(o){
+ return new Promise(function(res){
+  let answered=false;
+  const id='fgp_'+FG.uid();
+  const m=FG.modal({
+   title:o.title||'Enter a value', size:'sm',
+   body:'<label class="fg-lbl" for="'+id+'">'+h(o.label||'')+'</label><input id="'+id+'" type="'+(o.type==='password'?'password':'text')+'" autocomplete="'+(o.type==='password'?'off':'on')+'" spellcheck="false">'+(o.hint?'<p class="hint mt-2">'+h(o.hint)+'</p>':''),
+   focus:'#'+id,
+   actions:[
+    {label:'Cancel', kind:'ghost', reason:'cancel', onClick:function(){ answered=true; res(null); }},
+    {label:o.confirmLabel||'OK', kind:'p', onClick:function(api){ const v=api.el.querySelector('#'+id).value; if(!v){ api.el.querySelector('#'+id).focus(); return false; } answered=true; res(v); }}
+   ],
+   onClose:function(){ if(!answered) res(null); }
+  });
+  m.el.querySelector('#'+id).addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); m.foot.querySelector('.btn.p').click(); } });
+ });
+};
+/** Non-blocking message: toast when the FG layer is up, native alert only before it loads. */
+window.fgNotify=function(msg, kind){
+ if(window.FG&&FG.toast) FG.toast(String(msg), {kind:kind||'info'}); else window.alert(String(msg));
+};
+
 /* ---------------- backend capability ---------------- */
 FG.server={mode:'unknown', detail:''};
 function setMode(m, detail){

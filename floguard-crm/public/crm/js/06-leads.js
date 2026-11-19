@@ -76,12 +76,20 @@ function toggleLeadCause(l, cause, checked){
  if(checked && i<0) cur.push(cause);
  if(!checked && i>=0){
  if(cur.length===1){
+ const archive=function(){
+  l.status='Archived';
+  setListStatus(l, cause, 'Archived');
+  setLeadLists(l, [], {allowEmpty:true, touched:true});
+  l.list='Website';
+  return true;
+ };
+ // R2: app modal instead of window.confirm. Returns a Promise<boolean>; callers keep the box as
+ // it was and finish their work when it resolves true.
+ if(window.FG&&FG.confirm){
+  return FG.confirm({title:'Archive this lead?', message:'"'+(l.name||'This business')+'" is only on '+causeLabel(cause)+'. Unchecking it archives the lead.', confirmLabel:'Uncheck and archive', danger:true}).then(function(y){ return y?archive():false; });
+ }
  if(!confirm('"'+ (l.name||'This business') +'" is only on '+cause+'. Uncheck last cause and archive?')) return false;
- l.status='Archived';
- setListStatus(l, cause, 'Archived');
- setLeadLists(l, [], {allowEmpty:true, touched:true});
- l.list='Website';
- return true;
+ return archive();
  }
  cur.splice(i,1);
  }
@@ -325,6 +333,19 @@ function phoneCellExtras(l){
  return '<div class="ph-line">'+FG.phone.chips(p, l)+(list.length>1?'<span class="ph-chip more" title="'+esc(list.slice(1).map(function(x){ return x.number; }).join(', '))+'">+'+(list.length-1)+'</span>':'')+
   '<span class="ph-btns">'+btn('call','phone','Call')+btn('text','message-square','Text')+'</span></div>';
 }
+const LEADS_PAGE=150;
+let _leadsLimit=LEADS_PAGE;
+/** Back to the first page when the list itself changes (tab, search, filters, sort). */
+function resetLeadsPage(){ _leadsLimit=LEADS_PAGE; }
+document.addEventListener('click', function(e){
+ const b=e.target.closest&&e.target.closest('#tbody .more-row [data-more]'); if(!b) return;
+ _leadsLimit=b.getAttribute('data-more')==='all'?Infinity:_leadsLimit+LEADS_PAGE;
+ render();
+});
+['search','industry','cityFilter','dueThisMonth','sortSelect','chipStage'].forEach(function(id){
+ const el=document.getElementById(id); if(el){ el.addEventListener('input', resetLeadsPage, true); el.addEventListener('change', resetLeadsPage, true); }
+});
+['tabs','filterChips'].forEach(function(id){ const el=document.getElementById(id); if(el) el.addEventListener('click', resetLeadsPage, true); });
 function render(){
  syncDueFilterUi();
  const fg=window.FG&&FG.ready;
@@ -337,7 +358,10 @@ function render(){
  const list=visibleLeads();
  const shown=list.length;
  const sel=fg&&FG.views?FG.views.selection:null;
- list.forEach(l=>{
+ // R2: draw one page of rows (2,000 leads took ~400 ms and 100k DOM nodes per render); "Show more" adds pages.
+ const frag=document.createDocumentFragment();
+ const limit=Math.max(LEADS_PAGE, _leadsLimit);
+ list.slice(0, limit).forEach(l=>{
  const tr=document.createElement('tr'); tr.dataset.id=l.id;
  const cause=activeCause(l);
  const st=getListStatus(l, cause);
@@ -362,8 +386,15 @@ function render(){
  <td class="row-open cell-score" title="Open prospect for score details">${scoreCellHtml(l)}</td>
  <td class="cell-status" data-st="${esc(statusTone(st))}"><select data-f="status" data-cause-status="1" class="status-sel" aria-label="Status for ${esc(cause)}" title="Status for ${esc(cause)}">${STATUSES.map(s=>`<option ${st===s?'selected':''}>${esc(s)}</option>`).join('')}</select><div class="lead-cause">${fg?FG.stageChip(stage,' title="Pipeline stage"'):''}<span>${esc(cause)}</span></div></td>
  <td class="cell-acts"><button type="button" class="coachbtn openbtn" title="Open profile">Open</button> <button type="button" class="coachbtn" title="Game-plan this call with the AI Coach">Coach</button> <button type="button" class="del" title="Delete lead" aria-label="Delete lead">✕</button></td>`;
- tb.appendChild(tr);
+ frag.appendChild(tr);
  });
+ if(list.length>limit){
+  const more=document.createElement('tr'); more.className='more-row';
+  const left=list.length-limit;
+  more.innerHTML='<td colspan="8"><div class="more-in"><span class="more-n">Showing <b class="num">'+limit+'</b> of <b class="num">'+list.length+'</b></span><button type="button" class="btn btn--sm" data-more="page">Show '+Math.min(LEADS_PAGE,left)+' more</button>'+(left>LEADS_PAGE?'<button type="button" class="btn btn--sm ghost" data-more="all">Show all '+list.length+'</button>':'')+'</div></td>';
+  frag.appendChild(more);
+ }
+ tb.appendChild(frag);
  if(!shown){
   const tr=document.createElement('tr'); tr.className='empty-row';
   tr.innerHTML='<td colspan="8"><div class="empty-state"><b>'+(state.length?'No leads match these filters':'No leads yet')+'</b><span>'+(state.length?'Clear the search or filter chips, pick another cause tab, or reset the industry and city filters.':'Add a lead, paste one from Google Maps, or send parcels over from the flood map.')+'</span></div></td>';
@@ -403,10 +434,15 @@ document.getElementById('tbody').addEventListener('change',e=>{
  // Cause checkbox toggle
  if(e.target.matches('input[data-cause]')){
  const cause=e.target.getAttribute('data-cause');
- const ok=toggleLeadCause(l, cause, e.target.checked);
+ const want=e.target.checked;
+ const finish=function(){
+  appendActivity({lead_id:l.id,lead_key:leadKeyOf(l),type:'list_change',detail:{text:(want?'Checked':'Unchecked')+' '+cause,lists:leadLists(l)}});
+  saveLeads(); render(); refreshIndustryFilter(); refreshCityFilter();
+ };
+ const ok=toggleLeadCause(l, cause, want);
+ if(ok&&typeof ok.then==='function'){ e.target.checked=!want; ok.then(function(y){ if(y) finish(); }); return; }
  if(!ok){ e.target.checked=!e.target.checked; return; }
- appendActivity({lead_id:l.id,lead_key:leadKeyOf(l),type:'list_change',detail:{text:(e.target.checked?'Checked':'Unchecked')+' '+cause,lists:leadLists(l)}});
- saveLeads(); render(); refreshIndustryFilter(); refreshCityFilter();
+ finish();
  return;
  }
  // Per-cause status
@@ -518,7 +554,7 @@ function pmsg(t){ document.getElementById('parseMsg').textContent=t; }
 function mapsUrl(cat,city){ return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent((cat||'')+' in '+(city||'')+' FL'); }
 document.getElementById('mGo').addEventListener('click',()=>{
  const c=document.getElementById('mCat').value, city=document.getElementById('mCity').value;
- if(!c){ if(window.FG&&FG.ready) FG.toast('Type a category or keyword first.', {kind:'err'}); else alert('Type a category or keyword first.'); document.getElementById('mCat').focus(); return; }
+ if(!c){ if(window.FG&&FG.ready) FG.toast('Type a category or keyword first.', {kind:'err'}); else fgNotify('Type a category or keyword first.'); document.getElementById('mCat').focus(); return; }
  window.open(mapsUrl(c,city),'_blank');
 });
 (function initMaps(){

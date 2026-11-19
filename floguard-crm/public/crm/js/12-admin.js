@@ -46,7 +46,7 @@ async function adminFetch(action, payload={}){
  }
  return data;
 }
-function fmtNum(n){ return (n||0).toLocaleString(); }
+function fmtNum(n){ const x=Number(n); return (isFinite(x)?x:0).toLocaleString(); }
 async function loadAdmin(){
  const msg=document.getElementById('adminMsg');
  if(!isAdminUser(currentUser)){
@@ -91,26 +91,29 @@ document.getElementById('adminTbody')?.addEventListener('click',async e=>{
  const box=document.getElementById('adminDetail'); box.style.display='block';
  document.getElementById('adminDetailTitle').textContent=d.user.username+' · detail';
  const days=Object.entries(d.usage_by_day||{}).sort((a,b)=>a[0]<b[0]?1:-1).slice(0,14)
- .map(([day,tok])=>`${day}: ${fmtNum(tok)} tokens`).join('<br>')||'No usage yet';
+ .map(([day,tok])=>`${esc(day)}: ${fmtNum(tok)} tokens`).join('<br>')||'No usage yet';
  const modes=Object.entries(d.mode_counts||{}).map(([m,c])=>`${m}: ${c}`).join(' · ')||'—';
  const lists=Object.entries(d.leads_by_list||{}).map(([m,c])=>`${m}: ${c}`).join(' · ')||'—';
- const ev=(d.events||[]).slice(0,15).map(x=>`${(x.ts||'').slice(0,19)} · ${x.mode||x.kind||'chat'} · ${fmtNum(x.tokens)} tok`).join('<br>')||'—';
+ const ev=(d.events||[]).slice(0,15).map(x=>`${esc(String(x.ts||'').slice(0,19))} · ${esc(x.mode||x.kind||'chat')} · ${fmtNum(x.tokens)} tok`).join('<br>')||'—';
  document.getElementById('adminDetailBody').innerHTML=
- `<p><b>Tokens:</b> ${fmtNum(d.user.tokens_used)} / ${fmtNum(d.user.tokens_limit)} · locked=${d.user.locked} · role=${esc(d.user.role)}</p>
+ `<p><b>Tokens:</b> ${fmtNum(d.user.tokens_used)} / ${fmtNum(d.user.tokens_limit)} · ${d.user.locked?'Locked':'Active'} · role ${esc(d.user.role)}</p>
  <p><b>AI modes:</b> ${esc(modes)}</p>
  <p><b>Leads owned:</b> ${fmtNum(d.leads_count)} · ${esc(lists)}</p>
  <p><b>Usage by day</b><br>${days}</p>
  <p><b>Recent AI events</b><br>${ev}</p>`;
- }catch(err){ alert(err.message||err); }
+ }catch(err){ fgNotify(err.message||err, 'err'); }
  }
  if(btn.dataset.act==='approve'){
- const pin=prompt('Enter platform ADMIN PIN (ACADEMY_ADMIN_PIN) to approve +50,000 tokens for this user:');
+ if(btn.disabled) return;
+ const pin=await FG.prompt({title:'Approve 50,000 more tokens', label:'Admin PIN', type:'password', confirmLabel:'Approve', hint:'Raises this user\'s limit by 50,000 tokens and unlocks the account.'});
  if(!pin) return;
+ btn.disabled=true;
  try{
  await adminFetch('approve',{user_id:uid,admin_pin:pin});
  await loadAdmin();
- alert('Approved. Token limit raised and account unlocked.');
- }catch(err){ alert(err.message||err); }
+ fgNotify('Approved. Token limit raised and account unlocked.', 'ok');
+ }catch(err){ fgNotify(err.message||err, 'err'); }
+ finally{ btn.disabled=false; }
  }
 });
 // load admin when opening tab

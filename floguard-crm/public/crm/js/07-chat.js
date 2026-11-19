@@ -114,11 +114,17 @@ async function sendChat(mode,promptText){
  if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendChat(mode); }
  });
  document.getElementById('clear-'+mode).addEventListener('click',()=>{
- if(confirm('Clear this conversation?')){ chats[mode]=[]; saveChats(); if(mode==='roleplay') rpActive=null; restore(mode); }
+ fgAsk('Clear this conversation?', 'Clear').then(function(y){ if(!y) return; chats[mode]=[]; saveChats(); if(mode==='roleplay') rpActive=null; restore(mode); });
  });
 });
 document.getElementById('clear-review').addEventListener('click',()=>{
- if(confirm('Clear review history?')){ chats.review=[]; saveChats(); document.getElementById('lastScore').textContent='—'; restore('review'); }
+ fgAsk('Clear review history?', 'Clear').then(function(y){ if(!y) return; chats.review=[]; saveChats(); document.getElementById('lastScore').textContent='—'; restore('review'); });
 });
 document.querySelectorAll('.qp').forEach(b=>b.addEventListener('click',()=>{ goTab('coach'); sendChat('coach',b.dataset.q); }));
 
+
+/** Promise<boolean> confirm: the app modal when loaded, native confirm only before that (R2). */
+function fgAsk(msg, label){
+ if(window.FG&&FG.confirm) return FG.confirm({title:msg, message:'This cannot be undone.', confirmLabel:label||'Confirm', danger:true});
+ return Promise.resolve(window.confirm(msg));
+}

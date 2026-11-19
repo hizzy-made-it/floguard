@@ -15,9 +15,9 @@ async function loadDrafts(){
  const j=await draftsApi({action:'list', limit:200, status:status||undefined});
  _draftsCache=j.drafts||[];
  renderDraftsTable();
- document.getElementById('draftStats').innerHTML='Showing <b>'+_draftsCache.length+'</b> · backend <b>'+(j.backend||'?')+'</b>';
+ document.getElementById('draftStats').innerHTML='Showing <b>'+_draftsCache.length+'</b>';
  }catch(e){
- document.getElementById('draftStats').textContent='Error: '+(e.message||e);
+ document.getElementById('draftStats').textContent='Could not load drafts: '+(e.message||e);
  document.getElementById('draftTbody').innerHTML='';
  }
 }
@@ -56,24 +56,29 @@ document.getElementById('draftTbody')?.addEventListener('click', function(e){
  const tr=e.target.closest('tr'); if(tr) openDraftDetail(tr.dataset.did);
  }
 });
+/** One request at a time per button (R2: double clicks sent duplicate approve/queue calls). */
+function draftBusyClick(id, fn){
+ const el=document.getElementById(id); if(!el) return;
+ el.addEventListener('click', async function(){ if(el.disabled) return; el.disabled=true; el.setAttribute('aria-busy','true'); try{ await fn(); }finally{ el.disabled=false; el.removeAttribute('aria-busy'); } });
+}
 document.getElementById('draftDetailClose')?.addEventListener('click', function(){ document.getElementById('draftDetail').style.display='none'; _draftSelectedId=null; });
-document.getElementById('draftApprove')?.addEventListener('click', async function(){
+draftBusyClick('draftApprove', async function(){
  if(!_draftSelectedId) return;
- try{ await draftsApi({action:'approve', id:_draftSelectedId}); await loadDrafts(); openDraftDetail(_draftSelectedId); }catch(e){ alert(e.message); }
+ try{ await draftsApi({action:'approve', id:_draftSelectedId}); await loadDrafts(); openDraftDetail(_draftSelectedId); }catch(e){ fgNotify(e.message, 'err'); }
 });
-document.getElementById('draftReject')?.addEventListener('click', async function(){
+draftBusyClick('draftReject', async function(){
  if(!_draftSelectedId) return;
- try{ await draftsApi({action:'reject', id:_draftSelectedId}); await loadDrafts(); openDraftDetail(_draftSelectedId); }catch(e){ alert(e.message); }
+ try{ await draftsApi({action:'reject', id:_draftSelectedId}); await loadDrafts(); openDraftDetail(_draftSelectedId); }catch(e){ fgNotify(e.message, 'err'); }
 });
-document.getElementById('draftMarkSent')?.addEventListener('click', async function(){
+draftBusyClick('draftMarkSent', async function(){
  if(!_draftSelectedId) return;
- try{ await draftsApi({action:'mark_sent', id:_draftSelectedId}); await loadDrafts(); openDraftDetail(_draftSelectedId); }catch(e){ alert(e.message); }
+ try{ await draftsApi({action:'mark_sent', id:_draftSelectedId}); await loadDrafts(); openDraftDetail(_draftSelectedId); }catch(e){ fgNotify(e.message, 'err'); }
 });
 document.getElementById('draftCopy')?.addEventListener('click', async function(){
  const t=document.getElementById('draftDetailBody')?.textContent||'';
  try{ await navigator.clipboard.writeText(t); }catch(e){}
 });
-document.getElementById('draftCreate')?.addEventListener('click', async function(){
+draftBusyClick('draftCreate', async function(){
  const msg=document.getElementById('draftCreateMsg');
  try{
  const subject=document.getElementById('draftSubject').value.trim();
