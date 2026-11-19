@@ -41,10 +41,14 @@ function getListStatus(l, cause){
 function setListStatus(l, cause, status){
  const c=cause||activeCause(l);
  if(!l.list_status || typeof l.list_status!=='object') l.list_status={};
+ const fg=window.FG&&FG.ready;
+ const prevDerived=fg?FG.deriveStage(l):null, prevStage=fg?FG.stageOf(l):null;
  l.list_status[c]=status;
  // Rollup primary status for CSV/sync/LeadAgent compat
  if(!l.list || l.list===c || !leadLists(l).includes(l.list)) l.list=c;
  if(l.list===c) l.status=status;
+ // Pipeline stage follows a moved legacy status (same rule as the server)
+ if(fg) FG.onStatusChange(l, prevDerived, prevStage);
  return l;
 }
 
@@ -271,50 +275,90 @@ function statusTone(st){
  if(st==='Archived') return 'muted';
  return 'touched';
 }
+/** Leads that pass the cause tab, industry/city/due filters, search and the saved filter chips. */
+function visibleLeads(opts){
+ opts=opts||{};
+ const ind=(document.getElementById('industry')||{}).value||'';
+ const city=(document.getElementById('cityFilter')&&document.getElementById('cityFilter').value)||'';
+ const q=((document.getElementById('search')||{}).value||'').trim().toLowerCase();
+ const dueOnly=view==='Maintenance' && !!(document.getElementById('dueThisMonth')&&document.getElementById('dueThisMonth').checked);
+ const fg=window.FG&&FG.ready;
+ const out=[];
+ state.forEach(function(l){
+  normalizeLead(l);
+  if(!inView(l)) return;
+  if(ind&&l.industry!==ind) return;
+  if(city&&l.city!==city) return;
+  if(dueOnly && !(isDueThisMonth(l)||isOverdue(l))) return;
+  if(q){
+   const phones=Array.isArray(l.phones)?l.phones.map(function(p){ return p&&p.number||''; }).join(' '):'';
+   const hay=(l.name+' '+(l.address||'')+' '+l.city+' '+(l.zip||'')+' '+(l.parcel_id||'')+' '+l.industry+' '+l.phone+' '+phones+' '+(l.email||'')+' '+l.notes+' '+l.website+' '+(l.mgmt_company_name||'')+' '+(l.owner||'')).toLowerCase();
+   if(!hay.includes(q)) return;
+  }
+  if(fg && !opts.noChips && FG.views && !FG.views.passesChips(l)) return;
+  out.push(l);
+ });
+ return (fg && FG.views && !opts.noSort) ? FG.views.sortLeads(out) : out;
+}
+function phoneCellExtras(l){
+ if(!(window.FG&&FG.ready)) return '';
+ const list=FG.phone.list(l);
+ if(!list.length){
+  return l.enrich_status==='blocked'?'<div class="ph-line"><span class="ph-chip bad">All numbers blocked</span></div>':'';
+ }
+ const p=list[0];
+ const st=FG.phone.state(p, l);
+ const nm=esc(l.name||'lead');
+ const btn=function(kind, icon, label){
+  return st.blocked
+   ? '<button type="button" class="ph-btn" data-dial="'+kind+'" aria-disabled="true" aria-label="'+label+' '+nm+' (blocked)" title="'+esc(st.reason+' Send mail or a door hanger instead.')+'">'+FG.icon(icon)+'</button>'
+   : '<button type="button" class="ph-btn" data-dial="'+kind+'" aria-label="'+label+' '+nm+'" title="'+label+' '+esc(p.number)+(st.scrub==='unscrubbed'?' (not scrubbed: you will be asked first)':'')+'">'+FG.icon(icon)+'</button>';
+ };
+ return '<div class="ph-line">'+FG.phone.chips(p, l)+(list.length>1?'<span class="ph-chip more" title="'+esc(list.slice(1).map(function(x){ return x.number; }).join(', '))+'">+'+(list.length-1)+'</span>':'')+
+  '<span class="ph-btns">'+btn('call','phone','Call')+btn('text','message-square','Text')+'</span></div>';
+}
 function render(){
  syncDueFilterUi();
+ const fg=window.FG&&FG.ready;
  const ind=document.getElementById('industry').value;
  const city=(document.getElementById('cityFilter')&&document.getElementById('cityFilter').value)||'';
- const q=document.getElementById('search').value.trim().toLowerCase();
  const dueOnly=view==='Maintenance' && !!(document.getElementById('dueThisMonth')&&document.getElementById('dueThisMonth').checked);
- const tb=document.getElementById('tbody'); tb.innerHTML=''; let shown=0;
+ const tb=document.getElementById('tbody'); tb.innerHTML='';
  let dueCount=0;
- state.forEach(l=>{
- normalizeLead(l);
- if(leadLists(l).includes('Maintenance') && (isDueThisMonth(l)||isOverdue(l))) dueCount++;
- if(!inView(l)) return;
- if(ind&&l.industry!==ind) return;
- if(city&&l.city!==city) return;
- if(dueOnly && !(isDueThisMonth(l)||isOverdue(l))) return;
- if(q){
- const hay=(l.name+' '+(l.address||'')+' '+l.city+' '+(l.zip||'')+' '+(l.parcel_id||'')+' '+l.industry+' '+l.phone+' '+(l.email||'')+' '+l.notes+' '+l.website+' '+(l.mgmt_company_name||'')).toLowerCase();
- if(!hay.includes(q)) return;
- }
- shown++;
+ state.forEach(function(l){ normalizeLead(l); if(leadLists(l).includes('Maintenance') && (isDueThisMonth(l)||isOverdue(l))) dueCount++; });
+ const list=visibleLeads();
+ const shown=list.length;
+ const sel=fg&&FG.views?FG.views.selection:null;
+ list.forEach(l=>{
  const tr=document.createElement('tr'); tr.dataset.id=l.id;
  const cause=activeCause(l);
  const st=getListStatus(l, cause);
+ const stage=fg?FG.stageOf(l):'';
  const mntBadge=(view==='Maintenance'||leadLists(l).includes('Maintenance'))?mntDueBadgeHtml(l):'';
  const mgmtBit=(view==='PropertyMgmt'&&l.mgmt_company_name)?('<div class="lead-sub">'+esc(l.mgmt_company_name)+'</div>'):'';
  const addrBit=(l.address||'').trim()
   ? ('<div class="lead-addr" title="'+esc(l.address)+'">'+esc(l.address)+'</div>')
   : '<div class="lead-addr missing">No site address</div>';
- const contactHint=!(l.phone||'').trim()&&!(l.email||'').trim()
+ const contactHint=!(l.phone||'').trim()&&!(l.email||'').trim()&&!(Array.isArray(l.phones)&&l.phones.length)
   ? '<div class="lead-flag" title="County tax roll has no phone/email">Needs phone/email</div>'
   : '';
+ const naChip=fg?FG.tasks.chip(l):'';
+ const isSel=!!(sel&&sel.has(String(l.id)));
+ if(isSel) tr.classList.add('is-sel');
  tr.innerHTML=`
- <td class="name row-open"><input value="${esc(l.name)}" data-f="name" aria-label="Owner or business name" placeholder="(owner / business)" title="${esc((l.address||'')+(l.city?(' · '+l.city):'')+(l.industry?(' · '+l.industry):''))}">${addrBit}${mgmtBit}${contactHint}${mntBadge?'<div class="lead-due">'+mntBadge+'</div>':''}</td>
+ <td class="cell-sel"><input type="checkbox" class="row-sel" aria-label="Select ${esc(l.name||'lead')}"${isSel?' checked':''}></td>
+ <td class="name row-open"><input value="${esc(l.name)}" data-f="name" aria-label="Owner or business name" placeholder="(owner / business)" title="${esc((l.address||'')+(l.city?(' · '+l.city):'')+(l.industry?(' · '+l.industry):''))}">${addrBit}${mgmtBit}${contactHint}${naChip?'<div class="lead-na">'+naChip+'</div>':''}${mntBadge?'<div class="lead-due">'+mntBadge+'</div>':''}</td>
  <td class="cell-causes" title="Causes: ${esc(leadLists(l).join(', '))} — check/uncheck to work each product separately">${renderCauseChecks(l,{full:false})}</td>
- <td class="cell-phone"><input value="${esc(l.phone)}" data-f="phone" aria-label="Phone" placeholder="Add phone"></td>
+ <td class="cell-phone"><input value="${esc(l.phone)}" data-f="phone" aria-label="Phone" placeholder="Add phone">${phoneCellExtras(l)}</td>
  <td class="cell-email"><input value="${esc(l.email||'')}" data-f="email" aria-label="Email" placeholder="Add email" title="${esc(l.email||'')}"></td>
  <td class="row-open cell-score" title="Open prospect for score details">${scoreCellHtml(l)}</td>
- <td class="cell-status" data-st="${esc(statusTone(st))}"><select data-f="status" data-cause-status="1" class="status-sel" aria-label="Status for ${esc(cause)}" title="Status for ${esc(cause)}">${STATUSES.map(s=>`<option ${st===s?'selected':''}>${esc(s)}</option>`).join('')}</select><div class="lead-cause">${esc(cause)}</div></td>
- <td class="cell-acts"><button type="button" class="coachbtn openbtn" title="Open profile">Open</button> <button type="button" class="coachbtn" title="Game-plan this call with the AI Coach">Coach</button> <button type="button" class="del" title="Delete forever" aria-label="Delete lead forever">✕</button></td>`;
+ <td class="cell-status" data-st="${esc(statusTone(st))}"><select data-f="status" data-cause-status="1" class="status-sel" aria-label="Status for ${esc(cause)}" title="Status for ${esc(cause)}">${STATUSES.map(s=>`<option ${st===s?'selected':''}>${esc(s)}</option>`).join('')}</select><div class="lead-cause">${fg?FG.stageChip(stage,' title="Pipeline stage"'):''}<span>${esc(cause)}</span></div></td>
+ <td class="cell-acts"><button type="button" class="coachbtn openbtn" title="Open profile">Open</button> <button type="button" class="coachbtn" title="Game-plan this call with the AI Coach">Coach</button> <button type="button" class="del" title="Delete lead" aria-label="Delete lead">✕</button></td>`;
  tb.appendChild(tr);
  });
  if(!shown){
   const tr=document.createElement('tr'); tr.className='empty-row';
-  tr.innerHTML='<td colspan="7"><div class="empty-state"><b>'+(state.length?'No leads match these filters':'No leads yet')+'</b><span>'+(state.length?'Clear the search, pick another cause tab, or reset the industry and city filters.':'Add a lead, paste one from Google Maps, or send parcels over from the flood map.')+'</span></div></td>';
+  tr.innerHTML='<td colspan="8"><div class="empty-state"><b>'+(state.length?'No leads match these filters':'No leads yet')+'</b><span>'+(state.length?'Clear the search or filter chips, pick another cause tab, or reset the industry and city filters.':'Add a lead, paste one from Google Maps, or send parcels over from the flood map.')+'</span></div></td>';
   tb.appendChild(tr);
  }
  let dl=document.getElementById('indList');
@@ -331,19 +375,23 @@ function render(){
  (dueOnly?' · <b>Due filter on</b>':'')+
  (ind?(' · industry: <b>'+esc(ind)+'</b>'):'')+
  (city?(' · city: <b>'+esc(city)+'</b>'):'');
+ if(fg && FG.views) FG.views.afterRender(list);
 }
 document.getElementById('tbody').addEventListener('input',e=>{
  const f=e.target.dataset.f; if(!f) return;
  // Status is cause-scoped — handled on change via setListStatus
  if(f==='status' || e.target.getAttribute('data-cause-status')) return;
- const id=+e.target.closest('tr').dataset.id; const l=state.find(x=>x.id===id); if(!l) return;
+ if(f==='sel') return;
+ const tr0=e.target.closest('tr'); if(!tr0) return;
+ const l=state.find(x=>String(x.id)===tr0.dataset.id); if(!l) return;
  l[f]=e.target.value; saveLeads();
  if(f==='industry') refreshIndustryFilter();
  if(f==='city') refreshCityFilter();
 });
 document.getElementById('tbody').addEventListener('change',e=>{
  const tr=e.target.closest('tr'); if(!tr) return;
- const id=+tr.dataset.id; const l=state.find(x=>x.id===id); if(!l) return;
+ const l=state.find(x=>String(x.id)===tr.dataset.id); if(!l) return;
+ if(e.target.matches('input.row-sel')){ if(window.FG&&FG.views) FG.views.toggleSelect(l.id, e.target.checked, e); return; }
  // Cause checkbox toggle
  if(e.target.matches('input[data-cause]')){
  const cause=e.target.getAttribute('data-cause');
@@ -363,13 +411,26 @@ document.getElementById('tbody').addEventListener('change',e=>{
  }
 });
 document.getElementById('tbody').addEventListener('click',e=>{
- const tr=e.target.closest('tr'); if(!tr) return; const id=+tr.dataset.id;
- if(e.target.classList.contains('del')){ if(confirm('Permanently delete this lead?')){ const L=state.find(x=>x.id===id); if(L) appendActivity({lead_id:id,lead_key:leadKeyOf(L),type:'note',detail:{text:'Lead deleted'}}); state=state.filter(x=>x.id!==id); saveLeads(); render(); refreshIndustryFilter(); refreshCityFilter(); } return; }
+ const tr=e.target.closest('tr'); if(!tr||!tr.dataset.id) return;
+ const L=state.find(x=>String(x.id)===tr.dataset.id); if(!L) return;
+ const id=L.id;
+ if(window.FG&&FG.views) FG.views.setActiveRow(id, {noScroll:true});
+ const dialBtn=e.target.closest('[data-dial]');
+ if(dialBtn){
+  e.preventDefault();
+  const p=FG.phone.primary(L);
+  if(!p) return;
+  if(dialBtn.getAttribute('aria-disabled')==='true'){ FG.dial.explainBlocked(L, p, dialBtn.dataset.dial); return; }
+  FG.dial.start(L, p.number, dialBtn.dataset.dial);
+  return;
+ }
+ if(e.target.classList.contains('del')){ deleteLeadWithConfirm(L); return; }
  if(e.target.classList.contains('openbtn')){ openProfile(id); return; }
+ if(e.target.closest('td.cell-sel')) return;
  if(e.target.closest && e.target.closest('td.row-open') && !e.target.closest('input,select,button,a,label')){ openProfile(id); return; }
  if(e.target.closest && e.target.closest('td.name') && !e.target.closest('input,select,button,a,label')){ openProfile(id); return; }
  if(e.target.classList.contains('coachbtn') && !e.target.classList.contains('openbtn')){
- const l=state.find(x=>x.id===id); if(!l) return;
+ const l=L;
  goTab('coach');
  const lists = leadLists(l);
  let active = categoryKey(activeCause(l));
@@ -381,6 +442,20 @@ document.getElementById('tbody').addEventListener('click',e=>{
  box.focus();
  }
 });
+/** Delete one lead after a confirm. Soft delete on the server (history kept); local copy removed. */
+async function deleteLeadWithConfirm(L){
+ const ok=(window.FG&&FG.ready)
+  ? await FG.confirm({title:'Delete this lead?', message:'"'+(L.name||'This lead')+'" will be removed from the list'+((window.FG&&FG.isServer())?' (the server keeps its history).':'.'), confirmLabel:'Delete lead', danger:true})
+  : confirm('Permanently delete this lead?');
+ if(!ok) return false;
+ appendActivity({lead_id:L.id,lead_key:leadKeyOf(L),type:'note',detail:{text:'Lead deleted'}});
+ state=state.filter(x=>x!==L);
+ if(window.FG&&FG.views) FG.views.selection.delete(String(L.id));
+ saveLeads(); render(); refreshIndustryFilter(); refreshCityFilter();
+ if(window.FG&&FG.sync) FG.sync.remove(L);
+ if(window.FG&&FG.ready) FG.toast('Deleted '+(L.name||'lead')+'.', {kind:'ok'});
+ return true;
+}
 document.getElementById('tabs').addEventListener('click',e=>{
  const b=e.target.closest('button'); if(!b) return;
  view=b.dataset.list;
@@ -393,10 +468,11 @@ document.getElementById('search').addEventListener('input',render);
 document.getElementById('dueThisMonth')?.addEventListener('change',render);
 document.getElementById('addBtn').addEventListener('click',()=>{
  const primary=LISTS.includes(view)?view:'Website';
- const lead={id:nextId(),name:'',city:'',industry:document.getElementById('industry').value||'',list:primary,lists:[primary],list_status:{},phone:'',website:'',contact:'',status:'New',notes:'',lists_touched:true};
+ const lead={id:nextId(),name:'',city:'',industry:document.getElementById('industry').value||'',list:primary,lists:[primary],list_status:{},phone:'',website:'',contact:'',status:'New',notes:'',lists_touched:true,stage:'new',created_at:new Date().toISOString()};
  setListStatus(lead, primary, 'New');
  state.unshift(lead);
  saveLeads(); render();
+ if(window.FG&&FG.views) FG.views.focusNewLead(lead);
 });
 function parseBlock(text){
  const lines=text.split(/\n|\t/).map(s=>s.trim()).filter(Boolean);
@@ -434,7 +510,7 @@ function pmsg(t){ document.getElementById('parseMsg').textContent=t; }
 function mapsUrl(cat,city){ return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent((cat||'')+' in '+(city||'')+' FL'); }
 document.getElementById('mGo').addEventListener('click',()=>{
  const c=document.getElementById('mCat').value, city=document.getElementById('mCity').value;
- if(!c){ alert('Type a category or keyword first.'); return; }
+ if(!c){ if(window.FG&&FG.ready) FG.toast('Type a category or keyword first.', {kind:'err'}); else alert('Type a category or keyword first.'); document.getElementById('mCat').focus(); return; }
  window.open(mapsUrl(c,city),'_blank');
 });
 (function initMaps(){
@@ -463,24 +539,43 @@ function slimForEnrich(l){
  return {
   id:l.id, name:l.name||'', address:l.address||'', city:l.city||'', zip:l.zip||'',
   phone:l.phone||'', email:l.email||'', website:l.website||'', industry:l.industry||'',
-  lists:leadLists(l), source:l.source||'', parcel_id:l.parcel_id||''
+  lists:leadLists(l), source:l.source||'', parcel_id:l.parcel_id||'',
+  // Numbers already verified are not paid for again (A.md)
+  phones:Array.isArray(l.phones)?l.phones:[], phone_source:l.phone_source||'', phone_line_type:l.phone_line_type||'',
+  phone_confidence:l.phone_confidence==null?null:l.phone_confidence, phone_dnc:l.phone_dnc==null?null:l.phone_dnc
  };
 }
+/** Fold one enrich result into the lead. Never overwrites a phone/email the lead already has;
+ *  suggested_phone is stored as an offer only. Returns true when anything changed. */
 function applyEnrichResult(l, r){
  if(!l||!r) return false;
  let changed=false;
  if(r.phone && !String(l.phone||'').trim()){ l.phone=r.phone; changed=true; }
- if(r.email && !String(l.email||'').trim()){ l.email=r.email; changed=true; }
+ if(r.email && !String(l.email||'').trim()){ l.email=r.email; if(r.email_source) l.email_source=r.email_source; changed=true; }
  if(r.website && !String(l.website||'').trim()){ l.website=r.website; changed=true; }
+ if(Array.isArray(r.phones) && r.phones.length){
+  const merged=mergePhoneLists(l.phones, r.phones);
+  if(!sameJson(merged, l.phones)){ l.phones=merged; changed=true; }
+ }
+ // Scalar phone_* describe the lead's effective primary (A.md); DNC true is sticky.
+ ['phone_line_type','phone_source','phone_confidence'].forEach(function(f){
+  if(r[f]!=null && r[f]!=='' && l[f]!==r[f]){ l[f]=r[f]; changed=true; }
+ });
+ if(r.phone_dnc===true && l.phone_dnc!==true){ l.phone_dnc=true; changed=true; }
+ else if(r.phone_dnc===false && l.phone_dnc==null){ l.phone_dnc=false; changed=true; }
+ if(r.suggested_phone && FGdigits(r.suggested_phone)!==FGdigits(l.phone)){ l.suggested_phone=r.suggested_phone; changed=true; }
+ if(Array.isArray(r.warnings) && r.warnings.length){ l.enrich_warnings=r.warnings.slice(0,6); }
+ if(r.status){ l.enrich_status=r.status; }
  if(changed){
   const tag='Enriched '+(r.sources&&r.sources.length?r.sources.join(','):r.status)+' @ '+new Date().toISOString().slice(0,16);
   if(!(l.notes||'').includes('Enriched ')) l.notes=(l.notes?l.notes+'\n':'')+tag;
   else l.notes=String(l.notes||'')+'\n'+tag;
-  l.enriched_at=new Date().toISOString();
   l.enrich_sources=Array.isArray(r.sources)?r.sources:[];
  }
+ if(r.status && r.status!=='error' && r.status!=='timeout_budget') l.enriched_at=r.enriched_at||new Date().toISOString();
  return changed;
 }
+function FGdigits(n){ return phoneDigitsKey(n); }
 async function enrichApi(leads, opts){
  opts=opts||{};
  const tok=getToken();
@@ -488,7 +583,7 @@ async function enrichApi(leads, opts){
  const r=await fetch('/crm/api/enrich-contacts',{
   method:'POST',
   headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},
-  body:JSON.stringify({action:'enrich', leads:leads, force:!!opts.force, allowPaid:opts.allowPaid!==false})
+  body:JSON.stringify(Object.assign({action:opts.action||'enrich', leads:leads, force:!!opts.force, allowPaid:opts.allowPaid!==false}, opts.maxPaidLookups!=null?{maxPaidLookups:opts.maxPaidLookups}:{}))
  });
  const raw=await r.text(); let data=null; try{data=JSON.parse(raw);}catch(e){}
  if(!r.ok) throw new Error((data&&data.error)||('Enrich failed '+r.status));
@@ -543,6 +638,7 @@ async function bulkEnrichLeads(candidates, opts){
  }
 }
 async function enrichVisibleLeads(){
+ if(window.FG&&FG.enrich){ FG.enrich.open(); return; }
  enrichStatus('Preparing enrich…');
  if(!getToken()){
   enrichStatus('Sign in required to enrich contacts.');
@@ -604,8 +700,13 @@ async function fsiBulkAddAndEnrich(){
  _fsiState.selected=Object.create(null);
  fsiRenderList();
  if(typeof render==='function') render();
- fsiSay('Added <b>'+added.length+'</b> leads — enriching phone/email…', true);
  goTab('leads');
+ if(window.FG&&FG.enrich){
+  fsiSay('Added <b>'+added.length+'</b> leads. Review the enrich estimate on the Leads tab.', true);
+  FG.enrich.open({leads:added, scope:'given'});
+  return;
+ }
+ fsiSay('Added <b>'+added.length+'</b> leads — enriching phone/email…', true);
  await bulkEnrichLeads(added.slice(0, ENRICH_MAX));
 }
 
@@ -661,9 +762,10 @@ document.getElementById('jsonBtn').addEventListener('click',()=>{
  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='floguard_leads_backup.json'; a.click();
 });
 /* Merge imported leads (LeadAgent export or JSON backup) into state.
- Match by name+city (case-insensitive); union lists; fill blank fields only. */
+ Match by uuid, parcel_id, then name+city+address; union lists; fill blank fields only. */
 function mergeImportedLeads(incoming){
  let added=0, merged=0;
+ const claimed=new Set();
  incoming.forEach(raw=>{
  if(!raw || !raw.name) return;
  const inc=normalizeLead({...raw});
@@ -674,13 +776,13 @@ function mergeImportedLeads(incoming){
  suggested.forEach(function(x){ if(!lists.includes(x)) lists.push(x); });
  setLeadLists(inc, lists);
  }
- const k=(inc.name||'').trim().toLowerCase()+'|'+(inc.city||'').trim().toLowerCase();
- const existing=state.find(l=>((l.name||'').trim().toLowerCase()+'|'+((l.city||'').trim().toLowerCase()))===k);
+ const existing=findLocalLeadFor(inc, state, claimed);
  if(existing){
+ claimed.add(existing);
  const lists=leadLists(existing).slice();
  leadLists(inc).forEach(x=>{ if(!lists.includes(x)) lists.push(x); });
  setLeadLists(existing, lists);
- ['phone','website','contact','email','industry','notes','status','source','lead_type','categories'].forEach(f=>{
+ ['phone','website','contact','email','industry','notes','status','source','lead_type','categories','address','zip','parcel_id','uuid'].forEach(f=>{
  if((existing[f]==null||existing[f]==='')&&inc[f]!=null&&inc[f]!=='') existing[f]=inc[f];
  });
  if(inc.list_status && typeof inc.list_status==='object'){
@@ -691,6 +793,7 @@ function mergeImportedLeads(incoming){
  } else {
  inc.id=nextId();
  state.unshift(inc);
+ claimed.add(inc);
  added++;
  }
  });
@@ -710,8 +813,10 @@ document.getElementById('jsonFile').addEventListener('change',async e=>{
  finally{ e.target.value=''; }
 });
 document.getElementById('printBtn').addEventListener('click',()=>window.print());
-document.getElementById('resetBtn').addEventListener('click',()=>{
- if(confirm('Reset local list to named demo hotels only (no empty category shells)? This erases your local edits. Shared store is not fully wiped — empty seeds are pruned on next sync.')){
+document.getElementById('resetBtn').addEventListener('click',async()=>{
+ const msg='Reset the local list to the named demo leads? This erases your local edits on this device. The shared store is not wiped; empty seeds are pruned on the next sync.';
+ const ok=(window.FG&&FG.ready)?await FG.confirm({title:'Reset local leads?', message:msg, confirmLabel:'Reset local leads', danger:true}):confirm(msg);
+ if(ok){
  localStorage.removeItem(KEY); state=loadLeads(); render(); refreshIndustryFilter(); refreshCityFilter();
  prunePlaceholderLeadsOnServer().then(function(){ return hydrateLeadsFromServer(); });
  }
