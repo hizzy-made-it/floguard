@@ -7,6 +7,10 @@
  *   list | push | bulk_upsert | replace | prune_placeholders
  * Pipeline actions (Postgres backend only; 501 {error:'postgres_backend_required'} otherwise):
  *   get | patch | delete | activity_add | activity_list | task_add | task_done | tasks_due | funnel
+ * Estimate / job / invoice-record actions (agent G; Postgres only, need fsi/sql/020; contract in
+ *   docs/handoff/G.md): estimate_catalog | estimate_create | estimate_update | estimate_list |
+ *   estimate_get | estimate_send | estimate_void | job_create_from_estimate | job_update |
+ *   invoice_mark | jobs_list
  *   and `list` with since / cursor / limit.
  *
  * Auth (either):
@@ -30,6 +34,7 @@ import {
 } from '../server/lib/academy-db.js';
 import { LeadsError } from '../server/lib/academy-pg.js';
 import { applyPlanToStoreLeads, planUpsert } from '../server/lib/leads-core.js';
+import { ESTIMATE_ACTIONS, runEstimateAction } from '../server/lib/estimates.js';
 import { setCors, json, parseBody, rateLimit, clientIp } from '../server/lib/http.js';
 
 export const config = { maxDuration: 30 };
@@ -38,6 +43,7 @@ const MAX_LEADS = 20000;
 const PIPELINE_ACTIONS = new Set([
   'get', 'patch', 'delete', 'activity_add', 'activity_list', 'task_add', 'task_done', 'tasks_due', 'funnel',
 ]);
+const ESTIMATE_ACTION_SET = new Set(ESTIMATE_ACTIONS);
 
 function bearer(req) {
   const h = req.headers?.authorization || req.headers?.Authorization || '';
@@ -126,7 +132,7 @@ export default async function handler(req, res) {
     const pipe = await getLeadsPipeline();
     const wantsPaging = !!(body.since || body.cursor || body.limit);
 
-    if (PIPELINE_ACTIONS.has(action) || (action === 'list' && wantsPaging)) {
+    if (PIPELINE_ACTIONS.has(action) || ESTIMATE_ACTION_SET.has(action) || (action === 'list' && wantsPaging)) {
       if (!pipe) {
         return json(res, 501, {
           error: 'postgres_backend_required',
@@ -314,9 +320,17 @@ export default async function handler(req, res) {
       return json(res, 200, { ok: true, ...r, as_of: new Date().toISOString() });
     }
 
+    if (ESTIMATE_ACTION_SET.has(action)) {
+      const r = await runEstimateAction(action, body, { actor });
+      if (action !== 'estimate_catalog' && action !== 'estimate_list' && action !== 'estimate_get' && action !== 'jobs_list') {
+        await mirrorLeadsToStorage(); // stage moves (estimate_send) touch leads; keeps dual mode in step
+      }
+      return json(res, 200, { ok: true, ...r });
+    }
+
     return json(res, 400, {
       error:
-        'Unknown action. Use list, push, bulk_upsert, replace, prune_placeholders, get, patch, delete, activity_add, activity_list, task_add, task_done, tasks_due, or funnel.',
+        'Unknown action. Use list, push, bulk_upsert, replace, prune_placeholders, get, patch, delete, activity_add, activity_list, task_add, task_done, tasks_due, funnel, or an estimate/job action (estimate_create, estimate_update, estimate_list, estimate_get, estimate_send, estimate_void, estimate_catalog, job_create_from_estimate, job_update, invoice_mark, jobs_list).',
     });
   } catch (e) {
     if (e instanceof LeadsError) {
