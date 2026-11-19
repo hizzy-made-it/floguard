@@ -87,6 +87,8 @@ document.getElementById('syncPill')&&(document.getElementById('syncPill').style.
  document.getElementById('pfMntFreq')?.addEventListener('change', maybeFillNextDue);
  document.addEventListener('keydown', e=>{
   if(e.key==='Escape'){
+   // R2: Esc closes the top-most layer only (menu, estimate editor, modal), not the drawer under it.
+   if(document.querySelector('details.menu[open], .fg-modal-bg, .est-bg:not([hidden])')) return;
    closeProfile();
    closeNavMenu();
   }

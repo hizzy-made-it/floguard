@@ -111,18 +111,20 @@
   const open=document.querySelector('details.menu[open]');
   if(open){ open.removeAttribute('open'); open.querySelector('summary')?.focus(); }
  });
- document.querySelectorAll('details.menu').forEach(function(d){
-  d.addEventListener('toggle',function(){
-   if(d.open){ const f=d.querySelector('.menu-item'); f&&f.focus({preventScroll:true}); }
-  });
-  d.addEventListener('keydown',function(e){
-   if(e.key!=='ArrowDown'&&e.key!=='ArrowUp') return;
-   const items=[...d.querySelectorAll('.menu-item')]; if(!items.length) return;
-   e.preventDefault();
-   const i=items.indexOf(document.activeElement);
-   const n=e.key==='ArrowDown'?(i+1)%items.length:(i-1+items.length)%items.length;
-   items[n].focus();
-  });
+ // Delegated (R2) so menus rendered later (lead drawer "More") behave the same as static ones.
+ document.addEventListener('toggle',function(e){
+  const d=e.target; if(!(d instanceof HTMLDetailsElement)||!d.classList.contains('menu')) return;
+  const s=d.querySelector('summary'); if(s) s.setAttribute('aria-expanded', d.open?'true':'false');
+  if(d.open){ const f=d.querySelector('.menu-item:not(.is-off)')||d.querySelector('.menu-item'); f&&f.focus({preventScroll:true}); }
+ },true);
+ document.addEventListener('keydown',function(e){
+  if(e.key!=='ArrowDown'&&e.key!=='ArrowUp') return;
+  const d=e.target.closest&&e.target.closest('details.menu[open]'); if(!d) return;
+  const items=[...d.querySelectorAll('.menu-item')]; if(!items.length) return;
+  e.preventDefault();
+  const i=items.indexOf(document.activeElement);
+  const n=e.key==='ArrowDown'?(i+1)%items.length:(i-1+items.length)%items.length;
+  items[n].focus();
  });
 
  /* ---- lead drawer: focus in, scroll lock, focus back ---- */

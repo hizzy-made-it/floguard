@@ -78,15 +78,24 @@
     root.innerHTML = '<div class="est-modal" role="dialog" aria-modal="true" aria-labelledby="estTitle" tabindex="-1"><div class="est-head" id="estHead"></div><div class="est-body" id="estBody"></div><div class="est-foot" id="estFoot"></div></div>';
     document.body.appendChild(root);
     root.addEventListener('mousedown', function (e) { if (e.target === root) close(); });
-    root.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.stopPropagation(); close(); } });
+    root.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { e.stopPropagation(); close(); return; }
+      if (e.key === 'Tab' && window.FG && FG.trapTab) FG.trapTab(root.querySelector('.est-modal'), e);
+    });
     root.addEventListener('click', onClick);
     root.addEventListener('input', onInput);
     root.addEventListener('change', onInput);
     window.addEventListener('message', onMessage);
     return root;
   }
+  /** Sending and acceptance move the lead's stage on the server; pull it so the table, board,
+   *  stage chip and drawer timeline update without a reload (R2). */
+  function syncLead() {
+    try { if (window.FG && FG.sync && FG.sync.refresh && FG.isServer && FG.isServer()) FG.sync.refresh(); } catch (e) { /* best effort */ }
+  }
   function close() {
     if (!root || root.hidden) return;
+    if (S && S.touched) syncLead();
     root.hidden = true;
     document.documentElement.style.overflow = '';
     previewWin = null; previewReady = false;
@@ -136,6 +145,7 @@
     var r = await call('estimate_list', { lead_id: leadRef(S.lead) });
     if (r.status !== 200) return { ok: false, r: r };
     S.estimates = r.body.estimates || []; S.jobs = r.body.jobs || [];
+    if (S.estimates.some(function (e) { return e.status === 'accepted' || e.status === 'declined'; })) { S.touched = true; syncLead(); }
     return { ok: true };
   }
   function itemById(id) { return ((catalog && catalog.items) || []).filter(function (i) { return i.id === id; })[0] || null; }
@@ -164,7 +174,8 @@
   async function openEstimate(id) {
     var r = await call('estimate_get', { estimate_id: id });
     if (r.status !== 200) { S.notice = { t: 'err', m: errText(r) }; renderList(); return; }
-    S.est = r.body.estimate; S.proposal = r.body.proposal; S.job = r.body.job || null; S.sendResult = null; S.confirmSend = false; S.voiding = false;
+    S.est = r.body.estimate; S.proposal = r.body.proposal; S.job = r.body.job || null;
+    if (S.est && /^(accepted|declined)$/.test(S.est.status || '')) S.touched = true; S.sendResult = null; S.confirmSend = false; S.voiding = false;
     S.draft = draftFrom(S.est); S.dirty = false; S.view = 'edit';
     renderEdit();
   }
@@ -255,7 +266,7 @@
     head(e ? e.number : 'New estimate', (S.lead.name || '') + (leadAddress(S.lead) ? ' · ' + leadAddress(S.lead) : ''), e ? e.status : 'draft');
     var warns = '';
     var termsPh = (e && e.terms_placeholder) || (catalog && catalog.terms_placeholder);
-    if (termsPh) warns += '<p class="est-warn" role="note"><strong>Draft terms.</strong> The customer-facing terms, deposit and warranty text are still placeholders. The owner has to supply them (catalog file <code>public/crm/docs/estimate_catalog.json</code>) before real estimates go out.</p>';
+    if (termsPh) warns += '<p class="est-warn" role="note"><strong>Draft terms.</strong> The customer-facing terms, deposit and warranty text are still placeholders. Ask the owner to finish them before real estimates go out.</p>';
     if (S.notice) warns += '<p class="est-' + (S.notice.t === 'ok' ? 'ok' : 'err') + '" role="status">' + esc(S.notice.m) + '</p>';
     S.notice = null;
     if (ro) warns += '<p class="est-note">This estimate is ' + esc(e.status) + ' and can no longer be edited.' + (e.status !== 'accepted' && e.status !== 'void' ? ' Void it and create a new one to change it.' : '') + '</p>';
@@ -399,8 +410,9 @@
     var r = await call('estimate_send', { estimate_id: S.est.id, valid_until: S.draft.valid_until || undefined });
     S.busy = false;
     if (r.status !== 200) { S.notice = { t: 'err', m: errText(r) }; renderEdit(); return; }
-    S.est = r.body.estimate; S.sendResult = r.body; S.draft = draftFrom(S.est); S.dirty = false;
+    S.est = r.body.estimate; S.sendResult = r.body; S.draft = draftFrom(S.est); S.dirty = false; S.touched = true;
     renderEdit();
+    syncLead();
     var el = document.getElementById('estSend'); if (el && el.scrollIntoView) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
     reloadList();
   }
@@ -408,7 +420,8 @@
   async function resend() {
     var r = await call('estimate_send', { estimate_id: S.est.id });
     if (r.status !== 200) { S.notice = { t: 'err', m: errText(r) }; renderEdit(); return; }
-    S.est = r.body.estimate; S.sendResult = r.body; renderEdit();
+    S.est = r.body.estimate; S.sendResult = r.body; S.touched = true; renderEdit();
+    syncLead();
   }
   async function previewNow() {
     // open synchronously (popup blockers), then save and hand the proposal over via postMessage (same origin only)
@@ -551,7 +564,7 @@
       addFallbackButton();
     }
     if (bar) {
-      var mo = new MutationObserver(function () { if (!hooked) arm(); });
+      var mo = new MutationObserver(function () { if (hooked) { mo.disconnect(); return; } arm(); });
       mo.observe(bar, { childList: true });
       arm();
       bar.addEventListener('click', function (e) {

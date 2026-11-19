@@ -3,6 +3,8 @@
 
 /* ================= BASE ================= */
 *,*::before,*::after{box-sizing:border-box}
+/* One rule for the hidden attribute: component display rules must never resurrect a hidden element (R2: the estimate overlay stayed on screen, invisible but blocking every click, after it closed). */
+[hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:clip}
 body{margin:0;font-family:var(--font);font-size:var(--fs-14);line-height:var(--lh);color:var(--text);background:var(--bg);min-height:100dvh;font-optical-sizing:auto;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:clip}
 img,video{max-width:100%;height:auto}
@@ -330,7 +332,7 @@ td{font-variant-numeric:tabular-nums}
 .mnt-due.ok{background:var(--teal-soft);border-color:var(--teal-line);color:var(--teal)}
 
 /* ================= LEAD DRAWER ================= */
-.drawer-bg{position:fixed;inset:0;z-index:80;display:none;justify-content:flex-end;background:rgba(11,15,26,.42)}
+.drawer-bg{position:fixed;inset:0;z-index:80;display:none;justify-content:flex-end;background:var(--scrim)}
 .drawer-bg.open{display:flex;animation:fadeIn var(--t) var(--ease)}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .drawer{width:min(540px,100%);height:100%;background:var(--surface);border-left:1px solid var(--line);box-shadow:var(--sh-4);overflow-y:auto;overscroll-behavior:contain;padding:0 0 calc(32px + var(--safe-b));animation:slideIn var(--t-slow) var(--ease)}
@@ -585,7 +587,7 @@ td{font-variant-numeric:tabular-nums}
  .sb-close{display:inline-flex}
  .sb-foot{display:none}
  .nav button{height:44px;font-size:var(--fs-15)}
- .scrim{position:fixed;inset:0;z-index:55;background:rgba(11,15,26,.45);opacity:0;pointer-events:none;transition:opacity var(--t-slow) var(--ease);display:block}
+ .scrim{position:fixed;inset:0;z-index:55;background:var(--scrim);opacity:0;pointer-events:none;transition:opacity var(--t-slow) var(--ease);display:block}
  .nav-open .scrim{opacity:1;pointer-events:auto}
  .topbar{padding:0 max(12px,var(--safe-r)) 0 max(8px,var(--safe-l));gap:8px}
  .nav-toggle{display:inline-flex;width:44px;height:44px}
