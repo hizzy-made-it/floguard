@@ -4,7 +4,7 @@
  */
 import { restDelete, restGet, restInsert, restPatch } from './supabase-rest.js';
 import {
-  ACTIVITY_TYPES, STAGES, TASK_TYPES, carryDncPhone, cleanNextAction, deriveStage, isUuid, leadToRow, mergeLead,
+  ACTIVITY_TYPES, STAGES, TASK_TYPES, carryDncPhone, cleanNextAction, deriveStage, isUuid, leadToRow, mergeLead, rebaseLeadUpdate,
   mergePhones, normStage, phoneDigits, planUpsert, rowToLead,
 } from './leads-core.js';
 
@@ -329,9 +329,28 @@ export async function pgUpsertLeads(incoming, opts = {}) {
   const activity = [];
   const naSync = [];
   for (const u of plan.updates) {
-    const out = await restPatch('leads', `id=eq.${ENC(u.prev.uuid)}`, leadToRow(u.next, { orgId }));
-    const row = Array.isArray(out) ? out[0] : out;
+    // Conditional write on the updated_at we read: a patch/task/stage change that lands while this
+    // (possibly multi-second) push runs must not be overwritten with our stale copy. On a miss,
+    // re-read and re-apply only what this push changed (rebaseLeadUpdate), at most 3 times.
+    let guardAt = u.prev.updated_at || null;
+    let nextLead = u.next;
+    let row = null;
+    for (let attempt = 0; attempt < 3 && !row; attempt += 1) {
+      const guard = guardAt ? `&updated_at=eq.${ENC(guardAt)}` : '';
+      const out = await restPatch('leads', `id=eq.${ENC(u.prev.uuid)}${guard}`, leadToRow(nextLead, { orgId }));
+      row = (Array.isArray(out) ? out[0] : out) || null;
+      if (row || !guard) break;
+      const fresh = (await restGet('leads', `select=*&id=eq.${ENC(u.prev.uuid)}&limit=1`))?.[0];
+      if (!fresh) break;
+      const freshLead = rowToLead(fresh);
+      nextLead = rebaseLeadUpdate(u.prev, u.next, freshLead);
+      guardAt = fresh.updated_at || null;
+    }
     if (row) written.push(row);
+    else {
+      result.conflicts.push({ name: String(u.next?.name || ''), reason: 'concurrent_edit: the lead kept changing during this push; re-sync and retry' });
+      continue;
+    }
     if (u.stageChange) {
       activity.push({
         lead_id: u.prev.uuid,

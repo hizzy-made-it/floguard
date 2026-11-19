@@ -47,3 +47,32 @@ test('patch: phone replaced and then restored does not clear DNC without confirm
   assert.equal(r.status, 400, 'clearing still needs the confirm flag');
   assert.equal(r.body.error, 'dnc_clear_requires_confirmation');
 });
+
+// ---------------------------------------------------------------------------------------------
+// Lost update: push/bulk_upsert loads every lead, merges, then PATCHes by id with no concurrency
+// guard. A patch (or task/stage change) that lands in between was overwritten with the stale copy.
+// ---------------------------------------------------------------------------------------------
+test('push does not overwrite a concurrent patch that landed after it read the leads', async () => {
+  await call({ action: 'push', leads: [{ name: 'Race Push', city: 'X', notes: 'v1', status: 'New' }] });
+  const row = byName('Race Push');
+  const realFetch = globalThis.fetch;
+  let bumped = false;
+  globalThis.fetch = async (input, init) => {
+    const u = String(input);
+    if (!bumped && (init?.method || 'GET') === 'PATCH' && u.includes('/rest/v1/leads') && u.includes(row.id)) {
+      bumped = true; // another rep's patch wins the race
+      await realFetch(`https://fake.supabase.co/rest/v1/leads?id=eq.${row.id}`, { method: 'PATCH', body: JSON.stringify({ notes: 'rep B note', stage: 'assessment_booked' }) });
+    }
+    return realFetch(input, init);
+  };
+  try {
+    const r = await call({ action: 'push', leads: [{ name: 'Race Push', city: 'X', owner: 'rep A' }] });
+    assert.equal(r.status, 200);
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+  const after = byName('Race Push');
+  assert.equal(after.owner, 'rep A', 'the push change landed');
+  assert.equal(after.notes, 'rep B note', 'the concurrent patch was not reverted');
+  assert.equal(after.stage, 'assessment_booked', 'the concurrent stage move was not reverted');
+});

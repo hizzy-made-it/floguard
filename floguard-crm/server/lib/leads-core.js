@@ -290,6 +290,35 @@ export function carryDncPhone(phones, number) {
   return mergePhones(phones, [{ number, dnc: true, source: 'manual', line_type: 'unknown', note: 'kept: was the DNC primary number' }]);
 }
 
+/**
+ * Re-apply an update computed as prev -> next on top of `fresh`, a newer copy of the same lead
+ * (someone wrote between our read and our conditional write). Only the keys the update changed
+ * are taken from `next`; every other key keeps the concurrent writer's value. phones[] are merged
+ * per number and a DNC flag stays sticky unless the update itself moved the primary number.
+ */
+export function rebaseLeadUpdate(prev, next, fresh) {
+  const out = { ...fresh };
+  const keys = new Set([...Object.keys(prev || {}), ...Object.keys(next || {})]);
+  for (const k of keys) {
+    if (SYSTEM_KEYS.has(k) || k === 'phones' || k === 'phone_dnc') continue;
+    if (JSON.stringify(prev?.[k] ?? null) === JSON.stringify(next?.[k] ?? null)) continue;
+    out[k] = next?.[k];
+  }
+  let phones = mergePhones(fresh?.phones, next?.phones);
+  const freshD = phoneDigits(fresh?.phone);
+  const outD = phoneDigits(out.phone);
+  let dnc = fresh?.phone_dnc ?? null;
+  if (next?.phone_dnc === true) dnc = true;
+  else if (dnc === true && freshD && outD !== freshD) {
+    phones = carryDncPhone(phones, fresh.phone);
+    dnc = typeof next?.phone_dnc === 'boolean' ? next.phone_dnc : null;
+  } else if (dnc !== true && (prev?.phone_dnc ?? null) !== (next?.phone_dnc ?? null)) dnc = next?.phone_dnc ?? null;
+  if (outD && phones.find((p) => phoneDigits(p.number) === outD)?.dnc === true) dnc = true;
+  if (phones.length || Array.isArray(fresh?.phones)) out.phones = phones;
+  out.phone_dnc = dnc;
+  return out;
+}
+
 function cleanNextAction(v) {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return null;
   const type = TASK_TYPES.includes(String(v.type)) ? String(v.type) : 'other';
