@@ -18,7 +18,7 @@ async function loadDocsLibrary(force){
  _docsCatalog=await r.json();
  }catch(e){
  stats.textContent='Error loading documents';
- grid.innerHTML='<div class="card hint">'+(e.message||e)+'. Ask an admin to run <code>npm run academy:sync-docs</code>.</div>';
+ grid.innerHTML='<div class="empty-state">The document library could not load ('+esc(String(e&&e.message||e))+'). Try Refresh; if it keeps failing, tell the admin.</div>';
  return;
  }
  }

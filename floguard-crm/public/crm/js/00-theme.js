@@ -5,6 +5,8 @@
  try{
   var t=localStorage.getItem('floguard_theme');
   if(t==='light'||t==='dark') document.documentElement.setAttribute('data-theme',t);
-  if(localStorage.getItem('floguard_sidebar_collapsed')==='1') document.documentElement.classList.add('sb-collapsed');
+  var sb=localStorage.getItem('floguard_sidebar_collapsed');
+  // No stored choice: small laptops (<=1100px) start on the icon rail so the work area gets the width.
+  if(sb==='1'||(sb===null&&window.innerWidth>820&&window.innerWidth<=1100)) document.documentElement.classList.add('sb-collapsed');
  }catch(e){}
 })();

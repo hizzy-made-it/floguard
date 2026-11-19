@@ -1,0 +1,1582 @@
+{
+ "label": "after",
+ "at": "2026-11-19T22:50:39.914Z",
+ "screens": {
+  "leads-d1440-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "leads-full-d1440-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "board-d1440-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "drawer-d1440-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "drawer-timeline-d1440-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "estimate-buttons-d1440-light": {
+   "count": 1
+  },
+  "estimate-d1440-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "enrich-d1440-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "dnc-d1440-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "toast-d1440-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-d1440-light": {
+   "overflowX": 0,
+   "mapTop": 143,
+   "mapH": 604,
+   "mapPct": 67,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-detail-d1440-light": {
+   "overflowX": 0,
+   "mapTop": 143,
+   "mapH": 604,
+   "mapPct": 67,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-why-d1440-light": {
+   "overflowX": 0,
+   "mapTop": 143,
+   "mapH": 604,
+   "mapPct": 67,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-layers-d1440-light": {
+   "overflowX": 0,
+   "mapTop": 143,
+   "mapH": 604,
+   "mapPct": 67,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-search-d1440-light": {
+   "overflowX": 0,
+   "mapTop": 143,
+   "mapH": 604,
+   "mapPct": 67,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-storm-d1440-light": {
+   "overflowX": 0,
+   "mapTop": 239,
+   "mapH": 604,
+   "mapPct": 67,
+   "small": [],
+   "smallCount": 0
+  },
+  "drafts-d1440-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "docs-d1440-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "coach-d1440-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "roleplay-d1440-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "review-d1440-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "playbook-d1440-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "settings-d1440-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "admin-d1440-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "login-d1440-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "local-leads-d1440-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "local-estimate-d1440-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "leads-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "leads-full-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "board-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "drawer-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "drawer-timeline-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "estimate-buttons-d1440-dark": {
+   "count": 1
+  },
+  "estimate-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "enrich-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "dnc-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "toast-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": 143,
+   "mapH": 604,
+   "mapPct": 67,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-detail-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": 143,
+   "mapH": 604,
+   "mapPct": 67,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-why-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": 143,
+   "mapH": 604,
+   "mapPct": 67,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-layers-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": 143,
+   "mapH": 604,
+   "mapPct": 67,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-search-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": 143,
+   "mapH": 604,
+   "mapPct": 67,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-storm-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": 239,
+   "mapH": 604,
+   "mapPct": 67,
+   "small": [],
+   "smallCount": 0
+  },
+  "drafts-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "docs-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "coach-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "roleplay-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "review-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "playbook-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "settings-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "admin-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "login-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "local-leads-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "local-estimate-d1440-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "leads-d1024-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "board-d1024-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "drawer-d1024-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "drawer-timeline-d1024-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "estimate-buttons-d1024-light": {
+   "count": 1
+  },
+  "estimate-d1024-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "enrich-d1024-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "dnc-d1024-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "toast-d1024-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-d1024-light": {
+   "overflowX": 0,
+   "mapTop": 72,
+   "mapH": 526,
+   "mapPct": 68,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-detail-d1024-light": {
+   "overflowX": 0,
+   "mapTop": 72,
+   "mapH": 526,
+   "mapPct": 68,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-why-d1024-light": {
+   "overflowX": 0,
+   "mapTop": 72,
+   "mapH": 526,
+   "mapPct": 68,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-layers-d1024-light": {
+   "overflowX": 0,
+   "mapTop": 72,
+   "mapH": 526,
+   "mapPct": 68,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-search-d1024-light": {
+   "overflowX": 0,
+   "mapTop": 72,
+   "mapH": 526,
+   "mapPct": 68,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-storm-d1024-light": {
+   "overflowX": 0,
+   "mapTop": 168,
+   "mapH": 526,
+   "mapPct": 68,
+   "small": [],
+   "smallCount": 0
+  },
+  "drafts-d1024-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "docs-d1024-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "coach-d1024-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "roleplay-d1024-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "review-d1024-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "playbook-d1024-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "settings-d1024-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "admin-d1024-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "login-d1024-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "leads-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "board-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "drawer-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "drawer-timeline-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "estimate-buttons-d1024-dark": {
+   "count": 1
+  },
+  "estimate-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "enrich-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "dnc-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "toast-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": 72,
+   "mapH": 526,
+   "mapPct": 68,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-detail-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": 72,
+   "mapH": 526,
+   "mapPct": 68,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-why-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": 72,
+   "mapH": 526,
+   "mapPct": 68,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-layers-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": 72,
+   "mapH": 526,
+   "mapPct": 68,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-search-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": 72,
+   "mapH": 526,
+   "mapPct": 68,
+   "small": [],
+   "smallCount": 0
+  },
+  "map-storm-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": 168,
+   "mapH": 526,
+   "mapPct": 68,
+   "small": [],
+   "smallCount": 0
+  },
+  "drafts-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "docs-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "coach-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "roleplay-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "review-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "playbook-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "settings-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "admin-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "login-d1024-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "leads-m390-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "button#stormDismiss.btn 28x44 \"Dismiss storm banner\"",
+    "button.td-lead 222x20 \"Robert Lindqvist\"",
+    "button.td-lead 180x20 \"Dana Whitfield\""
+   ],
+   "smallCount": 3
+  },
+  "board-m390-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "button.td-lead 180x20 \"Dana Whitfield\""
+   ],
+   "smallCount": 1
+  },
+  "drawer-m390-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "button.td-lead 180x20 \"Dana Whitfield\"",
+    "input.row-sel 16x16 \"Select Marisol Vega\"",
+    "input. 262x32 \"Owner or business name\"",
+    "input. 34x30 \"\"",
+    "input. 49x30 \"\"",
+    "input. 43x30 \"\"",
+    "input. 40x30 \"\"",
+    "input. 36x30 \"\"",
+    "input.row-sel 16x16 \"Select Coastal Property \"",
+    "input. 262x32 \"Owner or business name\"",
+    "summary. 86x18 \"Set next action\""
+   ],
+   "smallCount": 11
+  },
+  "drawer-timeline-m390-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "button.td-lead 180x20 \"Dana Whitfield\"",
+    "input.row-sel 16x16 \"Select Marisol Vega\"",
+    "input. 262x32 \"Owner or business name\"",
+    "input. 34x30 \"\"",
+    "input. 49x30 \"\"",
+    "input. 43x30 \"\"",
+    "input. 40x30 \"\"",
+    "input. 36x30 \"\"",
+    "input.row-sel 16x16 \"Select Coastal Property \"",
+    "input. 262x32 \"Owner or business name\"",
+    "input. 102x34 \"\"",
+    "input. 100x34 \"\"",
+    "input. 104x34 \"\"",
+    "input. 98x34 \"\"",
+    "input. 110x34 \"\""
+   ],
+   "smallCount": 15
+  },
+  "estimate-buttons-m390-light": {
+   "count": 1
+  },
+  "estimate-m390-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "button.td-lead 180x20 \"Dana Whitfield\"",
+    "input.row-sel 16x16 \"Select Marisol Vega\"",
+    "input. 262x32 \"Owner or business name\"",
+    "input. 34x30 \"\"",
+    "input. 49x30 \"\"",
+    "input. 43x30 \"\"",
+    "input. 40x30 \"\"",
+    "input. 36x30 \"\"",
+    "input.row-sel 16x16 \"Select Coastal Property \"",
+    "input. 262x32 \"Owner or business name\"",
+    "summary. 86x18 \"Set next action\""
+   ],
+   "smallCount": 11
+  },
+  "enrich-m390-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "button#stormDismiss.btn 28x44 \"Dismiss storm banner\"",
+    "button.td-lead 222x20 \"Robert Lindqvist\"",
+    "button.td-lead 180x20 \"Dana Whitfield\"",
+    "input. 13x13 \"\"",
+    "input. 13x13 \"\"",
+    "input. 13x13 \"\"",
+    "input#enCap. 288x28 \"\""
+   ],
+   "smallCount": 7
+  },
+  "dnc-m390-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "input.row-sel 16x16 \"Select Robert Lindqvist\"",
+    "input. 262x32 \"Owner or business name\"",
+    "input. 34x30 \"\"",
+    "input. 49x30 \"\"",
+    "input. 43x30 \"\"",
+    "input. 40x30 \"\"",
+    "input. 36x30 \"\"",
+    "input.row-sel 16x16 \"Select Halifax Crawlspac\"",
+    "input. 262x32 \"Owner or business name\"",
+    "input. 34x30 \"\"",
+    "input. 49x30 \"\"",
+    "input. 43x30 \"\"",
+    "input. 40x30 \"\"",
+    "input. 36x30 \"\""
+   ],
+   "smallCount": 14
+  },
+  "toast-m390-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "input.row-sel 16x16 \"Select Robert Lindqvist\"",
+    "input. 262x32 \"Owner or business name\"",
+    "input. 34x30 \"\"",
+    "input. 49x30 \"\"",
+    "input. 43x30 \"\"",
+    "input. 40x30 \"\"",
+    "input. 36x30 \"\"",
+    "input.row-sel 16x16 \"Select Halifax Crawlspac\"",
+    "input. 262x32 \"Owner or business name\"",
+    "input. 34x30 \"\"",
+    "input. 49x30 \"\"",
+    "input. 43x30 \"\"",
+    "input. 40x30 \"\"",
+    "input. 36x30 \"\""
+   ],
+   "smallCount": 14
+  },
+  "map-m390-light": {
+   "overflowX": 0,
+   "mapTop": 284,
+   "mapH": 542,
+   "mapPct": 64,
+   "small": [
+    "button.lg-toggle 75x26 \"Legend\""
+   ],
+   "smallCount": 1
+  },
+  "map-detail-m390-light": {
+   "overflowX": 0,
+   "mapTop": -422,
+   "mapH": 542,
+   "mapPct": 14,
+   "small": [
+    "button.lg-toggle 75x26 \"Legend\"",
+    "button. 104x24 \"Port Orange · 6\"",
+    "input#fsiSelectAll.ck 24x24 \"\"",
+    "button#fsiBulkClear.btn 28x44 \"Clear selection\"",
+    "input.ck 24x24 \"Select parcel\"",
+    "input.ck 24x24 \"Select parcel\"",
+    "input.ck 24x24 \"Select parcel\"",
+    "input.ck 24x24 \"Select parcel\"",
+    "summary. 354x36 \"Why this score\""
+   ],
+   "smallCount": 9
+  },
+  "map-why-m390-light": {
+   "overflowX": 0,
+   "mapTop": -422,
+   "mapH": 542,
+   "mapPct": 14,
+   "small": [
+    "button.lg-toggle 75x26 \"Legend\"",
+    "button. 104x24 \"Port Orange · 6\"",
+    "input#fsiSelectAll.ck 24x24 \"\"",
+    "button#fsiBulkClear.btn 28x44 \"Clear selection\"",
+    "input.ck 24x24 \"Select parcel\"",
+    "input.ck 24x24 \"Select parcel\"",
+    "input.ck 24x24 \"Select parcel\"",
+    "input.ck 24x24 \"Select parcel\"",
+    "summary. 354x36 \"Why this score\""
+   ],
+   "smallCount": 9
+  },
+  "map-layers-m390-light": {
+   "overflowX": 0,
+   "mapTop": 284,
+   "mapH": 542,
+   "mapPct": 64,
+   "small": [
+    "input#fsiOpFema. 92x16 \"\"",
+    "input#fsiOpClaims. 92x16 \"\"",
+    "input#fsiOpParcels. 92x16 \"\"",
+    "button.lg-toggle 75x26 \"Legend\""
+   ],
+   "smallCount": 4
+  },
+  "map-search-m390-light": {
+   "overflowX": 0,
+   "mapTop": 284,
+   "mapH": 542,
+   "mapPct": 64,
+   "small": [
+    "button.lg-toggle 75x26 \"Legend\""
+   ],
+   "smallCount": 1
+  },
+  "map-storm-m390-light": {
+   "overflowX": 0,
+   "mapTop": 284,
+   "mapH": 542,
+   "mapPct": 64,
+   "small": [
+    "button.lg-toggle 75x26 \"Legend\""
+   ],
+   "smallCount": 1
+  },
+  "drafts-m390-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "docs-m390-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "button.on 41x28 \"All\"",
+    "button. 79x28 \"Playbook\"",
+    "button. 66x28 \"Pricing\"",
+    "button. 67x28 \"Scripts\"",
+    "button. 71x28 \"Product\"",
+    "button. 61x28 \"Leads\""
+   ],
+   "smallCount": 6
+  },
+  "coach-m390-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "button.qp 328x38 \"FD: first-call opener\"",
+    "button.qp 328x38 \"FD: DNS 78 urgent pitch\"",
+    "button.qp 328x38 \"Sump: battery backup clo\"",
+    "button.qp 328x38 \"Mnt: pre-season visit\"",
+    "button.qp 328x38 \"PM: pilot property close\"",
+    "button.qp 328x38 \"Quiz: FloGuard playbook\"",
+    "button.qp 328x38 \"Drill: price objections\"",
+    "button.qp 328x38 \"Voicemail + text\""
+   ],
+   "smallCount": 8
+  },
+  "roleplay-m390-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "review-m390-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "playbook-m390-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "settings-m390-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "admin-m390-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "login-m390-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "local-leads-m390-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "button#stormDismiss.btn 28x44 \"Dismiss storm banner\"",
+    "button.td-lead 222x20 \"Robert Lindqvist\"",
+    "button.td-lead 180x20 \"Dana Whitfield\""
+   ],
+   "smallCount": 3
+  },
+  "local-estimate-m390-light": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "button#stormDismiss.btn 28x44 \"Dismiss storm banner\"",
+    "button.td-lead 222x20 \"Robert Lindqvist\"",
+    "button.td-lead 180x20 \"Dana Whitfield\"",
+    "summary. 86x18 \"Set next action\""
+   ],
+   "smallCount": 4
+  },
+  "leads-m390-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "button#stormDismiss.btn 28x44 \"Dismiss storm banner\"",
+    "button.td-lead 222x20 \"Robert Lindqvist\"",
+    "button.td-lead 180x20 \"Dana Whitfield\""
+   ],
+   "smallCount": 3
+  },
+  "board-m390-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "button.td-lead 180x20 \"Dana Whitfield\""
+   ],
+   "smallCount": 1
+  },
+  "drawer-m390-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "button.td-lead 180x20 \"Dana Whitfield\"",
+    "input.row-sel 16x16 \"Select Marisol Vega\"",
+    "input. 262x32 \"Owner or business name\"",
+    "input. 34x30 \"\"",
+    "input. 49x30 \"\"",
+    "input. 43x30 \"\"",
+    "input. 40x30 \"\"",
+    "input. 36x30 \"\"",
+    "input.row-sel 16x16 \"Select Coastal Property \"",
+    "input. 262x32 \"Owner or business name\"",
+    "summary. 86x18 \"Set next action\""
+   ],
+   "smallCount": 11
+  },
+  "drawer-timeline-m390-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "button.td-lead 180x20 \"Dana Whitfield\"",
+    "input.row-sel 16x16 \"Select Marisol Vega\"",
+    "input. 262x32 \"Owner or business name\"",
+    "input. 34x30 \"\"",
+    "input. 49x30 \"\"",
+    "input. 43x30 \"\"",
+    "input. 40x30 \"\"",
+    "input. 36x30 \"\"",
+    "input.row-sel 16x16 \"Select Coastal Property \"",
+    "input. 262x32 \"Owner or business name\"",
+    "input. 102x34 \"\"",
+    "input. 100x34 \"\"",
+    "input. 104x34 \"\"",
+    "input. 98x34 \"\"",
+    "input. 110x34 \"\""
+   ],
+   "smallCount": 15
+  },
+  "estimate-buttons-m390-dark": {
+   "count": 1
+  },
+  "estimate-m390-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "button.td-lead 180x20 \"Dana Whitfield\"",
+    "input.row-sel 16x16 \"Select Marisol Vega\"",
+    "input. 262x32 \"Owner or business name\"",
+    "input. 34x30 \"\"",
+    "input. 49x30 \"\"",
+    "input. 43x30 \"\"",
+    "input. 40x30 \"\"",
+    "input. 36x30 \"\"",
+    "input.row-sel 16x16 \"Select Coastal Property \"",
+    "input. 262x32 \"Owner or business name\"",
+    "summary. 86x18 \"Set next action\""
+   ],
+   "smallCount": 11
+  },
+  "enrich-m390-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "button#stormDismiss.btn 28x44 \"Dismiss storm banner\"",
+    "button.td-lead 222x20 \"Robert Lindqvist\"",
+    "button.td-lead 180x20 \"Dana Whitfield\"",
+    "input. 13x13 \"\"",
+    "input. 13x13 \"\"",
+    "input. 13x13 \"\"",
+    "input#enCap. 288x28 \"\""
+   ],
+   "smallCount": 7
+  },
+  "dnc-m390-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "input.row-sel 16x16 \"Select Robert Lindqvist\"",
+    "input. 262x32 \"Owner or business name\"",
+    "input. 34x30 \"\"",
+    "input. 49x30 \"\"",
+    "input. 43x30 \"\"",
+    "input. 40x30 \"\"",
+    "input. 36x30 \"\"",
+    "input.row-sel 16x16 \"Select Halifax Crawlspac\"",
+    "input. 262x32 \"Owner or business name\"",
+    "input. 34x30 \"\"",
+    "input. 49x30 \"\"",
+    "input. 43x30 \"\"",
+    "input. 40x30 \"\"",
+    "input. 36x30 \"\""
+   ],
+   "smallCount": 14
+  },
+  "toast-m390-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "input.row-sel 16x16 \"Select Robert Lindqvist\"",
+    "input. 262x32 \"Owner or business name\"",
+    "input. 34x30 \"\"",
+    "input. 49x30 \"\"",
+    "input. 43x30 \"\"",
+    "input. 40x30 \"\"",
+    "input. 36x30 \"\"",
+    "input.row-sel 16x16 \"Select Halifax Crawlspac\"",
+    "input. 262x32 \"Owner or business name\"",
+    "input. 34x30 \"\"",
+    "input. 49x30 \"\"",
+    "input. 43x30 \"\"",
+    "input. 40x30 \"\"",
+    "input. 36x30 \"\""
+   ],
+   "smallCount": 14
+  },
+  "map-m390-dark": {
+   "overflowX": 0,
+   "mapTop": 284,
+   "mapH": 542,
+   "mapPct": 64,
+   "small": [
+    "button.lg-toggle 75x26 \"Legend\""
+   ],
+   "smallCount": 1
+  },
+  "map-detail-m390-dark": {
+   "overflowX": 0,
+   "mapTop": -422,
+   "mapH": 542,
+   "mapPct": 14,
+   "small": [
+    "button.lg-toggle 75x26 \"Legend\"",
+    "button. 104x24 \"Port Orange · 6\"",
+    "input#fsiSelectAll.ck 24x24 \"\"",
+    "button#fsiBulkClear.btn 28x44 \"Clear selection\"",
+    "input.ck 24x24 \"Select parcel\"",
+    "input.ck 24x24 \"Select parcel\"",
+    "input.ck 24x24 \"Select parcel\"",
+    "input.ck 24x24 \"Select parcel\"",
+    "summary. 354x36 \"Why this score\""
+   ],
+   "smallCount": 9
+  },
+  "map-why-m390-dark": {
+   "overflowX": 0,
+   "mapTop": -422,
+   "mapH": 542,
+   "mapPct": 14,
+   "small": [
+    "button.lg-toggle 75x26 \"Legend\"",
+    "button. 104x24 \"Port Orange · 6\"",
+    "input#fsiSelectAll.ck 24x24 \"\"",
+    "button#fsiBulkClear.btn 28x44 \"Clear selection\"",
+    "input.ck 24x24 \"Select parcel\"",
+    "input.ck 24x24 \"Select parcel\"",
+    "input.ck 24x24 \"Select parcel\"",
+    "input.ck 24x24 \"Select parcel\"",
+    "summary. 354x36 \"Why this score\""
+   ],
+   "smallCount": 9
+  },
+  "map-layers-m390-dark": {
+   "overflowX": 0,
+   "mapTop": 284,
+   "mapH": 542,
+   "mapPct": 64,
+   "small": [
+    "input#fsiOpFema. 92x16 \"\"",
+    "input#fsiOpClaims. 92x16 \"\"",
+    "input#fsiOpParcels. 92x16 \"\"",
+    "button.lg-toggle 75x26 \"Legend\""
+   ],
+   "smallCount": 4
+  },
+  "map-search-m390-dark": {
+   "overflowX": 0,
+   "mapTop": 284,
+   "mapH": 542,
+   "mapPct": 64,
+   "small": [
+    "button.lg-toggle 75x26 \"Legend\""
+   ],
+   "smallCount": 1
+  },
+  "map-storm-m390-dark": {
+   "overflowX": 0,
+   "mapTop": 284,
+   "mapH": 542,
+   "mapPct": 64,
+   "small": [
+    "button.lg-toggle 75x26 \"Legend\""
+   ],
+   "smallCount": 1
+  },
+  "drafts-m390-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "docs-m390-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "button.on 41x28 \"All\"",
+    "button. 79x28 \"Playbook\"",
+    "button. 66x28 \"Pricing\"",
+    "button. 67x28 \"Scripts\"",
+    "button. 71x28 \"Product\"",
+    "button. 61x28 \"Leads\""
+   ],
+   "smallCount": 6
+  },
+  "coach-m390-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "button.qp 328x38 \"FD: first-call opener\"",
+    "button.qp 328x38 \"FD: DNS 78 urgent pitch\"",
+    "button.qp 328x38 \"Sump: battery backup clo\"",
+    "button.qp 328x38 \"Mnt: pre-season visit\"",
+    "button.qp 328x38 \"PM: pilot property close\"",
+    "button.qp 328x38 \"Quiz: FloGuard playbook\"",
+    "button.qp 328x38 \"Drill: price objections\"",
+    "button.qp 328x38 \"Voicemail + text\""
+   ],
+   "smallCount": 8
+  },
+  "roleplay-m390-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "review-m390-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "playbook-m390-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "settings-m390-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "admin-m390-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "login-m390-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "local-leads-m390-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "button#stormDismiss.btn 28x44 \"Dismiss storm banner\"",
+    "button.td-lead 222x20 \"Robert Lindqvist\"",
+    "button.td-lead 180x20 \"Dana Whitfield\""
+   ],
+   "smallCount": 3
+  },
+  "local-estimate-m390-dark": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [
+    "button#stormDismiss.btn 28x44 \"Dismiss storm banner\"",
+    "button.td-lead 222x20 \"Robert Lindqvist\"",
+    "button.td-lead 180x20 \"Dana Whitfield\"",
+    "summary. 86x18 \"Set next action\""
+   ],
+   "smallCount": 4
+  },
+  "proposal-d1440": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "proposal-print": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  },
+  "proposal-m390": {
+   "overflowX": 0,
+   "mapTop": null,
+   "mapH": null,
+   "mapPct": null,
+   "small": [],
+   "smallCount": 0
+  }
+ },
+ "errors": {
+  "d1440-light": [],
+  "local-d1440-light": [],
+  "d1440-dark": [],
+  "local-d1440-dark": [],
+  "d1024-light": [],
+  "d1024-dark": [],
+  "m390-light": [],
+  "local-m390-light": [],
+  "m390-dark": [],
+  "local-m390-dark": []
+ },
+ "perf": {
+  "firstLoad": {
+   "requests": 34,
+   "js": 476736,
+   "css": 135484,
+   "fonts": 72920,
+   "html": 69684,
+   "total": 854373,
+   "bootMs": 1183,
+   "list": [
+    "/crm/ 69684",
+    "/crm/css/app.css 59444",
+    "/crm/css/leads-next.css 37454",
+    "/crm/css/map-next.css 22446",
+    "/crm/css/estimates.css 8038",
+    "/crm/css/tokens.css 8102",
+    "/crm/js/00-theme.js 717",
+    "/crm/js/01-data.js 1984",
+    "/crm/js/02-crm-core.js 38269",
+    "/crm/fonts/InterVariable-latin.woff2 72920",
+    "/crm/js/03-ai-prompts.js 31195",
+    "/crm/logo.png 84309",
+    "/crm/js/05-nav.js 2017",
+    "/crm/js/04-state.js 14896",
+    "/crm/js/06-leads.js 44731",
+    "/crm/js/07-chat.js 7142",
+    "/crm/js/08-roleplay.js 3140",
+    "/crm/js/09-review.js 398",
+    "/crm/js/10-settings.js 1437",
+    "/crm/js/11-auth.js 3575",
+    "/crm/js/13-boot.js 4644",
+    "/crm/js/14-drafts.js 5267",
+    "/crm/js/12-admin.js 6513",
+    "/crm/js/15-docs.js 4046",
+    "/crm/js/16-fsi-map.js 57338",
+    "/crm/js/17-shell.js 7246",
+    "/crm/js/18b-leads-views.js 35897",
+    "/crm/js/18c-leads-enrich.js 15988",
+    "/crm/js/19a-map-pure.js 19583",
+    "/crm/js/18d-leads-drawer.js 14633",
+    "/crm/js/18-leads-next.js 52786",
+    "/crm/js/20-estimates.js 44795",
+    "/crm/js/19-map-next.js 58499",
+    "/crm/docs/coach_knowledge.json 15240"
+   ]
+  },
+  "leads2000": {
+   "renderMs": [
+    38,
+    68,
+    57
+   ],
+   "rows": 151,
+   "boardMs": 58,
+   "searchMs": 19,
+   "domNodes": 8962
+  }
+ }
+}

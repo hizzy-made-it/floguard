@@ -76,12 +76,20 @@ function toggleLeadCause(l, cause, checked){
  if(checked && i<0) cur.push(cause);
  if(!checked && i>=0){
  if(cur.length===1){
+ const archive=function(){
+  l.status='Archived';
+  setListStatus(l, cause, 'Archived');
+  setLeadLists(l, [], {allowEmpty:true, touched:true});
+  l.list='Website';
+  return true;
+ };
+ // R2: app modal instead of window.confirm. Returns a Promise<boolean>; callers keep the box as
+ // it was and finish their work when it resolves true.
+ if(window.FG&&FG.confirm){
+  return FG.confirm({title:'Archive this lead?', message:'"'+(l.name||'This business')+'" is only on '+causeLabel(cause)+'. Unchecking it archives the lead.', confirmLabel:'Uncheck and archive', danger:true}).then(function(y){ return y?archive():false; });
+ }
  if(!confirm('"'+ (l.name||'This business') +'" is only on '+cause+'. Uncheck last cause and archive?')) return false;
- l.status='Archived';
- setListStatus(l, cause, 'Archived');
- setLeadLists(l, [], {allowEmpty:true, touched:true});
- l.list='Website';
- return true;
+ return archive();
  }
  cur.splice(i,1);
  }
@@ -130,7 +138,7 @@ function renderFitnessCard(l){
  const ws=resolveWebsiteScore(l);
  if(!ws){
  el.hidden=true;
- el.innerHTML='<div class="wfs-empty">No Drainage Need Score yet. Run <code>leadagent score</code>, then sync/import — or log <code>DNS 72/B (urgent) | standing water 2+ days; crawlspace damp</code> in notes.</div>';
+ el.innerHTML='<div class="wfs-empty">No Drainage Need Score yet.'+(leadFloodScore(l)!=null?' Flood score from the map: <b>'+esc(String(Math.round(leadFloodScore(l))))+'</b> (a call-list rank, not an inspection).':'')+' After talking to the owner, note it in the lead notes as <i>DNS 72/B</i> with what they described (for example, standing water 2+ days).</div>';
  el.hidden=false;
  return;
  }
@@ -252,14 +260,22 @@ function refreshCityFilter(){
  sel.innerHTML='<option value="">All cities</option>'+cities().map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
  if([...sel.options].some(o=>o.value===cur)) sel.value=cur;
 }
+/** Flood score carried from the map (must-have score, else live FSI), or null. R2. */
+function leadFloodScore(l){
+ const m=Number(l&&l.must_have_score), f=Number(l&&l.fsi_live);
+ if(l&&l.must_have_score!=null&&isFinite(m)) return m;
+ if(l&&l.fsi_live!=null&&isFinite(f)) return f;
+ return null;
+}
 function scoreCellHtml(l){
  const ws=resolveWebsiteScore(l);
- const hasWeb=!!websiteHref(l.website||'');
- if(!hasWeb && !ws){
- return '<span class="wfs-pill hot" title="Urgent drainage need — active flooding signals in notes/score">HOT</span>';
- }
  if(!ws){
- return '<span class="wfs-pill none" title="No drainage score yet — run leadagent score or log DNS in notes">—</span>';
+ const fs=leadFloodScore(l);
+ if(fs!=null){
+  const tone=fs>=70?'hot':fs>=45?'g-C':'g-E';
+  return '<span class="wfs-pill '+tone+'" title="Flood score from the map (terrain, soil, zone, rain). A call-list rank, not an inspection.">'+esc(String(Math.round(fs)))+'</span>';
+ }
+ return '<span class="wfs-pill none" title="No score yet. Leads added from the flood map carry their flood score; others get a Drainage Need Score after an assessment.">—</span>';
  }
  const gaps=(ws.gaps||[]).slice(0,3).join('; ');
  const title=esc('DNS '+ws.total+'/'+ws.grade+(ws.band?(' · '+ws.band):'')+(gaps?(' · '+gaps):''));
@@ -317,6 +333,28 @@ function phoneCellExtras(l){
  return '<div class="ph-line">'+FG.phone.chips(p, l)+(list.length>1?'<span class="ph-chip more" title="'+esc(list.slice(1).map(function(x){ return x.number; }).join(', '))+'">+'+(list.length-1)+'</span>':'')+
   '<span class="ph-btns">'+btn('call','phone','Call')+btn('text','message-square','Text')+'</span></div>';
 }
+const LEADS_PAGE=150;
+let _leadsLimit=LEADS_PAGE;
+/** Back to the first page when the list itself changes (tab, search, filters, sort). */
+function resetLeadsPage(){ _leadsLimit=LEADS_PAGE; }
+document.addEventListener('click', function(e){
+ const b=e.target.closest&&e.target.closest('#tbody .more-row [data-more]'); if(!b) return;
+ _leadsLimit=b.getAttribute('data-more')==='all'?Infinity:_leadsLimit+LEADS_PAGE;
+ render();
+});
+['search','industry','cityFilter','dueThisMonth','sortSelect','chipStage'].forEach(function(id){
+ const el=document.getElementById(id); if(el){ el.addEventListener('input', resetLeadsPage, true); el.addEventListener('change', resetLeadsPage, true); }
+});
+['tabs','filterChips'].forEach(function(id){ const el=document.getElementById(id); if(el) el.addEventListener('click', resetLeadsPage, true); });
+function paintCauseTabCounts(){
+ const tabs=document.getElementById('tabs'); if(!tabs) return;
+ tabs.querySelectorAll('button[data-list]').forEach(function(b){
+  const c=b.getAttribute('data-list');
+  const n=c==='All'?state.length:state.filter(function(l){ return leadLists(l).includes(c); }).length;
+  let sp=b.querySelector('.tab-n'); if(!sp){ sp=document.createElement('span'); sp.className='tab-n num'; b.appendChild(sp); }
+  sp.textContent=String(n);
+ });
+}
 function render(){
  syncDueFilterUi();
  const fg=window.FG&&FG.ready;
@@ -329,7 +367,10 @@ function render(){
  const list=visibleLeads();
  const shown=list.length;
  const sel=fg&&FG.views?FG.views.selection:null;
- list.forEach(l=>{
+ // R2: draw one page of rows (2,000 leads took ~400 ms and 100k DOM nodes per render); "Show more" adds pages.
+ const frag=document.createDocumentFragment();
+ const limit=Math.max(LEADS_PAGE, _leadsLimit);
+ list.slice(0, limit).forEach(l=>{
  const tr=document.createElement('tr'); tr.dataset.id=l.id;
  const cause=activeCause(l);
  const st=getListStatus(l, cause);
@@ -352,10 +393,17 @@ function render(){
  <td class="cell-phone"><input value="${esc(l.phone)}" data-f="phone" aria-label="Phone" placeholder="Add phone">${phoneCellExtras(l)}</td>
  <td class="cell-email"><input value="${esc(l.email||'')}" data-f="email" aria-label="Email" placeholder="Add email" title="${esc(l.email||'')}"></td>
  <td class="row-open cell-score" title="Open prospect for score details">${scoreCellHtml(l)}</td>
- <td class="cell-status" data-st="${esc(statusTone(st))}"><select data-f="status" data-cause-status="1" class="status-sel" aria-label="Status for ${esc(cause)}" title="Status for ${esc(cause)}">${STATUSES.map(s=>`<option ${st===s?'selected':''}>${esc(s)}</option>`).join('')}</select><div class="lead-cause">${fg?FG.stageChip(stage,' title="Pipeline stage"'):''}<span>${esc(cause)}</span></div></td>
+ <td class="cell-status" data-st="${esc(statusTone(st))}"><select data-f="status" data-cause-status="1" class="status-sel" aria-label="Status for ${esc(causeLabel(cause))}" title="Status for ${esc(causeLabel(cause))}">${STATUSES.map(s=>`<option ${st===s?'selected':''}>${esc(s)}</option>`).join('')}</select><div class="lead-cause">${fg?FG.stageChip(stage,' title="Pipeline stage"'):''}<span>${esc(causeLabel(cause))}</span></div></td>
  <td class="cell-acts"><button type="button" class="coachbtn openbtn" title="Open profile">Open</button> <button type="button" class="coachbtn" title="Game-plan this call with the AI Coach">Coach</button> <button type="button" class="del" title="Delete lead" aria-label="Delete lead">✕</button></td>`;
- tb.appendChild(tr);
+ frag.appendChild(tr);
  });
+ if(list.length>limit){
+  const more=document.createElement('tr'); more.className='more-row';
+  const left=list.length-limit;
+  more.innerHTML='<td colspan="8"><div class="more-in"><span class="more-n">Showing <b class="num">'+limit+'</b> of <b class="num">'+list.length+'</b></span><button type="button" class="btn btn--sm" data-more="page">Show '+Math.min(LEADS_PAGE,left)+' more</button>'+(left>LEADS_PAGE?'<button type="button" class="btn btn--sm ghost" data-more="all">Show all '+list.length+'</button>':'')+'</div></td>';
+  frag.appendChild(more);
+ }
+ tb.appendChild(frag);
  if(!shown){
   const tr=document.createElement('tr'); tr.className='empty-row';
   tr.innerHTML='<td colspan="8"><div class="empty-state"><b>'+(state.length?'No leads match these filters':'No leads yet')+'</b><span>'+(state.length?'Clear the search or filter chips, pick another cause tab, or reset the industry and city filters.':'Add a lead, paste one from Google Maps, or send parcels over from the flood map.')+'</span></div></td>';
@@ -367,10 +415,10 @@ function render(){
  let cdl=document.getElementById('cityList');
  if(!cdl){ cdl=document.createElement('datalist'); cdl.id='cityList'; document.body.appendChild(cdl); }
  cdl.innerHTML=cities().map(c=>`<option value="${esc(c)}">`).join('');
+ paintCauseTabCounts();
  document.getElementById('stats').innerHTML=
- `Showing <b>${shown}</b> of ${state.length} · `+LISTS.map(x=>`${x}: <b>${state.filter(l=>leadLists(l).includes(x)).length}</b>`).join(' · ')+
- ` · multi: <b>${state.filter(l=>leadLists(l).length>1).length}</b>`+
- (view!=='All'?' · status shown for <b>'+esc(view)+'</b>':' · status = primary cause')+
+ `Showing <b class="num">${shown}</b> of <span class="num">${state.length}</span> leads`+
+ (view!=='All'?' · status shown for <b>'+esc(causeLabel(view))+'</b>':' · status shown for each lead\'s primary cause')+
  (view==='Maintenance'?(' · due this month: <b>'+dueCount+'</b>'):'')+
  (dueOnly?' · <b>Due filter on</b>':'')+
  (ind?(' · industry: <b>'+esc(ind)+'</b>'):'')+
@@ -395,10 +443,15 @@ document.getElementById('tbody').addEventListener('change',e=>{
  // Cause checkbox toggle
  if(e.target.matches('input[data-cause]')){
  const cause=e.target.getAttribute('data-cause');
- const ok=toggleLeadCause(l, cause, e.target.checked);
+ const want=e.target.checked;
+ const finish=function(){
+  appendActivity({lead_id:l.id,lead_key:leadKeyOf(l),type:'list_change',detail:{text:(want?'Checked':'Unchecked')+' '+cause,lists:leadLists(l)}});
+  saveLeads(); render(); refreshIndustryFilter(); refreshCityFilter();
+ };
+ const ok=toggleLeadCause(l, cause, want);
+ if(ok&&typeof ok.then==='function'){ e.target.checked=!want; ok.then(function(y){ if(y) finish(); }); return; }
  if(!ok){ e.target.checked=!e.target.checked; return; }
- appendActivity({lead_id:l.id,lead_key:leadKeyOf(l),type:'list_change',detail:{text:(e.target.checked?'Checked':'Unchecked')+' '+cause,lists:leadLists(l)}});
- saveLeads(); render(); refreshIndustryFilter(); refreshCityFilter();
+ finish();
  return;
  }
  // Per-cause status
@@ -510,7 +563,7 @@ function pmsg(t){ document.getElementById('parseMsg').textContent=t; }
 function mapsUrl(cat,city){ return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent((cat||'')+' in '+(city||'')+' FL'); }
 document.getElementById('mGo').addEventListener('click',()=>{
  const c=document.getElementById('mCat').value, city=document.getElementById('mCity').value;
- if(!c){ if(window.FG&&FG.ready) FG.toast('Type a category or keyword first.', {kind:'err'}); else alert('Type a category or keyword first.'); document.getElementById('mCat').focus(); return; }
+ if(!c){ if(window.FG&&FG.ready) FG.toast('Type a category or keyword first.', {kind:'err'}); else fgNotify('Type a category or keyword first.'); document.getElementById('mCat').focus(); return; }
  window.open(mapsUrl(c,city),'_blank');
 });
 (function initMaps(){
@@ -692,6 +745,8 @@ async function fsiBulkAddAndEnrich(){
   const p=_fsiState.filtered.find(function(x){ return String(x.parcel_id)===String(id); })
    || _fsiState.raw.find(function(x){ return String(x.parcel_id)===String(id); });
   if(!p) return;
+  const had=(typeof fsiLeadForParcel==='function')?fsiLeadForParcel(p.parcel_id):null;
+  if(had){ added.push(had); return; } // already a lead: enrich it rather than duplicate it (R2)
   const lead=fsiLeadFromParcel(p);
   state.unshift(lead);
   added.push(lead);

@@ -385,6 +385,7 @@ function wireProfileActBar(){
  e.preventDefault();
  e.stopPropagation();
  const act=btn.getAttribute('data-act');
+ const dm=btn.closest('details.menu'); if(dm) dm.removeAttribute('open');
  if(act==='call') profileActionCall();
  else if(act==='sms') profileActionSms();
  else if(act==='email') profileActionEmail();
@@ -431,9 +432,12 @@ function paintProfileForm(l){
  if((l.email||'').trim()) contactBits.push('email');
  if((l.website||'').trim()) contactBits.push('web');
  const site=(l.address||'').trim();
- document.getElementById('pfMeta').textContent=(site?site+' · ':'')+(l.industry||'-')+' · '+(l.city||'-')+(l.zip?(' '+l.zip):'')+' · '+(isHot(l)?'HOT: urgent drainage need':(l.website||''))+wfsMeta+(contactBits.length?(' · '+contactBits.join('/')):' · no phone/email yet');
- document.getElementById('pfBadges').innerHTML=lists.map(x=>'<span class="badge">'+esc(x)+(x===cat?' · active':'')+'</span>').join('')+
- (causeStatus?'<span class="badge">'+esc(cat)+': '+esc(causeStatus)+'</span>':'')+
+ // R2: one clean line: where, who, score. City/ZIP only when the address does not already carry them.
+ const where=site?(site+(l.city&&site.toLowerCase().indexOf(String(l.city).toLowerCase())<0?', '+l.city:'')):[l.city,l.zip].filter(Boolean).join(' ');
+ const fsc=(typeof leadFloodScore==='function')?leadFloodScore(l):null;
+ document.getElementById('pfMeta').textContent=[where||'No address yet', l.industry||'', fsc!=null?('Flood score '+Math.round(fsc)):'', wfs?('DNS '+wfs.total+'/'+wfs.grade):''].filter(Boolean).join(' · ');
+ document.getElementById('pfBadges').innerHTML=lists.map(x=>'<span class="badge'+(x===cat?' badge--on':'')+'">'+esc(causeLabel(x))+(x===cat?' · active':'')+'</span>').join('')+
+ (causeStatus?'<span class="badge">'+esc(causeStatus)+'</span>':'')+
  (l.owner?'<span class="badge">Rep: '+esc(l.owner)+'</span>':'')+
  (l.parcel_id?'<span class="badge">Parcel '+esc(l.parcel_id)+'</span>':'')+
  (l.mgmt_company_name?'<span class="badge">Mgmt: '+esc(l.mgmt_company_name)+'</span>':'')+
@@ -447,8 +451,8 @@ function paintProfileForm(l){
  pfCauses.innerHTML=LISTS.map(function(c){
  const on=lists.includes(c);
  const tabOn=(view!=='All'&&view===c)?' tab-active':'';
- return '<label class="cause-chip'+(on?' on':'')+' badge-'+listBadge(c)+tabOn+'" title="'+esc(c)+'">'+
- '<input type="checkbox" data-cause="'+esc(c)+'" data-profile-cause="1"'+(on?' checked':'')+'>'+esc(c)+'</label>';
+ return '<label class="cause-chip'+(on?' on':'')+' badge-'+listBadge(c)+tabOn+'" title="'+esc(causeLabel(c))+'">'+
+ '<input type="checkbox" data-cause="'+esc(c)+'" data-profile-cause="1"'+(on?' checked':'')+'>'+esc(causeLabel(c))+'</label>';
  }).join('');
  }
  // PropertyMgmt → management company dropdown
@@ -498,21 +502,22 @@ function paintProfileForm(l){
  const hasPhone=!!normalizeDial(l.phone||'');
  const hasEmail=!!(l.email||'').trim();
  const hasWeb=!!websiteHref(l.website||'');
+ // R2: three primary actions in one row; extension actions (Estimate) join that row; the rest in More.
+ const mi=function(act, label, icon, off, title){ return '<button type="button" class="menu-item'+(off?' is-off':'')+'" role="menuitem" data-act="'+act+'"'+(title?' title="'+title+'"':'')+'><svg class="ic" aria-hidden="true"><use href="#i-'+icon+'"/></svg>'+label+'</button>'; };
  document.getElementById('pfActBar').innerHTML=
- '<button type="button" class="btn p'+(hasPhone?'':' is-off')+'" data-act="call" title="Open phone dialer">Call</button>'+
- '<button type="button" class="btn'+(hasPhone?'':' is-off')+'" data-act="sms" title="Open SMS / copy text">Text</button>'+
- '<button type="button" class="btn'+(hasEmail?'':' is-off')+'" data-act="email" title="Open email composer">Email</button>'+
- '<button type="button" class="btn" data-act="copy-phone">Copy phone</button>'+
- '<button type="button" class="btn" data-act="copy-email">Copy email</button>'+
- '<button type="button" class="btn'+(hasWeb?'':' is-off')+'" data-act="website">Website</button>'+
- '<button type="button" class="btn" data-act="maps">Maps</button>'+
- '<button type="button" class="btn o" data-act="coach">Coach this lead</button>'+
- '<button type="button" class="btn o" data-act="queue-draft" title="Create email draft for human approval">Queue draft</button>'+
+ '<button type="button" class="btn p'+(hasPhone?'':' is-off')+'" data-act="call" title="Open phone dialer"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg>Call</button>'+
+ '<button type="button" class="btn'+(hasPhone?'':' is-off')+'" data-act="sms" title="Open SMS / copy text"><svg class="ic" aria-hidden="true"><use href="#i-message-square"/></svg>Text</button>'+
+ '<button type="button" class="btn'+(hasEmail?'':' is-off')+'" data-act="email" title="Open email composer"><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg>Email</button>'+
+ '<details class="menu act-more"><summary class="btn" aria-label="More lead actions"><svg class="ic" aria-hidden="true"><use href="#i-ellipsis"/></svg>More</summary><div class="menu-pop" role="menu" aria-label="More lead actions">'+
+ mi('coach','Coach this lead','headphones')+mi('queue-draft','Queue email draft','send',false,'Create an email draft for human approval')+
+ '<div class="menu-sep" role="separator"></div>'+
+ mi('copy-phone','Copy phone','phone',!hasPhone)+mi('copy-email','Copy email','mail',!hasEmail)+mi('website','Open website','search',!hasWeb)+mi('maps','Open in Maps','map')+
+ '</div></details>'+
  '<div class="act-msg" id="pfActMsg" role="status" aria-live="polite"></div>';
  wireProfileActBar();
  const enrichHint=hasPhone||hasEmail||wfs
- ? ('Working cause: '+cat+(wfs?(' · score '+wfs.total+'/'+wfs.grade):'')+(hasPhone||hasEmail?' · contacts ready':''))
- : 'Tip: run LeadAgent enrich + sync, or fill Phone/Email below.';
+ ? ('Working on: '+causeLabel(cat)+(hasPhone||hasEmail?' · contact on file':''))
+ : 'No phone or email yet. Use Enrich contacts on the Leads page, or type them in below.';
  flashActMsg(enrichHint, hasPhone||hasEmail||wfs?'ok':'err');
  const pb=CATEGORY_PLAYBOOKS[cat]||CATEGORY_PLAYBOOKS.FrenchDrain;
  document.getElementById('pfPlaybook').innerHTML='<b>'+esc(pb.label)+'</b> <span class="badge">active cause</span><br>'+esc(pb.product||'')+
@@ -681,13 +686,17 @@ function removeLeadFromCurrentList(){
  const l=state.find(x=>x.id===profileLeadId); if(!l) return;
  normalizeLead(l);
  const active=activeCause(l);
- if(!active||active==='All'){ if(window.FG&&FG.ready) FG.toast('Pick a cause tab (not All) to uncheck that cause.', {kind:'err'}); else alert('Pick a list tab (not All) to uncheck that cause.'); return; }
+ if(!active||active==='All'){ fgNotify('Pick a cause tab (not All) to uncheck that cause.', 'err'); return; }
+ const finish=function(){
+  appendActivity({lead_id:l.id,lead_key:leadKeyOf(l),type:'list_change',detail:{text:'Unchecked cause '+active,lists:leadLists(l)}});
+  saveLeads();
+  closeProfile();
+  render(); refreshIndustryFilter(); refreshCityFilter();
+ };
  const ok=toggleLeadCause(l, active, false);
+ if(ok&&typeof ok.then==='function'){ ok.then(function(y){ if(y) finish(); }); return; }
  if(!ok) return;
- appendActivity({lead_id:l.id,lead_key:leadKeyOf(l),type:'list_change',detail:{text:'Unchecked cause '+active,lists:leadLists(l)}});
- saveLeads();
- closeProfile();
- render(); refreshIndustryFilter(); refreshCityFilter();
+ finish();
 }
 async function deleteLeadForever(){
  const l=state.find(x=>x.id===profileLeadId); if(!l) return;

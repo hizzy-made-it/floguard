@@ -96,6 +96,13 @@ var FSI_PURE = (function(){
   x:   ['#FBEFC6','#F4D57A','#E6AE3A','#C68512','#8F5B08'],
   sfha:['#DDEAF6','#A9CBE8','#6CA4D6','#3576B9','#174B8B']
  };
+ /* Dark basemap (R2): the light ramps start near-white and glare on near-black, while the low
+  * classes wash out. These run dark -> bright so "more claims" still reads as "more ink". */
+ var CLAIMS_RAMPS_DARK={
+  all: ['#2B2347','#47377F','#6A51B6','#9479DC','#C7B3FF'],
+  x:   ['#3A2E12','#6A4F15','#A6781B','#DDA63A','#FFD66B'],
+  sfha:['#13263C','#1C426C','#2C69A4','#4C93D6','#8CC4F5']
+ };
  var CLAIMS_NODATA='#9AA3AD';
 
  /**
@@ -172,7 +179,8 @@ var FSI_PURE = (function(){
   */
  function claimsModel(rows, opts){
   opts=opts||{};
-  var ramp=CLAIMS_RAMPS[opts.zone]||CLAIMS_RAMPS.all;
+  var ramps=opts.dark?CLAIMS_RAMPS_DARK:CLAIMS_RAMPS;
+  var ramp=ramps[opts.zone]||ramps.all;
   var mode=claimsColorMode(rows);
   var metrics=(rows||[]).map(function(r){
    var m=claimsMetric(r, opts);
@@ -417,7 +425,7 @@ var FSI_PURE = (function(){
 
  return {
   num:num, clamp01:clamp01, hsgScore:hsgScore, zoneScore:zoneScore, scoreBreakdown:scoreBreakdown,
-  CLAIMS_RAMPS:CLAIMS_RAMPS, CLAIMS_NODATA:CLAIMS_NODATA,
+  CLAIMS_RAMPS:CLAIMS_RAMPS, CLAIMS_RAMPS_DARK:CLAIMS_RAMPS_DARK, CLAIMS_NODATA:CLAIMS_NODATA,
   claimsMetric:claimsMetric, claimsColorMode:claimsColorMode, classBreaks:classBreaks, classOf:classOf,
   claimsModel:claimsModel, legendLabel:legendLabel, fmtInt:fmtInt, fmtMoney:fmtMoney, shortEvent:shortEvent,
   claimsLine:claimsLine, V2_FIELDS:V2_FIELDS, v2Rows:v2Rows, inputsList:inputsList,

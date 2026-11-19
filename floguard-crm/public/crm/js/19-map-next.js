@@ -112,7 +112,7 @@ function mnClaimsSyncBar(){
  });
  mnRenderEventChips();
  if(c.available===false){
-  mnClaimsStatus('Claims data not loaded yet. Block-group claims arrive once fsi/sql/016 is applied and the claims ingest has run. <button type="button" class="linkbtn" data-mn-use-heat>Use tract heat</button>','muted');
+  mnClaimsStatus('Claims data not loaded yet: neighbourhood claim shading appears here once the OpenFEMA import has run. Until then, <button type="button" class="linkbtn" data-mn-use-heat>use tract heat</button> for the county-wide picture.','muted');
   return;
  }
  if(c.available==null){ mnClaimsStatus('Loading neighbourhood claims… '+esc(MN_COMPLIANCE),'muted'); return; }
@@ -204,7 +204,7 @@ async function mnClaimsLoad(force){
 function mnClaimsPaint(){
  const c=MN.claims, map=mnMap();
  const rows=[...c.rows.values()];
- c.model=c.available&&rows.length?FSI_PURE.claimsModel(rows,{zone:c.zone, win:c.win, event:!!c.event}):null;
+ c.model=c.available&&rows.length?FSI_PURE.claimsModel(rows,{zone:c.zone, win:c.win, event:!!c.event, dark:(typeof fsiEffectiveTheme==='function'&&fsiEffectiveTheme()==='dark')}):null;
  if(map){
   const polys=[], pts=[];
   if(c.model) c.model.items.forEach(function(it){
@@ -414,8 +414,8 @@ async function mnPolyLoad(){
   if(ctl&&P.ctl!==ctl) return;
   P.ctl=null;
   if(!data||data.available===false){
-   if(data&&data.reason==='no_rpc'){ P.disabled=true; P.note='Parcel outlines are not available yet (fsi/sql/019 not applied); the map keeps dots.'; }
-   else P.boxes.push(box); // no geometry stored here: do not ask again
+   if(data&&data.reason==='no_rpc'){ P.disabled=true; P.note='Parcel outlines are not available yet, so parcels show as dots at every zoom.'; }
+   else { P.boxes.push(box); P.noGeom=true; } // no geometry stored here: do not ask again
    mnLayersNote();
    return;
   }
@@ -440,7 +440,7 @@ async function mnPolyLoad(){
 
 function mnLayersNote(){
  const el=mnEl('fsiLayersNote'); if(!el) return;
- el.textContent='Basemap follows the app theme (OpenFreeMap; no free hillshade there). '+(MN.poly.disabled?MN.poly.note:'Parcel outlines draw from zoom 15.');
+ el.textContent='Basemap follows the app theme. '+(MN.poly.disabled?MN.poly.note:(MN.poly.noGeom&&!MN.poly.cache.size?'Lot outlines are not in the county data yet, so parcels show as dots at every zoom.':'Lot outlines draw from zoom 15.'));
 }
 
 function mnPolyClick(e){
@@ -470,6 +470,7 @@ function mnInitialView(){
 let _mnWired=false;
 function mnOnStyleLoad(first){
  mnAddClaimsLayers();
+ if(!first&&MN.claims.rows.size) mnClaimsPaint(); // theme switch: repaint with that theme's ramp
  mnAddPolyLayers();
  mnApplyOpacity('parcels');
  if(_mnWired) return;
@@ -509,7 +510,7 @@ function mnOnMoveEnd(){
  }, 300);
 }
 
-function mnLayersChanged(){ fsiRenderLegend(); mnWriteHash(); }
+function mnLayersChanged(){ fsiRenderLegend(); mnWriteHash(); if(window.mnFiltersCount) window.mnFiltersCount(); }
 
 function mnAfterRefresh(){
  MN.bander=fsiBander(_fsiState.raw);
@@ -619,19 +620,80 @@ function mnRenderWhy(p){
  bd.innerHTML=h;
 }
 
-/* field reports (local: lead_outcomes needs a won/lost/no_show outcome, see docs/handoff/F2.md) */
+/* field reports: kept on this device and sent to /crm/api/lead-outcomes as action 'field_report'
+ * (R1 contract). Anything not acknowledged with {ok:true} (offline, 4xx/5xx, unknown action on an
+ * older server) stays queued (synced:false) and is retried on the next map boot / when back online. */
 function mnReports(){ try{ return JSON.parse(localStorage.getItem(MN_REPORT_KEY)||'{}')||{}; }catch(e){ return {}; } }
-function mnReportFor(id){ if(id==null) return null; return mnReports()[String(id)]||null; }
+function mnReportFor(id){ if(id==null) return null; const r=mnReports()[String(id)]; return r&&r.v?r:null; }
 function mnSaveReport(id, v){
  const all=mnReports();
  const k=String(id);
- if(!v) delete all[k];
- else all[k]={v:v, at:new Date().toISOString(), by:(typeof currentUserName==='function'?currentUserName():'')||''};
+ const by=(typeof currentUserName==='function'?currentUserName():'')||'';
+ // Withdrawing a report the server already has needs a null report sent (R1 contract); a report that
+ // never left this device is simply dropped.
+ if(!v){ if(all[k]&&all[k].synced) all[k]={v:null, at:new Date().toISOString(), by:by, synced:false}; else delete all[k]; }
+ else all[k]={v:v, at:new Date().toISOString(), by:by};
  try{ localStorage.setItem(MN_REPORT_KEY, JSON.stringify(all)); }catch(e){}
+ mnSyncReports();
 }
+let _mnReportSyncing=false;
+async function mnSyncReports(){
+ if(_mnReportSyncing) return;
+ const tok=(typeof getToken==='function')?getToken():''; if(!tok) return;
+ if(typeof navigator!=='undefined'&&navigator.onLine===false) return;
+ _mnReportSyncing=true;
+ try{
+  const all=mnReports();
+  for(const k of Object.keys(all)){
+   const r=all[k]; if(!r||r.synced) continue;
+   const body={action:'field_report', parcel_id:k, report:r.v==='water'?'water_confirmed':r.v==='no_problem'?'not_a_problem':null};
+   const lead=(typeof state!=='undefined'&&Array.isArray(state))?state.find(function(l){ return l&&String(l.parcel_id||'')===k&&(l.uuid||l.server_id!=null); }):null;
+   if(lead) body.lead_id=lead.uuid||lead.server_id;
+   if(r.by) body.note='Reported by '+r.by+' on '+String(r.at).slice(0,10);
+   let ok=false;
+   try{
+    const res=await fetch('/crm/api/lead-outcomes',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify(body)});
+    const j=res.ok?await res.json().catch(function(){ return null; }):null;
+    ok=!!(j&&j.ok===true);
+   }catch(e){ ok=false; }
+   if(!ok) break; // keep the queue; try again later
+   const now=mnReports(); if(now[k]&&now[k].at===r.at){ if(now[k].v) now[k].synced=true; else delete now[k]; try{ localStorage.setItem(MN_REPORT_KEY, JSON.stringify(now)); }catch(e){} }
+   if(MN_TEAM) MN_TEAM.delete(k);
+  }
+ }finally{ _mnReportSyncing=false; }
+ const p=_fsiState.selectedId&&mnFindParcel(_fsiState.selectedId); if(p) mnRenderReport(p);
+}
+window.addEventListener('online', function(){ mnSyncReports(); });
+setTimeout(function(){ mnSyncReports(); }, 4000);
 function mnFieldReportNote(id){
  const r=mnReportFor(id); if(!r) return '';
  return 'Field report: '+(r.v==='water'?'water confirmed on site':'not a problem on site')+' ('+String(r.at).slice(0,10)+(r.by?', '+r.by:'')+').';
+}
+/* Other reps' reports for a parcel ({action:'field_report_list'}); quiet when the server has none
+ * or the table is not there yet (503 field_reports_not_ready). Cached per parcel for the session. */
+const MN_TEAM=new Map();
+async function mnLoadTeamReports(pid){
+ const k=String(pid);
+ if(MN_TEAM.has(k)) return MN_TEAM.get(k);
+ MN_TEAM.set(k, null);
+ const tok=(typeof getToken==='function')?getToken():''; if(!tok) return null;
+ try{
+  const res=await fetch('/crm/api/lead-outcomes',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify({action:'field_report_list', parcel_id:k})});
+  if(!res.ok) return null;
+  const j=await res.json().catch(function(){ return null; });
+  const list=(j&&j.ok&&Array.isArray(j.reports))?j.reports.filter(function(r){ return r&&r.report&&!r.withdrawn_at; }):[];
+  MN_TEAM.set(k, list);
+  return list;
+ }catch(e){ return null; }
+}
+function mnTeamLine(list){
+ if(!list||!list.length) return '';
+ const me=(typeof currentUserName==='function'?currentUserName():'')||'';
+ const others=list.filter(function(r){ return !me||r.rep!==me; });
+ if(!others.length) return '';
+ const w=others.filter(function(r){ return /water/.test(r.report); }).length, n=others.length-w;
+ const last=others.map(function(r){ return String(r.updated_at||r.reported_at||''); }).sort().pop().slice(0,10);
+ return 'Team: '+[w?w+' water confirmed':'', n?n+' not a problem':''].filter(Boolean).join(', ')+(last?' (latest '+last+')':'')+'.';
 }
 function mnRenderReport(p){
  const box=mnEl('fsiDrReport'); if(!box) return;
@@ -641,7 +703,12 @@ function mnRenderReport(p){
   b.classList.toggle('on', on); b.setAttribute('aria-pressed', on?'true':'false');
  });
  const msg=mnEl('fsiDrReportMsg');
- if(msg) msg.textContent=r?('Saved on this device '+String(r.at).slice(0,10)+'. It goes into the lead notes when you add this parcel.'):'';
+ let team=box.querySelector('.fsi-report-team');
+ if(!team){ team=document.createElement('span'); team.className='fsi-report-team'; box.appendChild(team); }
+ const cached=MN_TEAM.get(String(p.parcel_id));
+ team.textContent=mnTeamLine(cached);
+ if(cached===undefined) mnLoadTeamReports(p.parcel_id).then(function(){ if(String(_fsiState.selectedId)===String(p.parcel_id)) team.textContent=mnTeamLine(MN_TEAM.get(String(p.parcel_id))); });
+ if(msg) msg.textContent=r?((r.synced?'Sent to the team ':'Saved on this device ')+String(r.at).slice(0,10)+(r.synced?'':', sends when the server accepts it')+'. It goes into the lead notes when you add this parcel.'):'';
 }
 
 /* ----------------------------------------------------------------------------------------
@@ -995,4 +1062,48 @@ function mnSyncOpInputs(){
 
  // Hash on list-side filter changes (16 handles the filtering itself)
  ['fsiMinScore','fsiLimit','fsiCityFilter'].forEach(function(id){ mnEl(id)?.addEventListener('change',function(){ mnWriteHash(); }); });
+})();
+
+/* ----------------------------------------------------------------------------------------
+ * R2: Filters popover (score, size, overlays) + Esc closes the desktop side sheet.
+ * ---------------------------------------------------------------------------------------- */
+(function mnFiltersBoot(){
+ const bar=document.getElementById('fsiToolbar'), btn=document.getElementById('fsiFiltersBtn'), pop=document.getElementById('fsiControls');
+ if(!bar||!btn||!pop) return;
+ function count(){
+  let n=0;
+  const v=function(id){ const el=document.getElementById(id); return el?el:null; };
+  if(Number(v('fsiMinScore')?.value||0)>0) n++;
+  if(String(v('fsiLimit')?.value||'200')!=='200') n++;
+  if(v('fsiNfhl')?.checked) n++;
+  if(v('fsiClaims')&&!v('fsiClaims').checked) n++;
+  if(v('fsiClaimHeat')?.checked) n++;
+  const c=document.getElementById('fsiFiltersCount');
+  if(c){ c.hidden=!n; c.textContent=n?String(n):''; }
+  btn.setAttribute('aria-label', 'Filters'+(n?' ('+n+' active)':''));
+ }
+ function open(on){
+  bar.classList.toggle('filters-open', on);
+  btn.setAttribute('aria-expanded', on?'true':'false');
+  if(on){ const f=pop.querySelector('input'); if(f&&!window.matchMedia('(max-width: 820px)').matches) f.focus({preventScroll:true}); }
+ }
+ btn.addEventListener('click', function(){ open(!bar.classList.contains('filters-open')); });
+ pop.addEventListener('input', count); pop.addEventListener('change', count);
+ document.addEventListener('mousedown', function(e){
+  if(!bar.classList.contains('filters-open')) return;
+  if(window.matchMedia('(max-width: 820px)').matches) return; // inline panel on phones
+  if(!e.target.closest('.fsi-filter-wrap, .fsi-claims-bar')) open(false);
+ });
+ document.addEventListener('keydown', function(e){
+  if(e.key!=='Escape') return;
+  if(bar.classList.contains('filters-open')){ open(false); btn.focus(); return; }
+  // desktop side sheet: Esc closes the parcel detail and returns to the list
+  if(!mnIsSheet() && _fsiState.selectedId && document.documentElement.getAttribute('data-panel')==='fsi'
+     && !e.target.closest('#fsiMapSearch') && !document.querySelector('.fg-modal-bg,.est-bg:not([hidden]),#profileDrawer.open')){
+   const id=_fsiState.selectedId; fsiSelect(null);
+   const row=document.querySelector('#fsiList .fsi-row[data-id="'+CSS.escape(String(id))+'"]'); if(row){ row.setAttribute('tabindex','-1'); row.focus({preventScroll:true}); }
+  }
+ });
+ count();
+ window.mnFiltersCount=count;
 })();

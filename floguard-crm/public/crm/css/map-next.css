@@ -19,9 +19,7 @@
  .fsi-controls .spacer{display:none}
 }
 .fsi-claims-bar{border-top:1px solid var(--line);padding-top:8px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
-.fsi-claims-bar[hidden]{display:none}
 .fsi-claims-ctrls{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;min-width:0}
-.fsi-claims-ctrls[hidden]{display:none}
 .seg.seg--sm{padding:2px;border-radius:8px}
 .seg.seg--sm button{height:26px;padding:0 10px;font-size:var(--fs-12);border-radius:6px}
 .seg.seg--sm button.on::after{margin:2px auto -4px;width:12px}
@@ -46,7 +44,6 @@
 .fsi-mapsearch .search-field .ic{z-index:1}
 .fsi-mapsearch input{height:36px;background:var(--surface);border-color:var(--line-strong);box-shadow:var(--sh-2)}
 .fsi-search-results{position:absolute;left:0;right:0;top:calc(100% + 4px);max-height:min(340px,55vh);overflow:auto;overscroll-behavior:contain;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh-3);padding:4px;animation:popIn var(--t-fast) var(--ease)}
-.fsi-search-results[hidden]{display:none}
 .sr-item{padding:8px 10px;border-radius:var(--r-md);cursor:pointer}
 .sr-item:hover,.sr-item.on{background:var(--surface-hover)}
 .sr-item.on{box-shadow:inset 3px 0 0 var(--action)}
@@ -63,7 +60,6 @@
 .fsi-tool .ic{width:16px;height:16px}
 
 .fsi-layers-pop{position:absolute;right:48px;top:82px;z-index:5;width:264px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh-3);padding:12px 14px;animation:popIn var(--t-fast) var(--ease)}
-.fsi-layers-pop[hidden]{display:none}
 .fsi-layers-pop h4{margin:0 0 8px;font-size:var(--fs-13)}
 .fsi-op-row{display:grid;grid-template-columns:1fr 92px 38px;gap:8px;align-items:center;font-size:var(--fs-12);margin:6px 0}
 .fsi-op-row label{color:var(--text)}
@@ -96,7 +92,6 @@
 /* box select */
 .fsi-boxsel-rect{position:absolute;z-index:6;pointer-events:none;border:2px dashed var(--action);background:color-mix(in srgb,var(--action) 14%,transparent);border-radius:2px}
 .fsi-boxsel-hint{position:absolute;left:50%;top:56px;transform:translateX(-50%);z-index:5;padding:6px 12px;border-radius:var(--r-pill);background:var(--text);color:var(--surface);font-size:var(--fs-12);font-weight:560;box-shadow:var(--sh-3);white-space:nowrap}
-.fsi-boxsel-hint[hidden]{display:none}
 
 /* ---------- list side ---------- */
 .fsi-active-filters{display:flex;flex-wrap:wrap;gap:5px;padding:0 14px 8px}
@@ -118,7 +113,6 @@
 .fsi-dr-title{min-width:0}
 .fsi-dr-head .btn--icon{margin:-4px -6px 0 0;flex:none}
 .fsi-nbhd{margin:0 0 12px;padding:9px 11px;border-radius:var(--r-md);background:var(--violet-soft);border:1px solid var(--violet-line);font-size:var(--fs-12);color:var(--text)}
-.fsi-nbhd[hidden]{display:none}
 .fsi-nbhd p{margin:3px 0 0;line-height:1.45}
 .nbhd-head{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--violet)}
 .nbhd-head .fsi-chip{background:var(--surface);border-color:var(--violet-line);color:var(--violet)}
@@ -228,3 +222,77 @@
 @keyframes mnSheetUp{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){.fsi-drawer.on.is-sheet{animation:none}}
 @media print{.fsi-mapsearch,.fsi-maptools,.fsi-layers-pop,.fsi-claims-bar{display:none!important}}
+
+/* ================= R2: compact map chrome, side-sheet detail =================
+ * One toolbar row (presets, status, Filters popover, load buttons) + one claims row, so the map
+ * gets ~75% of a 1440x900 viewport. Score/size/overlay controls live in the Filters popover
+ * (#fsiControls). The parcel detail is a side sheet over the ranked list on desktop and a
+ * bottom sheet on phones. */
+#p-fsi .page-head{margin-bottom:var(--s-2);align-items:center}
+#p-fsi .page-head h1{font-size:var(--fs-18)}
+#p-fsi .page-head .sub{margin-top:2px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;max-width:110ch}
+.fsi-toolbar{position:relative;gap:8px;padding:8px 10px;margin-bottom:var(--s-2);z-index:6}
+.fsi-toolbar-row{display:flex;align-items:center;gap:8px;min-width:0}
+.fsi-toolbar-row .fsi-presets{flex:1 1 auto;min-width:0;mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent);-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent);padding-right:20px}
+.fsi-toolbar-row .btn--sm{flex:none}
+.fsi-stats{flex:0 1 260px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:var(--fs-12);color:var(--text-2);text-align:right}
+.fsi-filter-wrap{position:relative;flex:none}
+.fsi-fcount{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:2px;border-radius:var(--r-pill);background:var(--action);color:var(--action-ink);font-size:11px;font-weight:700}
+#fsiFiltersBtn[aria-expanded="true"]{background:var(--surface-sunken);border-color:var(--input-border)}
+.fsi-toolbar .fsi-controls{display:none;position:absolute;right:0;top:calc(100% + 6px);z-index:var(--z-menu);width:min(560px,calc(100vw - 32px));flex-direction:column;align-items:stretch;gap:12px;padding:14px;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);box-shadow:var(--sh-3);animation:popIn var(--t-fast) var(--ease)}
+.fsi-toolbar.filters-open .fsi-controls{display:flex}
+.fsi-toolbar .fsi-controls .field--inline{display:grid;grid-template-columns:120px 1fr;align-items:center;gap:10px;margin:0}
+.fsi-toolbar .fsi-controls .num-input{width:100%}
+.fsi-toolbar .fsi-controls .toggles{display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:12px}
+.fsi-claims-bar{padding-top:8px}
+.fsi-claims-note{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1 1 200px;min-width:0}
+.fsi-claims-note:hover{white-space:normal}
+#p-fsi .compliance{margin-top:var(--s-2);font-size:11.5px;line-height:1.45}
+/* side sheet: detail covers the ranked list (desktop) */
+.fsi-sidecol{position:relative}
+@media (min-width:821px){
+ .fsi-drawer.on{position:absolute;inset:0;z-index:5;max-height:none;border-top:0;padding:14px 16px 18px;box-shadow:none;animation:mnSideIn var(--t-slow) var(--ease)}
+ .fsi-drawer:has(.fsi-why[open]){max-height:none}
+ .fsi-drawer .fsi-dr-head{position:sticky;top:-14px;z-index:2;margin:-14px -16px 8px;padding:12px 12px 10px 16px;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+ .fsi-drawer .fsi-dr-head .btn--icon{width:32px;height:32px}
+}
+@keyframes mnSideIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.fsi-drawer.on{animation:none}}
+@media (max-width:1000px) and (min-width:821px){
+ .fsi-sidecol{min-height:420px}
+}
+@media (max-width:820px){
+ #p-fsi .page-head{margin-bottom:var(--s-2)}
+ #p-fsi .page-head .sub{display:none}
+ #p-fsi .page-head h1{font-size:var(--fs-16)}
+ .fsi-toolbar{padding:8px}
+ .fsi-toolbar-row{flex-wrap:wrap}
+ .fsi-toolbar-row .fsi-presets{flex:1 1 100%;order:0}
+ .fsi-stats{display:none}
+ .fsi-filter-wrap{display:contents}
+ #fsiFiltersBtn{order:1;flex:1 1 0;justify-content:center}
+ .fsi-toolbar-row #fsiTop{order:2;flex:1 1 0}
+ .fsi-toolbar-row #fsiSearchArea{order:3;flex:1.2 1 0}
+ .fsi-toolbar-row .btn--sm{height:40px;font-size:var(--fs-13)}
+ .fsi-toolbar .fsi-controls .field--inline{grid-template-columns:1fr 1fr}
+ .fsi-toolbar .fsi-controls .num-input{height:40px}
+ .fsi-claims-bar{display:none}
+ .fsi-toolbar.filters-open .fsi-claims-bar{display:flex}
+ .fsi-toolbar .fsi-controls{order:5;flex:1 1 100%;position:static;width:auto;box-shadow:none;border:0;border-top:1px solid var(--line);border-radius:0;padding:12px 2px 2px;animation:none}
+ .fsi-presets button{height:36px;padding:0 13px}
+ .fsi-mapcol{height:calc(100dvh - var(--topbar-h) - var(--tabbar-h) - var(--safe-b) - 190px);min-height:340px}
+}
+.fsi-report-team{flex:1 1 100%;font-size:var(--fs-12);color:var(--text-2)}.fsi-report-team:empty{display:none}
+/* R2: the top bar already names the page; the map keeps its heading for screen readers only. */
+#p-fsi .fsi-head{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;margin:0;padding:0;border:0}
+.fsi-toolbar-row .fsi-source{flex:none}
+.fsi-banner{padding:6px 12px;margin-bottom:var(--s-2)}
+@media (max-width:820px){
+ .fsi-toolbar-row .fsi-source{display:none}
+ .fsi-banner{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
+/* Small laptops: the claims row folds into Filters too, so the map keeps the height. */
+@media (max-width:1100px) and (min-width:821px){
+ .fsi-claims-bar{display:none}
+ .fsi-toolbar.filters-open .fsi-claims-bar{display:flex}
+}

@@ -29,8 +29,10 @@
   function token() { try { return typeof getToken === 'function' ? getToken() : ''; } catch (e) { return ''; } }
   function leadRef(lead) { return lead.uuid || lead.id; }
   function leadAddress(l) {
-    var tail = [l.city, l.zip].filter(Boolean).join(' ');
-    return [String(l.address || '').trim(), tail].filter(Boolean).join(', ');
+    var a = String(l.address || '').trim(), low = a.toLowerCase();
+    // R2: imported addresses already carry city and ZIP ("…, Port Orange, FL 32127"); do not repeat them
+    var tail = [l.city && low.indexOf(String(l.city).toLowerCase()) < 0 ? l.city : '', l.zip && low.indexOf(String(l.zip)) < 0 ? l.zip : ''].filter(Boolean).join(' ');
+    return [a, tail].filter(Boolean).join(', ');
   }
   function toLocalInput(iso) {
     if (!iso) return '';
@@ -78,15 +80,31 @@
     root.innerHTML = '<div class="est-modal" role="dialog" aria-modal="true" aria-labelledby="estTitle" tabindex="-1"><div class="est-head" id="estHead"></div><div class="est-body" id="estBody"></div><div class="est-foot" id="estFoot"></div></div>';
     document.body.appendChild(root);
     root.addEventListener('mousedown', function (e) { if (e.target === root) close(); });
-    root.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.stopPropagation(); close(); } });
+    // Document-level so Esc works even when focus has left the editor (e.g. after Send re-renders it);
+    // a confirm opened on top of the editor (FG.modal) handles its own Esc first.
+    document.addEventListener('keydown', function (e) {
+      if (!root || root.hidden) return;
+      if (e.key === 'Escape') { if (document.querySelector('.fg-modal-bg')) return; e.stopPropagation(); close(); return; }
+      if (e.key === 'Tab' && window.FG && FG.trapTab && !document.querySelector('.fg-modal-bg')) {
+        var m = root.querySelector('.est-modal');
+        if (!m.contains(document.activeElement)) { e.preventDefault(); (FG.focusables(m)[0] || m).focus(); return; }
+        FG.trapTab(m, e);
+      }
+    }, true);
     root.addEventListener('click', onClick);
     root.addEventListener('input', onInput);
     root.addEventListener('change', onInput);
     window.addEventListener('message', onMessage);
     return root;
   }
+  /** Sending and acceptance move the lead's stage on the server; pull it so the table, board,
+   *  stage chip and drawer timeline update without a reload (R2). */
+  function syncLead() {
+    try { if (window.FG && FG.sync && FG.sync.refresh && FG.isServer && FG.isServer()) FG.sync.refresh(); } catch (e) { /* best effort */ }
+  }
   function close() {
     if (!root || root.hidden) return;
+    if (S && S.touched) syncLead();
     root.hidden = true;
     document.documentElement.style.overflow = '';
     previewWin = null; previewReady = false;
@@ -136,6 +154,7 @@
     var r = await call('estimate_list', { lead_id: leadRef(S.lead) });
     if (r.status !== 200) return { ok: false, r: r };
     S.estimates = r.body.estimates || []; S.jobs = r.body.jobs || [];
+    if (S.estimates.some(function (e) { return e.status === 'accepted' || e.status === 'declined'; })) { S.touched = true; syncLead(); }
     return { ok: true };
   }
   function itemById(id) { return ((catalog && catalog.items) || []).filter(function (i) { return i.id === id; })[0] || null; }
@@ -164,7 +183,8 @@
   async function openEstimate(id) {
     var r = await call('estimate_get', { estimate_id: id });
     if (r.status !== 200) { S.notice = { t: 'err', m: errText(r) }; renderList(); return; }
-    S.est = r.body.estimate; S.proposal = r.body.proposal; S.job = r.body.job || null; S.sendResult = null; S.confirmSend = false; S.voiding = false;
+    S.est = r.body.estimate; S.proposal = r.body.proposal; S.job = r.body.job || null;
+    if (S.est && /^(accepted|declined)$/.test(S.est.status || '')) S.touched = true; S.sendResult = null; S.confirmSend = false; S.voiding = false;
     S.draft = draftFrom(S.est); S.dirty = false; S.view = 'edit';
     renderEdit();
   }
@@ -255,7 +275,7 @@
     head(e ? e.number : 'New estimate', (S.lead.name || '') + (leadAddress(S.lead) ? ' · ' + leadAddress(S.lead) : ''), e ? e.status : 'draft');
     var warns = '';
     var termsPh = (e && e.terms_placeholder) || (catalog && catalog.terms_placeholder);
-    if (termsPh) warns += '<p class="est-warn" role="note"><strong>Draft terms.</strong> The customer-facing terms, deposit and warranty text are still placeholders. The owner has to supply them (catalog file <code>public/crm/docs/estimate_catalog.json</code>) before real estimates go out.</p>';
+    if (termsPh) warns += '<p class="est-warn" role="note"><strong>Draft terms.</strong> The customer-facing terms, deposit and warranty text are still placeholders. Ask the owner to finish them before real estimates go out.</p>';
     if (S.notice) warns += '<p class="est-' + (S.notice.t === 'ok' ? 'ok' : 'err') + '" role="status">' + esc(S.notice.m) + '</p>';
     S.notice = null;
     if (ro) warns += '<p class="est-note">This estimate is ' + esc(e.status) + ' and can no longer be edited.' + (e.status !== 'accepted' && e.status !== 'void' ? ' Void it and create a new one to change it.' : '') + '</p>';
@@ -311,7 +331,18 @@
   function sendHtml() {
     var r = S.sendResult, m = r.message || {}, links = r.links || {};
     var warn = [];
+    // R2/R1: a litigator flag blocks texting exactly like DNC, whether the server says so in
+    // warnings, in message.to, or only our local copy of the lead knows.
+    var to = m.to || {};
+    var lit = (r.warnings || []).indexOf('phone_litigator') >= 0 || to.phone_litigator === true;
+    var dnc = (r.warnings || []).indexOf('phone_dnc') >= 0 || to.phone_dnc === true;
+    var local = false;
+    try { var pp = FG.phone.primary(S.lead); local = !!(FG.phone.leadBlocked(S.lead) || (pp && FG.phone.state(pp, S.lead).blocked)); } catch (e) { local = false; }
+    if (lit || dnc || local) links = Object.assign({}, links, { sms: null });
+    if (lit) warn.push('This lead’s number is flagged as a known TCPA litigator. No text link was made. Do not text or call; send the link by email or mail.');
+    else if (local && !dnc) warn.push('This lead’s number is blocked in the CRM (DNC or litigator). No text link was made.');
     (r.warnings || []).forEach(function (w) {
+      if (w === 'phone_litigator') return;
       if (w === 'phone_dnc') warn.push('This lead’s number is on the do-not-call list. No text link was made. Do not text or call.');
       else if (w === 'no_email') warn.push('No email on file for this lead; copy the message instead.');
       else if (w === 'no_phone') warn.push('No phone number on file for this lead.');
@@ -325,7 +356,7 @@
       '<div class="est-field" style="margin-top:12px"><label for="estMsg">Message (' + esc(m.subject || '') + ')</label><textarea id="estMsg" class="est-msg">' + esc(m.body || '') + '</textarea></div>' +
       '<div class="est-links" style="margin-top:12px"><button type="button" class="btn" data-est="copyMsg">Copy message</button>' +
       (links.mailto ? '<a class="btn" href="' + esc(links.mailto) + '">Open in email</a>' : '<span class="btn" aria-disabled="true">Open in email</span>') +
-      (links.sms ? '<a class="btn" href="' + esc(links.sms) + '">Open in Messages</a>' : '<span class="btn" aria-disabled="true">Open in Messages</span>') +
+      (links.sms ? '<a class="btn" href="' + esc(links.sms) + '">Open in Messages</a>' : '<span class="btn" aria-disabled="true" title="' + ((lit || dnc || local) ? 'Texting is blocked for this number' : 'No mobile number on file') + '">Open in Messages</span>') +
       '<span class="est-hint" id="estCopied" role="status"></span></div></div>';
   }
 
@@ -399,8 +430,9 @@
     var r = await call('estimate_send', { estimate_id: S.est.id, valid_until: S.draft.valid_until || undefined });
     S.busy = false;
     if (r.status !== 200) { S.notice = { t: 'err', m: errText(r) }; renderEdit(); return; }
-    S.est = r.body.estimate; S.sendResult = r.body; S.draft = draftFrom(S.est); S.dirty = false;
+    S.est = r.body.estimate; S.sendResult = r.body; S.draft = draftFrom(S.est); S.dirty = false; S.touched = true;
     renderEdit();
+    syncLead();
     var el = document.getElementById('estSend'); if (el && el.scrollIntoView) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
     reloadList();
   }
@@ -408,7 +440,8 @@
   async function resend() {
     var r = await call('estimate_send', { estimate_id: S.est.id });
     if (r.status !== 200) { S.notice = { t: 'err', m: errText(r) }; renderEdit(); return; }
-    S.est = r.body.estimate; S.sendResult = r.body; renderEdit();
+    S.est = r.body.estimate; S.sendResult = r.body; S.touched = true; renderEdit();
+    syncLead();
   }
   async function previewNow() {
     // open synchronously (popup blockers), then save and hand the proposal over via postMessage (same origin only)
@@ -551,7 +584,7 @@
       addFallbackButton();
     }
     if (bar) {
-      var mo = new MutationObserver(function () { if (!hooked) arm(); });
+      var mo = new MutationObserver(function () { if (hooked) { mo.disconnect(); return; } arm(); });
       mo.observe(bar, { childList: true });
       arm();
       bar.addEventListener('click', function (e) {

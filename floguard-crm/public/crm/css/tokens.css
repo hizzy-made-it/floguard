@@ -90,6 +90,9 @@
   --sidebar-w-collapsed:64px;
   --topbar-h:56px;
   --tabbar-h:60px;
+  /* Layering (R2): one scale for every overlay so drawer, modal, sheet, map popups and toasts never fight. */
+  --z-sticky:20;--z-topbar:50;--z-scrim:55;--z-sheet:57;--z-tabbar:58;--z-sidebar:60;--z-menu:70;--z-drawer:80;--z-modal:120;--z-toast:300;
+  --scrim:rgba(11,15,26,.48);
 
   /* ---- spacing (4px grid) ---- */
   --s-0:0; --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:20px; --s-6:24px; --s-8:32px; --s-10:40px; --s-12:48px;
