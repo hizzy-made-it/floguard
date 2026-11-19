@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="css/tokens.css?v=20261119b">
 <link rel="stylesheet" href="vendor/maplibre-gl.css">
 <link rel="stylesheet" href="css/app.css?v=20261119b">
+<link rel="stylesheet" href="css/map-next.css?v=20261119f2">
 <link rel="stylesheet" href="css/estimates.css?v=20261119g">
 <script src="vendor/maplibre-gl.js"></script>
 </head>
@@ -506,6 +507,7 @@
 </section>
 
 <!-- ============ FSI FLOOD MAP COMMAND CENTER ============ -->
+<!-- Owned by js/16-fsi-map.js + js/19-map-next.js (+ css/map-next.css). Icons not in the sprite are inline. -->
 <section class="panel panel--map" id="p-fsi" aria-labelledby="h-fsi">
  <header class="page-head page-head--compact">
   <div class="page-title">
@@ -520,6 +522,7 @@
  <div class="fsi-toolbar">
  <div class="fsi-presets" id="fsiPresets" role="group" aria-label="Filter presets">
  <button type="button" data-preset="must" class="on">Must dial</button>
+ <button type="button" data-preset="storm" class="preset-storm" title="Parcels where it rained hardest yesterday (rainfall cells, last completed day)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></svg>Storm list</button>
  <button type="button" data-preset="top">Top risk</button>
  <button type="button" data-preset="claim_hot">Claim-hot neighborhood</button>
  <button type="button" data-preset="zone_x">Zone X bowls</button>
@@ -532,12 +535,29 @@
  <div class="field field--inline"><label for="fsiLimit">Max parcels</label><input type="text" id="fsiLimit" value="200" inputmode="numeric" class="num-input" title="Must dial defaults to top 200"></div>
  <div class="toggles" role="group" aria-label="Map overlays">
  <label class="toggle"><input type="checkbox" id="fsiNfhl"><span>FEMA flood zones</span></label>
- <label class="toggle" title="Neighborhood NFIP claim density — not personal claims"><input type="checkbox" id="fsiClaimHeat"><span>Claim heat</span></label>
+ <label class="toggle" title="NFIP claims per census block group (OpenFEMA). Neighbourhood totals, never this owner's claim."><input type="checkbox" id="fsiClaims" checked><span>Insurance claims</span></label>
+ <label class="toggle toggle--sub" title="Older census-tract claim heat. Neighbourhood aggregate, not personal claims. Works without the block-group tables."><input type="checkbox" id="fsiClaimHeat"><span>Tract heat</span></label>
  </div>
  <span class="spacer"></span>
  <span class="stats" id="fsiStats">Open this tab to load the map…</span>
  <button type="button" class="btn" id="fsiTop">Top countywide</button>
  <button type="button" class="btn p" id="fsiSearchArea">Search this area</button>
+ </div>
+ <div class="fsi-claims-bar" id="fsiClaimsBar" role="group" aria-label="Insurance claims filters">
+ <div class="fsi-claims-ctrls" id="fsiClaimsCtrls">
+ <div class="seg seg--sm" id="fsiClaimsZone" role="group" aria-label="Which claims to shade">
+ <button type="button" data-cz="all" class="on" aria-pressed="true">All<span class="opt"> claims</span></button>
+ <button type="button" data-cz="x" aria-pressed="false" title="Claims outside mapped flood zones: FloGuard's gold segment">Zone X<span class="opt"> only</span></button>
+ <button type="button" data-cz="sfha" aria-pressed="false" title="Claims inside FEMA special flood hazard areas (A/V zones)">SFHA<span class="opt"> only</span></button>
+ </div>
+ <div class="seg seg--sm" id="fsiClaimsWin" role="group" aria-label="Time window">
+ <button type="button" data-cw="5y" aria-pressed="false">5<span class="opt"> </span>yr</button>
+ <button type="button" data-cw="10y" class="on" aria-pressed="true">10<span class="opt"> </span>yr</button>
+ <button type="button" data-cw="all" aria-pressed="false">All</button>
+ </div>
+ <div class="fsi-event-chips" id="fsiClaimsEvents" role="group" aria-label="Storm events"></div>
+ </div>
+ <p class="fsi-claims-note" id="fsiClaimsStatus" role="status">Neighbourhood totals (census block group) from OpenFEMA. Never this owner's claim. Not insurance advice.</p>
  </div>
  </div>
 
@@ -546,7 +566,23 @@
  <div class="fsi-layout">
  <div class="fsi-mapcol">
  <div class="fsimap" id="fsiMap" role="application" aria-label="Flood susceptibility map"></div>
- <div class="fsimap-legend" id="fsiLegend" aria-label="Terrain score bands"></div>
+ <div class="fsi-mapsearch" id="fsiMapSearch" role="search">
+ <label class="search-field"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg><span class="sr-only">Find an address, owner or parcel id</span><input type="search" id="fsiMapSearchInput" placeholder="Find address, owner or parcel id" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="fsiMapSearchResults" aria-autocomplete="list"></label>
+ <div class="fsi-search-results" id="fsiMapSearchResults" role="listbox" aria-label="Search results" hidden></div>
+ </div>
+ <div class="fsi-maptools" role="toolbar" aria-label="Map tools">
+ <button type="button" class="fsi-tool" id="fsiLayersBtn" aria-expanded="false" aria-controls="fsiLayersPop" title="Layers and opacity"><svg class="ic" aria-hidden="true"><use href="#i-layers-2"/></svg><span class="sr-only">Layers and opacity</span></button>
+ <button type="button" class="fsi-tool" id="fsiBoxSel" aria-pressed="false" title="Select parcels: drag a box (desktop: Shift+drag works too)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3a2 2 0 0 0-2 2"/><path d="M19 3a2 2 0 0 1 2 2"/><path d="M5 21a2 2 0 0 1-2-2"/><path d="M9 3h1"/><path d="M9 21h2"/><path d="M14 3h1"/><path d="M3 9v1"/><path d="M21 9v2"/><path d="M3 14v1"/><path d="m12 12 4 10 1.7-4.3L22 16Z"/></svg><span class="sr-only">Box select parcels</span></button>
+ </div>
+ <div class="fsi-layers-pop" id="fsiLayersPop" role="dialog" aria-label="Layers and opacity" hidden>
+ <h4>Layers</h4>
+ <div class="fsi-op-row"><label for="fsiOpFema">FEMA flood zones</label><input type="range" id="fsiOpFema" min="10" max="100" step="5" value="45"><output for="fsiOpFema">45%</output></div>
+ <div class="fsi-op-row"><label for="fsiOpClaims">Insurance claims</label><input type="range" id="fsiOpClaims" min="10" max="100" step="5" value="45"><output for="fsiOpClaims">45%</output></div>
+ <div class="fsi-op-row"><label for="fsiOpParcels">Parcels</label><input type="range" id="fsiOpParcels" min="10" max="100" step="5" value="90"><output for="fsiOpParcels">90%</output></div>
+ <p class="hint" id="fsiLayersNote">Basemap follows the app theme. Parcel outlines draw from zoom 15.</p>
+ </div>
+ <div class="fsimap-legend" id="fsiLegend" aria-label="Map legend"></div>
+ <div class="fsi-boxsel-hint" id="fsiBoxHint" role="status" hidden>Drag a box over parcels to select them · Esc cancels</div>
  </div>
  <div class="fsi-sidecol">
  <div class="fsi-side-head">
@@ -560,6 +596,7 @@
  </select>
  </div>
  <div class="fsi-city-chips" id="fsiCityChips" aria-label="Quick city filters"></div>
+ <div class="fsi-active-filters" id="fsiActiveFilters"></div>
  <div class="fsi-bulk" id="fsiBulk" role="toolbar" aria-label="Bulk actions">
  <label class="fsi-selall"><input type="checkbox" id="fsiSelectAll" class="ck"> Select all</label>
  <span class="fsi-selcount"><b id="fsiSelCount">0</b> selected</span>
@@ -570,12 +607,22 @@
  <button type="button" class="btn btn--sm btn--icon ghost" id="fsiBulkClear" aria-label="Clear selection" title="Clear selection"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
  </div>
  <div class="fsi-list" id="fsiList" role="listbox" aria-label="Ranked parcels"></div>
- <div class="fsi-drawer" id="fsiDrawer" aria-live="polite">
+ <div class="fsi-drawer" id="fsiDrawer" aria-live="polite" aria-labelledby="fsiDrName">
+ <div class="fsi-sheet-handle" aria-hidden="true"></div>
+ <div class="fsi-dr-head">
+ <div class="fsi-dr-title">
  <h3 id="fsiDrName">Select a parcel</h3>
  <p class="addr" id="fsiDrAddr"></p>
+ </div>
+ <button type="button" class="btn btn--icon btn--sm ghost" id="fsiDrClose" aria-label="Close parcel details" title="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+ </div>
  <p class="headline" id="fsiDrHeadline"></p>
  <div class="meters" id="fsiDrMeters"></div>
- <div class="fsi-breakdown" id="fsiDrBreakdown" style="display:none"></div>
+ <div class="fsi-nbhd" id="fsiDrClaims" hidden></div>
+ <details class="fsi-why" id="fsiDrWhy">
+ <summary><svg class="ic" aria-hidden="true"><use href="#i-circle-gauge"/></svg>Why this score<svg class="ic chev" aria-hidden="true"><use href="#i-chevron-down"/></svg></summary>
+ <div class="fsi-breakdown" id="fsiDrBreakdown"></div>
+ </details>
  <div class="meta fsi-dr-chips" id="fsiDrChips"></div>
  <div class="fsi-suggest" id="fsiDrSuggest" style="display:none">
  <h4>Suggested causes (soft · assess on-site)</h4>
@@ -589,11 +636,17 @@
  <button type="button" class="btn" data-fsi-act="draft">Queue draft</button>
  </div>
  <div class="fsi-msg" id="fsiDrMsg" role="status"></div>
+ <div class="fsi-report" id="fsiDrReport" role="group" aria-label="Report what you saw on site">
+ <span class="fsi-report-q">Score wrong? Report what you saw:</span>
+ <button type="button" class="btn btn--sm" data-fsi-report="water" aria-pressed="false">Water confirmed</button>
+ <button type="button" class="btn btn--sm" data-fsi-report="no_problem" aria-pressed="false">Not a problem</button>
+ <span class="fsi-report-msg" id="fsiDrReportMsg" role="status"></span>
+ </div>
  <p class="fsi-disclaimer">Not an inspection, insurance quote, or guarantee. Free on-site assessment does the diagnosing. Parcel records are public; DNC / CAN-SPAM still govern outreach.</p>
  </div>
  </div>
  </div>
- <p class="hint compliance">FSI ranks a call list from public terrain, soil, flood-zone, and neighborhood claim-heat data. Residential + commercial + condos stay dialable. Weights are literature defaults. Claim heat is never a personal claim. Scrub DNC before dialing.</p>
+ <p class="hint compliance">FSI ranks a call list from public terrain, soil, flood-zone, and neighbourhood insurance-claim data. Residential + commercial + condos stay dialable. Weights are literature defaults, not calibrated. Claims are census block-group (or tract) totals from OpenFEMA, never a statement about one owner, and never insurance advice. Scrub DNC before dialing.</p>
 </section>
 
 
@@ -766,8 +819,10 @@
 <script src="js/13-boot.js?v=20261119b"></script>
 <script src="js/14-drafts.js?v=20261119b"></script>
 <script src="js/15-docs.js?v=20261119b"></script>
-<script src="js/16-fsi-map.js?v=20261119b"></script>
+<script src="js/16-fsi-map.js?v=20261119f2"></script>
 <script src="js/17-shell.js?v=20261119b"></script>
+<script src="js/19a-map-pure.js?v=20261119f2"></script>
+<script src="js/19-map-next.js?v=20261119f2"></script>
 <script src="js/20-estimates.js?v=20261119g"></script>
 </div><!-- /appRoot -->
 </body>
