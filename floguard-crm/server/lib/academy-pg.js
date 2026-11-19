@@ -36,21 +36,34 @@ export function pipelineFromStatus(status) {
   return STATUS_TO_PIPELINE[s] || STATUS_TO_PIPELINE[s.toLowerCase()] || 'new';
 }
 
+let missingOrgErr = null;
+let missingOrgAt = 0;
+
 export async function getDefaultOrg() {
   const now = Date.now();
   if (cachedOrg && now - cachedOrgAt < 60_000) return cachedOrg;
-  const rows = await restGet(
-    'organizations',
-    `select=*&slug=eq.${encodeURIComponent(DEFAULT_SLUG)}&limit=1`,
-  );
-  if (!Array.isArray(rows) || !rows.length) {
-    throw new Error(
-      `Default org slug "${DEFAULT_SLUG}" not found. Apply supabase/migrations/20260712_sales_rev_orgs.sql`,
+  // Production has no organizations table (single tenant): remember the miss for 60 s instead of
+  // paying an extra failing round trip on every leads call (review R1).
+  if (missingOrgErr && now - missingOrgAt < 60_000) throw missingOrgErr;
+  try {
+    const rows = await restGet(
+      'organizations',
+      `select=*&slug=eq.${encodeURIComponent(DEFAULT_SLUG)}&limit=1`,
     );
+    if (!Array.isArray(rows) || !rows.length) {
+      throw new Error(
+        `Default org slug "${DEFAULT_SLUG}" not found. Apply supabase/migrations/20260712_sales_rev_orgs.sql`,
+      );
+    }
+    cachedOrg = rows[0];
+    cachedOrgAt = now;
+    missingOrgErr = null;
+    return cachedOrg;
+  } catch (e) {
+    missingOrgErr = e;
+    missingOrgAt = now;
+    throw e;
   }
-  cachedOrg = rows[0];
-  cachedOrgAt = now;
-  return cachedOrg;
 }
 
 export async function resolveOrgId() {

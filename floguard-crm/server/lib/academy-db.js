@@ -131,13 +131,20 @@ async function postgresAvailable() {
   return _pgReady;
 }
 
+/**
+ * Users / activities / practice stores (NOT leads; see getLeadsPipeline). These Postgres tables are
+ * org-scoped (organizations, desk_users, activities, practice_sessions), which production does not
+ * have. Before review R1, ACADEMY_DATA_BACKEND=postgres|dual sent them to Postgres unconditionally,
+ * so `postgres` mode threw on every login. Now every mode needs the org tables to be present;
+ * otherwise these stores stay on Storage (the leads pipeline is decided separately).
+ */
 async function usePostgres() {
   const mode = dataBackend();
   if (mode === 'storage') return false;
-  if (mode === 'postgres' || mode === 'dual') return true;
-  // auto
   return postgresAvailable();
 }
+
+
 
 async function useDualWrite() {
   return dataBackend() === 'dual' && (await postgresAvailable());
@@ -348,8 +355,8 @@ export async function saveUsers(store) {
       console.warn('[academy-db] pg saveUsers failed:', e?.message);
     }
   }
-  // Always keep Storage warm unless pure postgres mode
-  if (mode !== 'postgres' || dual) {
+  // Always keep Storage warm unless pure postgres mode (and Postgres really holds the users)
+  if (mode !== 'postgres' || dual || !pgOn) {
     await storageSaveUsers(store);
   }
 }
@@ -527,7 +534,7 @@ export async function saveActivitiesStore(store) {
       console.warn('[academy-db] pg saveActivities failed:', e?.message);
     }
   }
-  if (dataBackend() !== 'postgres' || dual) {
+  if (dataBackend() !== 'postgres' || dual || !pgOn) {
     try {
       updated_at = await storageSaveActivities(store);
     } catch (e) {
@@ -597,7 +604,7 @@ export async function savePracticeStore(store) {
       if (dataBackend() === 'postgres') throw e;
     }
   }
-  if (dataBackend() !== 'postgres' || dual) {
+  if (dataBackend() !== 'postgres' || dual || !pgOn) {
     try {
       updated_at = await storageSavePractice(store);
     } catch (e) {
