@@ -11,6 +11,11 @@
  *              Upserts on lead_key. `rep` is taken from the session, not the body.
  *   list:      { limit? }  newest first
  *   readiness: {}          counts + whether there is enough to fit weights
+ *   field_report:      { parcel_id, report: 'water_confirmed'|'not_a_problem'|null, lead_id?, note? }
+ *              Map "Report wrong" buttons (fsi/sql/021). One live report per (parcel, rep); a new
+ *              value overwrites, report null withdraws. Calibration labels, NOT sales outcomes.
+ *   field_report_list: { parcel_id? | parcel_ids?: [..<=200], mine?: bool }  live reports
+ *   Contract: docs/handoff/R1.md.
  * Auth: Authorization: Bearer <academy session token>
  */
 import { verifySessionToken } from '../server/lib/academy-db.js';
@@ -24,6 +29,14 @@ const WATER_WHERE = new Set([
   'yard', 'crawlspace', 'slab_edge', 'driveway', 'patio', 'garage', 'pool_deck', 'street_side', 'other',
 ]);
 const MAX_LIST = 500;
+const FIELD_REPORTS = new Map([
+  ['water_confirmed', 'water_confirmed'], ['water', 'water_confirmed'],
+  ['not_a_problem', 'not_a_problem'], ['no_problem', 'not_a_problem'],
+]);
+// Parcel ids are used inside PostgREST filters: allow only the characters real ids use.
+const PARCEL_ID_RE = /^[A-Za-z0-9][A-Za-z0-9._\-/ ]{0,39}$/;
+const FR_COLS = 'id,parcel_id,lead_id,report,note,rep,reported_at,updated_at,withdrawn_at';
+const FR_NOT_READY = { error: 'field_reports_not_ready', hint: 'Apply fsi/sql/021_field_reports.sql.' };
 
 function bearer(req) {
   const h = req.headers?.authorization || req.headers?.Authorization || '';
@@ -85,6 +98,72 @@ function buildRow(body, rep) {
   return { row };
 }
 
+function parcelIdOrNull(v) {
+  const s = v == null ? '' : String(v).trim();
+  return PARCEL_ID_RE.test(s) ? s : null;
+}
+
+function isMissingTable(err) {
+  const code = err?.body?.code || '';
+  return code === 'PGRST205' || code === '42P01' || (err?.status === 404 && /parcel_field_report|schema cache|Could not find/i.test(String(err?.message || '') + JSON.stringify(err?.body || {})));
+}
+
+/** field_report: upsert (or withdraw) this rep's report for one parcel. */
+async function fieldReport(body, rep, res) {
+  const parcel_id = parcelIdOrNull(body.parcel_id);
+  if (!parcel_id) return json(res, 400, { error: 'parcel_id is required (letters, digits, . _ - / and spaces, max 40)' });
+  const raw = body.report === undefined ? body.v : body.report;
+  const withdraw = raw === null || raw === '' || String(raw).toLowerCase() === 'clear';
+  const report = withdraw ? null : FIELD_REPORTS.get(String(raw).toLowerCase()) || null;
+  if (!withdraw && !report) return json(res, 400, { error: "report must be 'water_confirmed', 'not_a_problem' or null" });
+  const who = `parcel_id=eq.${encodeURIComponent(parcel_id)}&rep=eq.${encodeURIComponent(rep)}`;
+  if (withdraw) {
+    const out = await rest(`/rest/v1/parcel_field_reports?${who}&withdrawn_at=is.null&select=${FR_COLS}`, {
+      method: 'PATCH',
+      prefer: 'return=representation',
+      body: JSON.stringify({ withdrawn_at: new Date().toISOString() }),
+    });
+    const row = Array.isArray(out) ? out[0] || null : out || null;
+    return json(res, 200, { ok: true, withdrawn: Boolean(row), report: row });
+  }
+  const saved = await rest(`/rest/v1/parcel_field_reports?on_conflict=parcel_id,rep&select=${FR_COLS}`, {
+    method: 'POST',
+    prefer: 'resolution=merge-duplicates,return=representation',
+    body: JSON.stringify([{
+      parcel_id,
+      rep,
+      report,
+      // only overwrite lead_id / note when the client sends them
+      ...(body.lead_id !== undefined ? { lead_id: str(body.lead_id, 100) } : {}),
+      ...(body.note !== undefined ? { note: str(body.note, 1000) } : {}),
+      source: 'crm_map',
+      withdrawn_at: null,
+    }]),
+  });
+  return json(res, 200, { ok: true, withdrawn: false, report: Array.isArray(saved) ? saved[0] : saved });
+}
+
+/** field_report_list: live reports for one parcel, a list of parcels, or this rep's. */
+async function fieldReportList(body, rep, res) {
+  const q = [`select=${FR_COLS}`, 'withdrawn_at=is.null', 'order=updated_at.desc'];
+  if (body.parcel_id != null) {
+    const id = parcelIdOrNull(body.parcel_id);
+    if (!id) return json(res, 400, { error: 'invalid parcel_id' });
+    q.push(`parcel_id=eq.${encodeURIComponent(id)}`);
+  } else if (Array.isArray(body.parcel_ids)) {
+    if (body.parcel_ids.length > 200) return json(res, 400, { error: 'at most 200 parcel_ids' });
+    const ids = body.parcel_ids.map(parcelIdOrNull);
+    if (!ids.length || ids.some((x) => !x)) return json(res, 400, { error: 'invalid parcel_ids' });
+    q.push(`parcel_id=in.(${ids.map((x) => encodeURIComponent(`"${x}"`)).join(',')})`);
+  } else if (body.mine !== true) {
+    return json(res, 400, { error: 'send parcel_id, parcel_ids or mine:true' });
+  }
+  if (body.mine === true) q.push(`rep=eq.${encodeURIComponent(rep)}`);
+  q.push(`limit=${MAX_LIST}`);
+  const rows = (await restGet('parcel_field_reports', q.join('&'))) || [];
+  return json(res, 200, { ok: true, count: rows.length, reports: rows });
+}
+
 export default async function handler(req, res) {
   setCors(req, res);
   if (req.method === 'OPTIONS') {
@@ -137,7 +216,17 @@ export default async function handler(req, res) {
       });
     }
 
-    return json(res, 400, { error: "Unknown action. Use 'record', 'list' or 'readiness'." });
+    if (action === 'field_report' || action === 'field_report_list') {
+      const rep = String(session.u || '').slice(0, 80) || 'rep';
+      try {
+        return action === 'field_report' ? await fieldReport(body, rep, res) : await fieldReportList(body, rep, res);
+      } catch (err) {
+        if (isMissingTable(err)) return json(res, 503, FR_NOT_READY);
+        throw err;
+      }
+    }
+
+    return json(res, 400, { error: "Unknown action. Use 'record', 'list', 'readiness', 'field_report' or 'field_report_list'." });
   } catch (err) {
     const status = err?.status === 404 ? 503 : 500;
     return json(res, status, {

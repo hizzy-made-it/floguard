@@ -1,0 +1,57 @@
+{
+  "_note": "Shape confirmed 2026-11-19 against BatchData's help center (help.batchdata.io articles 12859857 'BatchData V3 SkipTrace API' and 12856069 'Understanding your property skip trace results'): results.persons[].phoneNumbers[] {number, carrier, type, tested, reachable, score, dnc, tcpa}; emails[] {email, tested}; person-level litigator and dnc.tcpa. Values are made up. Not checked against a live response.",
+  "status": {
+    "code": 200,
+    "text": "OK"
+  },
+  "results": {
+    "persons": [
+      {
+        "name": {
+          "first": "John",
+          "last": "Smith",
+          "full": "John Smith"
+        },
+        "phoneNumbers": [
+          {
+            "number": "3865550101",
+            "type": "Mobile",
+            "carrier": "AT&T",
+            "tested": true,
+            "reachable": true,
+            "dnc": false,
+            "tcpa": false,
+            "score": 90
+          },
+          {
+            "number": "3865550102",
+            "type": "Land Line",
+            "reachable": true,
+            "dnc": true,
+            "tcpa": false,
+            "score": 60
+          },
+          {
+            "number": "3865550103",
+            "type": "VoIP",
+            "reachable": true,
+            "dnc": false,
+            "tcpa": true,
+            "score": 40
+          },
+          {
+            "number": "3865550104",
+            "type": "Mobile",
+            "reachable": false
+          }
+        ],
+        "emails": [
+          {
+            "email": "john.smith@gmail.com",
+            "tested": true
+          }
+        ]
+      }
+    ]
+  }
+}

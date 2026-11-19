@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "generated_from": "public/crm/docs/FloGuard_Pricing_and_Offers.md (SSOT). Every figure below is traceable to the `source` field. Anything the pricing doc does not price is NOT in `items`.",
+  "price_rule": {
+    "text": "Banded pricing only. Never per-foot. Quote only after a free on-site assessment; most quotes land mid-band, not at the top.",
+    "source": "The one price rule"
+  },
+  "business": {
+    "name": "FloGuard, LLC",
+    "tagline": "Smart drainage systems for Florida homes",
+    "address": "5114 S Ridgewood Ave, Port Orange, FL 32127",
+    "phone": "(386) 259-0023",
+    "phone_href": "tel:+13862590023",
+    "email": "sales@floguardfl.com",
+    "website": "FloGuardFL.com",
+    "hours": "Mon–Fri 8:00 AM–5:00 PM",
+    "license_line": "[[LICENSE / INSURANCE LINE — owner to supply]]",
+    "source": "Company"
+  },
+  "items": [
+    {
+      "id": "exterior_french_drain",
+      "name": "Exterior French drain",
+      "unit": "system",
+      "band_low": 4500,
+      "band_high": 12000,
+      "default_description": "Exterior French drain: fabric-lined gravel trench with 4\" perforated pipe and a custom slope and discharge design, typically 150–350 linear ft, usually paired with a sump.",
+      "disclaimer_ids": [
+        "assessment_priced",
+        "scope_limits"
+      ],
+      "source": "Service lines (table row \"Exterior French Drains\": $4,500–$12,000 band, assessment-quoted only)"
+    },
+    {
+      "id": "french_drain_sump_system",
+      "name": "Complete French drain + sump system (single-family home)",
+      "unit": "system",
+      "band_low": 4500,
+      "band_high": 12000,
+      "default_description": "Complete French drain and sump system for a single-family home: fabric-lined gravel trench with 4\" perforated pipe, custom slope and discharge design, sealed basin, float-switch pump and check valve, and the discharge run.",
+      "disclaimer_ids": [
+        "assessment_priced",
+        "scope_limits"
+      ],
+      "source": "The one price rule (\"Complete French drain + sump systems for a single-family home typically fall between $4,500 and $12,000\")"
+    }
+  ],
+  "unpriced_service_lines": [
+    {
+      "name": "Interior drains + sump pumps",
+      "doc_says": "Scoped per home; often part of the combined band",
+      "source": "Service lines"
+    },
+    {
+      "name": "Yard drainage and grading",
+      "doc_says": "Lower entry ticket; assessment-quoted",
+      "source": "Service lines"
+    },
+    {
+      "name": "Pump maintenance and monitoring",
+      "doc_says": "Plan pricing [CONFIRM WITH OWNER]",
+      "source": "Service lines"
+    },
+    {
+      "name": "Property management programs (B2B)",
+      "doc_says": "Per-property scoping [CONFIRM WITH OWNER]",
+      "source": "Service lines"
+    }
+  ],
+  "custom_line": {
+    "unit": "each",
+    "note": "Lines for work the pricing doc does not price. A band_override_reason (the basis for the price, owner-confirmed) is required. Per-foot or per-linear-foot pricing is never accepted."
+  },
+  "included": [
+    {
+      "text": "Free on-site assessment",
+      "source": "Proof points reps may use"
+    },
+    {
+      "text": "Design engineered for the specific soil, slope, and water table",
+      "source": "Proof points reps may use"
+    },
+    {
+      "text": "Full landscape restoration",
+      "source": "Proof points reps may use (\"Invisible when done\")"
+    }
+  ],
+  "disclaimers": [
+    {
+      "id": "assessment_priced",
+      "text": "Final scope and price are confirmed after the free on-site assessment.",
+      "source": "The one price rule (\"We quote only after a free on-site assessment\")"
+    },
+    {
+      "id": "scope_limits",
+      "text": "This system manages water around and under your home. It does not protect against hurricane storm surge or river flooding above the slab, it is not insurance, and it does not include mold remediation.",
+      "source": "What we never claim; Drainage Sales Playbook, section 9 (The honesty edge)"
+    }
+  ],
+  "terms": {
+    "placeholder": true,
+    "text": "[[TERMS — owner to supply; not legal advice]]",
+    "deposit": "[[DEPOSIT / PAYMENT SCHEDULE — owner to supply]]",
+    "warranty": "[[WARRANTY — owner to supply]]",
+    "source": "Pricing doc, \"Not confirmed — never quote until owner fills in\": deposit percentage, payment schedule and warranty years are all [CONFIRM WITH OWNER]. Replace `placeholder` with false and fill `text` to remove the draft-terms warning."
+  },
+  "acceptance": {
+    "consent_text": "I have reviewed this estimate and I accept it. I understand that typing my full name here records my acceptance.",
+    "note": "Owner/counsel to review this wording. No payment is taken on the proposal page."
+  }
+}

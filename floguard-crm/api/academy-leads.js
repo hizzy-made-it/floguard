@@ -1,20 +1,49 @@
 /**
- * Shared FloGuard Sales Rev leads store (<bucket>/leads.json).
- * POST body: { action: 'list'|'push'|'bulk_upsert'|'replace', leads? }
+ * Shared FloGuard Sales Rev leads store.
+ *
+ * POST body: { action, ... }. Full request/response contract: docs/handoff/C.md.
+ *
+ * Legacy actions (work on every backend, shapes unchanged for the browser + LeadAgent CLI):
+ *   list | push | bulk_upsert | replace | prune_placeholders
+ * Pipeline actions (Postgres backend only; 501 {error:'postgres_backend_required'} otherwise):
+ *   get | patch | delete | activity_add | activity_list | task_add | task_done | tasks_due | funnel
+ * Estimate / job / invoice-record actions (agent G; Postgres only, need fsi/sql/020; contract in
+ *   docs/handoff/G.md): estimate_catalog | estimate_create | estimate_update | estimate_list |
+ *   estimate_get | estimate_send | estimate_void | job_create_from_estimate | job_update |
+ *   invoice_mark | jobs_list
+ *   and `list` with since / cursor / limit.
+ *
  * Auth (either):
  *   - Authorization: Bearer <academy session token>   (browser reps)
  *   - X-Academy-Sync-Secret: <ACADEMY_SYNC_SECRET>    (LeadAgent CLI)
  * `replace` requires the sync secret (full overwrite — CLI ops only).
- * Merge rule: match by lowercased name+city; union `lists`; incoming
- * non-empty fields win, empty fields never clear existing values.
+ *
+ * Identity / merge rules live in server/lib/leads-core.js:
+ *   match by uuid/id, then parcel_id, then name+city (+address when both have one);
+ *   union `lists`; incoming non-empty fields win, empty fields never clear existing
+ *   values; phone_dnc === true is never cleared by a merge.
  */
 import { timingSafeEqual } from 'crypto';
-import { loadLeadsStore, saveLeadsStore, verifySessionToken } from '../server/lib/academy-db.js';
+import {
+  BackendError,
+  getLeadsPipeline,
+  loadLeadsStore,
+  mirrorLeadsToStorage,
+  saveLeadsStore,
+  verifySessionToken,
+} from '../server/lib/academy-db.js';
+import { LeadsError } from '../server/lib/academy-pg.js';
+import { applyPlanToStoreLeads, planUpsert } from '../server/lib/leads-core.js';
+import { ESTIMATE_ACTIONS, runEstimateAction } from '../server/lib/estimates.js';
 import { setCors, json, parseBody, rateLimit, clientIp } from '../server/lib/http.js';
 
 export const config = { maxDuration: 30 };
 
 const MAX_LEADS = 20000;
+const PIPELINE_ACTIONS = new Set([
+  'get', 'patch', 'delete', 'activity_add', 'activity_list', 'task_add', 'task_done', 'tasks_due', 'funnel',
+]);
+const ESTIMATE_ACTION_SET = new Set(ESTIMATE_ACTIONS);
 
 function bearer(req) {
   const h = req.headers?.authorization || req.headers?.Authorization || '';
@@ -37,10 +66,6 @@ function syncSecretOk(req) {
   }
 }
 
-function leadKey(l) {
-  return `${String(l?.name || '').trim().toLowerCase()}|${String(l?.city || '').trim().toLowerCase()}`;
-}
-
 /** Category-grid shells and List-A synthetic rows — not dialable businesses. */
 function isPlaceholderLead(l) {
   const name = String(l?.name || '').trim();
@@ -61,77 +86,16 @@ function isPlaceholderLead(l) {
   return false;
 }
 
-function leadListsOf(l) {
-  if (Array.isArray(l?.lists) && l.lists.length) {
-    return l.lists.filter((x) => typeof x === 'string' && x);
-  }
-  return l?.list ? [String(l.list)] : [];
+function leadRef(body) {
+  return body.lead_id ?? body.id ?? body.uuid ?? null;
 }
 
-function mergeLead(base, inc) {
-  const merged = { ...base };
-  // Explicit lists array from client is authoritative (checkboxes / uncheck must stick).
-  // Without lists, union by primary list label only (partial LeadAgent rows).
-  if (Array.isArray(inc?.lists)) {
-    const next = leadListsOf(inc);
-    if (next.length) {
-      merged.lists = next;
-      if (inc.list && next.includes(String(inc.list))) merged.list = String(inc.list);
-      else merged.list = next[0];
-    }
-  } else {
-    const lists = leadListsOf(base).slice();
-    for (const x of leadListsOf(inc)) {
-      if (!lists.includes(x)) lists.push(x);
-    }
-    if (lists.length) merged.lists = lists;
-  }
-  for (const [k, v] of Object.entries(inc)) {
-    if (k === 'lists' || k === 'id' || k === 'name' || k === 'city' || k === 'list_status') continue;
-    if (v == null || v === '') continue; // empty never clears existing
-    merged[k] = v; // incoming non-empty wins (last write)
-  }
-  // Per-cause pipeline map (each service line status independent)
-  if (inc?.list_status && typeof inc.list_status === 'object' && !Array.isArray(inc.list_status)) {
-    const keys = Object.keys(inc.list_status);
-    if (keys.length) {
-      merged.list_status = { ...(base.list_status || {}), ...inc.list_status };
-      // Drop statuses for causes no longer on the lead when lists were replaced
-      if (Array.isArray(merged.lists)) {
-        const keep = new Set(merged.lists);
-        for (const k of Object.keys(merged.list_status)) {
-          if (!keep.has(k)) delete merged.list_status[k];
-        }
-      }
-    }
-  }
-  if (inc?.lists_touched) merged.lists_touched = true;
-  return merged;
-}
-
-function mergeIntoStore(store, incoming) {
-  const leads = Array.isArray(store.leads) ? store.leads.slice() : [];
-  const index = new Map(leads.map((l, i) => [leadKey(l), i]));
-  let nextId = leads.reduce((m, l) => Math.max(m, Number(l?.id) || 0), 0) + 1;
-  let added = 0;
-  let merged = 0;
-  for (const raw of incoming) {
-    if (!raw || typeof raw !== 'object' || !String(raw.name || '').trim()) continue;
-    const key = leadKey(raw);
-    if (index.has(key)) {
-      const i = index.get(key);
-      leads[i] = mergeLead(leads[i], raw);
-      merged += 1;
-    } else {
-      const copy = { ...raw };
-      copy.id = nextId;
-      nextId += 1;
-      index.set(key, leads.length);
-      leads.push(copy);
-      added += 1;
-    }
-  }
-  return { leads, added, merged };
+function skippedOf(counts) {
+  return {
+    noop: counts.skip_noop,
+    invalid: counts.skip_invalid,
+    deleted: counts.skip_deleted,
+  };
 }
 
 export default async function handler(req, res) {
@@ -162,9 +126,38 @@ export default async function handler(req, res) {
   }
 
   const action = String(body.action || '').toLowerCase();
+  const actor = viaSecret ? String(body.actor || 'sync').slice(0, 80) : String(session.u || 'rep').slice(0, 80);
 
   try {
+    const pipe = await getLeadsPipeline();
+    const wantsPaging = !!(body.since || body.cursor || body.limit);
+
+    if (PIPELINE_ACTIONS.has(action) || ESTIMATE_ACTION_SET.has(action) || (action === 'list' && wantsPaging)) {
+      if (!pipe) {
+        return json(res, 501, {
+          error: 'postgres_backend_required',
+          detail: `Action "${action}"${action === 'list' ? ' with since/cursor/limit' : ''} needs the Postgres leads pipeline (ACADEMY_DATA_BACKEND=postgres|dual|auto with fsi/sql/017 applied).`,
+        });
+      }
+    }
+
+    // ---- list ----------------------------------------------------------
     if (action === 'list') {
+      if (pipe) {
+        const r = await pipe.pgListLeads({
+          since: body.since || null,
+          cursor: body.cursor || null,
+          limit: body.limit ? Number(body.limit) : null,
+          includeDeleted: body.include_deleted === undefined ? undefined : !!body.include_deleted,
+        });
+        return json(res, 200, {
+          leads: r.leads,
+          count: r.leads.length,
+          updated_at: r.updated_at || null,
+          next_cursor: r.next_cursor,
+          has_more: r.has_more,
+        });
+      }
       const store = await loadLeadsStore();
       return json(res, 200, {
         leads: store.leads,
@@ -173,6 +166,7 @@ export default async function handler(req, res) {
       });
     }
 
+    // ---- push / bulk_upsert -------------------------------------------
     if (action === 'push' || action === 'bulk_upsert') {
       const incoming = body.leads;
       if (!Array.isArray(incoming)) {
@@ -181,15 +175,42 @@ export default async function handler(req, res) {
       if (incoming.length > MAX_LEADS) {
         return json(res, 400, { error: `Too many leads (max ${MAX_LEADS}).` });
       }
+      if (pipe) {
+        const r = await pipe.pgUpsertLeads(incoming, { actor, maxLive: MAX_LEADS });
+        await mirrorLeadsToStorage();
+        return json(res, 200, {
+          ok: true,
+          count: r.count,
+          added: r.added,
+          merged: r.merged,
+          updated: r.updated,
+          skipped: skippedOf(r.counts),
+          conflicts: r.conflicts.slice(0, 20),
+          updated_at: r.updated_at,
+        });
+      }
       const store = await loadLeadsStore();
-      const { leads, added, merged } = mergeIntoStore(store, incoming);
+      const existing = Array.isArray(store.leads) ? store.leads : [];
+      const plan = planUpsert(existing, incoming);
+      const leads = applyPlanToStoreLeads(existing, plan);
       if (leads.length > MAX_LEADS) {
         return json(res, 400, { error: `Store would exceed ${MAX_LEADS} leads.` });
       }
-      const updated_at = await saveLeadsStore({ leads });
-      return json(res, 200, { ok: true, count: leads.length, added, merged, updated_at });
+      const changed = plan.inserts.length + plan.updates.length > 0;
+      const updated_at = changed ? await saveLeadsStore({ leads }) : store.updated_at || null;
+      return json(res, 200, {
+        ok: true,
+        count: leads.length,
+        added: plan.inserts.length,
+        merged: plan.updates.length + plan.counts.skip_noop,
+        updated: plan.updates.length,
+        skipped: skippedOf(plan.counts),
+        conflicts: plan.conflicts.slice(0, 20),
+        updated_at,
+      });
     }
 
+    // ---- replace (CLI) -------------------------------------------------
     if (action === 'replace') {
       if (!viaSecret) {
         return json(res, 403, { error: 'replace requires the sync secret.' });
@@ -198,24 +219,31 @@ export default async function handler(req, res) {
       if (!Array.isArray(incoming) || incoming.length > MAX_LEADS) {
         return json(res, 400, { error: 'leads must be an array within the size limit.' });
       }
+      if (pipe) {
+        const r = await pipe.pgUpsertLeads(incoming, { replace: true, prune: true, actor, maxLive: MAX_LEADS });
+        await mirrorLeadsToStorage();
+        return json(res, 200, { ok: true, count: r.count, pruned: r.pruned, updated_at: r.updated_at });
+      }
       const updated_at = await saveLeadsStore({ leads: incoming });
       return json(res, 200, { ok: true, count: incoming.length, updated_at });
     }
 
+    // ---- prune_placeholders -------------------------------------------
     if (action === 'prune_placeholders') {
       const store = await loadLeadsStore();
       const before = Array.isArray(store.leads) ? store.leads : [];
       const kept = before.filter((l) => !isPlaceholderLead(l));
       const removed = before.length - kept.length;
       if (removed > 0) {
-        const updated_at = await saveLeadsStore({ leads: kept });
-        return json(res, 200, {
-          ok: true,
-          removed,
-          remaining: kept.length,
-          leads: kept,
-          updated_at,
-        });
+        let updated_at;
+        if (pipe) {
+          await pipe.pgSoftDeleteLeads(before.filter((l) => isPlaceholderLead(l)).map((l) => l.uuid).filter(Boolean));
+          await mirrorLeadsToStorage();
+          updated_at = new Date().toISOString();
+        } else {
+          updated_at = await saveLeadsStore({ leads: kept });
+        }
+        return json(res, 200, { ok: true, removed, remaining: kept.length, leads: kept, updated_at });
       }
       return json(res, 200, {
         ok: true,
@@ -226,10 +254,91 @@ export default async function handler(req, res) {
       });
     }
 
+    // ---- pipeline actions ---------------------------------------------
+    if (action === 'get') {
+      const r = await pipe.pgGetLead(leadRef(body), { activityLimit: body.activity_limit });
+      return json(res, 200, { ok: true, ...r });
+    }
+
+    if (action === 'patch') {
+      const r = await pipe.pgPatchLead(leadRef(body), body.patch, {
+        expectedUpdatedAt: body.updated_at || null,
+        actor,
+        confirmDncClear: body.confirm_dnc_clear === true,
+      });
+      if (r.conflict) {
+        return json(res, 409, {
+          error: 'conflict',
+          detail: 'The lead changed since you loaded it. Re-apply your edit on top of `lead`.',
+          lead: r.conflict,
+        });
+      }
+      await mirrorLeadsToStorage();
+      return json(res, 200, { ok: true, lead: r.lead });
+    }
+
+    if (action === 'delete') {
+      const r = await pipe.pgDeleteLead(leadRef(body), {
+        actor,
+        restore: body.restore === true,
+        expectedUpdatedAt: body.updated_at || null,
+      });
+      if (r.conflict) {
+        return json(res, 409, { error: 'conflict', detail: 'The lead changed since you loaded it.', lead: r.conflict });
+      }
+      await mirrorLeadsToStorage();
+      return json(res, 200, { ok: true, id: r.id, deleted_at: r.deleted_at, updated_at: r.updated_at });
+    }
+
+    if (action === 'activity_add') {
+      const activity = await pipe.pgAddLeadActivity(leadRef(body), body, { actor });
+      return json(res, 200, { ok: true, activity });
+    }
+
+    if (action === 'activity_list') {
+      const activity = await pipe.pgListLeadActivity(leadRef(body), { limit: body.limit, before: body.before || null });
+      return json(res, 200, { ok: true, activity, count: activity.length });
+    }
+
+    if (action === 'task_add') {
+      const r = await pipe.pgAddTask(leadRef(body), body, { actor });
+      return json(res, 200, { ok: true, task: r.task, lead: r.lead });
+    }
+
+    if (action === 'task_done') {
+      const r = await pipe.pgCompleteTask(body.task_id, { actor, note: body.note || null });
+      return json(res, 200, { ok: true, task: r.task, lead: r.lead });
+    }
+
+    if (action === 'tasks_due') {
+      const r = await pipe.pgTasksDue({ leadId: leadRef(body) });
+      return json(res, 200, { ok: true, tasks: r.tasks, counts: r.counts, as_of: new Date().toISOString() });
+    }
+
+    if (action === 'funnel') {
+      const r = await pipe.pgFunnel();
+      return json(res, 200, { ok: true, ...r, as_of: new Date().toISOString() });
+    }
+
+    if (ESTIMATE_ACTION_SET.has(action)) {
+      const r = await runEstimateAction(action, body, { actor });
+      if (action !== 'estimate_catalog' && action !== 'estimate_list' && action !== 'estimate_get' && action !== 'jobs_list') {
+        await mirrorLeadsToStorage(); // stage moves (estimate_send) touch leads; keeps dual mode in step
+      }
+      return json(res, 200, { ok: true, ...r });
+    }
+
     return json(res, 400, {
-      error: 'Unknown action. Use list, push, bulk_upsert, replace, or prune_placeholders.',
+      error:
+        'Unknown action. Use list, push, bulk_upsert, replace, prune_placeholders, get, patch, delete, activity_add, activity_list, task_add, task_done, tasks_due, funnel, or an estimate/job action (estimate_create, estimate_update, estimate_list, estimate_get, estimate_send, estimate_void, estimate_catalog, job_create_from_estimate, job_update, invoice_mark, jobs_list).',
     });
   } catch (e) {
+    if (e instanceof LeadsError) {
+      return json(res, e.status, { error: e.code, detail: e.message, ...e.extra });
+    }
+    if (e instanceof BackendError) {
+      return json(res, e.status, { error: e.code, detail: e.message });
+    }
     return json(res, 500, { error: 'Leads store error', detail: String(e?.message || e).slice(0, 300) });
   }
 }

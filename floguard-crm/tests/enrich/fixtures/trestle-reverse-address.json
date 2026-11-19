@@ -1,0 +1,15 @@
+{
+  "id": "Location.1",
+  "is_valid": true,
+  "street_line_1": "123 Palm Ave",
+  "city": "Port Orange",
+  "state_code": "FL",
+  "postal_code": "32127",
+  "is_active": true,
+  "is_commercial": false,
+  "current_residents": [
+    { "id": "Person.1", "name": "John A Smith", "firstname": "John", "lastname": "Smith", "age_range": "45-49", "type": "Person" }
+  ],
+  "error": null,
+  "warnings": []
+}
