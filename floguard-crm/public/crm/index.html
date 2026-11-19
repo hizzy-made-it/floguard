@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="css/tokens.css?v=20261119b">
 <link rel="stylesheet" href="vendor/maplibre-gl.css">
 <link rel="stylesheet" href="css/app.css?v=20261119b">
+<link rel="stylesheet" href="css/leads-next.css?v=20261119f1">
 <script src="vendor/maplibre-gl.js"></script>
 </head>
 <body>
@@ -136,12 +137,39 @@
 
 <!-- ============ LEADS ============ -->
 <section class="panel on" id="p-leads" aria-labelledby="h-leads">
+<!-- Leads workspace icons (F1): Lucide, ISC License. -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></symbol>
+<symbol id="i-phone-off" viewBox="0 0 24 24"><path d="M10.1 13.9a14 14 0 0 0 3.732 2.668 1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2 18 18 0 0 1-12.728-5.272"/><path d="M22 2 2 22"/><path d="M4.76 13.582A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 .244.473"/></symbol>
+<symbol id="i-message-square" viewBox="0 0 24 24"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></symbol>
+<symbol id="i-kanban" viewBox="0 0 24 24"><path d="M5 3v14"/><path d="M12 3v8"/><path d="M19 3v18"/></symbol>
+<symbol id="i-table-2" viewBox="0 0 24 24"><path d="M3 9h18"/><path d="M9 3v18"/><rect x="3" y="3" width="18" height="18" rx="2"/></symbol>
+<symbol id="i-calendar-clock" viewBox="0 0 24 24"><path d="M16 14v2.2l1.6 1"/><path d="M16 2v3"/><path d="M21 7.338V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h2.338"/><path d="M3 9h5.859"/><path d="M8 2v3"/><circle cx="16" cy="16" r="6"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-alarm-clock" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/><path d="M6.38 18.7 4 21"/><path d="M17.64 18.67 20 21"/></symbol>
+<symbol id="i-cloud-rain" viewBox="0 0 24 24"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></symbol>
+<symbol id="i-triangle-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+<symbol id="i-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M4.929 4.929 19.07 19.071"/></symbol>
+<symbol id="i-grip-vertical" viewBox="0 0 24 24"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></symbol>
+<symbol id="i-keyboard" viewBox="0 0 24 24"><path d="M10 8h.01"/><path d="M12 12h.01"/><path d="M14 8h.01"/><path d="M16 12h.01"/><path d="M18 8h.01"/><path d="M6 8h.01"/><path d="M7 16h10"/><path d="M8 12h.01"/><rect width="20" height="16" x="2" y="4" rx="2"/></symbol>
+<symbol id="i-list-filter" viewBox="0 0 24 24"><path d="M2 5h20"/><path d="M6 12h12"/><path d="M9 19h6"/></symbol>
+<symbol id="i-arrow-up-down" viewBox="0 0 24 24"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></symbol>
+<symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></symbol>
+<symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol>
+<symbol id="i-circle-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16 9-5.5 5.5L8 12"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+<symbol id="i-list-todo" viewBox="0 0 24 24"><path d="M13 5h8"/><path d="M13 12h8"/><path d="M13 19h8"/><path d="m3 17 2 2 4-4"/><rect x="3" y="4" width="6" height="6" rx="1"/></symbol>
+<symbol id="i-house" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+</svg>
+ <div class="storm-banner" id="stormBanner" role="region" aria-label="Storm dial list" hidden></div>
  <header class="page-head">
   <div class="page-title">
    <h1 id="h-leads">Leads</h1>
-   <p class="sub">Work each service line on its own: check the <b>causes</b> on a lead (French drains, sump pumps, yard drainage, maintenance, property management) and set status per cause. Open a lead to call, text, email, log activity and track the deal. Agent data lands here through sync.</p>
+   <p class="sub">Work each service line (<b>cause</b>) on its own with its own status. Call and text from the list, log what happened, and keep every open lead on a next action.</p>
   </div>
   <div class="page-actions">
+   <button type="button" class="btn btn--icon btn--ghost" id="kbdHelp" aria-label="Keyboard shortcuts" title="Keyboard shortcuts (?)"><svg class="ic" aria-hidden="true"><use href="#i-keyboard"/></svg></button>
    <button type="button" class="btn" id="enrichBtn" title="Find phone/email for leads missing contacts (owner + site address). Free search + optional BatchData skip-trace."><svg class="ic" aria-hidden="true"><use href="#i-sparkles"/></svg>Enrich contacts</button>
    <button type="button" class="btn p" id="addBtn"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg>Add lead</button>
    <details class="menu" id="leadsMore">
@@ -159,6 +187,9 @@
   </div>
  </header>
 
+ <div class="funnel-strip" id="funnelStrip" role="region" aria-label="Pipeline summary"></div>
+ <section class="today-strip" id="todayStrip" aria-labelledby="todayTitle"><div class="td-head"><h2 id="todayTitle">Today</h2></div></section>
+
  <div class="toolbar">
   <div class="tabs seg" id="tabs" role="group" aria-label="Cause view">
    <button data-list="FrenchDrain" class="on">French drains</button>
@@ -175,6 +206,16 @@
    <label class="due-filter" id="dueThisMonthFilter" title="Show Maintenance leads whose next service falls in the current month">
     <input type="checkbox" id="dueThisMonth"> Due this month
    </label>
+  </div>
+  <div class="filter-chips" id="filterChips" role="group" aria-label="Quick filters (saved on this device)">
+   <span class="fc-label"><svg class="ic" aria-hidden="true"><use href="#i-list-filter"/></svg>Filters</span>
+   <button type="button" class="fchip" data-chip="has_phone" aria-pressed="false">Has phone <span class="fc-n num"></span></button>
+   <button type="button" class="fchip" data-chip="no_phone" aria-pressed="false">No phone <span class="fc-n num"></span></button>
+   <button type="button" class="fchip" data-chip="dnc" aria-pressed="false">DNC <span class="fc-n num"></span></button>
+   <button type="button" class="fchip" data-chip="due_today" aria-pressed="false">Due today <span class="fc-n num"></span></button>
+   <label class="fchip fc-stage"><span class="sr-only">Pipeline stage</span><select id="chipStage" aria-label="Filter by pipeline stage"></select></label>
+   <button type="button" class="fchip fc-clear" id="chipClear" hidden>Clear filters</button>
+   <label class="select-field fc-sort"><span class="sr-only">Sort</span><select id="sortSelect" aria-label="Sort leads"><option value="">Sort: default</option><option value="name:1">Name A–Z</option><option value="score:1">Score high–low</option><option value="phone:1">Dialable first</option><option value="stage:1">Stage</option><option value="next:1">Next action due</option></select></label>
   </div>
  </div>
  <div class="status-line" id="enrichStatus" role="status" aria-live="polite"></div>
@@ -212,23 +253,37 @@
 
  <div class="table-head">
   <div class="stats" id="stats"></div>
-  <p class="hint">Industry and city filter the list but stay off the grid. Open a lead for details, notes and drainage need score.</p>
+  <div class="seg view-toggle" id="viewToggle" role="group" aria-label="Leads view">
+   <button type="button" data-view="table" class="on" aria-pressed="true"><svg class="ic" aria-hidden="true"><use href="#i-table-2"/></svg>Table</button>
+   <button type="button" data-view="board" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-kanban"/></svg>Board</button>
+  </div>
+ </div>
+ <div class="bulk-bar" id="bulkBar" role="region" aria-label="Bulk actions" hidden>
+  <b id="bulkCount" class="num">0 selected</b>
+  <label class="select-field"><span class="sr-only">Move selected to stage</span><select id="bulkStage"></select></label>
+  <span class="bulk-owner"><label class="sr-only" for="bulkOwner">Owner (rep)</label><input id="bulkOwner" type="text" placeholder="Owner (rep)" list="bulkOwnerList"><button type="button" class="btn btn--sm" id="bulkOwnerApply">Set owner</button></span>
+  <button type="button" class="btn btn--sm" id="bulkEnrich"><svg class="ic" aria-hidden="true"><use href="#i-sparkles"/></svg>Enrich</button>
+  <button type="button" class="btn btn--sm" id="bulkExport"><svg class="ic" aria-hidden="true"><use href="#i-download"/></svg>Export CSV</button>
+  <span class="spacer"></span>
+  <button type="button" class="btn btn--sm ghost" id="bulkClear">Clear selection</button>
  </div>
  <div class="tablewrap leads-table">
  <table>
- <colgroup><col class="c-name"><col class="c-causes"><col class="c-phone"><col class="c-email"><col class="c-score"><col class="c-status"><col class="c-acts"></colgroup>
+ <colgroup><col class="c-sel"><col class="c-name"><col class="c-causes"><col class="c-phone"><col class="c-email"><col class="c-score"><col class="c-status"><col class="c-acts"></colgroup>
  <thead><tr>
- <th scope="col">Owner / business</th>
+ <th scope="col" class="th-sel"><input type="checkbox" id="selAll" aria-label="Select all shown leads"></th>
+ <th scope="col" aria-sort="none"><button type="button" class="th-sort" data-sort="name">Owner / business<svg class="ic" aria-hidden="true"><use href="#i-arrow-up-down"/></svg></button></th>
  <th scope="col">Causes</th>
- <th scope="col">Phone</th>
+ <th scope="col" aria-sort="none"><button type="button" class="th-sort" data-sort="phone" title="Dialable and scrubbed first">Phone<svg class="ic" aria-hidden="true"><use href="#i-arrow-up-down"/></svg></button></th>
  <th scope="col">Email</th>
- <th scope="col">Score</th>
- <th scope="col">Status</th>
+ <th scope="col" aria-sort="none"><button type="button" class="th-sort" data-sort="score">Score<svg class="ic" aria-hidden="true"><use href="#i-arrow-up-down"/></svg></button></th>
+ <th scope="col" aria-sort="none"><button type="button" class="th-sort" data-sort="stage" title="Sort by pipeline stage">Status · stage<svg class="ic" aria-hidden="true"><use href="#i-arrow-up-down"/></svg></button></th>
  <th scope="col"><span class="sr-only">Actions</span></th>
  </tr></thead>
- <tbody id="tbody"><tr class="loading-row"><td colspan="7"><span class="skel"></span><span class="skel short"></span><span class="sr-only">Loading leads…</span></td></tr></tbody>
+ <tbody id="tbody"><tr class="loading-row"><td colspan="8"><span class="skel"></span><span class="skel short"></span><span class="sr-only">Loading leads…</span></td></tr></tbody>
  </table>
  </div>
+ <div class="board" id="leadsBoard" role="region" aria-label="Pipeline board. Drag a card, or use its stage menu, to move it." hidden></div>
 </section>
 
 <!-- ============ COACH ============ -->
@@ -609,6 +664,25 @@
  <div class="badges" id="pfBadges"></div>
  <div class="wfs-card" id="pfFitness" hidden></div>
  <div class="actbar" id="pfActBar"></div>
+ <div class="ext-actions" id="pfExtActions" hidden></div>
+ <div class="sec sec-pipeline" id="pfPipeline">
+ <h3>Pipeline</h3>
+ <div class="pl-row">
+ <div class="pl-stage"><label for="pfStage">Stage</label><select id="pfStage"></select></div>
+ <div class="pl-days" id="pfStageDays"></div>
+ </div>
+ <div class="pl-next" id="pfNext"></div>
+ </div>
+ <div class="sec" id="pfPhonesSec">
+ <h3 class="sec-h">Phone numbers <span class="ph-state" id="pfEnrichState"></span></h3>
+ <div id="pfPhones"></div>
+ <p class="hint mt-2">DNC and litigator numbers cannot be called or texted from the CRM. Scrub any number marked <b>Not scrubbed</b> before dialing.</p>
+ </div>
+ <div class="sec" id="pfActivitySec">
+ <h3>Activity</h3>
+ <form class="quick-note" id="pfQuickNote"><label class="sr-only" for="pfQuickNoteText">Add a note</label><input id="pfQuickNoteText" type="text" placeholder="Add a note and press Enter" autocomplete="off"><button type="submit" class="btn btn--sm">Add note</button></form>
+ <div id="pfTimeline" class="timeline">No activity yet.</div>
+ </div>
  <div class="sec">
  <h3>Causes</h3>
  <div class="cause-checks full" id="pfCauses"></div>
@@ -695,7 +769,7 @@
  </div>
  </div>
  <div class="sec">
- <h3>Log activity</h3>
+ <h3>Log activity (detailed)</h3>
  <div class="grid-2">
  <div><label for="pfLogType">Type</label>
  <select id="pfLogType"><option value="call">Call</option><option value="email">Email</option><option value="sms">Text</option><option value="note">Note</option><option value="status">Status</option></select>
@@ -716,10 +790,6 @@
  <div class="sec">
  <h3>Category playbook</h3>
  <div id="pfPlaybook" class="hint"></div>
- </div>
- <div class="sec">
- <h3>Activity timeline</h3>
- <div id="pfTimeline" class="hint">No activity yet.</div>
  </div>
  </div>
 </div>
@@ -751,11 +821,11 @@
 </div>
 
 <script src="js/01-data.js?v=20261119b"></script>
-<script src="js/02-crm-core.js?v=20261119b"></script>
+<script src="js/02-crm-core.js?v=20261119f1"></script>
 <script src="js/03-ai-prompts.js?v=20261119b"></script>
-<script src="js/04-state.js?v=20261119b"></script>
+<script src="js/04-state.js?v=20261119f1"></script>
 <script src="js/05-nav.js?v=20261119b"></script>
-<script src="js/06-leads.js?v=20261119b"></script>
+<script src="js/06-leads.js?v=20261119f1"></script>
 <script src="js/07-chat.js?v=20261119b"></script>
 <script src="js/08-roleplay.js?v=20261119b"></script>
 <script src="js/09-review.js?v=20261119b"></script>
@@ -767,6 +837,10 @@
 <script src="js/15-docs.js?v=20261119b"></script>
 <script src="js/16-fsi-map.js?v=20261119b"></script>
 <script src="js/17-shell.js?v=20261119b"></script>
+<script src="js/18-leads-next.js?v=20261119f1"></script>
+<script src="js/18b-leads-views.js?v=20261119f1"></script>
+<script src="js/18c-leads-enrich.js?v=20261119f1"></script>
+<script src="js/18d-leads-drawer.js?v=20261119f1"></script>
 </div><!-- /appRoot -->
 </body>
 </html>

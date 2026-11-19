@@ -139,6 +139,8 @@ async function appendActivity(entry){
  };
  list.push(row);
  saveActivitiesLocal(list);
+ // Leads workspace (18-leads-next.js): mirror to the per-lead server timeline when available
+ if(window.FG&&FG.activity){ try{ FG.activity.mirror(row); }catch(e){} }
  const tok=getToken();
  if(tok){
  try{
@@ -149,7 +151,7 @@ async function appendActivity(entry){
 }
 function activitiesForLead(l){
  const key=leadKeyOf(l);
- return loadActivities().filter(a=>String(a.lead_key||'').toLowerCase()===key).slice(-100).reverse();
+ return loadActivities().filter(a=>(a.lead_id!=null&&l.id!=null)?String(a.lead_id)===String(l.id):String(a.lead_key||'').toLowerCase()===key).slice(-100).reverse();
 }
 function money(n){ const x=Number(n)||0; return '$'+x.toLocaleString(undefined,{maximumFractionDigits:0}); }
 function isHot(l){
@@ -263,9 +265,21 @@ function profileLeadAndCat(){
  const cat=categoryKey(activeCause(l));
  return {l, cat};
 }
+/** Form phone becomes the lead's primary (DNC kept per number by FG.phone.setPrimary). */
+async function adoptFormPhone(l, raw){
+ if(!raw || phoneDigitsKey(raw)===phoneDigitsKey(l.phone)) return;
+ if(window.FG&&FG.phone&&FG.phone.setPrimary&&l.phone){ await FG.phone.setPrimary(l, raw); return; }
+ l.phone=raw; saveLeads();
+}
 async function profileActionCall(){
  const {l}=profileLeadAndCat(); if(!l) return;
  const raw=profileFormPhone()||l.phone||'';
+ if(window.FG&&FG.ready){
+  if(!raw){ flashActMsg('Add a phone number first (Contact & deal → Phone), then try Call again.', 'err'); document.getElementById('pfPhone')?.focus(); return; }
+  await adoptFormPhone(l, raw);
+  FG.dial.start(l, raw, 'call');
+  return;
+ }
  const phone=normalizeDial(raw);
  if(!phone){
  flashActMsg('Add a phone number first (Contact & deal → Phone), then try Call again.', 'err');
@@ -282,6 +296,12 @@ async function profileActionCall(){
 async function profileActionSms(){
  const {l,cat}=profileLeadAndCat(); if(!l) return;
  const raw=profileFormPhone()||l.phone||'';
+ if(window.FG&&FG.ready){
+  if(!raw){ flashActMsg('Add a phone number first, then try Text again.', 'err'); document.getElementById('pfPhone')?.focus(); return; }
+  await adoptFormPhone(l, raw);
+  FG.dial.start(l, raw, 'text');
+  return;
+ }
  const phone=normalizeDial(raw);
  if(!phone){
  flashActMsg('Add a phone number first, then try Text again.', 'err');
@@ -500,19 +520,27 @@ function paintProfileForm(l){
  '<span style="display:block;margin-top:6px"><b>Close:</b> '+esc(pb.close||'')+'</span>'+
  '<span style="display:block;margin-top:6px"><b>Focus:</b> '+esc(pb.coach_focus||'')+'</span>';
  renderProfileTimeline(l);
+ // Leads workspace: pipeline, phone chips, extension actions (18d-leads-drawer.js)
+ if(window.FG&&FG.drawer){ try{ FG.drawer.paint(l); }catch(e){ console.error(e); } }
 }
 /** Pull latest server enrichment for one lead (phone/email/notes/DNS) into state. */
 async function refreshLeadEnrichmentFromServer(l){
  const tok=getToken(); if(!tok||!l||!l.name) return false;
+ if(window.FG&&FG.isServer&&FG.isServer()){
+  // Server mode: one `get` for this lead instead of pulling the whole list
+  const got=await FG.sync.get(l);
+  if(!got||!got.lead) return false;
+  FG.sync.takeServerCopy(l, got.lead);
+  try{ localStorage.setItem(KEY,JSON.stringify(state)); }catch(e){}
+  return true;
+ }
  try{
  const r=await fetch('/crm/api/academy-leads',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify({action:'list'})});
  if(!r.ok) return false;
  const data=await r.json();
  const rows=Array.isArray(data.leads)?data.leads:[];
- const k=(l.name||'').trim().toLowerCase()+'|'+(l.city||'').trim().toLowerCase();
- const match=rows.find(function(raw){
- return ((raw.name||'').trim().toLowerCase()+'|'+((raw.city||'').trim().toLowerCase()))===k;
- });
+ // Same identity rule as the merge: uuid, parcel, then name+city+address (never another owner)
+ const match=rows.find(function(raw){ return findLocalLeadFor(raw, [l])===l; });
  if(!match) return false;
  mergeServerLeads([match]);
  try{ localStorage.setItem(KEY,JSON.stringify(state)); }catch(e){}
@@ -537,6 +565,7 @@ function openProfile(id){
  });
 }
 function renderProfileTimeline(l){
+ if(window.FG&&FG.drawer&&FG.drawer.paintTimeline){ FG.drawer.paintTimeline(l); return; }
  const acts=activitiesForLead(l);
  const el=document.getElementById('pfTimeline');
  if(!acts.length){ el.innerHTML='<span class="hint">No activity yet. Log a call or note above.</span>'; return; }
@@ -559,7 +588,14 @@ function saveProfileFromForm(){
  if(document.getElementById('pfZip')) l.zip=document.getElementById('pfZip').value.trim();
  if(document.getElementById('pfIndustry')) l.industry=document.getElementById('pfIndustry').value.trim();
  // parcel_id is read-only (from FSI / tax roll)
- l.phone=document.getElementById('pfPhone').value.trim();
+ const newPhone=document.getElementById('pfPhone').value.trim();
+ if(phoneDigitsKey(newPhone)!==phoneDigitsKey(l.phone)){
+  // DNC is per number: park the old primary's flag on its phones[] entry, then re-evaluate
+  if(l.phone_dnc===true && l.phone) l.phones=mergePhoneLists(l.phones, [{number:l.phone, dnc:true, line_type:l.phone_line_type||'unknown', source:l.phone_source||'manual'}]);
+  const e=(l.phones||[]).find(function(p){ return phoneDigitsKey(p.number)===phoneDigitsKey(newPhone); });
+  l.phone_dnc=e&&e.dnc!=null?e.dnc:null;
+ }
+ l.phone=newPhone;
  l.email=document.getElementById('pfEmail').value.trim();
  l.contact=document.getElementById('pfContact').value.trim();
  l.owner=document.getElementById('pfOwner').value.trim();
@@ -645,7 +681,7 @@ function removeLeadFromCurrentList(){
  const l=state.find(x=>x.id===profileLeadId); if(!l) return;
  normalizeLead(l);
  const active=activeCause(l);
- if(!active||active==='All'){ alert('Pick a list tab (not All) to uncheck that cause.'); return; }
+ if(!active||active==='All'){ if(window.FG&&FG.ready) FG.toast('Pick a cause tab (not All) to uncheck that cause.', {kind:'err'}); else alert('Pick a list tab (not All) to uncheck that cause.'); return; }
  const ok=toggleLeadCause(l, active, false);
  if(!ok) return;
  appendActivity({lead_id:l.id,lead_key:leadKeyOf(l),type:'list_change',detail:{text:'Unchecked cause '+active,lists:leadLists(l)}});
@@ -653,8 +689,9 @@ function removeLeadFromCurrentList(){
  closeProfile();
  render(); refreshIndustryFilter(); refreshCityFilter();
 }
-function deleteLeadForever(){
+async function deleteLeadForever(){
  const l=state.find(x=>x.id===profileLeadId); if(!l) return;
+ if(typeof deleteLeadWithConfirm==='function'){ if(await deleteLeadWithConfirm(l)) closeProfile(); return; }
  if(!confirm('Permanently delete "'+l.name+'"? This cannot be undone.')) return;
  appendActivity({lead_id:l.id,lead_key:leadKeyOf(l),type:'note',detail:{text:'Lead deleted'}});
  state=state.filter(x=>x.id!==l.id);
