@@ -176,6 +176,8 @@ async function orgIdOrNull() {
   }
 }
 
+const ISO_TS_RE = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(:\d{2}(\.\d{1,9})?)?(Z|[+-]\d{2}(:?\d{2})?)?$/;
+
 function orgClause(orgId) {
   return orgId ? `&org_id=eq.${ENC(orgId)}` : '';
 }
@@ -193,10 +195,14 @@ export async function pgListLeadRows({ since = null, cursor = null, limit = PAGE
     const i = String(cursor).lastIndexOf('|');
     const ts = i > 0 ? String(cursor).slice(0, i) : '';
     const id = i > 0 ? String(cursor).slice(i + 1) : '';
-    if (!ts || !id || Number.isNaN(Date.parse(ts))) throw new LeadsError(400, 'bad_cursor', 'cursor is not valid');
+    // Both parts end up inside a PostgREST or=(...) group, where a decoded ',' or ')' is syntax:
+    // accept only an ISO-ish timestamp and a uuid (review R1).
+    if (!ts || !id || !ISO_TS_RE.test(ts) || Number.isNaN(Date.parse(ts)) || !isUuid(id)) {
+      throw new LeadsError(400, 'bad_cursor', 'cursor is not valid');
+    }
     q += `&or=(updated_at.gt.${ENC(ts)},and(updated_at.eq.${ENC(ts)},id.gt.${ENC(id)}))`;
   } else if (since) {
-    if (Number.isNaN(Date.parse(since))) throw new LeadsError(400, 'bad_since', 'since must be an ISO timestamp');
+    if (!ISO_TS_RE.test(String(since)) || Number.isNaN(Date.parse(since))) throw new LeadsError(400, 'bad_since', 'since must be an ISO timestamp');
     q += `&updated_at=gt.${ENC(since)}`;
   }
   const rows = (await restGet('leads', q)) || [];

@@ -217,3 +217,21 @@ test('v2 group: a missing BASE column is still an error', async () => {
   const have = new Set([...COLUMNS_BASE.filter((c) => c !== 'depr_n'), ...COLUMNS_OPTIONAL, ...COLUMNS_TERRAIN_V2]);
   await assert.rejects(selectParcelRows({ buildQuery: q, get: fakeGet(have), cache: new Map() }), /depr_n/);
 });
+
+// Review R1: claims_layer with geometry must stay under Vercel's 4.5 MB response limit.
+test('claims_layer includeGeom: geometry trimmed from the lowest-heat rows to fit the response budget', async () => {
+  const ring = Array.from({ length: 2500 }, (_, i) => [-81 + i * 1e-5, 29 + (i % 7) * 1e-5]);
+  const geom = { type: 'Polygon', coordinates: [ring] }; // ~70 KB each
+  const rows = Array.from({ length: 120 }, (_, i) => ({
+    block_group: `1212708260${String(i).padStart(2, '0')}`, heat: 1 - i / 200, claim_count_10y: 5, geom_geojson: geom,
+    bbox_w: -81.1, bbox_s: 29, bbox_e: -81, bbox_n: 29.1,
+  }));
+  globalThis.fetch = fakeFetch([{ match: /nfip_claim_block_group/, body: rows }]);
+  const r = await call({ action: 'claims_layer', bbox: [-81.5, 28.8, -80.8, 29.5], includeGeom: true, limit: 1000 });
+  assert.equal(r.status, 200);
+  assert.equal(r.json.count, 120, 'every block group is still returned');
+  assert.ok(r.json.geom_trimmed > 0);
+  assert.ok(Buffer.byteLength(JSON.stringify(r.json)) < 4_500_000);
+  assert.ok(r.json.rows[0].geom, 'hottest rows keep their polygon');
+  assert.equal(r.json.rows[119].geom, null, 'coolest rows lose it first');
+});

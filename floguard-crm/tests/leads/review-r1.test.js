@@ -76,3 +76,18 @@ test('push does not overwrite a concurrent patch that landed after it read the l
   assert.equal(after.notes, 'rep B note', 'the concurrent patch was not reverted');
   assert.equal(after.stage, 'assessment_booked', 'the concurrent stage move was not reverted');
 });
+
+// Cursor / since values are placed inside a PostgREST or=() group; a Date.parse-able string can still
+// carry ',' and '(' ')' ("Tue, 19 Nov 2026 (x)") and the id half was not checked at all.
+test('list cursor/since: only ISO timestamps and uuids reach the or=() filter', async () => {
+  for (const cursor of ['Tue, 19 Nov 2026 12:00:00 GMT|00000000-0000-4000-8000-000000000000', '2026-11-19T12:00:00Z|x),id.gt.(0', 'Nov 19 2026 (hi)|00000000-0000-4000-8000-000000000000']) {
+    const r = await call({ action: 'list', cursor, limit: 5 });
+    assert.equal(r.status, 400, cursor);
+    assert.equal(r.body.error, 'bad_cursor');
+  }
+  assert.equal((await call({ action: 'list', since: 'Tue, 19 Nov 2026 12:00:00 GMT' })).body.error, 'bad_since');
+  const ok = await call({ action: 'list', since: '2026-11-19T12:00:00.000+00:00', limit: 5 });
+  assert.equal(ok.status, 200);
+  const page = await call({ action: 'list', limit: 1 });
+  if (page.body.next_cursor) assert.equal((await call({ action: 'list', cursor: page.body.next_cursor, limit: 1 })).status, 200, 'real cursors still work');
+});
