@@ -531,3 +531,33 @@ grant execute on function public.rain_source_use(text, integer, integer) to serv
 grant execute on function public.fsi_static_batch(integer, integer, text) to service_role;
 grant execute on function public.fsi_recompute_static(text) to service_role;
 grant execute on function public.rain_fetch_enqueue() to service_role;
+
+-- ---------------------------------------------------------------------------
+-- Hardening (found by fsi/tests/sql/900_lint.test.sql): pin search_path on the
+-- helper functions and remove the default EXECUTE that Supabase grants to
+-- anon/authenticated. Idempotent; skips any signature that is absent.
+-- ---------------------------------------------------------------------------
+do $$
+declare
+  sig text;
+  fn  regprocedure;
+begin
+  foreach sig in array array[
+    'public.wt_score(real)',
+    'public.soil_score_v2(text,text,real)',
+    'public.mrms_cell_id(double precision,double precision)',
+    'public.ksat_score(real)',
+    'public.fsi_static_v2_of(public.parcel_risk)',
+    'public.fsi_static_v2_expr(real,real,real,real,real,text,text,real,real,text)',
+    'public.fsi_static_dispatch(text,public.parcel_risk)',
+    'public.fsi_model_version()',
+    'public.drain_class_score(text)',
+    'public.bowl_score(real,real)'
+  ] loop
+    fn := to_regprocedure(sig);
+    if fn is null then continue; end if;
+    execute format('alter function %s set search_path = public, extensions', fn);
+    execute format('revoke all on function %s from public, anon, authenticated', fn);
+    execute format('grant execute on function %s to service_role', fn);
+  end loop;
+end $$;
