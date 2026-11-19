@@ -30,3 +30,9 @@ select t.ok(has_function_privilege('service_role', 'public.fsi_parcel_geojson(do
             '019 RPC open to service_role');
 
 delete from public.parcel_risk where parcel_id like 'T-GEO-%';
+
+-- 016 geom column follows PostGIS's schema (public in production, extensions per 001)
+select t.ok((select format_type(a.atttypid, null) ~ 'geometry' from pg_attribute a
+              where a.attrelid = 'public.nfip_claim_block_group'::regclass and a.attname = 'geom' and not a.attisdropped),
+            '016 nfip_claim_block_group.geom created with the installed geometry type');
+select t.lives($$select public.nfip_claim_bg_build_geom()$$, '016 nfip_claim_bg_build_geom resolves st_* through search_path');

@@ -61,7 +61,8 @@ create table if not exists public.nfip_claim_block_group (
   bbox_e             double precision,
   bbox_n             double precision,
   geom_geojson       jsonb,                            -- generalised polygon for the map layer (written by the ingest)
-  geom               extensions.geometry(MultiPolygon, 4326), -- built from geom_geojson by nfip_claim_bg_build_geom()
+  -- geom (PostGIS MultiPolygon 4326, built from geom_geojson by nfip_claim_bg_build_geom()) is added
+  -- below in a DO block: PostGIS lives in schema `public` in production but `extensions` in 001.
 
   updated_at         timestamptz not null default now()
 );
@@ -69,7 +70,28 @@ create table if not exists public.nfip_claim_block_group (
 create index if not exists nfip_claim_bg_tract_idx on public.nfip_claim_block_group (tract);
 create index if not exists nfip_claim_bg_bbox_idx
   on public.nfip_claim_block_group (bbox_w, bbox_e, bbox_s, bbox_n);
-create index if not exists nfip_claim_bg_geom_idx on public.nfip_claim_block_group using gist (geom);
+-- geom column + GiST index, wherever PostGIS's `geometry` type lives (public in production,
+-- extensions per 001). Review R1. Skipped with a NOTICE when PostGIS is not installed; the map layer
+-- reads geom_geojson and does not need it.
+do $$
+declare gschema text; gdomain boolean;
+begin
+  select n.nspname, t.typtype = 'd' into gschema, gdomain
+    from pg_type t join pg_namespace n on n.oid = t.typnamespace
+   where t.typname = 'geometry' and n.nspname in ('public', 'extensions')
+   order by (n.nspname = 'public') desc limit 1;
+  if gschema is null then
+    raise notice '016: PostGIS geometry type not found in public or extensions; nfip_claim_block_group.geom not created';
+    return;
+  end if;
+  if not exists (select 1 from pg_attribute where attrelid = 'public.nfip_claim_block_group'::regclass
+                  and attname = 'geom' and not attisdropped) then
+    -- gdomain = the local test harness's text-domain stand-in, which takes no typmod
+    execute format('alter table public.nfip_claim_block_group add column geom %I.geometry%s',
+                   gschema, case when gdomain then '' else '(MultiPolygon, 4326)' end);
+  end if;
+  execute 'create index if not exists nfip_claim_bg_geom_idx on public.nfip_claim_block_group using gist (geom)';
+end $$;
 
 alter table public.nfip_claim_block_group enable row level security;
 revoke all on table public.nfip_claim_block_group from anon, authenticated;
