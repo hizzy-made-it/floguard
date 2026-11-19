@@ -1,0 +1,15 @@
+{
+  "id": "Phone.3a1b8c1e-0000-4000-8000-000000000001",
+  "phone_number": "+13865550142",
+  "is_valid": true,
+  "activity_score": 85,
+  "country_calling_code": "1",
+  "country_code": "US",
+  "country_name": "United States",
+  "line_type": "Mobile",
+  "carrier": "Verizon Wireless",
+  "is_prepaid": false,
+  "add_ons": { "litigator_checks": { "phone": { "is_litigator_risk": false } } },
+  "error": null,
+  "warnings": []
+}

@@ -3,8 +3,8 @@
 Implementation of `../docs/FLOOD-SUSCEPTIBILITY-INDEX.md`. Read the spec first;
 it holds the reasoning, this file holds the mechanics.
 
-**Nothing here has been run against real data yet.** The scoring math is
-implemented and testable; the raster pipeline is a scaffold.
+v1 terrain (10 m) is live; terrain v2 (below) is built and tested on synthetic
+data plus a small real pilot, not yet run on the county.
 
 ---
 
@@ -55,6 +55,27 @@ Anything over ~60 s cannot run through the Supabase MCP `execute_sql` either —
 Scoring lives in two places that must agree: `scripts/lib/fsi-score.mjs` (reference) and
 `sql/006` + `sql/008` (what runs). `tests/verify-mhs-sql.mjs` checks them against each other;
 `tests/verify-mhs-json.mjs` does the same from an exported JSON when PostgREST is unreachable.
+
+## Terrain v2 (built 2026-11-19, not yet run on the county)
+
+Most accurate lot-level result we can get from public data, and a way to measure it.
+Full procedure: [`RUNBOOK-terrain-v2.md`](RUNBOOK-terrain-v2.md). Column meanings for the
+map: `../docs/handoff/D.md`.
+
+| Piece | What it does | Code |
+|---|---|---|
+| 1 m LiDAR, per watershed | 3DEP 1 m tiles (TNM API / `prd-tnm` S3), 10 m fallback recorded per lot; tiles = HUC12 ∩ 5 km chunks + 300 m halo; flow crossing tile edges is routed into the neighbour tile (exact) | `terrain_v2.py`, `terrain_v2_run.py`, `sources.py` |
+| Hydro-conditioning | burn culverts + NHD flowlines, least-cost breach bounded at 40 m, epsilon fill; inlets drain; closed-basin depth from the **un-breached** DEM | `hydro.py` |
+| Lot polygon stats | p10/median elevation, max + area-weighted TWI, min HAND, depression depth and share of lot, optional yard-only (footprints removed) | `zonal.py`, `parcel_polygons.py` |
+| Bowl among neighbours | lot median minus neighbour lots within 30 m and minus the adjacent street | `neighbors.py` |
+| Soil | SSURGO via Soil Data Access: water table depth, drainage class, ksat; A/D B/D C/D treated as D | `soils.py`, `config_v2.py` |
+| Radar rain | MRMS 1 km 24 h / 72 h QPE (`noaa-mrms-pds`), per-cell API, behind `FSI_RAIN_SOURCE=mrms` | `rainfall.py` |
+| Confidence | `fsi_confidence` 0-1 + `fsi_inputs` jsonb per parcel | `confidence.py` |
+| SQL | `sql/018`: columns, `fsi_static_v2_expr`, model-version switch (v1 default), batched apply, pg_net loader, MRMS cells | `sql/018_terrain_v2_and_confidence.sql` |
+| Calibration | L2 logistic, class-weighted, tract-blocked CV, AUC / PR-AUC / calibration / lift, refuses below EPV 10 | `calibrate.py`, `proxy_labels.py` |
+
+Tests: `cd fsi && python -m pytest tests -q` (synthetic DEMs with known answers; the SQL
+test applies 018 twice to a throwaway local PostgreSQL when one is installed).
 
 ## Setup
 

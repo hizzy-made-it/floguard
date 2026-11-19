@@ -18,3 +18,18 @@ sqlalchemy>=2.0.0
 fastapi[standard]>=0.139.2
 # --- Data source client ---
 httpx>=0.27.0           # NWS/NOAA, Open-Meteo, FEMA NFHL REST
+
+# --- Terrain v2 / calibration (fsi/pipeline/{hydro,terrain_v2*,zonal,neighbors,soils,calibrate}.py) ---
+# Installed and tested 2026-11-19 on Python 3.13 (versions in parentheses).
+# The v2 hydrology is our own numba code (hydro.py), not WhiteboxTools: whitebox
+# downloads its binary at first use (blocked on locked-down machines) and has no
+# hook for cross-tile flow; richdem has no wheels for current Python.
+numpy>=2.0               # (2.5.3)
+scipy>=1.11              # (1.18.1) cKDTree for street points
+numba>=0.60              # (0.68.1) JIT for fill/breach/accumulation; pure-Python fallback is test-speed only
+affine>=2.4              # (3.0.1)
+pyproj>=3.6              # (3.8.0)
+pyogrio>=0.9             # (0.13.0) GeoPackage IO for geopandas
+pandas>=2.0              # (3.0.5)
+scikit-learn>=1.4        # (1.9.1) calibrate.py
+pytest>=8.0              # (9.1.1) fsi/tests

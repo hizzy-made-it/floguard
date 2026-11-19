@@ -124,3 +124,15 @@ export function gridKey(lon, lat, cellDeg = 0.02) {
   const r = Math.floor(Number(lat) / cellDeg);
   return `${c},${r}`;
 }
+
+/**
+ * First feature whose polygon contains the point (no zone ranking). For layers that do not
+ * overlap, e.g. census block groups. Returns the feature or null.
+ */
+export function findFirstContaining(index, lon, lat) {
+  for (const { f, bb } of queryGrid(index, lon, lat)) {
+    if (lon < bb[0] || lon > bb[2] || lat < bb[1] || lat > bb[3]) continue;
+    if (pointInPolygon(lon, lat, f.geometry)) return f;
+  }
+  return null;
+}

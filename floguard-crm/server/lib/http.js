@@ -59,8 +59,20 @@ export function parseBody(req) {
 /** In-memory rate limit (per isolate; better than nothing on Vercel) */
 const buckets = new Map();
 
+const MAX_BUCKETS = 5000;
+/** Test hook. */
+export function _bucketCount() {
+  return buckets.size;
+}
+
 export function rateLimit(key, { limit = 20, windowMs = 60_000 } = {}) {
   const now = Date.now();
+  // The public proposal endpoint keys buckets by (hashed) token and IP, so the map grew without
+  // bound in a warm isolate. Drop expired buckets when it gets large (review R1).
+  if (buckets.size >= MAX_BUCKETS) {
+    for (const [k, v] of buckets) if (now > v.reset) buckets.delete(k);
+    if (buckets.size >= MAX_BUCKETS) buckets.delete(buckets.keys().next().value);
+  }
   let b = buckets.get(key);
   if (!b || now > b.reset) {
     b = { count: 0, reset: now + windowMs };

@@ -1,0 +1,9 @@
+{
+  "id": "Phone.3a1b8c1e-0000-4000-8000-000000000005",
+  "phone_number": "+13865550142",
+  "is_valid": true,
+  "line_type": "Mobile",
+  "owners": [
+    { "id": "Person.2", "name": "Maria Jones", "firstname": "Maria", "lastname": "Jones", "type": "Person", "current_addresses": [] }
+  ]
+}

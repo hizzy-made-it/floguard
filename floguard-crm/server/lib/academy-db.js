@@ -131,13 +131,20 @@ async function postgresAvailable() {
   return _pgReady;
 }
 
+/**
+ * Users / activities / practice stores (NOT leads; see getLeadsPipeline). These Postgres tables are
+ * org-scoped (organizations, desk_users, activities, practice_sessions), which production does not
+ * have. Before review R1, ACADEMY_DATA_BACKEND=postgres|dual sent them to Postgres unconditionally,
+ * so `postgres` mode threw on every login. Now every mode needs the org tables to be present;
+ * otherwise these stores stay on Storage (the leads pipeline is decided separately).
+ */
 async function usePostgres() {
   const mode = dataBackend();
   if (mode === 'storage') return false;
-  if (mode === 'postgres' || mode === 'dual') return true;
-  // auto
   return postgresAvailable();
 }
+
+
 
 async function useDualWrite() {
   return dataBackend() === 'dual' && (await postgresAvailable());
@@ -348,8 +355,8 @@ export async function saveUsers(store) {
       console.warn('[academy-db] pg saveUsers failed:', e?.message);
     }
   }
-  // Always keep Storage warm unless pure postgres mode
-  if (mode !== 'postgres' || dual) {
+  // Always keep Storage warm unless pure postgres mode (and Postgres really holds the users)
+  if (mode !== 'postgres' || dual || !pgOn) {
     await storageSaveUsers(store);
   }
 }
@@ -408,8 +415,97 @@ export async function recordUserTokenSpend(userId, tokens, meta = {}) {
   return publicUser(user);
 }
 
+// ---------------------------------------------------------------------------
+// Leads
+//
+// Two implementations behind one API:
+//   - storage: one JSON blob (<bucket>/leads.json) — legacy, no history, no pipeline
+//   - pipeline: Postgres public.leads + lead_activity/lead_tasks (fsi/sql/017)
+// ACADEMY_DATA_BACKEND picks: storage -> blob; postgres -> pipeline (error if 017 is not
+// applied); dual -> pipeline when ready AND mirror every write to the blob; auto ->
+// pipeline when ready, else blob.
+// ---------------------------------------------------------------------------
+
+export class BackendError extends Error {
+  constructor(status, code, message) {
+    super(message || code);
+    this.status = status;
+    this.code = code;
+  }
+}
+
+/**
+ * Resolve the leads pipeline (the academy-pg module) or null when the blob backend is in use.
+ * Throws BackendError(503) when ACADEMY_DATA_BACKEND=postgres but 017 is not applied.
+ */
+export async function getLeadsPipeline() {
+  const mode = dataBackend();
+  if (mode === 'storage') return null;
+  const ready = await pg.pgLeadsReady();
+  if (ready) {
+    await seedPipelineFromBlobOnce();
+    return pg;
+  }
+  if (mode === 'postgres') {
+    throw new BackendError(
+      503,
+      'leads_pipeline_not_ready',
+      'ACADEMY_DATA_BACKEND=postgres but public.leads lacks the 017 pipeline columns. Apply fsi/sql/017_leads_pipeline.sql.',
+    );
+  }
+  if (mode === 'dual') console.warn('[academy-db] dual: leads pipeline not ready (017 not applied); writing blob only');
+  return null;
+}
+
+let _seedChecked = false;
+export function _resetSeedCheck() {
+  _seedChecked = false;
+}
+
+/**
+ * Safety net for the cut-over: the first time this instance uses the Postgres pipeline, if
+ * public.leads is empty (live or soft-deleted) while the Storage blob still holds leads, copy
+ * the blob in. Without this, flipping the backend (or `auto` after 017 is applied) would show
+ * an empty lead list until someone ran scripts/migrate-leads-to-pg.mjs. Idempotent: identity
+ * merge means two instances seeding at once converge on the same rows. Never deletes.
+ */
+async function seedPipelineFromBlobOnce() {
+  if (_seedChecked) return;
+  _seedChecked = true;
+  try {
+    const page = await pg.pgListLeadRows({ limit: 1, includeDeleted: true });
+    const rows = Array.isArray(page) ? page : page?.rows || page?.leads || [];
+    if (rows.length) return;
+    const blob = await storageLoadLeads();
+    const leads = Array.isArray(blob?.leads) ? blob.leads : [];
+    if (!leads.length) return;
+    const res = await pg.pgUpsertLeads(leads, { actor: 'system:seed-from-blob' });
+    console.warn(`[academy-db] seeded Postgres leads from the Storage blob: ${leads.length} in blob`, {
+      inserted: res?.inserted, updated: res?.updated,
+    });
+  } catch (e) {
+    _seedChecked = false; // try again on the next request
+    console.warn('[academy-db] seeding Postgres leads from the blob failed:', e?.message);
+  }
+}
+
+/** dual mode: keep the blob in step with Postgres (full live set). Best effort. */
+export async function mirrorLeadsToStorage() {
+  if (dataBackend() !== 'dual') return;
+  try {
+    const store = await pg.pgLoadLeadsStore();
+    await storageSaveLeads({ leads: store.leads });
+  } catch (e) {
+    console.warn('[academy-db] dual: mirroring leads to storage failed:', e?.message);
+  }
+}
+
 export async function loadLeadsStore() {
-  if (await usePostgres()) {
+  const pipe = await getLeadsPipeline().catch((e) => {
+    if (dataBackend() === 'postgres') throw e;
+    return null;
+  });
+  if (pipe) {
     try {
       return await pg.pgLoadLeadsStore();
     } catch (e) {
@@ -420,23 +516,29 @@ export async function loadLeadsStore() {
   return storageLoadLeads();
 }
 
-export async function saveLeadsStore(store) {
-  const dual = await useDualWrite();
-  const pgOn = await usePostgres();
+/**
+ * Full-set save. Blob: overwrite. Pipeline: matched leads overwritten, new leads inserted;
+ * leads absent from the set are soft-deleted only with opts.prune (CLI replace).
+ */
+export async function saveLeadsStore(store, opts = {}) {
+  const pipe = await getLeadsPipeline().catch((e) => {
+    if (dataBackend() === 'postgres') throw e;
+    return null;
+  });
   let updated_at = new Date().toISOString();
-  if (pgOn) {
+  if (pipe) {
     try {
-      updated_at = await pg.pgSaveLeadsStore(store);
+      updated_at = await pg.pgSaveLeadsStore(store, opts);
     } catch (e) {
       if (dataBackend() === 'postgres') throw e;
       console.warn('[academy-db] pg saveLeads failed:', e?.message);
     }
   }
-  if (dataBackend() !== 'postgres' || dual) {
+  if (!pipe || dataBackend() === 'dual') {
     try {
       updated_at = await storageSaveLeads(store);
     } catch (e) {
-      if (!pgOn) throw e;
+      if (!pipe) throw e;
       console.warn('[academy-db] storage saveLeads failed:', e?.message);
     }
   }
@@ -467,7 +569,7 @@ export async function saveActivitiesStore(store) {
       console.warn('[academy-db] pg saveActivities failed:', e?.message);
     }
   }
-  if (dataBackend() !== 'postgres' || dual) {
+  if (dataBackend() !== 'postgres' || dual || !pgOn) {
     try {
       updated_at = await storageSaveActivities(store);
     } catch (e) {
@@ -537,7 +639,7 @@ export async function savePracticeStore(store) {
       if (dataBackend() === 'postgres') throw e;
     }
   }
-  if (dataBackend() !== 'postgres' || dual) {
+  if (dataBackend() !== 'postgres' || dual || !pgOn) {
     try {
       updated_at = await storageSavePractice(store);
     } catch (e) {
