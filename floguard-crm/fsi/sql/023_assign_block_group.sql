@@ -6,11 +6,12 @@
 -- in SQL once nfip_claim_block_group has geometry (016 nfip_claim_bg_build_geom), so the claims
 -- load can be finished from the SQL editor.
 --
--- Method: a parcel's census tract is already known exactly (parcel_risk.census_tract, 11 digits),
--- and a block group is a subdivision of one tract. So candidates are only the block groups of
--- the parcel's own tract; among those take the polygon containing the parcel point, else the
--- nearest one (the stored polygons are generalised for the map, so a point within ~30 m of an
--- internal boundary can fall in a sliver). Parcels with no tract fall back to plain containment.
+-- Method: point-in-polygon against every block group (GiST on geom), so the answer does not
+-- depend on parcel_risk.census_tract. That column is NOT exact: scripts/join-census-tracts.mjs
+-- fills it from a 0.03 degree (~3 km) grid, so a parcel near a tract edge can carry a neighbour's
+-- tract. Parcels that land in no polygon (the stored outlines are generalised by ~30 m, which
+-- leaves slivers along shared edges and the coast) take the nearest block group within ~300 m;
+-- anything farther stays unassigned and keeps tract-level heat.
 -- Claims stay neighbourhood aggregates: this only labels which neighbourhood a parcel is in.
 
 create or replace function public.nfip_assign_parcel_block_groups(
@@ -29,36 +30,48 @@ begin
     raise exception 'bad bucket % of %', p_bucket, p_buckets;
   end if;
 
-  -- 1. Same-tract candidates: containing polygon first, else nearest.
+  -- 1. Containment across all block groups. A point on a shared edge can match two polygons:
+  --    take the lower GEOID so the result is deterministic.
+  update public.parcel_risk p
+     set block_group = c.block_group, updated_at = now()
+    from (
+      select p2.parcel_id, min(b.block_group) as block_group
+        from public.parcel_risk p2
+        join public.nfip_claim_block_group b
+          on b.geom is not null
+         and st_contains(b.geom, st_setsrid(st_makepoint(p2.lon, p2.lat), 4326))
+       where p2.lat is not null and p2.lon is not null
+         and (p_reassign or p2.block_group is null)
+         and abs(hashtext(p2.parcel_id)::bigint) % p_buckets = p_bucket
+       group by p2.parcel_id
+    ) c
+   where c.parcel_id = p.parcel_id
+     and p.block_group is distinct from c.block_group;
+  get diagnostics n = row_count;
+
+  -- 2. In no polygon: nearest block group within 0.003 degrees (~300 m). On a reassign, a parcel
+  --    that is in no polygon and near none loses its old label rather than keeping a stale one.
   update public.parcel_risk p
      set block_group = c.block_group, updated_at = now()
     from (
       select p2.parcel_id,
              (select b.block_group
                 from public.nfip_claim_block_group b
-               where b.tract = p2.census_tract and b.geom is not null
+               where b.geom is not null
+                 and st_dwithin(b.geom, st_setsrid(st_makepoint(p2.lon, p2.lat), 4326), 0.003)
                order by st_distance(b.geom, st_setsrid(st_makepoint(p2.lon, p2.lat), 4326)), b.block_group
                limit 1) as block_group
         from public.parcel_risk p2
-       where p2.census_tract is not null and p2.lat is not null and p2.lon is not null
-         and (p_reassign or p2.block_group is null)
+       where p2.lat is not null and p2.lon is not null
          and abs(hashtext(p2.parcel_id)::bigint) % p_buckets = p_bucket
+         and not exists (
+               select 1 from public.nfip_claim_block_group b2
+                where b2.geom is not null
+                  and st_contains(b2.geom, st_setsrid(st_makepoint(p2.lon, p2.lat), 4326)))
+         and (p_reassign or p2.block_group is null)
     ) c
    where c.parcel_id = p.parcel_id
-     and c.block_group is not null
      and p.block_group is distinct from c.block_group;
-  get diagnostics n = row_count;
-
-  -- 2. No tract on the parcel: plain containment across the county.
-  update public.parcel_risk p
-     set block_group = b.block_group, updated_at = now()
-    from public.nfip_claim_block_group b
-   where p.census_tract is null and p.lat is not null and p.lon is not null
-     and (p_reassign or p.block_group is null)
-     and abs(hashtext(p.parcel_id)::bigint) % p_buckets = p_bucket
-     and b.geom is not null
-     and st_contains(b.geom, st_setsrid(st_makepoint(p.lon, p.lat), 4326))
-     and p.block_group is distinct from b.block_group;
   get diagnostics n2 = row_count;
 
   return n + n2;

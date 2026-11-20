@@ -138,6 +138,9 @@ export async function main(argv = process.argv.slice(2)) {
   const since = sinceToYearStart(o.since);
   log(`NFIP claims -> block group (OpenFEMA ${o.apiVersion}, county ${COUNTY_FIPS}${since ? `, loss years >= ${since.year}` : ''}${o.dryRun ? ', DRY RUN' : ''})`);
 
+  if (o.emitSql && since) {
+    throw new Error('--emit-sql writes a full refresh; it cannot be combined with --since. Drop --since.');
+  }
   const db = o.dryRun || o.emitSql ? null : makeDb();
   if (db) log(`Target: ${db.url}`);
 

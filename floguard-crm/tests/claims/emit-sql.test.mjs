@@ -41,3 +41,16 @@ test('buildClaimsSqlFiles: counts before geometry, geometry split out, finish la
   assert.ok(!files[2].sql.includes('121270801002'), 'rows without geometry are skipped');
   assert.match(files[3].sql, /nfip_claim_bg_build_geom/);
 });
+
+test('--emit-sql with --since is rejected before any fetch', async () => {
+  const { main } = await import('../../scripts/ingest-nfip-claims.mjs');
+  const realFetch = globalThis.fetch;
+  let fetched = 0;
+  globalThis.fetch = async () => { fetched++; throw new Error('network must not be used'); };
+  try {
+    await assert.rejects(() => main(['--emit-sql', '/tmp/never-written', '--since', '2024']), /cannot be combined with --since/);
+    assert.equal(fetched, 0);
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+});
