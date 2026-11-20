@@ -3,7 +3,7 @@
 ## Business description (≤750 characters, no URLs or phone numbers per GBP rules)
 
 ```
-FloGuard LLC is a local drainage contractor in Port Orange serving Daytona Beach, Ormond Beach, and all of Volusia County. We fix standing water, soggy lawns, and flooding around homes with French drain installation, yard drainage and grading, sump pumps, and pump maintenance. Every job starts with a free on-site assessment: we walk the lot, check slope, soil, and water table, and find a legal discharge point before we quote. Florida's sandy soil, high water table, and summer storms call for drainage designed for this area, not a one-size-fits-all fix. We are owner-operated, explain the scope in plain language, and clean up when the job is done. Protect your foundation, landscaping, and peace of mind.
+FloGuard, LLC is a local drainage contractor in Port Orange serving Daytona Beach, Ormond Beach, and all of Volusia County. We fix standing water, soggy lawns, and flooding around homes with French drain installation, yard drainage and grading, sump pumps, and pump maintenance. Every job starts with a free on-site assessment: we walk the lot, check slope, soil, and water table, and find a legal discharge point before we quote. Florida's sandy soil, high water table, and summer storms call for drainage designed for this area, not a one-size-fits-all fix. We are owner-operated, explain the scope in plain language, and clean up when the job is done. Protect your foundation, landscaping, and peace of mind.
 ```
 
 (Current length: 710 characters. Keep it under 750 if edited.)

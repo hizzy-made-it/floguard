@@ -5,16 +5,14 @@ Use this block **exactly**, character for character, on every listing. Consisten
 ## Canonical NAP block
 
 ```
-FloGuard LLC
+FloGuard, LLC
 5114 S Ridgewood Ave
 Port Orange, FL 32127
-{{PHONE}}
+(386) 259-0023
 https://floguardfl.com
 ```
 
-> **Phone: Heath must confirm the public number before any listing goes live.** The site (`frontend/src/data/site.js`) and older docs currently show `(386) 259-0023`. Whatever number is chosen must match the site header, footer, LocalBusiness schema, and GBP exactly. If a call-tracking number is used, put it on GBP as primary and keep the main line as the additional number.
->
-> **Name:** older docs use "FloGuard, LLC" (with a comma). Pick one form and use it everywhere. This pack uses `FloGuard LLC`.
+> **Name/phone:** matched to the live Google Business Profile as of Nov 19 2026 — `FloGuard, LLC`, (386) 259-0023 (the Google Voice line that also appears on the site). GBP is the source of truth; if it changes, change this block.
 >
 > **Website:** always the apex `https://floguardfl.com` (www 301s to apex). Never list `https://www.floguardfl.com`.
 
@@ -37,7 +35,7 @@ French drains, yard drainage, grading, and sump pumps for homes in Port Orange, 
 
 **Long (≤500 chars)**
 ```
-FloGuard LLC is an owner-operated drainage contractor based in Port Orange, Florida. We install French drains, fix yard drainage and grading problems, and install and maintain sump pumps for homeowners in Daytona Beach, Ormond Beach, South Daytona, New Smyrna Beach, and across Volusia County. Every job starts with a free on-site assessment of slope, soil, and water table, so the fix is built for Florida's sandy soil and heavy summer storms.
+FloGuard, LLC is an owner-operated drainage contractor based in Port Orange, Florida. We install French drains, fix yard drainage and grading problems, and install and maintain sump pumps for homeowners in Daytona Beach, Ormond Beach, South Daytona, New Smyrna Beach, and across Volusia County. Every job starts with a free on-site assessment of slope, soil, and water table, so the fix is built for Florida's sandy soil and heavy summer storms.
 ```
 
 ## Categories per platform
