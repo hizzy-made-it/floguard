@@ -62,6 +62,23 @@ export const Seo = ({
   // Static index.html always ships homepage tags; without this, audits and some crawlers
   // report every URL as a homepage duplicate.
   useLayoutEffect(() => {
+    // createRoot (no hydration) appends React 19's hoisted <title>/meta next to the
+    // prerendered copies, so rendered DOM carried 2x <title> etc. Keep the last (React-owned)
+    // copy of each tag not covered by upsertHeadTag below.
+    [
+      "title",
+      'meta[name="googlebot"]',
+      'meta[property="og:site_name"]',
+      'meta[property="og:locale"]',
+      'meta[property="og:type"]',
+      'meta[name="twitter:card"]',
+      'meta[name="twitter:title"]',
+      'meta[name="twitter:description"]',
+      'meta[name="twitter:image"]',
+    ].forEach((sel) => {
+      const all = Array.from(document.head.querySelectorAll(sel));
+      all.slice(0, -1).forEach((n) => n.remove());
+    });
     document.title = title;
 
     upsertHeadTag('link[rel="canonical"]', () => {
