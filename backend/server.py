@@ -60,9 +60,19 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 logger = logging.getLogger(__name__)
 
 # ---- Email (Resend) ----
-RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
-SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'onboarding@resend.dev')
-LEAD_NOTIFICATION_EMAIL = os.environ.get('LEAD_NOTIFICATION_EMAIL', 'heath@hdconnex.com')
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '').strip()
+# Sender must be on a domain verified in Resend. The resend.dev sandbox sender only
+# delivers to the Resend account owner, so it silently drops real lead notifications.
+DEFAULT_SENDER_EMAIL = 'FloGuard Leads <leads@hdconnex.com>'
+_sender_env = os.environ.get('SENDER_EMAIL', '').strip()
+if not _sender_env or _sender_env.lower().endswith('@resend.dev') or _sender_env.lower().endswith('@resend.dev>'):
+    SENDER_EMAIL = DEFAULT_SENDER_EMAIL
+else:
+    SENDER_EMAIL = _sender_env
+# Comma-separated list. Every address gets each lead.
+LEAD_NOTIFICATION_EMAILS = [
+    e.strip() for e in os.environ.get('LEAD_NOTIFICATION_EMAIL', 'heath@hdconnex.com').split(',') if e.strip()
+]
 
 # ---- GridFS Storage (free using MongoDB, no extra paid services needed) ----
 APP_NAME = "floguard"
@@ -225,6 +235,9 @@ class Lead(BaseModel):
     source: str = "contact"
     status: str = "new"
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    # Set after the notification attempt; None means not attempted yet.
+    email_sent: Optional[bool] = None
+    email_error: str = ""
 
 
 class GuideRequest(BaseModel):
@@ -271,34 +284,44 @@ def build_lead_email(lead: Lead) -> str:
 
 
 async def send_lead_email(lead: Lead) -> bool:
-    """Returns True if email sent successfully. Always logs failures loudly for ops."""
+    """Email the lead to every LEAD_NOTIFICATION_EMAILS address. Records the outcome on the
+    lead document so failed notifications are visible in the admin data, not only in logs."""
+    ok, error = False, ""
     if not RESEND_API_KEY:
-        logger.error(
-            "LEAD_EMAIL_SKIPPED lead_id=%s reason=RESEND_API_KEY_missing source=%s",
-            lead.id,
-            lead.source,
-        )
-        return False
+        error = "RESEND_API_KEY missing"
+        logger.error("LEAD_EMAIL_SKIPPED lead_id=%s reason=RESEND_API_KEY_missing source=%s", lead.id, lead.source)
+    elif not LEAD_NOTIFICATION_EMAILS:
+        error = "LEAD_NOTIFICATION_EMAIL empty"
+        logger.error("LEAD_EMAIL_SKIPPED lead_id=%s reason=no_recipients source=%s", lead.id, lead.source)
+    else:
+        try:
+            import resend
+            resend.api_key = RESEND_API_KEY
+            label = "Guide download" if lead.source == "guide" else "Assessment request"
+            params = {
+                "from": SENDER_EMAIL,
+                "to": LEAD_NOTIFICATION_EMAILS,
+                "subject": f"New FloGuard lead: {lead.name} ({lead.location or 'FL'}) - {label}",
+                "html": build_lead_email(lead),
+            }
+            # Hitting Reply in your inbox goes straight to the homeowner.
+            if lead.email and "@" in lead.email:
+                params["reply_to"] = lead.email
+            await asyncio.to_thread(resend.Emails.send, params)
+            ok = True
+            logger.info("LEAD_EMAIL_SENT lead_id=%s source=%s", lead.id, lead.source)
+        except Exception as e:
+            error = str(e)[:500]
+            logger.error("LEAD_EMAIL_FAILED lead_id=%s source=%s error=%s", lead.id, lead.source, error)
     try:
-        import resend
-        resend.api_key = RESEND_API_KEY
-        params = {
-            "from": SENDER_EMAIL,
-            "to": [LEAD_NOTIFICATION_EMAIL],
-            "subject": f"New {lead.source} lead — {lead.name} ({lead.location or 'FL'})",
-            "html": build_lead_email(lead),
-        }
-        await asyncio.to_thread(resend.Emails.send, params)
-        logger.info("LEAD_EMAIL_SENT lead_id=%s source=%s", lead.id, lead.source)
-        return True
-    except Exception as e:
-        logger.error(
-            "LEAD_EMAIL_FAILED lead_id=%s source=%s error=%s",
-            lead.id,
-            lead.source,
-            str(e),
+        await db.leads.update_one(
+            {"id": lead.id},
+            {"$set": {"email_sent": ok, "email_error": error,
+                      "email_attempted_at": datetime.now(timezone.utc).isoformat()}},
         )
-        return False
+    except Exception as e:
+        logger.error("LEAD_EMAIL_STATUS_SAVE_FAILED lead_id=%s error=%s", lead.id, str(e))
+    return ok
 
 
 def generate_guide_pdf() -> bytes:
@@ -397,7 +420,13 @@ async def health():
     """Liveness + Mongo connectivity for uptime monitors."""
     try:
         await db.command("ping")
-        return {"status": "ok", "mongo": "up", "ts": datetime.now(timezone.utc).isoformat()}
+        return {
+            "status": "ok",
+            "mongo": "up",
+            # Booleans only: confirms lead email is wired without exposing config values.
+            "lead_email": {"api_key_set": bool(RESEND_API_KEY), "recipients": len(LEAD_NOTIFICATION_EMAILS)},
+            "ts": datetime.now(timezone.utc).isoformat(),
+        }
     except Exception as e:
         logger.error("HEALTH_CHECK_FAILED error=%s", str(e))
         raise HTTPException(status_code=503, detail="Database unavailable")
