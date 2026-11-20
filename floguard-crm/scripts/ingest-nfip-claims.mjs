@@ -22,6 +22,9 @@
  * Usage:
  *   node scripts/ingest-nfip-claims.mjs                       full run (needs fsi/sql/016 applied)
  *   node scripts/ingest-nfip-claims.mjs --dry-run             fetch + aggregate, print summary, write nothing
+ *   node scripts/ingest-nfip-claims.mjs --emit-sql out/claims  write SQL files instead of calling the database
+ *                                                          (no service key needed; apply them in the SQL editor,
+ *                                                          then fsi/sql/023's assign + 016's apply)
  *   node scripts/ingest-nfip-claims.mjs --since 2024          refresh nfip_claim_event for loss years >= 2024 only
  *   node scripts/ingest-nfip-claims.mjs --api-version v2      frozen legacy dataset (not recommended)
  *   flags: --years N (tract window, default 12)  --page N (default 5000, max 10000)
@@ -62,6 +65,7 @@ export function parseArgs(argv) {
     years: Number(opt('--years', '12')) || 12,
     page,
     dryRun: flag('--dry-run'),
+    emitSql: (() => { const i = argv.indexOf('--emit-sql'); return i >= 0 && argv[i + 1] ? argv[i + 1] : null; })(),
     noGeom: flag('--no-geom'),
     skipParcels: flag('--skip-parcels'),
     reassignAll: flag('--reassign-all'),
@@ -134,7 +138,10 @@ export async function main(argv = process.argv.slice(2)) {
   const since = sinceToYearStart(o.since);
   log(`NFIP claims -> block group (OpenFEMA ${o.apiVersion}, county ${COUNTY_FIPS}${since ? `, loss years >= ${since.year}` : ''}${o.dryRun ? ', DRY RUN' : ''})`);
 
-  const db = o.dryRun ? null : makeDb();
+  if (o.emitSql && since) {
+    throw new Error('--emit-sql writes a full refresh; it cannot be combined with --since. Drop --since.');
+  }
+  const db = o.dryRun || o.emitSql ? null : makeDb();
   if (db) log(`Target: ${db.url}`);
 
   log('OpenFEMA claims…');
@@ -190,6 +197,15 @@ export async function main(argv = process.argv.slice(2)) {
   log(`Block-group rows ${bgRows.length} (with claims ${bgRows.filter((r) => r.claim_count_all > 0).length}) · event rows ${evRows.length} · tract rows ${trRows.length}`);
   log('  hottest: ' + hot.map((r) => `${r.block_group} heat ${r.heat} (${r.claim_zone_x_10y} zone X / ${r.claim_sfha_10y} SFHA)`).join('; '));
 
+  if (o.emitSql) {
+    const { buildClaimsSqlFiles } = await import('./lib/claims-sql.mjs');
+    const fs = await import('node:fs');
+    fs.mkdirSync(o.emitSql, { recursive: true });
+    const files = buildClaimsSqlFiles({ bgRows, evRows, trRows });
+    for (const f of files) fs.writeFileSync(path.join(o.emitSql, f.name), f.sql);
+    log(`--emit-sql: wrote ${files.length} files to ${o.emitSql} (nothing sent to the database). Apply them in name order, then fsi/sql/023.`);
+    return;
+  }
   if (o.dryRun) {
     log('Dry run: nothing written.');
     return;
