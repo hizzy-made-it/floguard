@@ -1,4 +1,4 @@
--- 023: assign parcels to census block groups inside the database, and index the map search.
+-- 023: assign parcels to census block groups inside the database.
 -- Additive + idempotent.
 --
 -- Why: scripts/ingest-nfip-claims.mjs assigns parcel_risk.block_group by point-in-polygon over
@@ -71,20 +71,10 @@ grant execute on function public.nfip_assign_parcel_block_groups(integer, intege
 create index if not exists nfip_claim_block_group_tract_idx on public.nfip_claim_block_group (tract);
 
 -- Map search (api/fsi-parcels.js action 'search') does address/owner ILIKE '%term%' on 312k rows.
--- Trigram indexes turn that from a full scan into an index scan. Skipped quietly where pg_trgm
--- cannot be installed.
-do $$
-declare ext_schema text;
-begin
-  begin
-    create extension if not exists pg_trgm with schema extensions;
-  exception when others then
-    raise notice '023: pg_trgm not available (%), search stays a sequential scan', sqlerrm;
-    return;
-  end;
-  select n.nspname into ext_schema from pg_extension e join pg_namespace n on n.oid = e.extnamespace where e.extname = 'pg_trgm';
-  execute format('create index if not exists parcel_risk_address_trgm_idx on public.parcel_risk using gin (address %I.gin_trgm_ops)', ext_schema);
-  execute format('create index if not exists parcel_risk_owner_trgm_idx on public.parcel_risk using gin (owner_name %I.gin_trgm_ops)', ext_schema);
-end $$;
+-- Trigram GIN indexes were tried on 2026-11-19 and removed the same day: the nightly recompute
+-- rewrites every parcel row, and maintaining two GIN indexes on each rewrite costs more than the
+-- occasional full-scan search saves on this instance. Kept dropped here so a re-run stays clean.
+drop index if exists public.parcel_risk_address_trgm_idx;
+drop index if exists public.parcel_risk_owner_trgm_idx;
 
 notify pgrst, 'reload schema';
