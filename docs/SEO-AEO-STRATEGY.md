@@ -1,6 +1,6 @@
 # FloGuard SEO + AEO Strategy (Living Source of Truth)
 
-**Domain:** https://www.floguardfl.com  
+**Domain:** https://floguardfl.com  
 **Updated:** 2026-07-14  
 **Stack:** React CRA + FastAPI + MongoDB
 
@@ -38,15 +38,15 @@ Until CF policy matches the repo `public/robots.txt`, AEO citations will underpe
 
 ## GSC / Bing ops (required for indexing)
 
-1. Search Console property: `https://www.floguardfl.com`
-2. Submit sitemap: `https://www.floguardfl.com/sitemap.xml`
+1. Search Console: add a **Domain property** `floguardfl.com`, verified by DNS TXT record in Cloudflare (fallback: URL-prefix `https://floguardfl.com/`). Never add a `www` URL-prefix property — www 301s to the apex and would show no data.
+2. Submit sitemap: `https://floguardfl.com/sitemap.xml`
 3. URL Inspection → Request indexing for:
    - `/`
    - `/services/french-drains`, `/sump-pumps`, `/yard-drainage`, `/pump-maintenance`
    - `/areas/port-orange`, `/areas/daytona-beach`
    - `/blog/french-drain-cost-central-florida-2026`
 4. Bing Webmaster → import from GSC or submit same sitemap
-5. Optional: set `REACT_APP_GA_MEASUREMENT_ID` on Cloudflare Pages and rebuild
+5. Optional: set `REACT_APP_GA_MEASUREMENT_ID` on Cloudflare Pages and rebuild (GA4 web stream URL must be the apex `https://floguardfl.com`)
 
 ## Quality gates
 
