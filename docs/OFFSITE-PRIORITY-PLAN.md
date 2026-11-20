@@ -15,7 +15,7 @@ Work top-down. Do not skip GBP for content rewrites.
 2. Primary category: **Drainage contractor** (or closest Google allows)
 3. Secondary: landscaping / waterproofing / excavation-adjacent only if accurate
 4. Services with short descriptions: French drain, sump pump, yard drainage, pump maintenance
-5. Hours, phone `(386) 259-0023`, website `https://www.floguardfl.com`
+5. Hours, phone `(386) 259-0023`, website `https://floguardfl.com`
 6. **20+ photos**: before/after, crew, equipment, finished yards (use real job shots)
 7. Service area: Port Orange, Daytona Beach, New Smyrna, Ormond, Sanford, Orlando corridor, etc.
 8. Attributes: licensed/insured/warranty if true
@@ -55,10 +55,10 @@ Keep `COMPANY.rating` / `COMPANY.reviewCount` accurate when Google reviews grow.
 **Owner:** whoever owns Google accounts
 
 1. Open [Google Search Console](https://search.google.com/search-console)
-2. Add property: **Domain** `floguardfl.com` *or* URL-prefix `https://www.floguardfl.com`
-3. Verify (DNS TXT at registrar/Cloudflare is preferred for domain property)
-4. Submit sitemap: `https://www.floguardfl.com/sitemap.xml`
-5. Confirm preferred host (www vs non-www) matches production redirects
+2. Add a **Domain property** `floguardfl.com` (fallback only if DNS access is blocked: URL-prefix `https://floguardfl.com/`). **Never** add a `www` URL-prefix property — www 301s to the apex, so it would show no data.
+3. Verify via **DNS TXT record in Cloudflare** (DNS → Records → Add TXT at `@` with the Google value)
+4. Submit sitemap: `https://floguardfl.com/sitemap.xml`
+5. Canonical host is the **apex** `https://floguardfl.com` (www → apex 301 is live); canonicals, sitemap and schema already use the apex
 
 ### Pull real data (paste into chat or share access when ready)
 | Report | What we need |
@@ -80,7 +80,7 @@ FloGuard, LLC
 5114 S Ridgewood Ave
 Port Orange, FL 32127
 (386) 259-0023
-https://www.floguardfl.com
+https://floguardfl.com
 ```
 
 ### Citation order (first 15)

@@ -1,7 +1,7 @@
 # FloGuard SEO Execution Plan v2
 
 **Status:** Operational plan (replaces invalid “high volume 0–15 KD” draft)  
-**Domain:** https://www.floguardfl.com  
+**Domain:** https://floguardfl.com  
 **Business:** FloGuard, LLC — French drains, sump pumps, yard drainage (Central Florida)  
 **Type:** Hybrid local (Port Orange HQ + service-area cities)  
 **Updated:** 2026-07-14  
@@ -99,7 +99,7 @@ Home-service drainage wins in this order:
 6. **Reviews ≥1 every 18 days** (velocity matters as much as total).  
 7. **Exact NAP everywhere** (see citations checklist).  
 8. **No fake AggregateRating.** No invented prices in chatbot/AI copy.  
-9. **Canonical host:** `https://www.floguardfl.com` only.  
+9. **Canonical host:** `https://floguardfl.com` only.  
 
 ---
 
@@ -176,10 +176,10 @@ Re-validate volumes with DataForSEO/OpenSEO (national + Orlando DMA) before rank
 | # | Task | Owner | Done when |
 |---|------|--------|-----------|
 | 0.1 | **Cloudflare AI Crawl Control:** allow GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, PerplexityBot, Google-Extended (keep training-only blocks if desired) | Ops | Live `robots.txt` no longer Disallows those agents |
-| 0.2 | Confirm Sitemap line still present after CF managed robots | Ops | `Sitemap: https://www.floguardfl.com/sitemap.xml` live |
-| 0.3 | GSC property + sitemap submit + inspect top 10 money URLs | Marketing | All money URLs “Indexed” or clear fix path |
+| 0.2 | Confirm Sitemap line still present after CF managed robots | Ops | `Sitemap: https://floguardfl.com/sitemap.xml` live |
+| 0.3 | GSC **Domain property** `floguardfl.com` (DNS TXT in Cloudflare; fallback URL-prefix `https://floguardfl.com/`, never www) + sitemap submit + inspect top 10 money URLs | Marketing | All money URLs “Indexed” or clear fix path |
 | 0.4 | Bing Webmaster import/submit sitemap | Marketing | Sitemap accepted |
-| 0.5 | GA4: form submit + `tel:` click conversions | Dev | Events fire in DebugView |
+| 0.5 | GA4 (stream URL `https://floguardfl.com`): form submit + `tel:` click conversions | Dev | Events fire in DebugView |
 | 0.6 | Spreadsheet: reviews, citations, AI monitor, ranks | Marketing | Sheet live with baselines |
 | 0.7 | Snapshot GBP insights + review count/date | Marketing | Baseline row logged |
 

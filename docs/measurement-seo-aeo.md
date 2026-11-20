@@ -2,12 +2,13 @@
 
 ## Required Tools (Start Here)
 1. Google Search Console
-   - Add property: https://www.floguardfl.com
-   - Verify via DNS or HTML tag (use existing meta)
-   - Submit sitemap: https://www.floguardfl.com/sitemap.xml
+   - Add a **Domain property**: `floguardfl.com` (fallback: URL-prefix `https://floguardfl.com/`; never a `www` URL-prefix property — www 301s to the apex)
+   - Verify via DNS TXT record in Cloudflare
+   - Submit sitemap: https://floguardfl.com/sitemap.xml
    - Set up email alerts for errors
 
 2. Google Analytics 4
+   - Web data stream URL: `https://floguardfl.com` (apex, not www)
    - Link property to GSC
    - Enable enhanced measurement
    - Create custom events/conversions for:

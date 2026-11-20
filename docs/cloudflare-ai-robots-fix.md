@@ -2,7 +2,7 @@
 
 ## Problem
 
-Live `https://www.floguardfl.com/robots.txt` currently starts with **Cloudflare Managed Content** that **Disallows** the bots we need for AI citations:
+Live `https://floguardfl.com/robots.txt` currently starts with **Cloudflare Managed Content** that **Disallows** the bots we need for AI citations:
 
 - `ClaudeBot`, `GPTBot`, `Google-Extended`
 - `Applebot-Extended`, `CCBot`, `Bytespider`, `meta-externalagent`, `Amazonbot`
@@ -20,7 +20,7 @@ Our repo `frontend/public/robots.txt` **Allow**s those agents, but crawlers use 
 5. Confirm:
 
 ```bash
-curl -sL https://www.floguardfl.com/robots.txt
+curl -sL https://floguardfl.com/robots.txt
 ```
 
 You should **not** see a Cloudflare block of `GPTBot` / `ClaudeBot` / `Google-Extended` at the top. Origin Allow rules (or a clean CF allow list) should apply.

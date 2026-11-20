@@ -1,7 +1,7 @@
 # FloGuard Elite SEO + AEO Gameplan
 
 **Status:** Active command center for ranking ASAP  
-**Domain:** https://www.floguardfl.com  
+**Domain:** https://floguardfl.com  
 **Business:** FloGuard, LLC — French drains, sump pumps, yard drainage (Central Florida)  
 **HQ:** Port Orange, FL · Serves Volusia → Seminole → Orange corridor  
 **Updated:** 2026-07-14  
@@ -45,7 +45,7 @@
 4. **No city×service matrix** until hubs get GSC impressions. Cap first batch at 6.  
 5. **Hard stop at 30+ thin location URLs.**  
 6. **No fake AggregateRating / invented chatbot prices.**  
-7. **Canonical:** `https://www.floguardfl.com` only.  
+7. **Canonical:** `https://floguardfl.com` only.  
 
 ---
 
@@ -124,11 +124,11 @@ Goal: **index + trust + Pack motion**, not “publish 10 blogs.”
 | # | Task | Done when |
 |---|------|-----------|
 | 1 | Cloudflare AI Crawl Control: allow GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, PerplexityBot, Google-Extended | Live robots no longer Disallow those agents |
-| 2 | Confirm live `Sitemap: https://www.floguardfl.com/sitemap.xml` | Line present |
-| 3 | GSC property + submit sitemap | Sitemap accepted |
+| 2 | Confirm live `Sitemap: https://floguardfl.com/sitemap.xml` | Line present |
+| 3 | GSC **Domain property** `floguardfl.com` (DNS TXT in Cloudflare; never www URL-prefix) + submit sitemap | Sitemap accepted |
 | 4 | URL Inspection → Request indexing on **Top 12 money URLs** (below) | Requested |
 | 5 | Bing Webmaster import from GSC or submit sitemap | Accepted |
-| 6 | GA4: form submit + `tel:` click as conversions | DebugView green |
+| 6 | GA4 (stream URL `https://floguardfl.com`): form submit + `tel:` click as conversions | DebugView green |
 
 **Top 12 money URLs to force-index:**
 
