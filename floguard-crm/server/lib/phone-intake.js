@@ -11,6 +11,7 @@
  */
 import { loadLeadsStore, saveLeadsStore } from './academy-db.js';
 import { sendSms } from './twilio.js';
+import { notifyNewLead } from './notify.js';
 
 export const DEFAULT_AUTO_SMS =
   "Hi, it's Heath with FloGuard. Sorry we missed your call! The first step is a quick form at " +
@@ -89,6 +90,7 @@ export async function upsertPhoneLead({ phone, callerName, city, note, patch = {
   }
   while (leads.length > MAX_LEADS) leads.shift();
   await saveLeadsStore({ ...store, leads });
+  if (created) await notifyNewLead({ source: 'phone', name: lead.name, phone: lead.phone, city: lead.city, message: note });
   return { lead, created };
 }
 
