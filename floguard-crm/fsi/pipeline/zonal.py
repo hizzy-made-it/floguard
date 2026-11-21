@@ -50,6 +50,7 @@ class ZonalResult:
     depr_frac: float | None
     dem_1m_frac: float | None
     dem_res_m: float | None
+    hand_area_fraction: float | None = None
 
     def row(self) -> dict:
         return asdict(self)
@@ -183,6 +184,7 @@ def zonal_parcel(parcel_id: str, geom, arrays: dict[str, np.ndarray], transform:
         elev_p10_m=wq("elev", 0.10), elev_med_m=wq("elev", 0.50),
         twi_max=ext("twi", np.max), twi_awm=wmean("twi"),
         hand_min_m=ext("hand", np.min),
+        hand_area_fraction=float(w[np.isfinite(sub["hand"])].sum() / w.sum()) if "hand" in sub else None,
         depr_max_m=ext("depr", np.max), depr_frac=depr_frac,
         dem_1m_frac=dem_1m_frac, dem_res_m=dem_res,
     )
