@@ -329,7 +329,21 @@ def cmd_terrain(a):
     if a.only:
         keep = set(a.only.split(","))
         tiles = [t for t in tiles if t.huc12 in keep or t.key in keep]
-    diag = run_tiles(_inputs(a, plan), DiskStore(DATA / "tiles"), tiles, p, log=log)
+    preview_marker = DATA / "SHARED_REGION_PREVIEW"
+    if a.shared_region:
+        from .terrain_region import run_shared_region
+
+        if a.only:
+            raise ValueError("--shared-region needs the full pilot plan, not --only")
+        # Do not allow a preview to reuse or overwrite existing tiled outputs.
+        if (DATA / "tiles").exists():
+            raise ValueError("--shared-region needs a fresh pilot data directory without tiles")
+        preview_marker.touch()
+        diag = run_shared_region(_inputs(a, plan), DiskStore(DATA / "tiles"), tiles, p, log=log)
+    else:
+        if preview_marker.exists():
+            raise ValueError("shared-region pilot cache cannot be reused for tiled terrain")
+        diag = run_tiles(_inputs(a, plan), DiskStore(DATA / "tiles"), tiles, p, log=log)
     (DATA / "terrain_diag.json").write_text(json.dumps({**diag, "tile_keys": [t.key for t in tiles]}))
 
 
@@ -341,6 +355,8 @@ def cmd_zonal(a):
     store = DiskStore(DATA / "tiles")
     diag_path = DATA / "terrain_diag.json"
     diag = json.loads(diag_path.read_text()) if diag_path.exists() else {}
+    if (DATA / "SHARED_REGION_PREVIEW").exists() and diag.get("conditioning") != "shared_region_preview":
+        raise ValueError("shared-region pilot is incomplete; start a fresh terrain run")
     seam_status = flow_seam_status(diag)
     diagnosed = set(diag.get("tile_keys", []))
     parcels = gpd.read_file(DATA / "parcels.gpkg", layer="parcels").to_crs(SRC.UTM17)
@@ -576,10 +592,29 @@ def cmd_assemble(a):
     ten = load_ten_m(sorted(Path(a.compare_10m).glob("parcel_terrain_*.csv"))) if a.compare_10m else None
     plan = json.loads((DATA / "plan.json").read_text())
     rows = assemble(z, soils, street, geoms, ten, plan["cell"], a.tag)
-    parts = write_release(rows, RELEASE / a.tag)
+    diag_path = DATA / "terrain_diag.json"
+    diag = json.loads(diag_path.read_text()) if diag_path.exists() else {}
+    preview = (DATA / "SHARED_REGION_PREVIEW").exists() or diag.get("conditioning") == "shared_region_preview"
+    out_dir = RELEASE / a.tag
+    if preview:
+        out_dir.mkdir(parents=True, exist_ok=True)
+        if list(out_dir.glob("parcel_terrain_v2_*.json")):
+            raise ValueError("preview cannot share a release directory with uploadable terrain")
+        # Comparison only: omit uploadable JSON parts and mark the output.
+        preview_rows = pd.DataFrame(rows).rename(columns={
+            "fsi_confidence": "uncalibrated_input_index",
+            "_static_v2_no_zone": "uncalibrated_static_index",
+        })
+        preview_rows["hand_area_fraction"] = [r.get("hand_area_fraction") for r in z]
+        preview_rows.to_csv(out_dir / "parcel_terrain_shared_preview.csv", index=False)
+        parts = []
+    else:
+        parts = write_release(rows, out_dir)
     conf = np.array([r["fsi_confidence"] for r in rows])
     summary = {"parcels": len(rows), "parts": [p.name for p in parts],
-               "confidence_p10_50_90": np.percentile(conf, [10, 50, 90]).round(3).tolist() if len(conf) else None,
+               ("uncalibrated_input_index_p10_50_90" if preview else "confidence_p10_50_90"):
+                   np.percentile(conf, [10, 50, 90]).round(3).tolist() if len(conf) else None,
+               **({"shared_region_preview": True, "uploadable": False} if preview else {}),
                **resolution_summary(rows)}
     (RELEASE / a.tag / "summary.json").write_text(json.dumps(summary, indent=1))
     log(f"release {a.tag}: {summary}")
@@ -599,6 +634,7 @@ def main():
     ap.add_argument("--chunk-m", type=float, default=CHUNK_M)
     ap.add_argument("--max-breach-m", type=float, default=40.0)
     ap.add_argument("--stream-area-m2", type=float, default=250_000.0)
+    ap.add_argument("--shared-region", action="store_true", help="bounded shared-surface terrain preview; use a fresh pilot data directory")
     ap.add_argument("--only", help="terrain: comma list of huc12 or tile keys (pilot runs)")
     ap.add_argument("--flowlines", type=Path)
     ap.add_argument("--culverts", type=Path, help="county stormwater culverts/pipes (lines)")
