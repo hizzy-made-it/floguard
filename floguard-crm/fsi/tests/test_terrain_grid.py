@@ -36,6 +36,7 @@ def test_source_grid_and_effective_resolution_are_distinct():
 def test_seam_tolerance_not_reported_as_exact():
     assert flow_seam_status({"residual_cells": 0, "residual_mfd_cells": 0.00009}) == "residual"
     assert flow_seam_status({"residual_cells": 0, "residual_mfd_cells": 0}) == "converged"
+    assert flow_seam_status({"residual_cells": 0, "residual_mfd_cells": 0, "seam_new_sink_cells": 1}) == "seam_sinks"
     assert flow_seam_status({"residual_cells": 0}) == "unknown"
 
 

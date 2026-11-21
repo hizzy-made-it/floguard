@@ -107,3 +107,44 @@ def test_hand_paths_linked_across_tiles():
     assert np.isnan(h[:, :76]).sum() == 0
     assert np.nanmax(np.abs(h - h1)) < 1e-6
     assert h[20, 5] == pytest.approx(dem[20, 5] - (dem[20, 78] - p.nhd_burn_m), abs=0.05)   # channel burned 1 m
+
+def test_inconsistent_tile_halos_cannot_recirculate_one_cell_of_flow(monkeypatch):
+    # Tile A thinks its east neighbour is lower, while tile B thinks its west
+    # neighbour is lower. Both of those conditional views are individually DAGs;
+    # composing their outgoing edges without reconciling creates A <-> B.
+    dem = np.array([[4.0, 3.0]])
+    views = iter([np.array([[4.0, 1.0]]), np.array([[2.0, 3.0]])])
+
+    def condition(dem, valid, **_):
+        routing = next(views)
+        return {"routing": routing, "basin_dem": dem, "breached": dem, "n_breached": 0}
+
+    monkeypatch.setattr(T.H, "condition_dem", condition)
+    labels = np.array([[1, 2]])
+    p = T.TerrainParams(halo_m=1, propagate_max_rounds=3, stream_area_m2=2)
+    tiles, lookup = T.tiles_from_labels(labels, p.halo_cells)
+    store = T.MemoryStore()
+    diag = T.run_tiles(T.ArrayInputs(dem, labels, label_of_key=lookup), store, tiles, p, log=lambda _: None)
+    assert diag["residual_cells"] == diag["residual_mfd_cells"] == 0.0
+    for layer in ("acc_d8_final", "acc_mfd_final"):
+        np.testing.assert_allclose(T.mosaic(store, tiles, layer, dem.shape), [[1.0, 2.0]])
+    # HAND consumes the same stitched potential and finds the actual channel.
+    np.testing.assert_allclose(T.mosaic(store, tiles, "hand", dem.shape), [[1.0, 0.0]])
+
+def test_reconciled_seam_sink_does_not_invent_a_hand_channel(monkeypatch):
+    dem = np.array([[4.0, 4.0]])
+    views = iter([np.array([[4.0, 1.0]]), np.array([[2.0, 4.0]])])
+
+    def condition(dem, valid, **_):
+        return {"routing": next(views), "basin_dem": dem, "breached": dem, "n_breached": 0}
+
+    monkeypatch.setattr(T.H, "condition_dem", condition)
+    p = T.TerrainParams(halo_m=1, propagate_max_rounds=3, stream_area_m2=2)
+    tiles, lookup = T.tiles_from_labels(np.array([[1, 2]]), p.halo_cells)
+    store = T.MemoryStore()
+    diag = T.run_tiles(T.ArrayInputs(dem, np.array([[1, 2]]), label_of_key=lookup),
+                       store, tiles, p, log=lambda _: None)
+    assert diag["residual_cells"] == diag["residual_mfd_cells"] == 0.0
+    assert diag["seam_new_sink_cells"] == diag["hand_unresolved_cells"] == 2
+    np.testing.assert_allclose(T.mosaic(store, tiles, "acc_d8_final", dem.shape), [[1.0, 1.0]])
+    assert np.isnan(T.mosaic(store, tiles, "hand", dem.shape)).all()

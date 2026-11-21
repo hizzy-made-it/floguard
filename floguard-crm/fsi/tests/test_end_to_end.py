@@ -30,7 +30,13 @@ def run(tmp_path_factory):
     p = T.TerrainParams(cell_m=1.0, halo_m=15, stream_area_m2=1500)
     tiles, lk = T.tiles_from_labels(labels, p.halo_cells, {1: "030802010101_0_0", 2: "030802010102_0_0"})
     st = T.MemoryStore()
-    T.run_tiles(T.ArrayInputs(dem, labels, 1.0, srcres=src, label_of_key=lk), st, tiles, p, log=lambda m: None)
+    # Give the artificial bowl a surveyed channel, rather than relying on
+    # a crossing loop to become a channel by exceeding the area threshold.
+    stream = np.zeros(dem.shape, dtype=bool)
+    stream[55, 50:] = True
+    diag = T.run_tiles(T.ArrayInputs(dem, labels, 1.0, srcres=src, flowlines=stream, label_of_key=lk),
+                       st, tiles, p, log=lambda m: None)
+    assert diag["residual_cells"] == diag["residual_mfd_cells"] == 0.0
     lots = {}
     for i, r0 in enumerate(range(26, 74, 12)):
         for j, c0 in enumerate(range(26, 110, 12)):
@@ -45,7 +51,7 @@ def run(tmp_path_factory):
             r, c = int(-pt.y) - t.row_off, int(pt.x) - t.col_off
             if 0 <= r < t.height and 0 <= c < t.width and core[r, c]:
                 z = Z.zonal_parcel(pid, g, arr, wt).row()
-                z.update(huc12=t.key.split("_")[0], nhd=False, culverts_or_inlets=False)
+                z.update(huc12=t.key.split("_")[0], nhd=True, culverts_or_inlets=False)
                 rows.append(z)
     road = LineString([(0, -23), (120, -23)])
     xy = NB.sample_lines([road])

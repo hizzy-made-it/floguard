@@ -129,7 +129,12 @@ Sanity checks before uploading:
   A 2 m processing grid can use 1 m source LiDAR, and a 1 m grid can use 10 m source data.
   `dem_1m_share` remains a compatibility alias for source coverage only. For a mixed-grid run,
   run zonal separately for each processing plan and preserve `grid_cell_m` when combining CSVs.
-- `flow_seam_status_counts`: review residual and unknown counts before any model activation.
+- `flow_seam_status_counts`: review residual, seam-sink and unknown counts before any model activation.
+  Use the same owner-defined routing elevation in every overlapping valid halo
+  to avoid cross-tile recirculation. This may expose boundary sinks where tile
+  conditioning disagrees. Check `seam_new_sink_cells`, `seam_max_routing_shift_m`,
+  HAND coverage, and any tolerance-discarded area; zero pending flow alone
+  is not validation of the stitched hydrology.
   A nonzero D8 or MFD residual means that flow accumulation did not finish across the
   processed tile group. It does not identify exactly which individual parcels are affected.
   Reprocess the affected groups and review residuals and parcel-level deltas before switching.
