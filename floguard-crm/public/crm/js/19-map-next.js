@@ -725,7 +725,9 @@ function mnSearchRender(state){
  const list=mnEl('fsiMapSearchResults'); if(!list) return;
  const items=MN.search.items;
  if(state==='loading'&&!items.length){ list.innerHTML='<div class="sr-empty">Searching…</div>'; mnSearchOpen(true); return; }
+ const timeout='<div class="sr-empty">County-wide search did not finish. Try a parcel ID or a full street address.</div>';
  if(state==='error'){ list.innerHTML='<div class="sr-empty">Search failed. Try again.</div>'; mnSearchOpen(true); return; }
+ if(state==='timeout'&&!items.length){ list.innerHTML=timeout; mnSearchOpen(true); return; }
  if(!items.length){ list.innerHTML='<div class="sr-empty">No parcel matches. Try the street number and name.</div>'; mnSearchOpen(true); return; }
  list.innerHTML=items.map(function(p,i){
   const inList=!!_fsiState.filtered.find(function(x){ return String(x.parcel_id)===String(p.parcel_id); });
@@ -733,7 +735,7 @@ function mnSearchRender(state){
    '<div class="sr-addr">'+esc(p.address||('Parcel '+p.parcel_id))+'</div>'+
    '<div class="sr-meta">'+(p.owner_name?esc(p.owner_name)+' · ':'')+esc(String(p.parcel_id))+
    (p.fsi_live!=null?' · <span class="num">FSI '+esc(fsiNum(p.fsi_live))+'</span>':'')+(inList?' · <span class="sr-in">in list</span>':'')+'</div></div>';
- }).join('')+(state==='loading'?'<div class="sr-empty">Searching…</div>':'');
+ }).join('')+(state==='loading'?'<div class="sr-empty">Searching…</div>':state==='timeout'?timeout:'');
  mnSearchOpen(true);
 }
 function mnSearchLocal(q){
@@ -744,6 +746,7 @@ function mnSearchLocal(q){
 }
 function mnSearchRun(q){
  q=String(q||'').trim();
+ const seq=++MN.search.seq;
  if(MN.search.ctl) try{ MN.search.ctl.abort(); }catch(e){}
  if(q.length<2){ MN.search.items=[]; mnSearchOpen(false); return; }
  MN.search.items=mnSearchLocal(q);
@@ -751,7 +754,6 @@ function mnSearchRun(q){
  mnSearchRender('loading');
  const ctl=(typeof AbortController!=='undefined')?new AbortController():null;
  MN.search.ctl=ctl;
- const seq=++MN.search.seq;
  fsiFetch({action:'search', q:q}, ctl&&ctl.signal).then(function(data){
   if(seq!==MN.search.seq) return;
   const seen=new Set(MN.search.items.map(function(p){ return String(p.parcel_id); }));
@@ -764,7 +766,7 @@ function mnSearchRun(q){
  }).catch(function(err){
   if(err&&err.name==='AbortError') return;
   if(seq!==MN.search.seq) return;
-  mnSearchRender(MN.search.items.length?'done':'error');
+  mnSearchRender(err&&err.code==='parcel_search_timeout'?'timeout':MN.search.items.length?'done':'error');
  });
 }
 /** Put a found parcel into the working set (if needed), fly to it and open its detail. */
@@ -781,7 +783,7 @@ function mnPick(p){
  fsiSelect(id,{fly:true, zoom:17});
 }
 function mnSearchById(id){
- fsiFetch({action:'search', q:String(id)}).then(function(data){
+ fsiFetch({action:'search', q:String(id), mode:'parcel_id'}).then(function(data){
   const p=(data&&data.parcels||[]).find(function(x){ return String(x.parcel_id)===String(id); });
   if(p) mnPick(p);
  }).catch(function(){});
@@ -1032,7 +1034,9 @@ function mnSyncOpInputs(){
   inp.addEventListener('input',function(){
    const v=this.value;
    clearTimeout(MN.search.timer);
-   MN.search.timer=setTimeout(function(){ mnSearchRun(v); }, 250);
+   ++MN.search.seq;
+   if(MN.search.ctl) MN.search.ctl.abort();
+   MN.search.timer=setTimeout(function(){ mnSearchRun(v); }, 450);
   });
   inp.addEventListener('focus',function(){ if(MN.search.items.length&&this.value.trim().length>=2) mnSearchRender('done'); });
   inp.addEventListener('keydown',function(e){

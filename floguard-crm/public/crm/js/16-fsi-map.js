@@ -218,7 +218,9 @@ async function fsiFetch(payload, signal){
  const raw=await r.text(); let data=null; try{data=JSON.parse(raw);}catch(e){}
  if(!r.ok){
   const err=(data&&(data.hint?(data.error+' — '+data.hint):(data.detail||data.error)))||('Error '+r.status);
-  throw new Error(typeof err==='string'?err:JSON.stringify(err));
+  const failure=new Error(typeof err==='string'?err:JSON.stringify(err));
+  failure.code=data&&data.code;
+  throw failure;
  }
  return data;
 }
