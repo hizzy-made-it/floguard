@@ -36,6 +36,7 @@ from . import config_v2 as C2
 from . import hydro as H
 from . import neighbors as NB
 from . import sources as SRC
+from .terrain_grid import flow_seam_status, grid_cell, resolution_summary
 from . import zonal as Z
 from .terrain_v2 import DiskStore, TerrainParams, Tile, run_tiles, window_from_cores
 
@@ -329,7 +330,7 @@ def cmd_terrain(a):
         keep = set(a.only.split(","))
         tiles = [t for t in tiles if t.huc12 in keep or t.key in keep]
     diag = run_tiles(_inputs(a, plan), DiskStore(DATA / "tiles"), tiles, p, log=log)
-    (DATA / "terrain_diag.json").write_text(json.dumps(diag))
+    (DATA / "terrain_diag.json").write_text(json.dumps({**diag, "tile_keys": [t.key for t in tiles]}))
 
 
 def cmd_zonal(a):
@@ -338,6 +339,10 @@ def cmd_zonal(a):
 
     plan = json.loads((DATA / "plan.json").read_text())
     store = DiskStore(DATA / "tiles")
+    diag_path = DATA / "terrain_diag.json"
+    diag = json.loads(diag_path.read_text()) if diag_path.exists() else {}
+    seam_status = flow_seam_status(diag)
+    diagnosed = set(diag.get("tile_keys", []))
     parcels = gpd.read_file(DATA / "parcels.gpkg", layer="parcels").to_crs(SRC.UTM17)
     parcels["rep"] = parcels.geometry.representative_point()
     rep = gpd.GeoDataFrame(parcels[["parcel_id"]], geometry=parcels["rep"], crs=SRC.UTM17)
@@ -370,7 +375,8 @@ def cmd_zonal(a):
                 if len(cand):
                     fp = cand.geometry.union_all()
             r = Z.zonal_parcel(pid, g, arrays, tr, fp).row()
-            r.update(huc12=tile.huc12, nhd=meta.get("has_flowlines", False),
+            r.update(huc12=tile.huc12, grid_cell_m=plan["cell"], nhd=meta.get("has_flowlines", False),
+                     flow_seam_status=seam_status if tile.key in diagnosed else "unknown",
                      culverts_or_inlets=bool(meta.get("n_culverts") or meta.get("has_inlets")))
             rows.append(r)
             done.add(pid)
@@ -438,6 +444,7 @@ def pct_rank(v: np.ndarray) -> np.ndarray:
 def assemble(zonal_rows, soils: dict, street_xyz, parcel_geoms: dict, ten_m: dict | None,
              cell_m: float, release_tag: str) -> list[dict]:
     """Pure table step (unit-tested): neighbours, normalisation, v2 static, confidence."""
+    cells = [grid_cell(r.get("grid_cell_m"), fallback=cell_m) for r in zonal_rows]
     ids = [r["parcel_id"] for r in zonal_rows]
     em = np.array([np.nan if r.get("elev_med_m") is None else r["elev_med_m"] for r in zonal_rows], float)
     nbr = NB.neighbour_relative(ids, [parcel_geoms[i] for i in ids], em, street_xyz)
@@ -477,13 +484,14 @@ def assemble(zonal_rows, soils: dict, street_xyz, parcel_geoms: dict, ten_m: dic
         conf = CF.fsi_confidence(dem_1m_frac=r.get("dem_1m_frac"), geom_mode=r.get("geom_mode"),
                                  soil_cov=so.get("soil_cov"), nhd=r.get("nhd"),
                                  culverts_or_inlets=r.get("culverts_or_inlets"), rank_diffs=rd,
-                                 area_m2=r.get("area_m2"), cell_m=cell_m)
+                                 area_m2=r.get("area_m2"), cell_m=cells[k])
         s2 = C2.static_score_v2(tn, hn, dn, nb.get("nbr_rel_m"), nb.get("street_rel_m"), so.get("hsg_eff"),
                                 so.get("drain_class"), so.get("ksat_um_s"), so.get("wt_depth_m"), None)
         inputs = CF.fsi_inputs(
             model="terrain-v2", release=release_tag, huc12=r.get("huc12"),
             dem=("3dep_1m" if (r.get("dem_1m_frac") or 0) >= 0.5 else "3dep_13"),
-            dem_res_m=r.get("dem_res_m"), dem_1m_frac=_r3(r.get("dem_1m_frac")),
+            dem_res_m=r.get("dem_res_m"), grid_cell_m=cells[k], dem_1m_frac=_r3(r.get("dem_1m_frac")),
+            flow_seam_status=r.get("flow_seam_status", "unknown"),
             geom=r.get("geom_mode"), yard_only=r.get("yard_only"),
             nhd_burn=bool(r.get("nhd")), culverts_or_inlets=bool(r.get("culverts_or_inlets")),
             soil=("ssurgo_sda" if so else None), soil_cov=_r3(so.get("soil_cov")),
@@ -556,7 +564,9 @@ def cmd_assemble(a):
     import geopandas as gpd
     import pandas as pd
 
-    z = pd.read_csv(DATA / "zonal.csv").replace({np.nan: None}).to_dict("records")
+    z = pd.read_csv(DATA / "zonal.csv", dtype={"parcel_id": str, "huc12": str}).replace({np.nan: None}).to_dict("records")
+    if any(r.get("grid_cell_m") is None for r in z):
+        raise ValueError("zonal.csv lacks per-parcel grid_cell_m; rerun zonal on each original processing plan before assembly")
     soils = json.loads((DATA / "parcel_soils.json").read_text()) if (DATA / "parcel_soils.json").exists() else {}
     street = np.load(DATA / "street_pts.npy") if (DATA / "street_pts.npy").exists() else None
     parcels = gpd.read_file(DATA / "parcels.gpkg", layer="parcels").to_crs(SRC.UTM17)
@@ -570,7 +580,7 @@ def cmd_assemble(a):
     conf = np.array([r["fsi_confidence"] for r in rows])
     summary = {"parcels": len(rows), "parts": [p.name for p in parts],
                "confidence_p10_50_90": np.percentile(conf, [10, 50, 90]).round(3).tolist() if len(conf) else None,
-               "dem_1m_share": float(np.mean([(r["dem_1m_frac"] or 0) >= 0.5 for r in rows])) if rows else None}
+               **resolution_summary(rows)}
     (RELEASE / a.tag / "summary.json").write_text(json.dumps(summary, indent=1))
     log(f"release {a.tag}: {summary}")
 

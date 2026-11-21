@@ -125,7 +125,14 @@ Output: `data/v2/release/<tag>/parcel_terrain_v2.csv` (human), `parcel_terrain_v
 (10k rows each, for SQL), `summary.json`.
 
 Sanity checks before uploading:
-- `summary.json`: parcels ≈ 312k; `dem_1m_share` > 0.95 (Volusia is fully covered by 2017-2018 LiDAR).
+- `summary.json`: report `dem_source_1m_share` separately from `effective_1m_share`.
+  A 2 m processing grid can use 1 m source LiDAR, and a 1 m grid can use 10 m source data.
+  `dem_1m_share` remains a compatibility alias for source coverage only. For a mixed-grid run,
+  run zonal separately for each processing plan and preserve `grid_cell_m` when combining CSVs.
+- `flow_seam_status_counts`: review residual and unknown counts before any model activation.
+  A nonzero D8 or MFD residual means that flow accumulation did not finish across the
+  processed tile group. It does not identify exactly which individual parcels are affected.
+  Reprocess the affected groups and review residuals and parcel-level deltas before switching.
 - `confidence_p10_50_90` — expect a median around 0.8; a median under 0.6 means an input is missing.
 - Open the CSV, sort by `depr_v2_n` and `nbr_rel_m`; the top rows should be lots you would expect to hold water (Deltona / Orange City basins, older Daytona grid streets). If the top is all lots next to highway fill, culverts are missing.
 

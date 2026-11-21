@@ -96,6 +96,17 @@ test('claimsLine: block-group first, tract fallback, never personal', () => {
   for (const t of [bg.text, tract.text]) assert.doesNotMatch(t, /\byou\b|owner filed|your claim/i);
 });
 
+test('v2Rows: keep source LiDAR and the processing grid distinct', () => {
+  const describe = (fsi_inputs) => plain(P.v2Rows({ dem_res_m: 1, fsi_inputs }).map(({ label, value }) => [label, value]));
+  const archive = { release: 'terrain-v2-corridor-2026-11-20', huc12: '030802010700' };
+  assert.deepEqual(describe({ ...archive, huc12: 30802010700 }), describe(archive));
+  assert.deepEqual(describe(archive), [['Elevation data source', '1 m LiDAR'], ['Terrain processing grid', '2 m']]);
+  assert.deepEqual(describe({ ...archive, huc12: '030802010100' }).at(-1), ['Terrain processing grid', '1 m']);
+  assert.deepEqual(describe({ ...archive, grid_cell_m: 3 }).at(-1), ['Terrain processing grid', '3 m']);
+  assert.deepEqual(describe({ ...archive, release: 'future-release' }), [['Elevation data source', '1 m LiDAR']]);
+  assert.deepEqual(describe({ ...archive, grid_cell_m: 0 }), [['Elevation data source', '1 m LiDAR']]);
+});
+
 test('v2Rows / inputsList: render present fields only', () => {
   assert.deepEqual(plain(P.v2Rows({})), []);
   const rows = P.v2Rows({ nbr_rel_m: -0.42, wt_depth_m: 0.6, dem_res_m: 1, drain_class: 'Poorly drained', twi_v2_n: null });
