@@ -21,7 +21,7 @@ hero blending into a clean, trust-focused light body. Phone (386) 259-0023, 5.0 
   surface/navy/slate/orange/lime); light theme HSL vars in `index.css`.
 - 3D: `components/three/FlowHero.jsx` (transparent canvas over a cinematic CSS backdrop so the hero is
   premium even before WebGL paints) + `MiniShield.jsx` on Contact.
-- Backend: `POST/GET /api/leads` (Mongo `leads`), Resend email best-effort (`send_lead_email`), status routes.
+- Backend: `POST/GET /api/leads` (Mongo `leads`), Resend lead email (`send_lead_email`) from a verified hdconnex.com sender to `LEAD_NOTIFICATION_EMAIL` (comma list), Reply-To = homeowner; outcome saved as `email_sent`/`email_error` on the lead; `/api/health` reports `lead_email.api_key_set`.
 
 ## Pages / Components implemented (2026-07-07)
 - **Home**: 3D hero + CTAs, animated StatsBar counters, Problem section, How-It-Works FlowPath + diagram,
