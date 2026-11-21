@@ -23,7 +23,9 @@ def flow_seam_status(diag):
     rem = [diag.get("residual_cells"), diag.get("residual_mfd_cells")]
     if any(not isinstance(x, (float, int)) or not isfinite(x) or x < 0 for x in rem):
         return "unknown"
-    return "residual" if any(x > 0 for x in rem) else "converged"
+    if any(x > 0 for x in rem):
+        return "residual"
+    return "seam_sinks" if diag.get("seam_new_sink_cells", 0) else "converged"
 
 
 def resolution_summary(rows):

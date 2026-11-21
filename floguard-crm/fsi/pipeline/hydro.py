@@ -439,7 +439,7 @@ def condition_dem(dem: np.ndarray, valid: np.ndarray | None = None, *,
 # ---------------------------------------------------------------------------
 
 @njit(cache=True)
-def _d8(z, valid, outlet):
+def _d8(z, valid, outlet, guard):
     nr, nc = z.shape
     rec = np.full(nr * nc, -1, dtype=np.int64)
     for r in range(nr):
@@ -451,7 +451,7 @@ def _d8(z, valid, outlet):
             for k in range(8):
                 rr = r + DR[k]
                 cc = c + DC[k]
-                if rr < 0 or cc < 0 or rr >= nr or cc >= nc or not valid[rr, cc]:
+                if rr < 0 or cc < 0 or rr >= nr or cc >= nc or not valid[rr, cc] or guard[r, c] <= guard[rr, cc]:
                     continue
                 s = (z[r, c] - z[rr, cc]) / DIST[k]
                 if s > best:
@@ -462,16 +462,17 @@ def _d8(z, valid, outlet):
 
 
 def d8_receivers(routing_dem: np.ndarray, valid: np.ndarray,
-                 outlets: np.ndarray | None = None) -> np.ndarray:
+                 outlets: np.ndarray | None = None, *, routing_guard: np.ndarray | None = None) -> np.ndarray:
     """Flat index of the steepest-descent neighbour, -1 for outlets/edges/inlets."""
     if outlets is None:
         outlets = np.zeros(routing_dem.shape, dtype=np.bool_)
     zz = np.where(valid, routing_dem, 0.0)
-    return _d8(zz, valid.astype(np.bool_), outlets.astype(np.bool_))
+    guard = zz if routing_guard is None else routing_guard
+    return _d8(zz, valid.astype(np.bool_), outlets.astype(np.bool_), guard)
 
 
 @njit(cache=True)
-def _accumulate(z, valid, core, weights, outlet, mfd, p, order, export):
+def _accumulate(z, valid, core, weights, outlet, mfd, p, order, export, guard):
     """Accumulate `weights` downslope in `order` (descending z).
 
     Flow from a core cell into a non-core cell is not added there: it is
@@ -494,7 +495,7 @@ def _accumulate(z, valid, core, weights, outlet, mfd, p, order, export):
             for k in range(8):
                 rr = r + DR[k]
                 cc = c + DC[k]
-                if rr < 0 or cc < 0 or rr >= nr or cc >= nc or not valid[rr, cc]:
+                if rr < 0 or cc < 0 or rr >= nr or cc >= nc or not valid[rr, cc] or guard[r, c] <= guard[rr, cc]:
                     continue
                 d = z[r, c] - z[rr, cc]
                 if d > 0.0:
@@ -504,7 +505,7 @@ def _accumulate(z, valid, core, weights, outlet, mfd, p, order, export):
             for k in range(8):
                 rr = r + DR[k]
                 cc = c + DC[k]
-                if rr < 0 or cc < 0 or rr >= nr or cc >= nc or not valid[rr, cc]:
+                if rr < 0 or cc < 0 or rr >= nr or cc >= nc or not valid[rr, cc] or guard[r, c] <= guard[rr, cc]:
                     continue
                 d = z[r, c] - z[rr, cc]
                 if d > 0.0:
@@ -520,7 +521,7 @@ def _accumulate(z, valid, core, weights, outlet, mfd, p, order, export):
             for k in range(8):
                 rr = r + DR[k]
                 cc = c + DC[k]
-                if rr < 0 or cc < 0 or rr >= nr or cc >= nc or not valid[rr, cc]:
+                if rr < 0 or cc < 0 or rr >= nr or cc >= nc or not valid[rr, cc] or guard[r, c] <= guard[rr, cc]:
                     continue
                 s = (z[r, c] - z[rr, cc]) / DIST[k]
                 if s > best:
@@ -546,12 +547,14 @@ def descending_order(routing_dem: np.ndarray, valid: np.ndarray) -> np.ndarray:
 def accumulate(routing_dem: np.ndarray, valid: np.ndarray, weights: np.ndarray, *,
                core: np.ndarray | None = None, outlets: np.ndarray | None = None,
                method: str = "d8", exponent: float = MFD_EXPONENT,
-               order: np.ndarray | None = None) -> tuple[np.ndarray, np.ndarray]:
+               order: np.ndarray | None = None, routing_guard: np.ndarray | None = None) -> tuple[np.ndarray, np.ndarray]:
     """Flow accumulation of `weights` (e.g. cell area) on a routing DEM.
 
     Returns (acc, export). `export[r, c]` is the amount that left the core into
     non-core cell (r, c); it is 0 everywhere when `core` is None.
-    The routing DEM must strictly drain (condition_dem()['routing']).
+    The routing DEM must strictly drain (condition_dem()['routing']). Where
+    provided, routing_guard also has to decrease across each edge, while the
+    gradient for D8 direction and MFD weights still comes from routing_dem.
     """
     if core is None:
         core = valid.copy()
@@ -561,9 +564,10 @@ def accumulate(routing_dem: np.ndarray, valid: np.ndarray, weights: np.ndarray, 
         order = descending_order(routing_dem, valid)
     export = np.zeros(routing_dem.shape, dtype=np.float64)
     zz = np.where(valid, routing_dem, 0.0).astype(np.float64)
+    guard = zz if routing_guard is None else routing_guard
     acc = _accumulate(zz, valid.astype(np.bool_), core.astype(np.bool_),
                       np.asarray(weights, dtype=np.float64).copy(), outlets.astype(np.bool_),
-                      method == "mfd", float(exponent), order, export)
+                      method == "mfd", float(exponent), order, export, guard)
     return acc, export
 
 
@@ -624,7 +628,7 @@ def _hand(z_elev, rec, stream, valid, core, order):
     return hand, drain, term
 
 
-def hand_full(elev, routing_dem, valid, stream, outlets=None, core=None):
+def hand_full(elev, routing_dem, valid, stream, outlets=None, core=None, *, routing_guard=None):
     """HAND plus `term`: for unresolved cells, the flat index of the cell where the
     path stopped (-1 when resolved). With `core`, a core cell's path stops at the
     first non-core cell, because cells near a window edge route along the edge
@@ -634,7 +638,7 @@ def hand_full(elev, routing_dem, valid, stream, outlets=None, core=None):
         outlets = np.zeros(elev.shape, dtype=np.bool_)
     if core is None:
         core = valid
-    rec = d8_receivers(routing_dem, valid, outlets)
+    rec = d8_receivers(routing_dem, valid, outlets, routing_guard=routing_guard)
     flat = np.where(valid, routing_dem, np.inf).ravel()
     order = np.argsort(flat, kind="stable").astype(np.int64)
     order = order[np.isfinite(flat[order])]

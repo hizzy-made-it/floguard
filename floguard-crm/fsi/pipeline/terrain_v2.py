@@ -9,14 +9,17 @@ disagrees with them, and large HUC12s must be split to fit in RAM. So:
     tile = (HUC12 polygon ∩ chunk square)   core: the cells this tile owns
          + halo of `halo_m` metres          context for breaching, slope, HAND
 
-    phase 1  per tile: read DEM window, condition (burn culverts + NHD, bounded
-             breach, epsilon fill), closed-basin depth, local accumulation of the
-             core's own area. Flow that leaves the core is not dropped: it is
-             recorded as an *export* at the global cell it flows into.
+    phase 1  per tile: condition independent DEM windows for contextual burn,
+             breach and fill. Then make each core owner authoritative for
+             routing elevations in its neighbours' halos before accumulating
+             any flow. A seam crossing therefore strictly descends one shared
+             scalar potential, not two disagreeing local surfaces. Edge weights
+             keep the original local slope on allowed cross-seam edges.
     phase 2  propagate exports: each export is injected into the tile whose core
              owns the target cell and routed onward with the same routing DEM.
-             Accumulation is linear, so final = local + routed injections. This
-             is exact across any partition and is what test_tile_edge checks.
+             Accumulation is linear: final = local + routed injections. Routing
+             cannot recirculate once all shared elevations agree. New boundary
+             sinks and exports still pending at the round cap are reported.
     phase 3  per tile: assemble final accumulation for the whole window (core
              values from every overlapping tile), streams (area threshold, NHD
              cells, inlets), HAND, slope, TWI.
@@ -56,7 +59,7 @@ class TerrainParams:
     nhd_burn_m: float = 1.0           # NHD flowline burn depth
     stream_area_m2: float = 250_000.0 # contributing area that makes a channel for HAND (0.25 km2)
     propagate_tol: float = 1e-3       # export amounts below this (cells) are dropped; 1e-3 m2 at 1 m
-    propagate_max_rounds: int = 25    # cap for ping-pong between tiles with disagreeing seams
+    propagate_max_rounds: int = 25    # bound legitimate long cross-tile paths / MFD tails
 
     @property
     def halo_cells(self) -> int:
@@ -212,9 +215,8 @@ def tiles_from_labels(labels: np.ndarray, halo_cells: int, keys: dict[int, str] 
 # Phases
 # ---------------------------------------------------------------------------
 
-def phase1_condition(inputs: Inputs, store: Store, tile: Tile, p: TerrainParams) -> np.ndarray:
-    """Condition one tile and accumulate its own core area. Returns exports as an
-    (n, 4) array of (global_row, global_col, d8_amount, mfd_amount)."""
+def phase1_condition(inputs: Inputs, store: Store, tile: Tile, p: TerrainParams) -> None:
+    """Condition one tile; do not route area on its unshared halo yet."""
     dem, srcres = inputs.dem(tile)
     valid = np.isfinite(dem)
     core = inputs.core(tile) & valid
@@ -227,12 +229,6 @@ def phase1_condition(inputs: Inputs, store: Store, tile: Tile, p: TerrainParams)
         max_breach_depth_m=p.max_breach_depth_m,
     )
     depr = H.depression_depth(cond["basin_dem"], valid, inl)
-    w = core.astype(np.float64)
-    order = H.descending_order(cond["routing"], valid)
-    acc8, ex8 = H.accumulate(cond["routing"], valid, w, core=core, outlets=inl, method="d8", order=order)
-    accm, exm = H.accumulate(cond["routing"], valid, w, core=core, outlets=inl, method="mfd", order=order)
-    store.put(tile.key, "order", order)
-
     store.put(tile.key, "elev", dem.astype(np.float32))
     store.put(tile.key, "srcres", srcres.astype(np.float32))
     store.put(tile.key, "valid", valid)
@@ -242,13 +238,74 @@ def phase1_condition(inputs: Inputs, store: Store, tile: Tile, p: TerrainParams)
     store.put(tile.key, "routing", cond["routing"])
     store.put(tile.key, "breached", cond["breached"])
     store.put(tile.key, "depr", depr.astype(np.float32))
-    store.put(tile.key, "acc_d8", acc8)
-    store.put(tile.key, "acc_mfd", accm)
     tile.meta["n_breached"] = cond["n_breached"]
     tile.meta["has_flowlines"] = bool(flow is not None and flow.any())
     tile.meta["has_inlets"] = bool(inl.any())
     tile.meta["n_culverts"] = len(inputs.culverts(tile))
-    return _collect_exports(tile, ex8, exm)
+    # Write readiness last so a partially conditioned tile is never reused.
+    store.put(tile.key, "meta", np.array(json.dumps(tile.meta)))
+
+
+def _seam_routing(store: Store, tiles: list[Tile], target: Tile,
+                  raw: np.ndarray, core: np.ndarray, valid: np.ndarray):
+    """Overlay each owner's conditioned core elevation on target's valid halo.
+
+    Own core elevations and unowned boundary cells stay unchanged. Conflicting
+    core ownership is rejected, not made dependent on tile iteration order.
+    """
+    routing = raw.copy()
+    filled = core.copy()
+    changed = 0
+    shift = 0.0
+    for other in tiles:
+        if other.key == target.key:
+            continue
+        r0 = max(target.row_off, other.row_off)
+        r1 = min(target.row_off + target.height, other.row_off + other.height)
+        c0 = max(target.col_off, other.col_off)
+        c1 = min(target.col_off + target.width, other.col_off + other.width)
+        if r0 >= r1 or c0 >= c1:
+            continue
+        here = np.s_[r0 - target.row_off:r1 - target.row_off, c0 - target.col_off:c1 - target.col_off]
+        there = np.s_[r0 - other.row_off:r1 - other.row_off, c0 - other.col_off:c1 - other.col_off]
+        owned = store.get(other.key, "core")[there] & valid[here]
+        seen = filled[here]
+        if np.any(seen & owned):
+            raise ValueError(f"overlapping valid terrain cores: {target.key}, {other.key}")
+        if not np.any(owned):
+            continue
+        values = store.get(other.key, "routing")[there][owned]
+        target_view = routing[here]
+        delta = np.abs(target_view[owned] - values)
+        changed += int(np.count_nonzero(delta))
+        shift = max(shift, float(delta.max()))
+        target_view[owned] = values
+        seen[owned] = True
+    return routing, changed, shift
+
+
+def _seed_tile_flow(store: Store, tiles: list[Tile], t: Tile):
+    raw = store.get(t.key, "routing")
+    valid = store.get(t.key, "valid")
+    core = store.get(t.key, "core")
+    inl = store.get(t.key, "inlets")
+    guard, changed, shift = _seam_routing(store, tiles, t, raw, core, valid)
+    new_sinks = 0
+    if changed:
+        old = H.d8_receivers(raw, valid, inl)
+        new = H.d8_receivers(raw, valid, inl, routing_guard=guard)
+        new_sinks = int(np.count_nonzero(core.ravel() & (old >= 0) & (new < 0)))
+    weights = core.astype(np.float64)
+    order = H.descending_order(raw, valid)
+    acc8, ex8 = H.accumulate(raw, valid, weights, core=core, outlets=inl,
+                              method="d8", order=order, routing_guard=guard)
+    accm, exm = H.accumulate(raw, valid, weights, core=core, outlets=inl,
+                              method="mfd", order=order, routing_guard=guard)
+    store.put(t.key, "routing_guard", guard)
+    store.put(t.key, "order", order)
+    store.put(t.key, "acc_d8", acc8)
+    store.put(t.key, "acc_mfd", accm)
+    return _collect_exports(t, ex8, exm), changed, shift, new_sinks
 
 
 def _collect_exports(tile: Tile, ex8: np.ndarray, exm: np.ndarray) -> np.ndarray:
@@ -280,16 +337,19 @@ def phase2_propagate(store: Store, tiles: list[Tile], exports, p: TerrainParams)
     reaches an outlet or falls below tolerance. Returns diagnostics."""
     pending = np.asarray(exports, dtype=np.float64).reshape(-1, 4)
     rounds = 0
-    lost = 0.0
+    initial = pending[:, 2:].sum(axis=0)
+    lost = np.zeros(2)
+    discarded = np.zeros(2)
     while len(pending) and rounds < p.propagate_max_rounds:
         rounds += 1
         owner = _assign_owners(tiles, store, pending)
-        lost += float(pending[owner < 0, 2].sum())  # landed outside every core: flows out of the study area
+        lost += pending[owner < 0, 2:].sum(axis=0)  # outside every owned core
         nxt = []
         for ti in np.unique(owner[owner >= 0]):
             t = tiles[ti]
             items = pending[owner == ti]
             routing = store.get(t.key, "routing")
+            guard = store.get(t.key, "routing_guard")
             valid = store.get(t.key, "valid")
             core = store.get(t.key, "core")
             inl = store.get(t.key, "inlets")
@@ -300,20 +360,30 @@ def phase2_propagate(store: Store, tiles: list[Tile], exports, p: TerrainParams)
             np.add.at(w8, (rr, cc), items[:, 2])
             np.add.at(wm, (rr, cc), items[:, 3])
             order = store.get(t.key, "order")
-            a8, e8 = H.accumulate(routing, valid, w8, core=core, outlets=inl, method="d8", order=order)
-            am, em = H.accumulate(routing, valid, wm, core=core, outlets=inl, method="mfd", order=order)
+            a8, e8 = H.accumulate(routing, valid, w8, core=core, outlets=inl,
+                                  method="d8", order=order, routing_guard=guard)
+            am, em = H.accumulate(routing, valid, wm, core=core, outlets=inl,
+                                  method="mfd", order=order, routing_guard=guard)
             store.put(t.key, "acc_d8", store.get(t.key, "acc_d8") + a8 * core)
             store.put(t.key, "acc_mfd", store.get(t.key, "acc_mfd") + am * core)
             e = _collect_exports(t, e8, em)
             if len(e):
-                nxt.append(e[(e[:, 2] > p.propagate_tol) | (e[:, 3] > p.propagate_tol)])
+                keep = (e[:, 2] > p.propagate_tol) | (e[:, 3] > p.propagate_tol)
+                discarded += e[~keep, 2:].sum(axis=0)
+                nxt.append(e[keep])
         pending = np.vstack(nxt) if nxt else np.zeros((0, 4))
     residual = float(pending[:, 2].sum()) if len(pending) else 0.0
     residual_mfd = float(pending[:, 3].sum()) if len(pending) else 0.0
-    # MFD splits flow along seams and can bounce a shrinking remainder back and forth;
-    # residual_mfd is what was still in flight when the round cap hit (cells of area).
-    return {"rounds": rounds, "outflow_cells": lost, "residual_cells": residual,
-            "residual_mfd_cells": residual_mfd}
+    # Compare total uniquely seeded seam flow, not cumulative injections (which
+    # include the same legitimate flow whenever it crosses a *different* seam).
+    remaining = np.array([residual, residual_mfd])
+    if np.any(lost + discarded + remaining > initial + 1e-8 * np.maximum(initial, 1.0)):
+        raise RuntimeError("terrain seam routing emitted more area than it received")
+    return {"rounds": rounds, "outflow_cells": float(lost[0]), "outflow_mfd_cells": float(lost[1]),
+            "seam_initial_d8_cells": float(initial[0]), "seam_initial_mfd_cells": float(initial[1]),
+            "seam_tolerance_discarded_d8_cells": float(discarded[0]),
+            "seam_tolerance_discarded_mfd_cells": float(discarded[1]),
+            "residual_cells": residual, "residual_mfd_cells": residual_mfd}
 
 
 def window_from_cores(store: Store, tiles: list[Tile], t: Tile, name: str, fill: float = 0.0) -> np.ndarray:
@@ -338,13 +408,15 @@ def phase3_finalize(store: Store, tiles: list[Tile], t: Tile, p: TerrainParams) 
     """Streams, HAND, slope and TWI for one tile window using final accumulation."""
     valid = store.get(t.key, "valid")
     routing = store.get(t.key, "routing")
+    guard = store.get(t.key, "routing_guard")
     breached = store.get(t.key, "breached")
     inl = store.get(t.key, "inlets")
     flow = store.get(t.key, "flowlines")
     acc8 = window_from_cores(store, tiles, t, "acc_d8")
     accm = window_from_cores(store, tiles, t, "acc_mfd")
     stream = ((acc8 >= p.stream_cells) | flow) & valid
-    hnd, term = H.hand_full(breached, routing, valid, stream, inl, core=store.get(t.key, "core"))
+    hnd, term = H.hand_full(breached, routing, valid, stream, inl,
+                            core=store.get(t.key, "core"), routing_guard=guard)
     # Unresolved paths: remember the global cell where they left the window.
     tr_, tc_ = np.divmod(term, t.width)
     gterm = np.where(term >= 0, (tr_ + t.row_off) * GLOBAL_STRIDE + (tc_ + t.col_off), -1)
@@ -431,26 +503,31 @@ def phase3b_link_hand(store: Store, tiles: list[Tile], p: TerrainParams) -> dict
 
 
 def run_tiles(inputs: Inputs, store: Store, tiles: list[Tile], p: TerrainParams, log=print) -> dict:
-    """All three phases. Phase 1 results are reused if the store already has them (resumable).
-    Phase 2 restarts from the phase-1 accumulation, so a rerun never double counts."""
-    exports = []
+    """Condition cached inputs, then rebuild a consistent flow graph each run.
+
+    The tile set can change between runs. Never reuse legacy local accumulators,
+    exports, or stitched elevations from a different core selection.
+    """
     for i, t in enumerate(tiles):
-        if store.has(t.key, "exports"):
-            ex = store.get(t.key, "exports")
+        if store.has(t.key, "meta"):
             t.meta.update(json.loads(str(store.get(t.key, "meta"))))
-            log(f"[1/3] {t.key} cached ({len(ex)} exports)")
+            log(f"[1/3] {t.key} conditioned cache")
         else:
-            ex = phase1_condition(inputs, store, t, p)
-            store.put(t.key, "acc_d8_local", store.get(t.key, "acc_d8"))
-            store.put(t.key, "acc_mfd_local", store.get(t.key, "acc_mfd"))
-            store.put(t.key, "meta", np.array(json.dumps(t.meta)))
-            store.put(t.key, "exports", ex)  # written last: marks phase 1 complete
-            log(f"[1/3] {t.key} {i + 1}/{len(tiles)} breached={t.meta.get('n_breached')} exports={len(ex)}")
-        store.put(t.key, "acc_d8", store.get(t.key, "acc_d8_local"))
-        store.put(t.key, "acc_mfd", store.get(t.key, "acc_mfd_local"))
+            phase1_condition(inputs, store, t, p)
+            log(f"[1/3] {t.key} {i + 1}/{len(tiles)} breached={t.meta.get('n_breached')}")
+    exports = []
+    changed = sinks = 0
+    max_shift = 0.0
+    for i, t in enumerate(tiles):
+        ex, n, shift, n_sinks = _seed_tile_flow(store, tiles, t)
+        changed += n
+        sinks += n_sinks
+        max_shift = max(max_shift, shift)
         exports.append(ex)
+        log(f"[1/3] {t.key} {i + 1}/{len(tiles)} seam exports={len(ex)}, new sinks={n_sinks}")
     allx = np.vstack(exports) if exports else np.zeros((0, 4))
     diag = phase2_propagate(store, tiles, allx, p)
+    diag.update(seam_changed_halo_cells=changed, seam_max_routing_shift_m=max_shift, seam_new_sink_cells=sinks)
     log(f"[2/3] propagate {diag}")
     for i, t in enumerate(tiles):
         phase3_finalize(store, tiles, t, p)
