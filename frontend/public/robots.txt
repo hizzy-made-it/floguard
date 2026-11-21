@@ -3,52 +3,81 @@
 User-agent: *
 Allow: /
 Disallow: /admin
-Disallow: /admin/login
 Disallow: /studio
 
 User-agent: GPTBot
 Allow: /
+Disallow: /admin
+Disallow: /studio
 
 User-agent: ChatGPT-User
 Allow: /
+Disallow: /admin
+Disallow: /studio
 
 User-agent: OAI-SearchBot
 Allow: /
+Disallow: /admin
+Disallow: /studio
 
 User-agent: ClaudeBot
 Allow: /
+Disallow: /admin
+Disallow: /studio
 
 User-agent: anthropic-ai
 Allow: /
+Disallow: /admin
+Disallow: /studio
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /admin
+Disallow: /studio
 
 User-agent: Google-Extended
 Allow: /
+Disallow: /admin
+Disallow: /studio
 
 User-agent: GoogleOther
 Allow: /
+Disallow: /admin
+Disallow: /studio
 
 User-agent: Applebot
 Allow: /
+Disallow: /admin
+Disallow: /studio
 
 User-agent: Applebot-Extended
 Allow: /
+Disallow: /admin
+Disallow: /studio
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin
+Disallow: /studio
 
 User-agent: Amazonbot
 Allow: /
+Disallow: /admin
+Disallow: /studio
 
 User-agent: meta-externalagent
 Allow: /
+Disallow: /admin
+Disallow: /studio
 
 User-agent: Bytespider
 Allow: /
+Disallow: /admin
+Disallow: /studio
 
 User-agent: CCBot
 Allow: /
+Disallow: /admin
+Disallow: /studio
 
 Sitemap: https://floguardfl.com/sitemap.xml

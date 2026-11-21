@@ -144,6 +144,12 @@ async function renderRoute(page, route) {
     keepLast('meta[name="googlebot"]');
     for (const p of ["og:title","og:description","og:type","og:url","og:image","og:image:alt","og:locale","og:site_name"]) keepLast(`meta[property="${p}"]`);
     for (const n of ["twitter:card","twitter:title","twitter:description","twitter:image"]) keepLast(`meta[name="${n}"]`);
+    // Keep the public sales mailto usable without Cloudflare's decoder, including
+    // for no-JS visitors. Do not opt other addresses out of zone-wide protection.
+    document.querySelectorAll('a[href="mailto:sales@floguardfl.com"]').forEach((link) => {
+      link.before(document.createComment("email_off"));
+      link.after(document.createComment("/email_off"));
+    });
     return "<!doctype html>\n" + document.documentElement.outerHTML;
   });
 

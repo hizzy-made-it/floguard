@@ -1,32 +1,28 @@
 name: IndexNow ping
 
-# Pushes every sitemap URL to IndexNow (Bing, Yandex, Seznam, Naver; Bing feeds
-# ChatGPT search and Copilot) after a deploy-triggering push to main.
 on:
   push:
     branches: [main]
     paths:
       - "frontend/**"
+      - ".github/scripts/indexnow.py"
+      - ".github/workflows/indexnow.yml"
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: floguard-indexnow
+  cancel-in-progress: true
 
 jobs:
   ping:
     runs-on: ubuntu-latest
+    timeout-minutes: 12
     steps:
-      - name: Wait for Cloudflare Pages deploy
-        if: github.event_name == 'push'
-        run: sleep 240
-      - name: Submit sitemap URLs
-        env:
-          HOST: floguardfl.com
-          KEY: 3f154475ac32fbe6c760b295b84469ec
-        run: |
-          set -euo pipefail
-          curl -fsS "https://$HOST/$KEY.txt" | grep -q "$KEY" || { echo "key file not live yet"; exit 1; }
-          urls=$(curl -fsS "https://$HOST/sitemap.xml" | grep -oE '<loc>[^<]+</loc>' | sed -E 's#</?loc>##g')
-          count=$(echo "$urls" | wc -l)
-          export KEYLOC="https://$HOST/$KEY.txt"
-          json=$(printf '%s\n' "$urls" | python3 -c 'import sys,json,os; e=os.environ; print(json.dumps({"host":e["HOST"],"key":e["KEY"],"keyLocation":e["KEYLOC"],"urlList":[l.strip() for l in sys.stdin if l.strip()]}))')
-          code=$(curl -sS -o /tmp/resp -w '%{http_code}' -X POST https://api.indexnow.org/IndexNow             -H 'Content-Type: application/json; charset=utf-8' --data "$json")
-          echo "Submitted $count URLs -> HTTP $code"; cat /tmp/resp || true
-          case "$code" in 200|202) ;; *) exit 1;; esac
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Test sitemap and ownership checks
+        run: python3 -B .github/scripts/test_indexnow.py
+      - name: Verify live sitemap and notify IndexNow
+        run: python3 .github/scripts/indexnow.py --attempts 18 --pages --submit
