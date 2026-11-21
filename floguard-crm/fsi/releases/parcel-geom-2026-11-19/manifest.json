@@ -1,0 +1,200 @@
+{
+ "source": "parcels.gpkg",
+ "rows": 313435,
+ "skipped_empty": 0,
+ "simplify_deg": 5e-06,
+ "parts": [
+  {
+   "file": "parcel_geom_00.json",
+   "rows": 10000,
+   "bytes": 1935493,
+   "sha256": "646250d1ebcd6f5ff6a9b0b2ff85823d00fde405c5137c877338973d3f8b5e0e"
+  },
+  {
+   "file": "parcel_geom_01.json",
+   "rows": 10000,
+   "bytes": 1526409,
+   "sha256": "0f27d9959822780895dae9bcfa0f202e94ea910d0dc200ea1ac4dc771f3bf71a"
+  },
+  {
+   "file": "parcel_geom_02.json",
+   "rows": 10000,
+   "bytes": 1480976,
+   "sha256": "dde81a7c1a878a5cb109df5b06d2c93df0f19a2f449b17671c3d5970090b036a"
+  },
+  {
+   "file": "parcel_geom_03.json",
+   "rows": 10000,
+   "bytes": 1457580,
+   "sha256": "9a7a1815b1a7322baff4310003a9933ea2b578e033e18fa2e222c281093a859e"
+  },
+  {
+   "file": "parcel_geom_04.json",
+   "rows": 10000,
+   "bytes": 1573628,
+   "sha256": "9f00ddcfffddc467a642fa0fb9c5ba25ab343ec6b9ecd5dcda22a62c06ac0fa5"
+  },
+  {
+   "file": "parcel_geom_05.json",
+   "rows": 10000,
+   "bytes": 1527053,
+   "sha256": "59d4257d467c4be6e304a011414567913256f65f2753e3e5ba8c04ac2802a403"
+  },
+  {
+   "file": "parcel_geom_06.json",
+   "rows": 10000,
+   "bytes": 1533086,
+   "sha256": "1f63181c6400f84f034a1b4f8319bbcc938891b2d673a4dd437b13090af739d6"
+  },
+  {
+   "file": "parcel_geom_07.json",
+   "rows": 10000,
+   "bytes": 1572034,
+   "sha256": "70a0f8827348b65b7fa5f05c187ea2da5dc305894cc9d30a9b8ab07f2e70f1e2"
+  },
+  {
+   "file": "parcel_geom_08.json",
+   "rows": 10000,
+   "bytes": 2735726,
+   "sha256": "d2d580228c520c1cff1fd130ca51f93becf66347ba35b550ef63f9e6269aa110"
+  },
+  {
+   "file": "parcel_geom_09.json",
+   "rows": 10000,
+   "bytes": 1668366,
+   "sha256": "817793d7377ae6ce424fc9f9d495e6877081603fc42d6159568e26e3111681d6"
+  },
+  {
+   "file": "parcel_geom_10.json",
+   "rows": 10000,
+   "bytes": 1468672,
+   "sha256": "35c61b979c55cc3fc728a887ebe5b48ef8627712ea02eb92129e47b078b2cf3d"
+  },
+  {
+   "file": "parcel_geom_11.json",
+   "rows": 10000,
+   "bytes": 1536756,
+   "sha256": "818c64f033ab33bdcc99379aee6ddf094246eda9591160374912d6fe06f86d1b"
+  },
+  {
+   "file": "parcel_geom_12.json",
+   "rows": 10000,
+   "bytes": 1721457,
+   "sha256": "a84dea055543e6552fd053c5e4c4f511b8ae48aae9857dd76d242996bd2afdaa"
+  },
+  {
+   "file": "parcel_geom_13.json",
+   "rows": 10000,
+   "bytes": 1492332,
+   "sha256": "a4074eb6325b3a5392fbbb0946bb19583f05bdefda9161e9ac67dcfb236dd3ad"
+  },
+  {
+   "file": "parcel_geom_14.json",
+   "rows": 10000,
+   "bytes": 1624759,
+   "sha256": "ab985acfa195c52b533d13b169b696c8f6a5c09bd7eb065133ac8b1f856352b3"
+  },
+  {
+   "file": "parcel_geom_15.json",
+   "rows": 10000,
+   "bytes": 1696174,
+   "sha256": "68cd53e5d560e7f0aa748fceeedb6f63db39de8ce47c43666070ee9709e89444"
+  },
+  {
+   "file": "parcel_geom_16.json",
+   "rows": 10000,
+   "bytes": 1791255,
+   "sha256": "69b76e2cdb82425ff202eeb6f2e7c4c19bd92da5f5e14aeda41947431d8b0040"
+  },
+  {
+   "file": "parcel_geom_17.json",
+   "rows": 10000,
+   "bytes": 1447408,
+   "sha256": "1ea12b9fcfa8af254cb4b575e37a7ff7261bb45153acb6c64d9a869d37895fc0"
+  },
+  {
+   "file": "parcel_geom_18.json",
+   "rows": 10000,
+   "bytes": 3035659,
+   "sha256": "dee2ae3fd7ea713d65917f343c933b7a46c76d5828afc1cf88bda8b88b040f29"
+  },
+  {
+   "file": "parcel_geom_19.json",
+   "rows": 10000,
+   "bytes": 1780096,
+   "sha256": "5bd68a7815cb467f82aa647c9b159a5278f960945d182d4c3f5601f2dc2cee3f"
+  },
+  {
+   "file": "parcel_geom_20.json",
+   "rows": 10000,
+   "bytes": 1815178,
+   "sha256": "c52836c3ed1d7168a7b86ec25e355b2c9fc25e8b23e1c33edf5afe6d776fcfd6"
+  },
+  {
+   "file": "parcel_geom_21.json",
+   "rows": 10000,
+   "bytes": 1784027,
+   "sha256": "f9f06066aea80a2834bbb073d2902f9020af9989b46f2375cffa92b91025c752"
+  },
+  {
+   "file": "parcel_geom_22.json",
+   "rows": 10000,
+   "bytes": 2040322,
+   "sha256": "162a79f3123b3770fcd7281e1619724ad1eeb929c1d139ed3510bb23b4fc9d7b"
+  },
+  {
+   "file": "parcel_geom_23.json",
+   "rows": 10000,
+   "bytes": 2496825,
+   "sha256": "307af5f7cd99021a415f85fea8b94b36a9fd82e8245c47be3cab7ba0b5e87aaf"
+  },
+  {
+   "file": "parcel_geom_24.json",
+   "rows": 10000,
+   "bytes": 2423164,
+   "sha256": "053bdb71cc5cac914423188e076b1b7df9232fd817ab3f28334a073edda7c120"
+  },
+  {
+   "file": "parcel_geom_25.json",
+   "rows": 10000,
+   "bytes": 2282470,
+   "sha256": "be2a063e09bde3de27306608eb46b6351ffa5489314ab9d1c5d7a2349547dc1b"
+  },
+  {
+   "file": "parcel_geom_26.json",
+   "rows": 10000,
+   "bytes": 2254140,
+   "sha256": "72a1c7dedd1145a53582395923902d11196263eedc8daf0d8c191d942686923e"
+  },
+  {
+   "file": "parcel_geom_27.json",
+   "rows": 10000,
+   "bytes": 2519978,
+   "sha256": "3ad8e5cd9d6c16410aefa88369aec0d87b7786fed5b8453f91c552f9679ccb03"
+  },
+  {
+   "file": "parcel_geom_28.json",
+   "rows": 10000,
+   "bytes": 2849193,
+   "sha256": "5f7bc5b3d2de4d7bfa1a220775d52a65a7494ba2975402aa1c151b07249c78fa"
+  },
+  {
+   "file": "parcel_geom_29.json",
+   "rows": 10000,
+   "bytes": 1725708,
+   "sha256": "dacc411c6b82ecceb61df6b6e963b0e1f5131493b2385f05508ffd41b9841b0a"
+  },
+  {
+   "file": "parcel_geom_30.json",
+   "rows": 10000,
+   "bytes": 1779004,
+   "sha256": "cd9f4273bd4692e01e18dee8510befae73d63a2799eac9010b427828b53c011e"
+  },
+  {
+   "file": "parcel_geom_31.json",
+   "rows": 3435,
+   "bytes": 653906,
+   "sha256": "d598845f1bbb7edfb718c4f54e072dddf1b247db50f474b72a0e7ed2e12952a1"
+  }
+ ]
+}

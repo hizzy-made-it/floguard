@@ -10,6 +10,7 @@ import { setCors, json, parseBody, rateLimit, clientIp } from '../server/lib/htt
 import { persistWebLead, validateLeadPayload } from '../server/lib/web-leads.js';
 import { getLeadsPipeline, mirrorLeadsToStorage } from '../server/lib/academy-db.js';
 import { LeadsError } from '../server/lib/academy-pg.js';
+import { notifyNewLead } from '../server/lib/notify.js';
 import {
   isTokenShape, tokenHandle, publicProposalAccept, publicProposalDecline, publicProposalGet,
 } from '../server/lib/estimates.js';
@@ -117,6 +118,7 @@ export default async function handler(req, res) {
       page: body.page,
       source: body.source || 'website',
     });
+    await notifyNewLead({ source: 'website', name: body.name, phone: body.phone, email: body.email, message: body.message, services: body.services });
     return json(res, 200, { success: true, id: lead.id });
   } catch (e) {
     const msg = e?.message || 'Failed to save lead';

@@ -1,0 +1,23 @@
+{
+ "parcels": 110990,
+ "parts": [
+  "parcel_terrain_v2_00.json",
+  "parcel_terrain_v2_01.json",
+  "parcel_terrain_v2_02.json",
+  "parcel_terrain_v2_03.json",
+  "parcel_terrain_v2_04.json",
+  "parcel_terrain_v2_05.json",
+  "parcel_terrain_v2_06.json",
+  "parcel_terrain_v2_07.json",
+  "parcel_terrain_v2_08.json",
+  "parcel_terrain_v2_09.json",
+  "parcel_terrain_v2_10.json",
+  "parcel_terrain_v2_11.json"
+ ],
+ "confidence_p10_50_90": [
+  0.856,
+  0.912,
+  0.948
+ ],
+ "dem_1m_share": 1.0
+}
