@@ -13,7 +13,7 @@ MAX_REGION_CELLS = 16_000_000
 
 
 def run_shared_region(inputs: Inputs, store: Store, tiles: list[Tile],
-                      p: TerrainParams, log=print) -> dict:
+                      p: TerrainParams, log=print, *, region: Tile | None = None) -> dict:
     """Condition and route one region, then slice both cores and halos.
 
     All overlapping outputs read identical cells, including elevations after
@@ -28,7 +28,12 @@ def run_shared_region(inputs: Inputs, store: Store, tiles: list[Tile],
     r0, c0 = min(t.row_off for t in tiles), min(t.col_off for t in tiles)
     r1 = max(t.row_off + t.height for t in tiles)
     c1 = max(t.col_off + t.width for t in tiles)
-    region = Tile("_shared_region", r0, c0, r1 - r0, c1 - c0)
+    if region is None:
+        region = Tile("_shared_region", r0, c0, r1 - r0, c1 - c0)
+    if not (region.row_off <= r0 and r1 <= region.row_off + region.height
+            and region.col_off <= c0 and c1 <= region.col_off + region.width):
+        raise ValueError("terrain tile windows must fit inside the shared study region")
+    r0, c0 = region.row_off, region.col_off
     shape = (region.height, region.width)
     if math.prod(shape) > MAX_REGION_CELLS:
         raise ValueError("shared-region preview exceeds 16 million raster cells; use a smaller study area")
@@ -42,7 +47,6 @@ def run_shared_region(inputs: Inputs, store: Store, tiles: list[Tile],
     if dem.shape != shape or srcres.shape != shape:
         raise ValueError("shared-region DEM and provenance must both match the planned raster")
     valid = np.isfinite(dem)
-    covered = np.zeros(shape, bool)
     owned = np.zeros(shape, bool)
     for t in tiles:
         w = window(t)
@@ -50,10 +54,6 @@ def run_shared_region(inputs: Inputs, store: Store, tiles: list[Tile],
         if (owned[w] & core).any():
             raise ValueError(f"overlapping terrain core ownership at {t.key}")
         owned[w] |= core
-        covered[w] = True
-    valid &= covered
-    dem = np.where(valid, dem, np.nan)
-    srcres = np.where(valid, srcres, 0.0)
     if not owned.any():
         raise ValueError("shared-region preview has no owned DEM cells")
     flow = inputs.flowlines(region)
