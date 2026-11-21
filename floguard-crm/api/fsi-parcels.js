@@ -541,32 +541,66 @@ export const SEARCH_LIMIT = 10;
 /** Trim, cap length, and strip characters that are syntax in a PostgREST or=() filter. */
 export function sanitizeSearch(q) {
   const t = String(q ?? '')
-    .replace(/[\u0000-\u001f"\\(),*%:]/g, ' ')
+    .replace(/[\u0000-\u001f"\\(),*%:_]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, 80);
   return t.length >= 2 ? t : '';
 }
 
-/** PostgREST filter params: address ilike, exact parcel_id, owner ilike (session callers only). */
-export function buildSearchParams(q, { owner = true, limit = SEARCH_LIMIT } = {}) {
+/** Volusia account numbers are seven digits. The deep link may also name a fixture ID. */
+function exactParcelLookup(term, mode) {
+  return mode === 'parcel_id' || /^\d{7}$/.test(term);
+}
+
+function searchLimit(limit) {
+  const n = Number.parseInt(limit, 10);
+  return Number.isFinite(n) ? Math.min(SEARCH_LIMIT, Math.max(1, n)) : SEARCH_LIMIT;
+}
+
+/**
+ * Equality on the primary key must not share a PostgREST OR with unindexed text.
+ * For text, take a bounded candidate set before ranking. A database-wide
+ * score sort forces even common terms to read far beyond the requested limit.
+ */
+export function buildSearchParams(q, { owner = true, limit = SEARCH_LIMIT, mode } = {}) {
   const term = sanitizeSearch(q);
   if (!term) return null;
-  const quoted = (v) => `"${v}"`;
-  const ors = [`address.ilike.${quoted(`*${term}*`)}`, `parcel_id.eq.${quoted(term)}`];
-  if (owner) ors.push(`owner_name.ilike.${quoted(`*${term}*`)}`);
-  return [
-    `or=${encodeURIComponent(`(${ors.join(',')})`)}`,
-    'order=fsi_live.desc.nullslast',
-    `limit=${Math.min(SEARCH_LIMIT, Math.max(1, Number(limit) || SEARCH_LIMIT))}`,
-  ];
+  if (exactParcelLookup(term, mode)) {
+    if (!/^[A-Za-z0-9-]+$/.test(term)) return null;
+    return ['parcel_id=eq.' + encodeURIComponent(term), 'limit=1'];
+  }
+  const pattern = '"*' + term + '*"';
+  const filters = owner ? 'or=' + encodeURIComponent('(address.ilike.' + pattern + ',owner_name.ilike.' + pattern + ')')
+    : 'address=ilike.' + encodeURIComponent(pattern);
+  return [filters, 'limit=' + Math.max(20, 4 * searchLimit(limit))];
+}
+
+function searchRank(row, term, owner) {
+  const address = String(row.address ?? '').trim().toLowerCase();
+  const name = owner ? String(row.owner_name ?? '').trim().toLowerCase() : '';
+  if (address === term) return 0;
+  if (address.startsWith(term)) return 1;
+  if (name === term || name.startsWith(term)) return 2;
+  return address.includes(term) ? 3 : 4;
+}
+
+function pickSearchRows(rows, term, owner, limit) {
+  const q = term.toLowerCase();
+  return [...rows].sort((a, b) => searchRank(a, q, owner) - searchRank(b, q, owner)
+    || (b.fsi_live ?? -1) - (a.fsi_live ?? -1)
+    || String(a.parcel_id ?? '').localeCompare(String(b.parcel_id ?? ''))).slice(0, limit);
 }
 
 async function searchParcels(body, res, session) {
-  // Every caller here holds a session (checked in the handler); owner-name matching stays tied to that.
+  // Every caller holds a CRM session; preserve its owner-name search permission.
   const owner = Boolean(session);
-  const params = buildSearchParams(body.q, { owner, limit: body.limit });
-  if (!params) return json(res, 400, { error: 'q must be at least 2 characters' });
+  const term = sanitizeSearch(body.q);
+  const limit = searchLimit(body.limit);
+  const exact = exactParcelLookup(term, body.mode);
+  const params = buildSearchParams(term, { owner, limit, mode: body.mode });
+  if (!params) return json(res, 400, { error: exact ? 'Enter a valid parcel ID' : 'q must be at least 2 characters' });
+
   const project = (p) => {
     const o = projectRow(p);
     if (!owner) o.owner_name = null;
@@ -574,17 +608,27 @@ async function searchParcels(body, res, session) {
   };
   try {
     const { rows } = await selectParcelRows({
-      buildQuery: (select) => [`select=${select}`, ...params].join('&'),
+      buildQuery: (select) => ['select=' + select, ...params].join('&'),
       get: restGet,
     });
-    const list = Array.isArray(rows) ? rows : [];
-    return json(res, 200, { ok: true, source: 'postgres', q: sanitizeSearch(body.q), count: list.length, parcels: list.map(project) });
+    const candidates = Array.isArray(rows) ? rows : [];
+    const list = exact ? candidates.slice(0, 1) : pickSearchRows(candidates, term, owner, limit);
+    return json(res, 200, { ok: true, source: 'postgres', q: term, count: list.length, parcels: list.map(project) });
   } catch (err) {
     if (isMissingTableError(err)) {
-      const list = searchFixtures(sanitizeSearch(body.q), { owner, limit: SEARCH_LIMIT }).map(project);
-      return json(res, 200, { ok: true, source: 'fixtures', q: sanitizeSearch(body.q), count: list.length, parcels: list, note: FIXTURE_NOTE });
+      const candidates = searchFixtures(term, { owner, limit: SEARCH_LIMIT });
+      const list = exact
+        ? candidates.filter((p) => String(p.parcel_id).toLowerCase() === term.toLowerCase()).slice(0, 1)
+        : pickSearchRows(candidates, term, owner, limit);
+      return json(res, 200, { ok: true, source: 'fixtures', q: term, count: list.length, parcels: list.map(project), note: FIXTURE_NOTE });
     }
-    return json(res, 500, { error: 'parcel search failed', detail: String(err?.message || err).slice(0, 300) });
+    if (err?.body?.code === '57014' || err?.status === 504) {
+      return json(res, 503, {
+        code: 'parcel_search_timeout',
+        error: 'County-wide search did not finish. Try a parcel ID or a full street address.',
+      });
+    }
+    return json(res, 500, { error: 'Parcel search is temporarily unavailable.' });
   }
 }
 

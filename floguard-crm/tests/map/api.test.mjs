@@ -96,9 +96,10 @@ test('search: sanitising strips PostgREST syntax, short queries rejected', () =>
   assert.equal(sanitizeSearch('x'.repeat(200)).length, 80);
   const p = buildSearchParams('100 Sample', { owner: true });
   const or = decodeURIComponent(p[0].slice(3));
-  assert.equal(or, '(address.ilike."*100 Sample*",parcel_id.eq."100 Sample",owner_name.ilike."*100 Sample*")');
+  assert.equal(or, '(address.ilike."*100 Sample*",owner_name.ilike."*100 Sample*")');
   assert.ok(!decodeURIComponent(buildSearchParams('100 Sample', { owner: false })[0]).includes('owner_name'));
-  assert.ok(p.includes('limit=10'));
+  assert.ok(p.includes('limit=40'));
+  assert.ok(!p.some((part) => part.startsWith('order=')));
   assert.equal(buildSearchParams('!'), null);
 });
 
@@ -114,6 +115,55 @@ test('search: postgres path ships at most 10 rows with the parcel column list', 
   assert.match(log[0].key, /or=\(address\.ilike\."\*palm\*"/);
   const r2 = await call({ action: 'search', q: 'x' });
   assert.equal(r2.status, 400);
+});
+
+test('search: exact Volusia ID only uses primary-key equality, including no-match', async () => {
+  const log = [];
+  globalThis.fetch = fakeFetch([{ match: /parcel_risk\?select=/, body: [{ parcel_id: '1234567' }] }], log);
+  const hit = await call({ action: 'search', q: '1234567' });
+  assert.equal(hit.status, 200);
+  assert.deepEqual(hit.json.parcels.map((p) => p.parcel_id), ['1234567']);
+  assert.equal(log.length, 1);
+  assert.match(log[0].key, /&parcel_id=eq\.1234567&limit=1$/);
+  assert.doesNotMatch(log[0].key, /&or=|&order=/);
+  assert.deepEqual(buildSearchParams('FIXTURE-001', { mode: 'parcel_id' }), ['parcel_id=eq.FIXTURE-001', 'limit=1']);
+  assert.equal(buildSearchParams('100 Palm', { mode: 'parcel_id' }), null);
+  globalThis.fetch = fakeFetch([{ match: /parcel_risk\?select=/, body: [] }], log);
+  const missing = await call({ action: 'search', q: '9999999' });
+  assert.equal(missing.status, 200);
+  assert.deepEqual(missing.json.parcels, []);
+});
+
+test('search: bounded text candidates prefer address relevance then FSI', async () => {
+  const log = [];
+  globalThis.fetch = fakeFetch([{ match: /parcel_risk\?select=/, body: [
+    { parcel_id: 'x0', address: '101 Palm Ave', fsi_live: 99 },
+    { parcel_id: 'x1', address: '100 Palm Ave', fsi_live: 10 },
+    { parcel_id: 'x2', address: '100 Palm Ave East', fsi_live: 50 },
+    { parcel_id: 'x3', address: '100 Palm Ave West', fsi_live: 70 },
+  ] }], log);
+  const r = await call({ action: 'search', q: '100 Palm Ave', limit: 2 });
+  assert.deepEqual(r.json.parcels.map((p) => p.parcel_id), ['x1', 'x3']);
+  assert.equal(log.length, 1);
+  assert.match(log[0].key, /&limit=20$/);
+  assert.doesNotMatch(log[0].key, /parcel_id.eq|&order=/);
+});
+
+test('search: completed text miss is empty, but a timeout is not a false miss or internal error', async () => {
+  const log = [];
+  globalThis.fetch = fakeFetch([{ match: /parcel_risk\?select=/, body: [] }], log);
+  const none = await call({ action: 'search', q: 'Unlisted street' });
+  assert.equal(none.status, 200);
+  assert.deepEqual(none.json.parcels, []);
+  globalThis.fetch = fakeFetch([{ match: /parcel_risk\?select=/, status: 500,
+    body: { code: '57014', message: 'cartographic backend statement timeout' } }], log);
+  const timeout = await call({ action: 'search', q: 'Unlisted street' });
+  assert.equal(timeout.status, 503);
+  assert.equal(timeout.json.code, 'parcel_search_timeout');
+  assert.match(timeout.json.error, /Try a parcel ID or a full street address/);
+  assert.equal(timeout.json.detail, undefined);
+  assert.equal(timeout.json.parcels, undefined);
+  assert.equal(log.length, 2, 'no unbounded retries or fan-out');
 });
 
 test('search: fixture mode searches the demo parcels', async () => {

@@ -96,6 +96,7 @@ async function stubApis(context, { claims = 'demo', log }) {
       return json({ ok: true, source: 'fixtures', available: true, demo: true, type: 'FeatureCollection', count: features.length, truncated: false, features });
     }
     if (action === 'search') {
+      if (body.q === 'Slow street') return json({ code: 'parcel_search_timeout', error: 'County-wide search did not finish.' }, 503);
       const parcels = fx.searchFixtures(api.sanitizeSearch(body.q)).map(addV2);
       return json({ ok: true, source: 'fixtures', count: parcels.length, parcels });
     }
@@ -151,6 +152,30 @@ async function openMap(page, base) {
   await page.evaluate(() => goTab('fsi'));
   await page.waitForFunction(() => document.querySelectorAll('#fsiList .fsi-row').length > 0, null, { timeout: 15000 });
 }
+
+test('parcel search browser distinguishes a timeout from a completed no-match', { skip, timeout: 55000 }, async () => {
+  const server = await startServer();
+  let browser;
+  try {
+    browser = await chromium.launch({ executablePath: chromePath() });
+    const vp = { name: 'desktop', width: 1440, height: 900 };
+    const { context, page } = await newPage(browser, vp, 'light', { claims: 'demo' });
+    await openMap(page, 'http://localhost:' + server.port + '/crm/');
+    const input = page.locator('#fsiMapSearchInput');
+    const empty = page.locator('#fsiMapSearchResults .sr-empty');
+    await input.fill('Slow street');
+    await page.waitForFunction(() => document.querySelector('#fsiMapSearchResults .sr-empty')?.textContent.includes('did not finish'));
+    assert.match(await empty.textContent(), /Try a parcel ID/);
+    await input.fill('Unlisted street');
+    await page.waitForFunction(() => document.querySelector('#fsiMapSearchResults .sr-empty')?.textContent.includes('No parcel matches'));
+    await input.fill('');
+    await page.waitForFunction(() => document.getElementById('fsiMapSearchResults').hidden);
+    await context.close();
+  } finally {
+    await browser?.close();
+    server.stop();
+  }
+});
 
 test('flood map next: claims, events, popup, search, polygons, score breakdown, hash, sheet', { skip, timeout: 300000 }, async () => {
   const server = await startServer();
@@ -242,7 +267,13 @@ test('flood map next: claims, events, popup, search, polygons, score breakdown, 
         await page.click('#fsiClaimsZone [data-cz="all"]');
 
         // --- address search -> flies to the parcel, opens detail, polygons at zoom >= 15
+        const response = page.waitForResponse((r) => {
+          const request = r.request();
+          return /fs[i]-parcels$/.test(new URL(r.url()).pathname) && request.method() === 'POST'
+            && request.postDataJSON()?.q === '300 Sample';
+        });
         await page.fill('#fsiMapSearchInput', '300 Sample');
+        await response;
         await page.waitForSelector('#fsiMapSearchResults .sr-item', { timeout: 8000 });
         assert.ok(log.some((l) => l.action === 'search' && l.body.q === '300 Sample'), `${tag}: search action called`);
         await page.press('#fsiMapSearchInput', 'Enter');
