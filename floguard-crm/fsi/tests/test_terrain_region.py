@@ -60,3 +60,23 @@ def test_large_or_empty_preview_rejected_before_loading_data():
     with pytest.raises(ValueError, match="nonempty"):
         run_shared_region(None, None, [], TerrainParams())
 
+
+
+def test_explicit_region_routes_through_unowned_context_outside_tile_windows():
+    rows, cols = np.indices((5, 14))
+    dem = (14 - cols + 3 * np.abs(rows - 2)).astype(float)
+    labels = np.where(cols < 3, 1, np.where(cols > 10, 2, 0))
+    channel = (rows == 2) & (cols >= 11)
+    study = Tile("study", 0, 0, 5, 14)
+    results = []
+    for halo in (0, 4):
+        tiles, ids = tiles_from_labels(labels, halo)
+        store = MemoryStore()
+        diag = run_shared_region(ArrayInputs(dem, labels, flowlines=channel, label_of_key=ids),
+                                 store, tiles, TerrainParams(stream_area_m2=1000),
+                                 log=lambda _: None, region=study)
+        assert diag["valid_cells"] == 70
+        assert diag["terminal_d8_cells"] == 30
+        results.append(store.get("t1", "hand")[:, :3])
+    np.testing.assert_array_equal(*results)
+    assert np.isfinite(results[0][2, :]).all()
