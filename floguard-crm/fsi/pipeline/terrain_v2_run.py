@@ -339,7 +339,9 @@ def cmd_terrain(a):
         if (DATA / "tiles").exists():
             raise ValueError("--shared-region needs a fresh pilot data directory without tiles")
         preview_marker.touch()
-        diag = run_shared_region(_inputs(a, plan), DiskStore(DATA / "tiles"), tiles, p, log=log)
+        region = Tile("_shared_region", 0, 0, plan["nrows"], plan["ncols"])
+        diag = run_shared_region(_inputs(a, plan), DiskStore(DATA / "tiles"), tiles, p,
+                                 log=log, region=region)
     else:
         if preview_marker.exists():
             raise ValueError("shared-region pilot cache cannot be reused for tiled terrain")
