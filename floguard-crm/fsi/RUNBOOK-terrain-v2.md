@@ -111,6 +111,25 @@ tile (exact; `terrain_diag.json` reports rounds, lost and residual cells — res
 should be 0). Phase 3 computes streams, HAND, slope, TWI. Phase 1 is cached per tile
 in `data/v2/tiles/<key>/`; delete a tile's folder to redo it.
 
+### Shared-surface preview (offline only)
+
+Use a fresh pilot data directory with terrain inputs and a plan, but no tile
+cache. Run `python -m pipeline.terrain_v2_run terrain --data-dir data/shared-pilot
+--shared-region --remote-dem` (omit `--remote-dem` for local DEM files). Then run
+the ordinary `zonal` and `assemble` steps on that same directory. This preview
+writes a comparison CSV only, not the JSON parts used by the upload tools.
+
+The preview conditions one common DEM across the planned windows and slices
+the finished layers back into identical core/halo views. Owned cells seed runoff
+area once; adjacent halo cells can route it. The solver checks D8/MFD terminal
+mass against owned area. Synthetic perimeter and NoData boundaries are still
+open model boundaries, not verified drainage structures. HAND is unresolved if
+its path never reaches a mapped or inferred channel or an inlet; edge-only sinks
+are not inferred channels. No result validates unknown culverts or neighboring
+catchments omitted from the pilot. Limit: 16 million cells in the **bounding
+rectangle**. Do not mix these caches with tiled-mode output; this is a bounded
+reference and not a county-scale algorithm or an activation procedure.
+
 ## 5. Zonal, soils, assemble
 
 ```bash
