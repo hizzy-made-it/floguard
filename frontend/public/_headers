@@ -40,3 +40,17 @@
 /llms-full.txt
   Content-Type: text/plain; charset=utf-8
   Cache-Control: public, max-age=3600
+
+# Explicit MIME for the IndexNow ownership file and no indexing of private shells.
+/3f154475ac32fbe6c760b295b84469ec.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=300
+
+/admin
+  X-Robots-Tag: noindex
+
+/admin/*
+  X-Robots-Tag: noindex
+
+/studio
+  X-Robots-Tag: noindex
