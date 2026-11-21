@@ -1,0 +1,63 @@
+{
+  "parcels": 110990,
+  "parts": [
+    "parcel_terrain_v2_00.json",
+    "parcel_terrain_v2_01.json",
+    "parcel_terrain_v2_02.json",
+    "parcel_terrain_v2_03.json",
+    "parcel_terrain_v2_04.json",
+    "parcel_terrain_v2_05.json",
+    "parcel_terrain_v2_06.json",
+    "parcel_terrain_v2_07.json",
+    "parcel_terrain_v2_08.json",
+    "parcel_terrain_v2_09.json",
+    "parcel_terrain_v2_10.json",
+    "parcel_terrain_v2_11.json"
+  ],
+  "confidence_p10_50_90": [
+    0.856,
+    0.912,
+    0.948
+  ],
+  "dem_1m_share": 1.0,
+  "dem_source_1m_share": 1.0,
+  "flow_seam_status_counts": {
+    "unknown": 110990
+  },
+  "grid_cell_m_counts": {
+    "1": 100541,
+    "2": 10449
+  },
+  "effective_1m_share": 0.9058563834579691,
+  "confidence_legacy_grid_penalty_pending": 44,
+  "flow_seam_validation": "pending",
+  "activation_ready": false,
+  "source_part_sha256": {
+    "parcel_terrain_v2_00.json": "1e0038fff52334ff8730591152b32d27a1a697c7920ec22b193fb7d70652e7ac",
+    "parcel_terrain_v2_01.json": "a2ec246044a2953aed3e662c8e896fb79491fe43bae58bd3652940f14d749cde",
+    "parcel_terrain_v2_02.json": "80b39ca70206968af495d8b31aa9f15617f040c3ebaa91eaebb3c6e4053cad6a",
+    "parcel_terrain_v2_03.json": "cfa807e421ea42a43430ec6263647b350459fb761ab0817d16bf399bdacfc111",
+    "parcel_terrain_v2_04.json": "b463bd05b7be06b48af52e8a442058e010f544feeada99f8ac9bfa5887511553",
+    "parcel_terrain_v2_05.json": "224ccc14a549a354d4d704e981648001f9f1999c40e7f892fb10b830603f2bc7",
+    "parcel_terrain_v2_06.json": "f7e27a40b70a52e417a7e7e0ab78454091fb9042304945a2e41592f4df50fcfc",
+    "parcel_terrain_v2_07.json": "0474a8cb4f25e7d474a7de752a9616eb1da8af21bd6ba2316ab21491f2e45e16",
+    "parcel_terrain_v2_08.json": "a71b384a4d18c4e26de11ba036e07543e23f111d1ffe3b2824bc25d1a45afdd2",
+    "parcel_terrain_v2_09.json": "904bc98ff3b6d59d92448c37d5e4ecb498b49382d34e116e9718eb626812f227",
+    "parcel_terrain_v2_10.json": "676b0eb7efe51bee72054490459b9d2fa42e42a6c98c4a18a1aaba66239be8ec",
+    "parcel_terrain_v2_11.json": "234eb97988da81252f7a257cfd94943e48f0e5f65011edc4de12437666dfa15a"
+  },
+  "corrected_part_sha256": {
+    "parcel_terrain_v2_00.json": "8c8407fb574806ba32778156b5127f3ca4317f77279aa26f4a82216a74c4782b",
+    "parcel_terrain_v2_01.json": "c67efeaf5f4cce48a90c594d4cdf2b80ec0213b3b76726f300dbd86276698bdd",
+    "parcel_terrain_v2_02.json": "532f9087a82bfef66ac71f1f808691d2a258afa151f984f5309db9bc5ee53fec",
+    "parcel_terrain_v2_03.json": "847b021d7737edbe65549d96f77e02ba5aa3fbbbfb1bbae66de6a439943ff997",
+    "parcel_terrain_v2_04.json": "f52e57507d17967ae98bce1794fdf20f3fb1c33248d71b5a5e9586a29ac0cc46",
+    "parcel_terrain_v2_05.json": "1cb62488dba3cf8de5be55be24c2b8f96bdd4f4278004983aa2940fceccd8254",
+    "parcel_terrain_v2_06.json": "f1db4dc04f870958823380202fed458d6a8ccc87fb33df328c1d4b1920f463f9",
+    "parcel_terrain_v2_07.json": "ed50a60accb312bc4461a14b4b7ab53758b0a6b5f3525cbf58fcfcf5a2e4bfdc",
+    "parcel_terrain_v2_08.json": "8489ac5aac036242dbea189f42fb7c0d11b4d77294624c53e8fc08988316694d",
+    "parcel_terrain_v2_09.json": "bfd07a3d8301653cf7b919df85d1f8d88c0dc062e8a69d72d8d496ad73cd650e",
+    "parcel_terrain_v2_10.json": "6b9b7ed2c5ce56773559b6a39dea0f45c06b38d19e024d0e4ad792cebfaf33c9",
+    "parcel_terrain_v2_11.json": "070d77a158584a5b1395b753e6b7bc00b7c61662bbc0b0086dd40d726f71fa37"
+  }
+}

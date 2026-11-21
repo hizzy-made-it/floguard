@@ -30,7 +30,7 @@ All nullable. Null = not computed for that parcel (no v2 run yet, or input missi
 | `model_version` | text | which model produced this row's `fsi_static` | `v1` \| `v2` | small badge |
 | `fsi_static_v2` | real | v2 static score, computed whenever v2 terms exist (even while v1 is live) | 0-1 (pilot: 0.08-0.83) | "v2 score" in the breakdown |
 | `fsi_confidence` | real | input-quality confidence. NOT a flood probability | 0-1 (pilot median 0.94) | grey out < 0.6; tooltip "data quality" |
-| `fsi_inputs` | jsonb | provenance: `dem` (`3dep_1m`/`3dep_13`), `dem_res_m`, `dem_1m_frac`, `geom`, `yard_only`, `nhd_burn`, `culverts_or_inlets`, `soil`, `soil_cov`, `nbr_count`, `street_n`, `agree_10m`, `huc12`, `release`, `twi_clip`, `hand_clip` | keys may be absent | "data used" list |
+| `fsi_inputs` | jsonb | provenance: `dem` (`3dep_1m`/`3dep_13`), `dem_res_m`, `grid_cell_m` (processing grid), `dem_1m_frac`, `geom`, `yard_only`, `nhd_burn`, `culverts_or_inlets`, `soil`, `soil_cov`, `nbr_count`, `street_n`, `agree_10m`, `huc12`, `release`, `twi_clip`, `hand_clip` | keys may be absent | "data used" list |
 | `huc12` | text | 12-digit watershed the lot was processed in | e.g. `030802010103` | (internal) |
 | `dem_res_m` | real | DEM resolution under most of the lot | `1` or `10` | "1 m LiDAR" / "10 m" |
 | `dem_1m_frac` | real | share of the lot covered by 1 m LiDAR | 0-1 | |

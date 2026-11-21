@@ -261,7 +261,8 @@ var FSI_PURE = (function(){
   {k:'street_rel_m',  l:'Lot vs street', fmt:'signed_m', hint:'below 0 = lower than the road'},
   {k:'wt_depth_m',    l:'Water table depth', fmt:'m', hint:'SSURGO annual minimum; 2.0 m = none within 2 m'},
   {k:'drain_class',   l:'Soil drainage class', fmt:'text'},
-  {k:'dem_res_m',     l:'Elevation data', fmt:'dem'},
+  {k:'dem_res_m',     l:'Elevation data source', fmt:'dem'},
+  {k:'grid_cell_m',   l:'Terrain processing grid', fmt:'grid', hint:'Cell size used for the terrain calculation; distinct from the source data'},
   {k:'rain_72h',      l:'Rain, last 72 h', fmt:'mm'},
   {k:'model_version', l:'Model', fmt:'text'}
  ];
@@ -273,13 +274,25 @@ var FSI_PURE = (function(){
   if(f.fmt==='signed_m') return (n>0?'+':n<0?'−':'')+Math.abs(n).toFixed(2)+' m';
   if(f.fmt==='m') return n.toFixed(2)+' m';
   if(f.fmt==='mm') return Math.round(n)+' mm';
+  if(f.fmt==='grid') return n>0?n+' m':null;
   if(f.fmt==='dem') return n<=1.5?'1 m LiDAR':Math.round(n)+' m (3DEP)';
   return String(n);
+ }
+ function terrainGrid(p){
+  var inputs=p&&p.fsi_inputs;
+  if(!inputs||typeof inputs!=='object'||Array.isArray(inputs)) return null;
+  if(Object.prototype.hasOwnProperty.call(inputs,'grid_cell_m')) return inputs.grid_cell_m;
+  // Pinned historical artifact; new releases must supply the cell from zonal provenance.
+  var huc=String(inputs.huc12||'');
+  if(inputs.release==='terrain-v2-corridor-2026-11-20'&&/^\d{11,12}$/.test(huc)){
+   return huc.padStart(12,'0')==='030802010700'?2:1;
+  }
+  return null;
  }
  function v2Rows(p, fields){
   var out=[];
   (fields||V2_FIELDS).forEach(function(f){
-   var v=p?p[f.k]:null;
+   var v=f.k==='grid_cell_m'?terrainGrid(p):(p?p[f.k]:null);
    if(v==null||v==='') return;
    var t=fmtV2(f, v);
    if(t==null) return;

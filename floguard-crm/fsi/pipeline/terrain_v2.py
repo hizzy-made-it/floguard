@@ -313,7 +313,7 @@ def phase2_propagate(store: Store, tiles: list[Tile], exports, p: TerrainParams)
     # MFD splits flow along seams and can bounce a shrinking remainder back and forth;
     # residual_mfd is what was still in flight when the round cap hit (cells of area).
     return {"rounds": rounds, "outflow_cells": lost, "residual_cells": residual,
-            "residual_mfd_cells": round(residual_mfd, 3)}
+            "residual_mfd_cells": residual_mfd}
 
 
 def window_from_cores(store: Store, tiles: list[Tile], t: Tile, name: str, fill: float = 0.0) -> np.ndarray:
