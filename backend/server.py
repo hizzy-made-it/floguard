@@ -23,6 +23,8 @@ import uuid
 import bcrypt
 import jwt
 
+import lead_pages
+
 # MongoDB connection
 mongo_url = os.environ.get('MONGO_URL', '').strip()
 db_name = os.environ.get('DB_NAME', 'floguard')
@@ -238,6 +240,11 @@ class Lead(BaseModel):
     # Set after the notification attempt; None means not attempted yet.
     email_sent: Optional[bool] = None
     email_error: str = ""
+    # Lead page on the CRM (floguardfl.com/p/<token>) and the auto-reply outcome.
+    page_url: str = ""
+    page_version: str = ""
+    auto_reply: str = ""
+    auto_reply_at: Optional[str] = None
 
 
 class GuideRequest(BaseModel):
@@ -250,7 +257,7 @@ def _row(label, value):
     return f'<tr><td style="padding:6px 0;"><b>{esc(label)}</b></td><td>{safe}</td></tr>'
 
 
-def build_lead_email(lead: Lead) -> str:
+def build_lead_email(lead: Lead, page: Optional[dict] = None) -> str:
     def li(items):
         return "".join(f"<li>{esc(i)}</li>" for i in items) or "<li>None specified</li>"
     header = 'Guide Download' if lead.source == 'guide' else 'Assessment Request'
@@ -279,11 +286,22 @@ def build_lead_email(lead: Lead) -> str:
       <p style="color:#334155;"><b>Damage seen:</b></p><ul style="color:#334155;">{li(lead.damages)}</ul>
       {photos_html}
       <p style="color:#334155;"><b>Message:</b> {esc(lead.message) if lead.message else '&mdash;'}</p>
+      {_page_html(page)}
       <p style="color:#F57C1F;font-size:12px;">Submitted {esc(lead.created_at)}</p>
     </div>"""
 
 
-async def send_lead_email(lead: Lead) -> bool:
+def _page_html(page: Optional[dict]) -> str:
+    if not page or not page.get("url"):
+        return ""
+    kind = "full version with before/after" if page.get("version") == "full" else "simple version"
+    sent = {"sent": "Auto-reply sent to the homeowner.", "disabled": "Auto-reply is switched off; nothing was sent.",
+            "test_only": "Auto-reply is in test mode; nothing went to the homeowner."}.get(page.get("sent"), "")
+    return (f'<p style="color:#334155;"><b>Lead page ({esc(kind)}):</b> '
+            f'<a href="{esc(page["url"])}">{esc(page["url"])}</a><br>{esc(sent)}</p>')
+
+
+async def send_lead_email(lead: Lead, page: Optional[dict] = None) -> bool:
     """Email the lead to every LEAD_NOTIFICATION_EMAILS address. Records the outcome on the
     lead document so failed notifications are visible in the admin data, not only in logs."""
     ok, error = False, ""
@@ -302,7 +320,7 @@ async def send_lead_email(lead: Lead) -> bool:
                 "from": SENDER_EMAIL,
                 "to": LEAD_NOTIFICATION_EMAILS,
                 "subject": f"New FloGuard lead: {lead.name} ({lead.location or 'FL'}) - {label}",
-                "html": build_lead_email(lead),
+                "html": build_lead_email(lead, page),
             }
             # Hitting Reply in your inbox goes straight to the homeowner.
             if lead.email and "@" in lead.email:
@@ -493,9 +511,27 @@ async def create_lead(payload: LeadCreate, request: Request):
     )
     doc = lead.model_dump()
     await db.leads.insert_one(doc)
-    # Fire-and-forget email; failures are logged as LEAD_EMAIL_FAILED for alerting
-    asyncio.create_task(send_lead_email(lead))
+    # Fire-and-forget: build the lead page on the CRM (and its auto-reply, when switched on there),
+    # then email Heath with the page link. Failures are logged as LEAD_FORWARD_FAILED / LEAD_EMAIL_FAILED.
+    asyncio.create_task(after_lead_saved(lead))
     return lead
+
+
+async def after_lead_saved(lead: Lead) -> None:
+    page = None
+    doc = lead.model_dump()
+    if lead_pages.forwarding_enabled() and lead_pages.wants_page(doc):
+        page = await asyncio.to_thread(lead_pages.forward_lead, doc, send=True)
+        if page:
+            try:
+                await db.leads.update_one({"id": lead.id}, {"$set": {
+                    "page_url": page.get("url", ""), "page_version": page.get("version", ""),
+                    "auto_reply": page.get("sent", ""),
+                    "auto_reply_at": datetime.now(timezone.utc).isoformat() if page.get("sent") == "sent" else None,
+                }})
+            except Exception as e:
+                logger.error("LEAD_PAGE_SAVE_FAILED lead_id=%s error=%s", lead.id, str(e))
+    await send_lead_email(lead, page)
 
 
 @api_router.post("/guide")
@@ -531,6 +567,47 @@ async def lead_stats(admin: dict = Depends(get_current_admin)):
     week_ago = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
     recent = sum(1 for l in leads if l.get("created_at", "") >= week_ago)
     return {"total": len(leads), "recent_7d": recent, "by_source": by_source}
+
+
+class LeadPagesRequest(BaseModel):
+    # Build (or reuse) pages for every saved drainage lead. Never emails anyone unless `send` is true
+    # AND the lead's id is listed in `send_ids` AND sending is switched on in the CRM.
+    send: bool = False
+    send_ids: List[str] = []
+    only_ids: List[str] = []
+    refresh: bool = False
+
+
+@api_router.post("/admin/lead-pages")
+async def admin_lead_pages(body: LeadPagesRequest, admin: dict = Depends(get_current_admin)):
+    if not lead_pages.forwarding_enabled():
+        raise HTTPException(status_code=503, detail="LEAD_FORWARD_SECRET is not set on the backend.")
+    query = {"source": {"$nin": ["guide", "honeypot"]}}
+    if body.only_ids:
+        query["id"] = {"$in": body.only_ids[:500]}
+    leads = await db.leads.find(query, {"_id": 0}).sort("created_at", -1).to_list(500)
+    send_ids = set(body.send_ids) if body.send else set()
+    sem = asyncio.Semaphore(4)
+
+    async def one(doc: dict) -> dict:
+        async with sem:
+            send = doc.get("id") in send_ids
+            out = await asyncio.to_thread(lead_pages.forward_lead, doc, send=send, persist=True,
+                                          preview=False)
+        row = {"id": doc.get("id"), "name": doc.get("name", ""), "email": doc.get("email", ""),
+               "address": doc.get("address") or doc.get("location") or "", "created_at": doc.get("created_at", "")}
+        if not out:
+            return {**row, "ok": False}
+        upd = {"page_url": out.get("url", ""), "page_version": out.get("version", "")}
+        if out.get("sent") == "sent":
+            upd.update({"auto_reply": "sent", "auto_reply_at": datetime.now(timezone.utc).isoformat()})
+        await db.leads.update_one({"id": doc.get("id")}, {"$set": upd})
+        return {**row, "ok": True, "url": out.get("url"), "version": out.get("version"),
+                "reasons": out.get("reasons", []), "sent": out.get("sent"),
+                "already_sent_at": out.get("already_sent_at"), "sending_enabled": out.get("sending_enabled")}
+
+    rows = await asyncio.gather(*(one(d) for d in leads))
+    return {"count": len(rows), "leads": rows}
 
 
 @api_router.patch("/leads/{lead_id}")

@@ -5,6 +5,9 @@
  * Also the customer-facing estimate endpoint (no login; the unguessable proposal token is the
  * credential). POST JSON { action: 'proposal_get' | 'proposal_accept' | 'proposal_decline', token, ... }.
  * Contract and security notes: docs/handoff/G.md. Lead intake (no `action`) is unchanged.
+ *
+ * Also: per-lead public pages (GET, rewritten from /p/<token>) and `action: 'lead_forward'` from the
+ * website backend (shared secret). See server/lib/lead-pages/http.js and docs/lead-pages.md.
  */
 import { setCors, json, parseBody, rateLimit, clientIp } from '../server/lib/http.js';
 import { persistWebLead, validateLeadPayload } from '../server/lib/web-leads.js';
@@ -14,8 +17,9 @@ import { notifyNewLead } from '../server/lib/notify.js';
 import {
   isTokenShape, tokenHandle, publicProposalAccept, publicProposalDecline, publicProposalGet,
 } from '../server/lib/estimates.js';
+import { handleLeadPageGet, handleLeadForward } from '../server/lib/lead-pages/http.js';
 
-export const config = { maxDuration: 30 };
+export const config = { maxDuration: 60 };
 
 const PROPOSAL_ACTIONS = new Set(['proposal_get', 'proposal_accept', 'proposal_decline']);
 
@@ -82,6 +86,13 @@ export default async function handler(req, res) {
     res.statusCode = 204;
     return res.end();
   }
+  // Per-lead public pages: /p/<token>[/before.png|/after.png] are rewritten here (vercel.json).
+  if (req.method === 'GET' || req.method === 'HEAD') {
+    const q = new URL(req.url || '/', 'http://x').searchParams;
+    // Vercel puts rewrite params on req.query; the dev server only on the URL.
+    for (const [k, v] of Object.entries(req.query || {})) if (!q.has(k)) q.set(k, Array.isArray(v) ? v[0] : String(v));
+    if (q.has('lead_page')) return handleLeadPageGet(req, res, q);
+  }
   if (req.method !== 'POST') {
     return json(res, 405, { error: 'Method not allowed' });
   }
@@ -89,6 +100,7 @@ export default async function handler(req, res) {
   const pre = parseBody(req);
   const preAction = pre && typeof pre.action === 'string' ? pre.action.toLowerCase() : '';
   if (PROPOSAL_ACTIONS.has(preAction)) return handleProposal(req, res, pre, preAction);
+  if (preAction === 'lead_forward') return handleLeadForward(req, res, pre);
 
   const ip = clientIp(req);
   const rl = rateLimit(`leads:${ip}`, { limit: 12, windowMs: 60_000 });
