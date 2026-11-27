@@ -20,7 +20,7 @@ export const fromMerc = ([x, y]) => [
   (2 * Math.atan(Math.exp(y / R)) - Math.PI / 2) * (180 / Math.PI),
 ];
 
-async function getJson(url, { fetchImpl = globalThis.fetch, timeoutMs = 7000, body } = {}) {
+async function getJson(url, { fetchImpl = globalThis.fetch, timeoutMs = 10000, body } = {}) {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
@@ -31,27 +31,35 @@ async function getJson(url, { fetchImpl = globalThis.fetch, timeoutMs = 7000, bo
       init.body = body;
     }
     const r = await fetchImpl(url, init);
-    if (!r.ok) return null;
+    if (!r.ok) {
+      console.error('[lead-page:gis]', new URL(url).host, 'status', r.status);
+      return null;
+    }
     const j = await r.json();
+    if (j?.error) console.error('[lead-page:gis]', new URL(url).host, 'error', JSON.stringify(j.error).slice(0, 160));
     return j && !j.error ? j : null;
-  } catch {
+  } catch (e) {
+    console.error('[lead-page:gis]', new URL(url).host, String(e?.name || e).slice(0, 60));
     return null;
   } finally {
     clearTimeout(t);
   }
 }
 
-async function getBytes(url, { fetchImpl = globalThis.fetch, timeoutMs = 9000 } = {}) {
+async function getBytes(url, { fetchImpl = globalThis.fetch, timeoutMs = 12000 } = {}) {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
     const r = await fetchImpl(url, { signal: ctrl.signal });
-    if (!r.ok) return null;
     const type = String(r.headers?.get?.('content-type') || '');
-    if (type && !/^image\//i.test(type)) return null;
+    if (!r.ok || (type && !/^image\//i.test(type))) {
+      console.error('[lead-page:img]', new URL(url).host, r.status, type.slice(0, 40));
+      return null;
+    }
     const buf = Buffer.from(await r.arrayBuffer());
     return buf.length > 2000 ? buf : null;
-  } catch {
+  } catch (e) {
+    console.error('[lead-page:img]', new URL(url).host, String(e?.name || e).slice(0, 60));
     return null;
   } finally {
     clearTimeout(t);
