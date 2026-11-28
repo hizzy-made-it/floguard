@@ -85,3 +85,9 @@ export async function updateLeadStatus(id, status) {
   const { data } = await client.patch(`/leads/${id}`, { status });
   return data;
 }
+// Lead pages (floguardfl.com/p/...) built on the CRM. Sends nothing unless `send` + `send_ids`.
+export async function buildLeadPages(body = {}) {
+  assertApiConfigured();
+  const { data } = await client.post("/admin/lead-pages", body, { timeout: 300000 });
+  return data;
+}

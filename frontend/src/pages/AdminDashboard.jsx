@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { LogOut, Inbox, TrendingUp, FileDown, Phone, Mail, Search, Loader2, ChevronDown } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { getLeads, getLeadStats, updateLeadStatus, fileUrl } from "../lib/api";
+import LeadPagesPanel from "../components/LeadPagesPanel";
 import { formatDate } from "../data/blog";
 import { IMAGES } from "../data/site";
 
@@ -137,6 +138,8 @@ export default function AdminDashboard() {
             </motion.div>
           ))}
         </div>
+
+        <LeadPagesPanel />
 
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex-1">

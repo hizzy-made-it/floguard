@@ -67,6 +67,19 @@
           "value": "no-store"
         }
       ]
+    },
+    {
+      "source": "/p/:path*",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow, noarchive"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        }
+      ]
     }
   ],
   "redirects": [
@@ -82,6 +95,18 @@
     }
   ],
   "rewrites": [
+    {
+      "source": "/p/:token/before.png",
+      "destination": "/api/leads?lead_page=:token&img=before"
+    },
+    {
+      "source": "/p/:token/after.png",
+      "destination": "/api/leads?lead_page=:token&img=after"
+    },
+    {
+      "source": "/p/:token",
+      "destination": "/api/leads?lead_page=:token"
+    },
     {
       "source": "/crm/",
       "destination": "/crm/index.html"
@@ -100,5 +125,11 @@
       "path": "/api/cron-rainfall",
       "schedule": "0 10 * * *"
     }
-  ]
+  ],
+  "functions": {
+    "api/leads.js": {
+      "includeFiles": "server/assets/fonts/**",
+      "maxDuration": 60
+    }
+  }
 }

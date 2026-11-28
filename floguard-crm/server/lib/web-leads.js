@@ -86,6 +86,7 @@ export async function persistWebLead(input) {
     budget: String(input.budget || '').trim(),
     page: String(input.page || '').trim(),
     city: String(input.city || quiz?.location || '').trim(),
+    address: String(input.address || '').trim().slice(0, 160),
     quiz,
     created_at,
   };
@@ -109,11 +110,13 @@ export async function persistWebLead(input) {
       id: `web_${id}`,
       name: lead.name || lead.email,
       city: lead.city,
+      ...(lead.address ? { address: lead.address } : {}),
       email: lead.email,
       phone: lead.phone,
       company: lead.company,
       notes: [
         lead.message,
+        input.page_url ? `Lead page: ${input.page_url}` : '',
         lead.services?.length ? `Services: ${lead.services.join(', ')}` : '',
         lead.budget ? `Budget: ${lead.budget}` : '',
         quizLines.length ? `--- Drainage quiz ---\n${quizLines.join('\n')}` : '',

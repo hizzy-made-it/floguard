@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "FLOGUARD SALES REV — drainage sales training & lead command center (floguardfl.com/crm)",
+  "description": "FLOGUARD SALES REV \u2014 drainage sales training & lead command center (floguardfl.com/crm)",
   "scripts": {
     "dev": "node scripts/dev-server.mjs",
     "sync-docs": "node scripts/sync-sales-docs.mjs",
@@ -17,5 +17,8 @@
     "ingest-claims": "node scripts/ingest-nfip-claims.mjs",
     "score-must-have": "node scripts/score-must-have.mjs",
     "test": "node --test \"tests/**/*.test.js\" \"tests/**/*.test.mjs\""
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "2.6.2"
   }
 }

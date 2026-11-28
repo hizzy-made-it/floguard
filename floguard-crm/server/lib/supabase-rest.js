@@ -168,3 +168,27 @@ export async function storagePutJson(bucket, objectPath, data) {
     throw new Error(`Storage put ${objectPath} (${r.status}): ${t.slice(0, 200)}`);
   }
 }
+
+/** Storage download of a binary object; 404 -> null. */
+export async function storageGetBytes(bucket, objectPath) {
+  const base = storageObjectUrl(bucket, objectPath);
+  const r = await fetch(base, { headers: restHeaders({ json: false }), cache: 'no-store' });
+  if (r.status === 404 || r.status === 400) return null;
+  if (!r.ok) {
+    const t = await r.text();
+    throw new Error(`Storage get ${objectPath} (${r.status}): ${t.slice(0, 200)}`);
+  }
+  return Buffer.from(await r.arrayBuffer());
+}
+
+/** Storage upload (upsert) of a binary object. */
+export async function storagePutBytes(bucket, objectPath, bytes, contentType) {
+  const target = storageObjectUrl(bucket, objectPath);
+  const headers = { ...restHeaders({ json: false }), 'Content-Type': contentType, 'x-upsert': 'true' };
+  let r = await fetch(target, { method: 'POST', headers, body: bytes });
+  if (!r.ok && (r.status === 404 || r.status === 405)) r = await fetch(target, { method: 'PUT', headers, body: bytes });
+  if (!r.ok) {
+    const t = await r.text();
+    throw new Error(`Storage put ${objectPath} (${r.status}): ${t.slice(0, 200)}`);
+  }
+}
