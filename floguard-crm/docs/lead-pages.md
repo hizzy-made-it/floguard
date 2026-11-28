@@ -4,7 +4,7 @@ Every drainage request from the website gets its own private page and, once swit
 auto-reply email that links to it.
 
 ```
-website form ─▶ Render backend (MongoDB, emails Heath)
+website form ─▶ Railway backend (floguard-api; MongoDB, emails Heath)
                    └─▶ POST crm/api/leads {action:'lead_forward'} (shared secret)
                           ├─ saves the lead to the CRM (web-leads + sales list, with the page link)
                           ├─ builds the page: Census geocode ─▶ Volusia parcel ─▶ aerial + USGS lidar
@@ -38,7 +38,7 @@ CRM (Vercel, project floguard-crm):
 
 | Name | Value |
 |---|---|
-| `LEAD_FORWARD_SECRET` | random 32+ chars, same value on Render |
+| `LEAD_FORWARD_SECRET` | random 32+ chars, same value on the Railway backend |
 | `LEAD_PAGE_BASE_URL` | `https://floguardfl.com` once the Cloudflare function is live (default `https://crm.floguardfl.com`) |
 | `LEAD_AUTOREPLY_ENABLED` | `true` to send. **Unset = nothing is ever emailed to a lead.** |
 | `LEAD_AUTOREPLY_TEST_ONLY` | an address; when set, replies go only to it (use first) |
@@ -48,7 +48,7 @@ CRM (Vercel, project floguard-crm):
 | `RESEND_API_KEY` | already used for lead alerts |
 | `LEAD_PAGE_SAMPLE` | `off` to disable `/p/sample` |
 
-Render backend: `LEAD_FORWARD_SECRET` (same value), optional `CRM_LEAD_FORWARD_URL`.
+Railway backend (floguard-api, api service): `LEAD_FORWARD_SECRET` (same value), optional `CRM_LEAD_FORWARD_URL`.
 
 ## Existing leads
 
